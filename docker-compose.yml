@@ -6,7 +6,6 @@ services:
         user: "${DC_UID:-1000}:${DC_GID:-1000}"
         volumes:
             - ./:/docker
-            - ${HOME}/Webguneak/Amaia/Laravel12/packages12:/packages12
         working_dir: /docker
         ports:
             - "80:80"
@@ -30,7 +29,6 @@ services:
         profiles: ["composer"]
         volumes:
             - ./:/docker
-            - ${HOME}/Webguneak/Amaia/Laravel12/packages12:/packages12
         working_dir: /docker
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
@@ -49,7 +47,6 @@ services:
         profiles: ["reformat"]
         volumes:
             - ./:/docker
-            - ${HOME}/Webguneak/Amaia/Laravel12/packages12:/packages12
         working_dir: /docker
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
@@ -59,11 +56,10 @@ services:
             - frontend
 
     madaia33-npm-all:
-        image: node:${DC_NODE:-23-bullseye}
+        image: node:${DC_NODE:-24-bullseye}
         profiles: ["npm-all"]
         volumes:
             - ./:/docker
-            - ${HOME}/Webguneak/Amaia/Laravel12/packages12:/packages12
         ports:
             - "3000:3000"
         working_dir: /docker
@@ -81,18 +77,18 @@ services:
             - frontend
 
     madaia33-npm:
-        image: node:${DC_NODE:-23-bullseye}
+        image: node:${DC_NODE:-24-bullseye}
         profiles: ["npm"]
         volumes:
             - ./:/docker
-            - ${HOME}/Webguneak/Amaia/Laravel12/packages12:/packages12
         ports:
             - "3000:3000"
         working_dir: /docker
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
         command: bash -c "
-            npm run build
+            npm install
+            && npm run build
             && chown -R ${DC_UID:-1000}:${DC_GID:-1000} node_modules
             && chown ${DC_UID:-1000}:${DC_GID:-1000} package-lock.json
             && chown -R ${DC_UID:-1000}:${DC_GID:-1000} public"
@@ -104,7 +100,6 @@ services:
         profiles: ["migrate-all"]
         volumes:
             - ./:/docker
-            - ${HOME}/Webguneak/Amaia/Laravel12/packages12:/packages12
         working_dir: /docker
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
@@ -123,7 +118,6 @@ services:
         profiles: ["migrate"]
         volumes:
             - ./:/docker
-            - ${HOME}/Webguneak/Amaia/Laravel12/packages12:/packages12
         working_dir: /docker
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
@@ -141,7 +135,6 @@ services:
         profiles: ["phpunit"]
         volumes:
             - ./:/docker
-            - ${HOME}/Webguneak/Amaia/Laravel12/packages12:/packages12
         working_dir: /docker
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
