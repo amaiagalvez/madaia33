@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('app.name', 'Comunidad de Vecinos') }}</title>
+    <title>{{ config('app.name', 'Comunidad Madaya') }}</title>
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -36,7 +36,7 @@
             class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <a href="{{ route('home') }}"
                 class="font-['Space_Grotesk'] text-lg font-semibold tracking-tight">
-                Comunidad de Vecinos
+                Comunidad Madaya · Labeaga
             </a>
 
             <nav class="hidden items-center gap-6 text-sm text-slate-300 md:flex">
@@ -67,22 +67,22 @@
             <div class="space-y-8 lg:col-span-7">
                 <p
                     class="inline-flex rounded-full border border-amber-200/25 bg-amber-100/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-amber-100">
-                    Bienvenida
+                    Urretxu · Alto Urola
                 </p>
 
                 <div
                     class="space-y-5 transition duration-700 starting:translate-y-4 starting:opacity-0">
                     <h1
                         class="font-['Space_Grotesk'] text-4xl leading-tight font-bold sm:text-5xl lg:text-6xl">
-                        Un hogar compartido,
-                        <span class="text-emerald-300">ordenado y cercano</span>
+                        Madaya: de la forja industrial
+                        <span class="text-emerald-300">a una comunidad residencial viva</span>
                     </h1>
                     <p class="max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">
-                        Somos una comunidad de vecinos grande y activa, construida con el compromiso
-                        diario de
-                        quienes vivimos aqui. En esta portada encontraras un resumen visual de
-                        nuestro entorno,
-                        parte de nuestra historia y un acceso directo al portal del vecino.
+                        Este lugar nacio junto a la calle Labeaga como sede de Madaya
+                        (Manufactura de Accesorios de Automovilismo y Aviacion), empresa fundada por
+                        Madariaga y Unceta y vinculada al mecanizado y la transformacion de acero.
+                        Tras su cierre en los anos 80, el entorno se reconvirtio en viviendas,
+                        conservando su nombre y su identidad.
                     </p>
                 </div>
 
@@ -100,20 +100,20 @@
 
                 <dl class="grid grid-cols-2 gap-3 pt-4 text-sm sm:grid-cols-4">
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                        <dt class="text-slate-300">Viviendas</dt>
-                        <dd class="mt-1 text-xl font-semibold text-white">320+</dd>
+                        <dt class="text-slate-300">Origen</dt>
+                        <dd class="mt-1 text-xl font-semibold text-white">Industrial</dd>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                        <dt class="text-slate-300">Portales</dt>
-                        <dd class="mt-1 text-xl font-semibold text-white">6</dd>
+                        <dt class="text-slate-300">Sector historico</dt>
+                        <dd class="mt-1 text-xl font-semibold text-white">Acero y forja</dd>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                        <dt class="text-slate-300">Zonas comunes</dt>
-                        <dd class="mt-1 text-xl font-semibold text-white">14</dd>
+                        <dt class="text-slate-300">Ubicacion</dt>
+                        <dd class="mt-1 text-xl font-semibold text-white">Labeaga</dd>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                        <dt class="text-slate-300">Anos de historia</dt>
-                        <dd class="mt-1 text-xl font-semibold text-white">30</dd>
+                        <dt class="text-slate-300">Reconversion</dt>
+                        <dd class="mt-1 text-xl font-semibold text-white">Anos 80</dd>
                     </div>
                 </dl>
             </div>
@@ -121,18 +121,19 @@
             <div class="lg:col-span-5">
                 <article
                     class="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/70 shadow-2xl shadow-black/20 transition duration-700 starting:translate-y-6 starting:opacity-0">
-                    <img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80"
-                        alt="Vista principal de la comunidad" class="h-80 w-full object-cover"
-                        loading="lazy">
+                    <img src="https://www.euskadi.eus/contenidos/informacion/madaya_fondo_pascual/es_madaya/images/madaya44.jpg"
+                        alt="Foto historica de Fundiciones y Forja Madaya"
+                        class="h-80 w-full object-cover" loading="lazy">
                     <div class="space-y-3 p-6">
-                        <p class="text-xs uppercase tracking-[0.2em] text-emerald-200">Comunidad
-                            viva</p>
+                        <p class="text-xs uppercase tracking-[0.2em] text-emerald-200">Memoria y
+                            presente</p>
                         <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white">
-                            Espacios cuidados para convivir mejor
+                            Un nuevo barrio sobre una huella industrial
                         </h2>
                         <p class="text-sm leading-relaxed text-slate-300">
-                            Jardines, zonas de encuentro y servicios compartidos que conectan a los
-                            vecinos en su dia a dia.
+                            La antigua zona productiva de Urretxu evoluciono hacia un entorno de
+                            convivencia,
+                            manteniendo el nombre Madaya como parte de su historia local.
                         </p>
                     </div>
                 </article>
@@ -147,35 +148,77 @@
                     </p>
                     <h2
                         class="font-['Space_Grotesk'] text-3xl font-semibold text-white sm:text-4xl">
-                        Crecimiento con identidad de barrio
+                        Del auge de la forja a la vida residencial
                     </h2>
                     <p class="max-w-3xl text-base leading-relaxed text-slate-300">
-                        Nuestra comunidad nacio como un proyecto residencial familiar y, con el paso
-                        de los anos,
-                        se convirtio en un referente local por su organizacion y participacion
-                        vecinal. Hoy seguimos
-                        mejorando las zonas comunes, impulsando actividades y cuidando un entorno
-                        seguro y acogedor.
+                        Madaya fue una destacada empresa de mecanizado y transformacion de acero en
+                        Urretxu, situada en Labeaga junto a la via principal y cerca del rio. Su
+                        actividad formo parte del tejido industrial del Alto Urola, en un entorno
+                        proximo a otras fabricas historicas como Genaro Berriochoa. Tras su cierre
+                        en
+                        la decada de los 80, el area se transformo en zona residencial, conservando
+                        el nombre como legado colectivo.
                     </p>
                 </div>
 
                 <ol class="space-y-3 text-sm lg:col-span-5">
                     <li class="rounded-xl border border-white/10 bg-slate-900/60 p-4">
-                        <span class="text-emerald-200">1996</span>
-                        <p class="mt-1 text-slate-200">Inicio del primer bloque y creacion de la
-                            comunidad.</p>
+                        <span class="text-emerald-200">Fundacion industrial</span>
+                        <p class="mt-1 text-slate-200">
+                            Madariaga y Unceta impulsan Madaya como referente local en
+                            automovilismo,
+                            aviacion y transformacion de acero.
+                        </p>
                     </li>
                     <li class="rounded-xl border border-white/10 bg-slate-900/60 p-4">
-                        <span class="text-emerald-200">2008</span>
-                        <p class="mt-1 text-slate-200">Ampliacion de zonas verdes y nuevas areas
-                            comunes.</p>
+                        <span class="text-emerald-200">Decada de los 80</span>
+                        <p class="mt-1 text-slate-200">
+                            Cierre de la actividad fabril en un contexto de declive de la forja
+                            tradicional en Urretxu.
+                        </p>
                     </li>
                     <li class="rounded-xl border border-white/10 bg-slate-900/60 p-4">
-                        <span class="text-emerald-200">2024</span>
-                        <p class="mt-1 text-slate-200">Digitalizacion de gestiones y puesta en
-                            marcha del portal del vecino.</p>
+                        <span class="text-emerald-200">Etapa residencial</span>
+                        <p class="mt-1 text-slate-200">
+                            Reconstruccion urbana de Labeaga en viviendas, manteniendo Madaya como
+                            nombre identitario.
+                        </p>
                     </li>
                 </ol>
+            </div>
+        </section>
+
+        <section class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+                    <p class="text-xs uppercase tracking-[0.2em] text-amber-100">Ubicacion</p>
+                    <h3 class="mt-2 font-['Space_Grotesk'] text-xl font-semibold text-white">
+                        Labeaga, junto a la via y el rio</h3>
+                    <p class="mt-2 text-sm leading-relaxed text-slate-300">
+                        Un punto historico de actividad industrial de Urretxu, conectado al eje
+                        principal del municipio.
+                    </p>
+                </article>
+
+                <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+                    <p class="text-xs uppercase tracking-[0.2em] text-amber-100">Actividad</p>
+                    <h3 class="mt-2 font-['Space_Grotesk'] text-xl font-semibold text-white">
+                        Mecanizado, acero y forja</h3>
+                    <p class="mt-2 text-sm leading-relaxed text-slate-300">
+                        Madaya formo parte del auge productivo del Alto Urola, ligado al trabajo
+                        metalurgico y la transformacion de materiales.
+                    </p>
+                </article>
+
+                <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+                    <p class="text-xs uppercase tracking-[0.2em] text-amber-100">Evolucion</p>
+                    <h3 class="mt-2 font-['Space_Grotesk'] text-xl font-semibold text-white">Del
+                        taller al barrio</h3>
+                    <p class="mt-2 text-sm leading-relaxed text-slate-300">
+                        El cierre de la empresa dio paso a nuevas estructuras urbanas y a una gran
+                        comunidad vecinal.
+                    </p>
+                </article>
             </div>
         </section>
 
@@ -185,42 +228,63 @@
                     <p class="text-xs uppercase tracking-[0.2em] text-amber-100">Galeria</p>
                     <h2
                         class="font-['Space_Grotesk'] text-3xl font-semibold text-white sm:text-4xl">
-                        Rincones de la comunidad
+                        Imagenes de ayer y de hoy
                     </h2>
                 </div>
                 <p class="max-w-md text-sm text-slate-300">
-                    Una seleccion de imagenes de nuestras zonas comunes y espacios de convivencia.
+                    Una galeria con referencias historicas y actuales de Madaya, Labeaga y su
+                    entorno.
                 </p>
             </div>
 
             <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                 <figure
                     class="group overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60">
-                    <img src="https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=900&q=80"
-                        alt="Zona ajardinada"
+                    <img src="https://www.euskadi.eus/contenidos/informacion/madaya_fondo_pascual/es_madaya/images/madaya43.jpg"
+                        alt="Fotografia historica de Fundiciones y Forja Madaya"
                         class="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
                         loading="lazy">
-                    <figcaption class="p-4 text-sm text-slate-300">Jardines y paseos interiores
+                    <figcaption class="space-y-2 p-4 text-sm text-slate-300">
+                        <p>Archivo historico de Fundiciones y Forja Madaya.</p>
+                        <a href="https://www.euskadi.eus/fondo-pascual-madaya/web01-a2kulonz/es/madaya3.html"
+                            target="_blank" rel="noopener noreferrer"
+                            class="inline-flex text-xs font-medium text-emerald-200 underline underline-offset-4 transition hover:text-emerald-100">
+                            Ver fuente historica
+                        </a>
                     </figcaption>
                 </figure>
 
                 <figure
                     class="group overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60">
-                    <img src="https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80"
-                        alt="Fachada residencial"
+                    <img src="https://s3.ppllstatics.com/diariovasco/www/multimedia/202106/26/media/cortadas/65574194--1248x1898.jpg"
+                        alt="Chimenea y composicion floral entre Liceo y Madaya en Urretxu"
                         class="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
                         loading="lazy">
-                    <figcaption class="p-4 text-sm text-slate-300">Arquitectura residencial
+                    <figcaption class="space-y-2 p-4 text-sm text-slate-300">
+                        <p>La chimenea preservada como recuerdo del pasado industrial de la zona.
+                        </p>
+                        <a href="https://www.diariovasco.com/alto-urola/urretxu/xxxiii-edicion-certamen-20210626222529-ntvo.html"
+                            target="_blank" rel="noopener noreferrer"
+                            class="inline-flex text-xs font-medium text-emerald-200 underline underline-offset-4 transition hover:text-emerald-100">
+                            Ver referencia en Diario Vasco
+                        </a>
                     </figcaption>
                 </figure>
 
                 <figure
                     class="group overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60">
                     <img src="https://images.unsplash.com/photo-1459535653751-d571815e906b?auto=format&fit=crop&w=900&q=80"
-                        alt="Zona comun de encuentro"
+                        alt="Vista urbana residencial actual"
                         class="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
                         loading="lazy">
-                    <figcaption class="p-4 text-sm text-slate-300">Espacios de encuentro vecinal
+                    <figcaption class="space-y-2 p-4 text-sm text-slate-300">
+                        <p>Referencia visual del presente residencial y comercial de la zona Madaya.
+                        </p>
+                        <a href="https://es.wallapop.com/item/local-comercial-en-venta-en-urretxu-1237053961"
+                            target="_blank" rel="noopener noreferrer"
+                            class="inline-flex text-xs font-medium text-emerald-200 underline underline-offset-4 transition hover:text-emerald-100">
+                            Ver referencia actual
+                        </a>
                     </figcaption>
                 </figure>
             </div>
@@ -262,12 +326,27 @@
         </section>
     </main>
 
+    @php
+        $footerLogo = file_exists(storage_path('app/public/amaia.png'))
+            ? 'amaia.png'
+            : (file_exists(storage_path('app/public/a.png'))
+                ? 'a.png'
+                : null);
+    @endphp
+
     <footer class="border-t border-white/10 py-6">
         <div
             class="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-            <p>Comunidad de Vecinos · {{ date('Y') }}</p>
-            <p>Convivencia, transparencia y cuidado del entorno.</p>
+            <p>Comunidad Madaya · {{ date('Y') }}</p>
+            <p>Convivencia, memoria y cuidado del entorno.</p>
         </div>
+
+        @if ($footerLogo)
+            <div class="mx-auto mt-4 flex w-full max-w-6xl justify-end px-4 sm:px-6 lg:px-8">
+                <img src="{{ asset('storage/' . $footerLogo) }}" alt="Logo Amaia"
+                    class="h-7 w-auto opacity-50 transition hover:opacity-70" loading="lazy">
+            </div>
+        @endif
     </footer>
 </body>
 
