@@ -97,51 +97,74 @@ class DevSeeder extends Seeder
 
     private function seedImages(): void
     {
-        // Crear un placeholder SVG reutilizable en storage
-        $placeholder = $this->createPlaceholderImage();
-
         $items = [
-            ['alt_eu' => 'Komunitate-etxea', 'alt_es' => 'Casa de la comunidad'],
-            ['alt_eu' => '33-A atariko sarrera', 'alt_es' => 'Entrada portal 33-A'],
-            ['alt_eu' => '33-B atariko sarrera', 'alt_es' => 'Entrada portal 33-B'],
-            ['alt_eu' => 'P-1 aparkalekua', 'alt_es' => 'Garaje P-1'],
-            ['alt_eu' => 'Lorategia', 'alt_es' => 'Jardín comunitario'],
+            [
+                'alt_eu' => 'Komunitate-etxea',
+                'alt_es' => 'Casa de la comunidad',
+                'colors' => ['#0f172a', '#155e75'],
+            ],
+            [
+                'alt_eu' => '33-A atariko sarrera',
+                'alt_es' => 'Entrada portal 33-A',
+                'colors' => ['#1e293b', '#1d4ed8'],
+            ],
+            [
+                'alt_eu' => '33-B atariko sarrera',
+                'alt_es' => 'Entrada portal 33-B',
+                'colors' => ['#312e81', '#7c3aed'],
+            ],
+            [
+                'alt_eu' => 'P-1 aparkalekua',
+                'alt_es' => 'Garaje P-1',
+                'colors' => ['#78350f', '#ea580c'],
+            ],
+            [
+                'alt_eu' => 'Lorategia',
+                'alt_es' => 'Jardín comunitario',
+                'colors' => ['#14532d', '#16a34a'],
+            ],
         ];
 
-        foreach ($items as $item) {
-            $filename = Str::uuid().'.jpg';
-            Storage::disk('public')->copy($placeholder, 'images/'.$filename);
+        Storage::disk('public')->makeDirectory('images');
+
+        foreach ($items as $index => $item) {
+            $filename = Str::uuid().'.svg';
+            $path = 'images/'.$filename;
+            $imageText = $item['alt_es'];
+
+            Storage::disk('public')->put(
+                $path,
+                $this->buildSeededImageSvg($imageText, $item['colors'][0], $item['colors'][1], $index + 1)
+            );
 
             $image = Image::create([
                 'filename' => $filename,
-                'path' => 'images/'.$filename,
+                'path' => $path,
                 'alt_text_eu' => $item['alt_eu'],
                 'alt_text_es' => $item['alt_es'],
             ]);
         }
     }
 
-    private function createPlaceholderImage(): string
+    private function buildSeededImageSvg(string $label, string $startColor, string $endColor, int $number): string
     {
-        $path = 'images/dev-placeholder.jpg';
+        $escapedLabel = e($label);
 
-        if (! Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->makeDirectory('images');
-
-            // SVG mínimo convertido a contenido binario simulado (JPEG válido 1×1 px)
-            $jpeg1x1 = base64_decode(
-                '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8U'.
-                    'HRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgN'.
-                    'DRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy'.
-                    'MjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAA'.
-                    'AAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAA'.
-                    'AAD/2gAMAwEAAhEDEQA/AJAA/9k='
-            );
-
-            Storage::disk('public')->put($path, $jpeg1x1);
-        }
-
-        return $path;
+        return <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="{$escapedLabel}">
+    <defs>
+        <linearGradient id="bg-{$number}" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="{$startColor}" />
+            <stop offset="100%" stop-color="{$endColor}" />
+        </linearGradient>
+    </defs>
+    <rect width="1200" height="800" fill="url(#bg-{$number})" />
+    <circle cx="960" cy="200" r="170" fill="rgba(255,255,255,0.12)" />
+    <rect x="90" y="560" width="1020" height="160" rx="24" fill="rgba(15,23,42,0.45)" />
+    <text x="140" y="650" fill="#ffffff" font-size="52" font-family="Arial, sans-serif" font-weight="700">{$escapedLabel}</text>
+    <text x="140" y="695" fill="rgba(255,255,255,0.8)" font-size="26" font-family="Arial, sans-serif">Comunidad 33 · Imagen de prueba {$number}</text>
+</svg>
+SVG;
     }
 
     // -------------------------------------------------------------------------
