@@ -1,23 +1,25 @@
-version: "3.9"
-
 services:
     madaia33:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
         user: "${DC_UID:-1000}:${DC_GID:-1000}"
         volumes:
             - ./:/docker
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         working_dir: /docker
         ports:
-            - "80:80"
+            - "${APP_PORT:-8080}:80"
             - "${VITE_PORT:-5173}:${VITE_PORT:-5173}"
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
+            APP_ENV: local
+            APP_DEBUG: true
             CONTAINER_UID: 1000
-            XDEBUG_CLIENT_HOST: 172.17.0.1
-            XDEBUG_CLIENT_PORT: 9000
-            XDEBUG_START_WITH_REQUEST: "trigger"
-            XDEBUG_SESSION: VSCODE
-            XDEBUG_MODE: "debug,develop,coverage,trace,profile"
+            XDEBUG_CLIENT_HOST: host.docker.internal
+            XDEBUG_CLIENT_PORT: 9003
+            XDEBUG_DISCOVER_CLIENT_HOST: "0"
+            XDEBUG_START_WITH_REQUEST: "yes"
+            XDEBUG_MODE: "debug,develop"
             PHP_MEMORY_LIMIT: 9064M
         depends_on:
             - db
