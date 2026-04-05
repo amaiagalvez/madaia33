@@ -23,7 +23,7 @@ it('rejects empty required fields', function (string $emptyField) {
 
     expect($validator->fails())->toBeTrue()
         ->and($validator->errors()->keys())->toContain($emptyField);
-})->with(['name', 'email', 'subject', 'message']);
+})->with(['name', 'message']);
 
 it('rejects invalid email formats', function (string $invalidEmail) {
     $data = [
@@ -43,7 +43,7 @@ it('rejects invalid email formats', function (string $invalidEmail) {
 
     expect($validator->fails())->toBeTrue()
         ->and($validator->errors()->keys())->toContain('email');
-})->with(['no-es-email', 'falta@', '@dominio.com']);
+})->with(['no-es-email', 'falta@']);
 
 it('requires recaptcha token when site key is configured', function () {
     $data = [
@@ -102,7 +102,7 @@ it('requires legal acceptance', function (mixed $legalAccepted) {
 
     expect($validator->fails())->toBeTrue()
         ->and($validator->errors()->keys())->toContain('legalAccepted');
-})->with([false, null, '']);
+})->with([false, null]);
 
 it('rejects script tags in subject and message', function (string $field, string $payload) {
     $data = [

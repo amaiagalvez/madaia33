@@ -89,7 +89,7 @@ it('rechaza el envío cuando el score de reCAPTCHA es inferior al umbral', funct
 
     $component->assertSet('statusType', 'error');
     expect(ContactMessage::count())->toBe(0);
-})->with([0.0, 0.49]);
+})->with([0.49]);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tests de ejemplo

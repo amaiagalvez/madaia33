@@ -31,8 +31,20 @@ set -e
 apt-get update -qq
 apt-get install -y -qq chromium >/dev/null
 php artisan dusk:chrome-driver --detect --no-interaction
-php artisan migrate:fresh --seed --force >/tmp/migrate-seed.log 2>&1
 export APP_URL=http://127.0.0.1:8000
+export APP_ENV=testing
+export DB_CONNECTION=mysql
+export DB_HOST=db
+export DB_PORT=3306
+export DB_DATABASE=laravel
+export DB_USERNAME=laravel
+export DB_PASSWORD=laravel
+export SESSION_DRIVER=file
+export CACHE_STORE=array
+export QUEUE_CONNECTION=sync
+export MAIL_MAILER=array
+export RECAPTCHA_SKIP=true
+php artisan migrate:fresh --seed --force >/tmp/migrate-seed.log 2>&1
 php artisan serve --host=127.0.0.1 --port=8000 >/tmp/laravel-serve.log 2>&1 &
 SERVER_PID=$!
 for i in $(seq 1 30); do
@@ -43,6 +55,8 @@ php artisan test --compact tests/Browser/FooterLinksTest.php tests/Browser/Langu
 STATUS=$?
 kill $SERVER_PID || true
 wait $SERVER_PID 2>/dev/null || true
+chown -R ${DC_UID:-1000}:${DC_GID:-1000} storage tests/Browser/screenshots tests/Browser/source
+chown ${DC_UID:-1000}:${DC_GID:-1000} .phpunit.result.cache 2>/dev/null || true
 exit $STATUS
 '
 ```
@@ -57,12 +71,16 @@ Replace test file paths with only the Browser files you changed.
    - Prevents chromedriver version/path mismatch.
 3. `php artisan migrate:fresh --seed --force`
    - Ensures legal pages/settings/data expected by UI tests exist.
-4. `APP_URL=http://127.0.0.1:8000` + `php artisan serve`
+4. `export DB_*` + `export APP_ENV=testing`
+   - Prevents Browser tests from falling back to `sqlite` in-memory (which causes `no such table` errors across Dusk processes).
+5. `APP_URL=http://127.0.0.1:8000` + `php artisan serve`
    - Prevents `ERR_CONNECTION_REFUSED` by making app reachable from Chromium in the same container.
-5. Run only affected Browser tests
+6. Run only affected Browser tests
    - Keeps verification fast and focused.
-6. Explicit `kill`/`wait`
+7. Explicit `kill`/`wait`
    - Prevents orphaned background server processes.
+8. Final `chown` on generated artifacts
+   - Prevents new files from being owned by `root` after running with `--user root`.
 
 ## Minimal Debug Checklist
 
@@ -84,6 +102,18 @@ php artisan dusk:chrome-driver --detect --no-interaction
 curl -fsS http://127.0.0.1:8000 >/dev/null && echo ok
 ```
 
+- Test DB points to shared MySQL (not sqlite memory):
+
+```bash
+php artisan tinker --execute 'dump(config("database.default"), config("database.connections.mysql.database"));'
+```
+
+## Common Failure and Fix
+
+- Error: `SQLSTATE[HY000]: General error: 1 no such table: users` (or `settings`, `notices`) during Browser tests.
+  - Cause: test run is using `sqlite` in-memory, which is not shared the same way for Dusk browser processes.
+  - Fix: use the one-shot command above with explicit `DB_CONNECTION=mysql` and related `DB_*` exports before `migrate` and `test`.
+
 ## Test Scope Rule
 
 - Start with only changed Browser files.
@@ -94,3 +124,4 @@ curl -fsS http://127.0.0.1:8000 >/dev/null && echo ok
 - Use `php artisan test --compact ...` for Browser file runs.
 - If Browser tests depend on translations/settings/legal content, always seed before running.
 - Temporary `Xdebug` connection warnings during CLI test runs are non-blocking unless tests actually fail.
+- Keep `DC_UID` and `DC_GID` set in `.env` so the final `chown` maps files back to your host user.

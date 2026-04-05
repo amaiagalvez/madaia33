@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\App;
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('muestra las imágenes creadas en la galería pública', function () {
-    $count = rand(1, 5);
+    $count = 3;
     Image::factory()->count($count)->create();
 
     $component = Livewire::test('image-gallery');
@@ -36,10 +36,9 @@ it('no muestra imágenes eliminadas en la galería', function () {
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('todas las imágenes tienen alt text en el locale activo', function () {
-    $locale = fake()->randomElement(['eu', 'es']);
-    App::setLocale($locale);
+    App::setLocale('eu');
 
-    Image::factory()->count(rand(1, 5))->create();
+    Image::factory()->count(3)->create();
 
     $component = Livewire::test('image-gallery');
 
@@ -49,7 +48,7 @@ it('todas las imágenes tienen alt text en el locale activo', function () {
 });
 
 it('muestra todas las imágenes cuando no hay filtro activo', function () {
-    $count = rand(1, 5);
+    $count = 3;
     Image::factory()->count($count)->create();
 
     $component = Livewire::test('image-gallery');

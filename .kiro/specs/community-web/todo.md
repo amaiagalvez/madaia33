@@ -5,5 +5,9 @@
 [ ] seo
 [ ] acceesibilidad
 
-[ ] coverage
 [ ] traducciones repetidas
+[ ] 
+
+## Txuletak
+/dusk-test pasar los dusk test
+pasar los test con coverage

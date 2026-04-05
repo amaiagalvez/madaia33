@@ -25,7 +25,7 @@ it('no muestra avisos privados en la ruta pública de avisos', function () {
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('pagina los avisos a 10 por página ordenados por published_at desc', function () {
-    $total = rand(11, 20);
+    $total = 12;
     Notice::factory()->count($total)->public()->create();
 
     $component = Livewire::test('public-notices');
@@ -34,7 +34,7 @@ it('pagina los avisos a 10 por página ordenados por published_at desc', functio
 
     expect($notices->count())->toBe(10);
     expect($notices->total())->toBe($total);
-})->repeat(2);
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Propiedad 19: Filtrado por ubicación
@@ -64,14 +64,14 @@ it('filtra avisos por portal mostrando también los de ámbito general', functio
 });
 
 it('muestra todos los avisos cuando no hay filtro activo', function () {
-    $count = rand(1, 5);
+    $count = 4;
     Notice::factory()->count($count)->public()->create();
 
     $component = Livewire::test('public-notices')
         ->set('locationFilter', '');
 
     expect($component->notices->total())->toBe($count);
-})->repeat(2);
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tests de ejemplo

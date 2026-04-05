@@ -136,6 +136,8 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
 - Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
+- When the user asks to run tests with coverage, run them and append one line to `.docs/test_coverage.md` with: date and time, number of tests, execution time, and coverage percentage.
+- If coverage drops compared to the previous line in `.docs/test_coverage.md`, warn the user explicitly and include a short analysis of how to improve it.
 
 === laravel/core rules ===
 

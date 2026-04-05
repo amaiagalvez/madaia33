@@ -27,6 +27,7 @@ All tests must be written using Pest. Use `php artisan make:test --pest {name}`.
 ### Basic Test Structure
 
 <!-- Basic Pest Test Example -->
+
 ```php
 it('is true', function () {
     expect(true)->toBeTrue();
@@ -39,22 +40,29 @@ it('is true', function () {
 - Run all tests: `php artisan test --compact`.
 - Run file: `php artisan test --compact tests/Feature/ExampleTest.php`.
 
+### Coverage Workflow (Project Rule)
+
+- When the user asks to run tests with coverage, run coverage tests and append one line to `.docs/test_coverage.md` including: date and time, number of tests, execution time, and coverage percentage.
+- Compare against the previous line in `.docs/test_coverage.md`; if coverage decreased, warn the user explicitly.
+- If coverage decreased, add a brief improvement analysis with concrete actions (for example: missing unit tests for pure logic, untested branches, or uncovered validation rules).
+
 ## Assertions
 
 Use specific assertions (`assertSuccessful()`, `assertNotFound()`) instead of `assertStatus()`:
 
 <!-- Pest Response Assertion -->
+
 ```php
 it('returns all', function () {
     $this->postJson('/api/docs', [])->assertSuccessful();
 });
 ```
 
-| Use | Instead of |
-|-----|------------|
+| Use                  | Instead of          |
+| -------------------- | ------------------- |
 | `assertSuccessful()` | `assertStatus(200)` |
-| `assertNotFound()` | `assertStatus(404)` |
-| `assertForbidden()` | `assertStatus(403)` |
+| `assertNotFound()`   | `assertStatus(404)` |
+| `assertForbidden()`  | `assertStatus(403)` |
 
 ## Mocking
 
@@ -65,6 +73,7 @@ Import mock function before use: `use function Pest\Laravel\mock;`
 Use datasets for repetitive tests (validation rules, etc.):
 
 <!-- Pest Dataset Example -->
+
 ```php
 it('has emails', function (string $email) {
     expect($email)->not->toBeEmpty();
@@ -76,13 +85,13 @@ it('has emails', function (string $email) {
 
 ## Pest 4 Features
 
-| Feature | Purpose |
-|---------|---------|
-| Browser Testing | Full integration tests in real browsers |
-| Smoke Testing | Validate multiple pages quickly |
-| Visual Regression | Compare screenshots for visual changes |
-| Test Sharding | Parallel CI runs |
-| Architecture Testing | Enforce code conventions |
+| Feature              | Purpose                                 |
+| -------------------- | --------------------------------------- |
+| Browser Testing      | Full integration tests in real browsers |
+| Smoke Testing        | Validate multiple pages quickly         |
+| Visual Regression    | Compare screenshots for visual changes  |
+| Test Sharding        | Parallel CI runs                        |
+| Architecture Testing | Enforce code conventions                |
 
 ### Browser Test Example
 
@@ -98,6 +107,7 @@ Browser tests run in real browsers for full integration testing:
 - Take screenshots or pause tests for debugging.
 
 <!-- Pest Browser Test Example -->
+
 ```php
 it('may reset the password', function () {
     Notification::fake();
@@ -122,6 +132,7 @@ it('may reset the password', function () {
 Quickly validate multiple pages have no JavaScript errors:
 
 <!-- Pest Smoke Testing Example -->
+
 ```php
 $pages = visit(['/', '/about', '/contact']);
 
@@ -141,6 +152,7 @@ Split tests across parallel processes for faster CI runs.
 Pest 4 includes architecture testing (from Pest 3):
 
 <!-- Architecture Test Example -->
+
 ```php
 arch('controllers')
     ->expect('App\Http\Controllers')
