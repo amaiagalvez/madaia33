@@ -2,6 +2,7 @@
   "LaravelExtraIntellisense.phpCommand": "docker compose run --rm madaia33 php -r \"{code}\"",
   "LaravelExtraIntellisense.basePathForCode": "/docker",
   "chat.tools.terminal.autoApprove": {
-    "docker compose": true
+    "docker compose": true,
+    "timeout": true
   }
 }
