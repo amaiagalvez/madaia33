@@ -74,6 +74,18 @@ it('abrir un mensaje ya leído no cambia read_at', function () {
         ->toBe($readAt->timestamp);
 });
 
+it('abrir el mismo mensaje dos veces cierra el detalle', function () {
+    $user = User::factory()->create();
+    $message = ContactMessage::factory()->unread()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->call('openMessage', $message->id)
+        ->assertSet('openMessageId', $message->id)
+        ->call('openMessage', $message->id)
+        ->assertSet('openMessageId', null);
+});
+
 it('eliminar con confirmación borra el mensaje', function () {
     $user = User::factory()->create();
     $message = ContactMessage::factory()->create();
@@ -82,6 +94,22 @@ it('eliminar con confirmación borra el mensaje', function () {
         ->test('admin-message-inbox')
         ->call('confirmDelete', $message->id)
         ->call('deleteMessage');
+
+    expect(ContactMessage::find($message->id))->toBeNull();
+});
+
+it('confirmar eliminación guarda el id y borrar limpia selección y detalle abierto', function () {
+    $user = User::factory()->create();
+    $message = ContactMessage::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->call('openMessage', $message->id)
+        ->call('confirmDelete', $message->id)
+        ->assertSet('confirmingDeleteId', $message->id)
+        ->call('deleteMessage')
+        ->assertSet('confirmingDeleteId', null)
+        ->assertSet('openMessageId', null);
 
     expect(ContactMessage::find($message->id))->toBeNull();
 });
@@ -106,6 +134,20 @@ it('ordenar por created_at desc produce orden correcto', function () {
     $component = Livewire::actingAs($user)->test('admin-message-inbox');
 
     // default is created_at desc
+    $ids = $component->messages->pluck('id')->toArray();
+    expect(array_search($new->id, $ids))->toBeLessThan(array_search($old->id, $ids));
+});
+
+it('usa created_at desc como fallback cuando el orden solicitado no es válido', function () {
+    $user = User::factory()->create();
+    $old = ContactMessage::factory()->create(['created_at' => now()->subDays(2)]);
+    $new = ContactMessage::factory()->create(['created_at' => now()]);
+
+    $component = Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->set('sortBy', 'invalid-column')
+        ->set('sortDir', 'sideways');
+
     $ids = $component->messages->pluck('id')->toArray();
     expect(array_search($new->id, $ids))->toBeLessThan(array_search($old->id, $ids));
 });

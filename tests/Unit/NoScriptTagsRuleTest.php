@@ -26,3 +26,16 @@ it('allows safe plain text content', function (string $value) {
     'Consulta normal de la comunidad',
     "' OR 1=1 --",
 ]);
+
+it('ignores non string values', function (mixed $value) {
+    $validator = Validator::make(
+        ['content' => $value],
+        ['content' => [new NoScriptTags]],
+    );
+
+    expect($validator->fails())->toBeFalse();
+})->with([
+    null,
+    123,
+    true,
+]);

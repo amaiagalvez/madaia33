@@ -322,10 +322,10 @@ Rediseño responsive incremental de la parte pública de la web, partiendo de lo
   - _Requisito: Convención del proyecto_
   - ✅ **SPECS SINCRONIZADAS:** design docs actualizadas para HeroSlider, hooks `data-*`, smoke suite Dusk y verificación SMTP con MailHog
 
-- [ ] 17. Hacer que los tests pasen con coverage
+- [x] 17. Hacer que los tests pasen con coverage
   - Ejecutar la suite de test con coverage dentro de Docker
   - Corregir los fallos de tests o de configuración que impidan completar la ejecución con coverage
   - Registrar el resultado en `.docs/test_coverage.md` con fecha/hora, número de tests, duración y porcentaje de coverage
   - Comparar el porcentaje con la entrada anterior y documentar si hay regresión de coverage
   - _Requisitos: Convención del proyecto, cobertura de tests_
-  - ✅ **COVERAGE COMPLETO PASADO:** 191 tests, 23.91s, 95.8%
+  - ✅ **COVERAGE COMPLETO PASADO:** 202 tests, 27.58s, 97.4%
