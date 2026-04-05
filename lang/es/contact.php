@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'title' => 'Contacto',
+    'name' => 'Nombre completo',
+    'email' => 'Correo electrónico',
+    'subject' => 'Asunto',
+    'message' => 'Mensaje',
+    'send' => 'Enviar',
+    'legal_text' => 'He leído y acepto la política de privacidad.',
+    'success' => 'Tu mensaje ha sido enviado. ¡Gracias!',
+    'error' => 'Ha ocurrido un error. Inténtalo de nuevo.',
+    'email_error' => 'El mensaje ha sido recibido, pero puede haber un problema al enviar el correo de confirmación.',
+    'spam_error' => 'Tu solicitud no ha podido ser procesada. Inténtalo de nuevo.',
+    'validation' => [
+        'name_required' => 'El nombre es obligatorio.',
+        'email_required' => 'El correo electrónico es obligatorio.',
+        'email_invalid' => 'El formato del correo electrónico no es válido.',
+        'subject_required' => 'El asunto es obligatorio.',
+        'message_required' => 'El mensaje es obligatorio.',
+        'message_max' => 'El mensaje no puede superar los 5000 caracteres.',
+        'legal_required' => 'Debes aceptar la política de privacidad.',
+    ],
+    'mail' => [
+        'greeting' => 'Hola, :name.',
+        'confirmation_intro' => 'Hemos recibido tu mensaje. A continuación encontrarás una copia:',
+        'confirmation_footer' => 'Gracias por ponerte en contacto con nosotros.',
+        'notification_intro' => 'Has recibido un nuevo mensaje de contacto:',
+    ],
+    'admin' => [
+        'inbox' => 'Bandeja de entrada',
+        'from' => 'Remitente',
+        'received' => 'Fecha de recepción',
+        'read' => 'Leído',
+        'unread' => 'No leído',
+        'mark_read' => 'Marcar como leído',
+        'mark_unread' => 'Marcar como no leído',
+        'confirm_delete' => '¿Estás seguro de que quieres eliminar este mensaje?',
+    ],
+];

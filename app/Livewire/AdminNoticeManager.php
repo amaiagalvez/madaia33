@@ -1,0 +1,183 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Notice;
+use Livewire\Component;
+use App\CommunityLocations;
+use Illuminate\Support\Str;
+use App\Models\NoticeLocation;
+use Illuminate\Contracts\View\View;
+
+class AdminNoticeManager extends Component
+{
+    // Form state
+    public ?int $editingId = null;
+
+    public string $titleEu = '';
+
+    public string $titleEs = '';
+
+    public string $contentEu = '';
+
+    public string $contentEs = '';
+
+    public bool $isPublic = false;
+
+    /** @var string[] */
+    public array $selectedLocations = [];
+
+    // Delete confirmation
+    public ?int $confirmingDeleteId = null;
+
+    // UI state
+    public bool $showForm = false;
+
+    /**
+     * @var array<string, string>
+     */
+    protected function rules(): array
+    {
+        return [
+            'titleEu' => 'required|string|max:255',
+            'titleEs' => 'nullable|string|max:255',
+            'contentEu' => 'required|string',
+            'contentEs' => 'nullable|string',
+            'isPublic' => 'boolean',
+            'selectedLocations' => 'array',
+            'selectedLocations.*' => 'string',
+        ];
+    }
+
+    public function createNotice(): void
+    {
+        $this->resetForm();
+        $this->showForm = true;
+    }
+
+    public function editNotice(int $id): void
+    {
+        $notice = Notice::with('locations')->findOrFail($id);
+
+        $this->editingId = $notice->id;
+        $this->titleEu = $notice->title_eu ?? '';
+        $this->titleEs = $notice->title_es ?? '';
+        $this->contentEu = $notice->content_eu ?? '';
+        $this->contentEs = $notice->content_es ?? '';
+        $this->isPublic = $notice->is_public;
+        $this->selectedLocations = $notice->locations->pluck('location_code')->toArray();
+        $this->showForm = true;
+    }
+
+    public function saveNotice(): void
+    {
+        $this->validate();
+
+        $slug = Str::slug($this->titleEu);
+
+        if ($this->editingId) {
+            $notice = Notice::findOrFail($this->editingId);
+            $notice->update([
+                'slug' => $slug ?: $notice->slug,
+                'title_eu' => $this->titleEu,
+                'title_es' => $this->titleEs ?: null,
+                'content_eu' => $this->contentEu,
+                'content_es' => $this->contentEs ?: null,
+                'is_public' => $this->isPublic,
+                'published_at' => $this->isPublic && ! $notice->published_at ? now() : $notice->published_at,
+            ]);
+        } else {
+            $notice = Notice::create([
+                'slug' => $slug ?: Str::uuid(),
+                'title_eu' => $this->titleEu,
+                'title_es' => $this->titleEs ?: null,
+                'content_eu' => $this->contentEu,
+                'content_es' => $this->contentEs ?: null,
+                'is_public' => $this->isPublic,
+                'published_at' => $this->isPublic ? now() : null,
+            ]);
+        }
+
+        $this->syncLocations($notice);
+
+        $this->resetForm();
+        $this->showForm = false;
+    }
+
+    public function publishNotice(int $id): void
+    {
+        $notice = Notice::findOrFail($id);
+        $notice->update([
+            'is_public' => true,
+            'published_at' => now(),
+        ]);
+    }
+
+    public function unpublishNotice(int $id): void
+    {
+        $notice = Notice::findOrFail($id);
+        $notice->update(['is_public' => false]);
+    }
+
+    public function confirmDelete(int $id): void
+    {
+        $this->confirmingDeleteId = $id;
+    }
+
+    public function cancelDelete(): void
+    {
+        $this->confirmingDeleteId = null;
+    }
+
+    public function deleteNotice(): void
+    {
+        if ($this->confirmingDeleteId) {
+            Notice::findOrFail($this->confirmingDeleteId)->delete();
+            $this->confirmingDeleteId = null;
+        }
+    }
+
+    public function cancelForm(): void
+    {
+        $this->resetForm();
+        $this->showForm = false;
+    }
+
+    private function resetForm(): void
+    {
+        $this->editingId = null;
+        $this->titleEu = '';
+        $this->titleEs = '';
+        $this->contentEu = '';
+        $this->contentEs = '';
+        $this->isPublic = false;
+        $this->selectedLocations = [];
+        $this->resetValidation();
+    }
+
+    /**
+     * Sync the notice_locations pivot for the given notice.
+     */
+    private function syncLocations(Notice $notice): void
+    {
+        $notice->locations()->delete();
+
+        foreach ($this->selectedLocations as $code) {
+            NoticeLocation::create([
+                'notice_id' => $notice->id,
+                'location_type' => CommunityLocations::typeForCode($code),
+                'location_code' => $code,
+            ]);
+        }
+    }
+
+    public function render(): View
+    {
+        $notices = Notice::with('locations')->latest()->get();
+
+        return view('livewire.admin-notice-manager', [
+            'notices' => $notices,
+            'allLocations' => CommunityLocations::options(__('notices.portal'), __('notices.garage')),
+        ]);
+    }
+}

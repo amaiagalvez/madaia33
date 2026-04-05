@@ -1,0 +1,41 @@
+<?php
+
+return [
+    'nav' => [
+        'notices' => 'Iragarkiak',
+        'gallery' => 'Argazki-bilduma',
+        'contact' => 'Kontaktua',
+        'private' => 'Eremu pribatua',
+        'admin' => 'Administrazioa',
+    ],
+    'language' => [
+        'eu' => 'Euskara',
+        'es' => 'Gaztelania',
+        'switch' => 'Hizkuntza aldatu',
+    ],
+    'buttons' => [
+        'save' => 'Gorde',
+        'cancel' => 'Utzi',
+        'delete' => 'Ezabatu',
+        'edit' => 'Editatu',
+        'back' => 'Itzuli',
+        'send' => 'Bidali',
+        'create' => 'Sortu',
+    ],
+    'messages' => [
+        'saved' => 'Aldaketak gordeta.',
+        'deleted' => 'Ezabatuta.',
+        'error' => 'Errore bat gertatu da. Saiatu berriro.',
+    ],
+    'footer' => [
+        'privacy_policy' => 'Pribatutasun-politika',
+        'legal_notice' => 'Lege-oharra',
+    ],
+    'pagination' => [
+        'previous' => 'Aurrekoa',
+        'next' => 'Hurrengoa',
+    ],
+    'close' => 'Itxi',
+    'sending' => 'Bidaltzen...',
+    'privacy_policy' => 'Pribatutasun-politika',
+];

@@ -1,6 +1,14 @@
 <?php
 
+use App\Models\Setting;
+
+pest()->extend(DuskTestCase::class)
+    //  ->use(Illuminate\Foundation\Testing\DatabaseMigrations::class)
+    ->in('Browser');
+
 use Tests\TestCase;
+use Tests\DuskTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,8 +22,11 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
+
+pest()->extend(TestCase::class)
+    ->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +54,12 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function settingValue(string $key, mixed $default = null): mixed
 {
-    // ..
+    return Setting::where('key', $key)->value('value') ?? $default;
+}
+
+function createSetting(string $key, mixed $value): Setting
+{
+    return Setting::factory()->forKey($key, (string) $value)->create();
 }

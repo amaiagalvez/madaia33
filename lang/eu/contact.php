@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'title' => 'Kontaktua',
+    'name' => 'Izen-abizenak',
+    'email' => 'Helbide elektronikoa',
+    'subject' => 'Gaia',
+    'message' => 'Mezua',
+    'send' => 'Bidali',
+    'legal_text' => 'Pribatutasun-politika irakurri eta onartzen dut.',
+    'success' => 'Zure mezua bidali da. Eskerrik asko!',
+    'error' => 'Errore bat gertatu da. Saiatu berriro.',
+    'email_error' => 'Mezua jaso da, baina baliteke posta elektronikoa bidaltzean arazo bat egotea.',
+    'spam_error' => 'Zure eskaera ezin izan da prozesatu. Saiatu berriro.',
+    'validation' => [
+        'name_required' => 'Izena beharrezkoa da.',
+        'email_required' => 'Helbide elektronikoa beharrezkoa da.',
+        'email_invalid' => 'Helbide elektronikoaren formatua ez da zuzena.',
+        'subject_required' => 'Gaia beharrezkoa da.',
+        'message_required' => 'Mezua beharrezkoa da.',
+        'message_max' => 'Mezuak gehienez 5000 karaktere izan ditzake.',
+        'legal_required' => 'Pribatutasun-politika onartu behar duzu.',
+    ],
+    'mail' => [
+        'greeting' => 'Kaixo, :name.',
+        'confirmation_intro' => 'Zure mezua jaso dugu. Hemen duzu kopia bat:',
+        'confirmation_footer' => 'Eskerrik asko gurekin harremanetan jartzeagatik.',
+        'notification_intro' => 'Kontaktu-mezu berri bat jaso duzu:',
+    ],
+    'admin' => [
+        'inbox' => 'Mezu-sarrera',
+        'from' => 'Igorlea',
+        'received' => 'Jasotze-data',
+        'read' => 'Irakurrita',
+        'unread' => 'Irakurri gabe',
+        'mark_read' => 'Irakurrita markatu',
+        'mark_unread' => 'Irakurri gabe markatu',
+        'confirm_delete' => 'Ziur zaude mezu hau ezabatu nahi duzula?',
+    ],
+];
