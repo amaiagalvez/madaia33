@@ -173,6 +173,7 @@ Web pública para la comunidad de vecinos. La web contará con una parte públic
 7. THE Formulario_Contacto SHALL limitar el campo "mensaje" a un máximo de 5000 caracteres.
 8. THE Formulario_Contacto SHALL mostrar todas las etiquetas, mensajes de error y mensajes de confirmación en el idioma activo seleccionado por el visitante.
 9. WHEN el visitante introduce etiquetas `<script>` en el asunto o en el mensaje, THE Formulario_Contacto SHALL rechazar el envío, mostrar un mensaje de validación y no guardar el mensaje.
+10. WHEN el visitante pulsa repetidamente el botón de envío con el mismo contenido en un intervalo corto, THEN THE Formulario_Contacto SHALL procesar un único envío válido, sin duplicar el mensaje guardado ni los correos asociados.
 
 ---
 
@@ -245,6 +246,7 @@ Web pública para la comunidad de vecinos. La web contará con una parte públic
 2. THE Web SHALL incluir una página de aviso legal accesible desde el footer.
 3. THE Administrador SHALL poder editar el contenido de la página de política de privacidad y de la página de aviso legal desde el Panel_Administración.
 4. THE Web SHALL mostrar las páginas de política de privacidad y aviso legal en Euskera y en Castellano según el idioma activo seleccionado por el visitante.
+5. THE Web MAY reutilizar una plantilla pública común para ambas páginas legales siempre que mantenga título, contenido y URL diferenciados para cada ruta.
 
 ---
 

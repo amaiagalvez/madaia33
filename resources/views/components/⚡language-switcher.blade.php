@@ -25,15 +25,17 @@ new class extends Component {
 ?>
 
 <div class="flex items-center gap-2">
-    <button wire:click="switchLocale('eu')"
-        class="text-sm font-medium px-2 py-1 rounded transition-colors {{ $currentLocale === 'eu' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:text-gray-900' }}"
-        aria-label="{{ __('general.language.eu') }}" @if ($currentLocale === 'eu') aria-current="true" @endif>
+    <button wire:click="switchLocale('eu')" data-language-option="eu"
+        class="cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors {{ $currentLocale === 'eu' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:text-gray-900' }}"
+        aria-label="{{ __('general.language.eu') }}"
+        @if ($currentLocale === 'eu') aria-current="true" @endif>
         EU
     </button>
     <span class="text-gray-400" aria-hidden="true">|</span>
-    <button wire:click="switchLocale('es')"
-        class="text-sm font-medium px-2 py-1 rounded transition-colors {{ $currentLocale === 'es' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:text-gray-900' }}"
-        aria-label="{{ __('general.language.es') }}" @if ($currentLocale === 'es') aria-current="true" @endif>
+    <button wire:click="switchLocale('es')" data-language-option="es"
+        class="cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors {{ $currentLocale === 'es' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:text-gray-900' }}"
+        aria-label="{{ __('general.language.es') }}"
+        @if ($currentLocale === 'es') aria-current="true" @endif>
         ES
     </button>
 </div>

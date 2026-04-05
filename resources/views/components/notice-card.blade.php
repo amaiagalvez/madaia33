@@ -10,8 +10,14 @@
         {{-- Image Header --}}
         @if ($showImage)
             @if ($image)
+                @php
+                    $imageUrl =
+                        data_get($image, 'public_url') ??
+                        (data_get($image, 'path') ?? asset('favicon.svg'));
+                    $imageAlt = data_get($image, 'alt_text', '');
+                @endphp
                 <div class="relative overflow-hidden bg-gray-100 aspect-video">
-                    <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
+                    <img src="{{ $imageUrl }}" alt="{{ $imageAlt }}"
                         class="w-full h-full object-cover" />
                 </div>
             @else

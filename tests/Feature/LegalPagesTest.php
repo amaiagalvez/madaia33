@@ -18,6 +18,25 @@ it('la página de aviso legal es accesible públicamente', function () {
     $this->get(route('legal-notice'))->assertOk();
 });
 
+it('las páginas legales reutilizan la misma vista pública con contenido diferenciado', function () {
+    createSetting('legal_page_privacy_policy_eu', 'Pribatutasun eduki partekatua');
+    createSetting('legal_page_legal_notice_eu', 'Lege ohar eduki partekatua');
+
+    $privacy = $this->get(route('privacy-policy'));
+
+    $privacy->assertOk()
+        ->assertViewIs('public.legal-page')
+        ->assertSee('data-legal-page="privacy-policy"', false)
+        ->assertSee('Pribatutasun eduki partekatua');
+
+    $legal = $this->get(route('legal-notice'));
+
+    $legal->assertOk()
+        ->assertViewIs('public.legal-page')
+        ->assertSee('data-legal-page="legal-notice"', false)
+        ->assertSee('Lege ohar eduki partekatua');
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Admin puede editar el contenido de páginas legales
 // ─────────────────────────────────────────────────────────────────────────────

@@ -15,7 +15,8 @@
         </div>
     @endif
 
-    <form wire:submit="submit" novalidate>
+    <form wire:submit="submit" x-on:submit="$refs.submitButton?.setAttribute('disabled', 'disabled')"
+        novalidate>
         {{-- Name --}}
         <div class="mb-4">
             <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-1">
@@ -100,11 +101,11 @@
         <input type="hidden" wire:model="recaptchaToken" id="recaptcha-token">
 
         {{-- Submit --}}
-        <button type="submit"
+        <button type="submit" x-ref="submitButton"
             class="inline-flex w-full sm:w-auto min-h-11 items-center justify-center rounded-md bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:opacity-50"
-            wire:loading.attr="disabled">
+            data-contact-submit wire:loading.attr="disabled" wire:target="submit">
             <span wire:loading.remove>{{ __('contact.send') }}</span>
-            <span wire:loading class="flex items-center gap-2">
+            <span wire:loading wire:target="submit" class="flex items-center gap-2">
                 <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10"
                         stroke="currentColor" stroke-width="4"></circle>

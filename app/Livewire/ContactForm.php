@@ -15,6 +15,8 @@ use App\Validations\ContactFormValidation;
 
 class ContactForm extends Component
 {
+    private const DUPLICATE_SUBMISSION_WINDOW_SECONDS = 15;
+
     public string $name = '';
 
     public string $email = '';
@@ -55,6 +57,17 @@ class ContactForm extends Component
 
             return;
         }
+
+        if ($this->hasRecentDuplicateSubmission()) {
+            $this->reset(['name', 'email', 'subject', 'message', 'legalAccepted', 'recaptchaToken']);
+            $this->statusType = 'success';
+            $this->statusMessage = __('contact.success');
+            $this->dispatch('contact-form-submitted');
+
+            return;
+        }
+
+        $this->rememberRecentSubmission();
 
         $contactMessage = ContactMessage::create([
             'name' => $this->name,
@@ -99,6 +112,45 @@ class ContactForm extends Component
         }
 
         $this->dispatch('contact-form-submitted');
+    }
+
+    private function hasRecentDuplicateSubmission(): bool
+    {
+        return array_key_exists($this->submissionFingerprint(), $this->recentSubmissions());
+    }
+
+    private function rememberRecentSubmission(): void
+    {
+        $submissions = $this->recentSubmissions();
+        $submissions[$this->submissionFingerprint()] = now()->getTimestamp();
+
+        session(['contact_form_recent_submissions' => $submissions]);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function recentSubmissions(): array
+    {
+        $threshold = now()->subSeconds(self::DUPLICATE_SUBMISSION_WINDOW_SECONDS)->getTimestamp();
+
+        return collect(session('contact_form_recent_submissions', []))
+            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+                && is_numeric($timestamp)
+                && (int) $timestamp >= $threshold)
+            ->map(fn (mixed $timestamp): int => (int) $timestamp)
+            ->all();
+    }
+
+    private function submissionFingerprint(): string
+    {
+        return hash('sha256', implode('|', [
+            session()->getId(),
+            trim($this->name),
+            mb_strtolower(trim($this->email)),
+            trim($this->subject),
+            trim($this->message),
+        ]));
     }
 
     private function verifyRecaptcha(): bool

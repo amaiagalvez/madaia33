@@ -114,6 +114,43 @@ it('happy path: guarda ContactMessage y despacha ambos emails', function () {
     $component->assertSet('statusType', 'success');
 });
 
+it('evita envíos duplicados cuando se repite rápidamente el mismo payload', function () {
+    Mail::fake();
+
+    $payload = [
+        'name' => 'Ane Etxebarria',
+        'email' => 'ane@example.com',
+        'subject' => 'Proba',
+        'message' => 'Kaixo!',
+        'legalAccepted' => true,
+        'recaptchaToken' => 'skip',
+    ];
+
+    Livewire::test('contact-form')
+        ->set('name', $payload['name'])
+        ->set('email', $payload['email'])
+        ->set('subject', $payload['subject'])
+        ->set('message', $payload['message'])
+        ->set('legalAccepted', $payload['legalAccepted'])
+        ->set('recaptchaToken', $payload['recaptchaToken'])
+        ->call('submit')
+        ->assertSet('statusType', 'success');
+
+    Livewire::test('contact-form')
+        ->set('name', $payload['name'])
+        ->set('email', $payload['email'])
+        ->set('subject', $payload['subject'])
+        ->set('message', $payload['message'])
+        ->set('legalAccepted', $payload['legalAccepted'])
+        ->set('recaptchaToken', $payload['recaptchaToken'])
+        ->call('submit')
+        ->assertSet('statusType', 'success');
+
+    expect(ContactMessage::count())->toBe(1);
+    Mail::assertSent(ContactConfirmation::class, 1);
+    Mail::assertSent(ContactNotification::class, 1);
+});
+
 it('fallo de email: guarda el mensaje y muestra advertencia', function () {
     Log::spy();
 

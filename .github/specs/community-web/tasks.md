@@ -97,9 +97,10 @@ Implementación incremental de la web de la comunidad de vecinos sobre Laravel 1
   - Crear el componente Livewire `ContactForm` con las reglas de validación definidas en el diseño
   - Implementar la integración con reCAPTCHA v3: solicitar token en el cliente y verificar score en el servidor
   - Implementar la lógica de envío: guardar `ContactMessage`, despachar Mailables, manejar excepciones de email
+  - Endurecer el submit para ignorar dobles clics rápidos o reenvíos inmediatos del mismo payload sin duplicar persistencia ni correos
   - Implementar la limpieza de campos tras envío exitoso y el mensaje de confirmación
   - Crear la vista Blade del formulario con TailwindCSS, incluyendo el checkbox legal con enlace configurable
-  - _Requisitos: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 11.1, 11.2, 11.3, 11.4, 11.5, 12.1, 12.2, 12.3, 13.1, 13.2, 13.3_
+  - _Requisitos: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.10, 11.1, 11.2, 11.3, 11.4, 11.5, 12.1, 12.2, 12.3, 13.1, 13.2, 13.3_
 
   - [ ]\* 7.1 Escribir test de propiedad para validación del formulario con entradas inválidas
     - **Propiedad 9: Validación del formulario de contacto rechaza entradas inválidas**
@@ -214,13 +215,13 @@ Implementación incremental de la web de la comunidad de vecinos sobre Laravel 1
 
 - [x] 13. Implementar páginas legales, SEO y seguridad
   - Crear el componente Livewire `AdminLegalPages` para editar el contenido de política de privacidad y aviso legal (EU + ES)
-  - Crear las vistas Blade públicas para `/politica-de-privacidad` y `/aviso-legal` que muestran el contenido del locale activo
+  - Crear las vistas Blade públicas para `/politica-de-privacidad` y `/aviso-legal` que muestran el contenido del locale activo, permitiendo compartir una plantilla reutilizable para ambas rutas
   - Implementar el controlador/ruta para `/sitemap.xml` que genera dinámicamente las URLs de la parte pública
   - Implementar el archivo `robots.txt` que permite la parte pública y bloquea `/admin`
   - Crear el middleware de cabeceras de seguridad HTTP (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) y registrarlo en el grupo `web`
   - Configurar la expiración de sesión admin (120 minutos por defecto, configurable en `.env`)
   - Inyectar título de página y meta description únicos en cada vista pública mediante `@push('meta')`
-  - _Requisitos: 15.1, 15.2, 15.3, 15.4, 16.1, 16.2, 16.3, 16.4, 16.5, 17.1, 17.2, 17.3, 17.4, 17.5_
+  - _Requisitos: 15.1, 15.2, 15.3, 15.4, 15.5, 16.1, 16.2, 16.3, 16.4, 16.5, 17.1, 17.2, 17.3, 17.4, 17.5_
 
   - [ ]\* 13.1 Escribir test de propiedad para cabeceras de seguridad
     - **Propiedad 20: Cabeceras de seguridad presentes en todas las respuestas**

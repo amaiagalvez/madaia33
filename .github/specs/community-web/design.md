@@ -18,6 +18,7 @@ La web de la comunidad de vecinos es una aplicación Laravel 13 con arquitectura
 - **SEO**: Cada vista Blade pública usa un stack de Blade (`@stack('meta')`) para inyectar título y meta description únicos por página en el idioma activo. Se genera un `sitemap.xml` dinámico mediante una ruta dedicada y un controlador.
 - **Seguridad**: Cabeceras HTTP de seguridad (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) añadidas mediante middleware. Protección CSRF nativa de Laravel activa en todos los formularios. HTTPS obligatorio en producción mediante configuración de `AppServiceProvider` o `.env`.
 - **Validación defensiva en contacto**: El formulario de contacto rechaza entradas que incluyen etiquetas `<script>` en asunto o mensaje mediante reglas de validación específicas (`not_regex`), como capa adicional frente a XSS, manteniendo además el escape de salida en Blade.
+- **Anti-duplicado en contacto**: `ContactForm` mantiene durante 15 segundos una huella del payload enviado en la sesión actual para ignorar dobles clics rápidos o reenvíos inmediatos del mismo mensaje sin duplicar persistencia ni correos.
 - **Paginación**: Los avisos se paginan a 10 por página usando el paginador de Laravel/Livewire. Las imágenes se muestran en grid sin paginación pero con lazy loading.
 - **Filtrado público**: El componente `PublicNotices` expone un selector de portal/planta que filtra los avisos en tiempo real mediante Livewire. La galería pública de imágenes no filtra por ubicación en el estado actual del código.
 - **Seeders de desarrollo**: `DevSeeder` genera datos de prueba realistas (avisos con y sin traducción, imágenes, mensajes de contacto leídos y no leídos). `DatabaseSeeder` lo invoca condicionalmente con `if (app()->isLocal())`, de modo que nunca se ejecuta en producción ni en el entorno de test Dusk (que usa `APP_ENV=testing`).
@@ -202,12 +203,15 @@ La ruta `/admin/imagenes` y su vista existen, pero el componente dedicado de ges
 
 - `layouts/public.blade.php` — Layout para la parte pública (nav con selector de idioma, footer)
 - `layouts/admin.blade.php` — Layout para el panel de administración (sidebar, nav admin)
+- `public/legal-page.blade.php` — Plantilla pública reutilizable para política de privacidad y aviso legal; cambia solo la clave de título, el slug expuesto en `data-legal-page` y el contenido cargado desde `settings`
 
 ### Convenciones de testing UI implementadas
 
 - Las vistas públicas exponen atributos `data-*` estables para Dusk en puntos clave (`data-hero-slider`, `data-latest-notices`, `data-notices-grid`).
+- Las páginas legales públicas exponen `data-legal-page="privacy-policy|legal-notice"` para validar la plantilla compartida sin depender de texto duplicado.
 - El menú móvil público usa `x-cloak` y altura máxima con scroll para que los tests landscape y la UX móvil no dependan del tiempo de inicialización de Alpine.
-- La comprobación E2E del formulario de contacto en navegador valida tanto la persistencia de `ContactMessage` como la llegada del email a MailHog.
+- La comprobación E2E del formulario de contacto en navegador valida el flujo visible, incluido el bloqueo inmediato del botón de envío frente a doble clic rápido.
+- La deduplicación de persistencia y correos del formulario de contacto se cubre con tests de Feature sobre `ContactForm`.
 
 ---
 
@@ -441,12 +445,17 @@ sequenceDiagram
     APP->>RC: Verifica token (POST siteverify)
     RC-->>APP: Score (0.0 - 1.0)
     alt Score >= 0.5 (humano)
-        APP->>APP: Guarda ContactMessage en BD
-        APP->>MAIL: Envía confirmación al visitante
-        APP->>MAIL: Envía notificación al admin
-        MAIL->>SMTP: Despacha emails
-        APP-->>LW: Éxito
-        LW-->>V: Mensaje de confirmación + limpia campos
+        alt Mismo payload reciente en la sesión
+            APP-->>LW: Éxito sin duplicar guardado ni correos
+            LW-->>V: Mensaje de confirmación + limpia campos
+        else Nuevo envío válido
+            APP->>APP: Guarda ContactMessage en BD
+            APP->>MAIL: Envía confirmación al visitante
+            APP->>MAIL: Envía notificación al admin
+            MAIL->>SMTP: Despacha emails
+            APP-->>LW: Éxito
+            LW-->>V: Mensaje de confirmación + limpia campos
+        end
     else Score < 0.5 (bot sospechoso)
         APP-->>LW: Error anti-spam
         LW-->>V: Mensaje de error

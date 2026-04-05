@@ -9,6 +9,8 @@ use Laravel\Dusk\Browser;
 test('language switcher toggles interface between Spanish and Basque', function () {
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
+            ->assertScript("return getComputedStyle(document.querySelector('[data-language-option=\"es\"]')).cursor;", 'pointer')
+            ->assertScript("return getComputedStyle(document.querySelector('[data-language-option=\"eu\"]')).cursor;", 'pointer')
             ->assertSee('Iragarkiak') // EU nav text
             ->press('ES')
             ->waitForText('Avisos')

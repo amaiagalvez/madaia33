@@ -315,17 +315,58 @@ Rediseño responsive incremental de la parte pública de la web, partiendo de lo
   - Verificar que no há cambios no deseados introducidos por el formateador
   - _Requisito: Convención del proyecto_
 
-- [x] 16. Documentación y specs sync
+- [x] 16. Mejorar affordance del selector de idioma
+  - Revisar el componente del selector de idioma público para que los botones/enlaces de cambio de idioma muestren cursor tipo mano en desktop y dispositivos con puntero
+  - Verificar que el cambio no afecta estados hover, focus ni accesibilidad del selector
+  - Comprobar errores/advertencias en la consola del navegador de las páginas afectadas
+  - Comprobar errores/advertencias nuevos en logs de Laravel relacionados con la tarea
+  - _Requisitos: 1.5, Convención del proyecto_
+  - ✅ **VERIFICADO:** cursor tipo mano aplicado en EU/ES; consola limpia en `/` y `/avisos`; sin errores nuevos relacionados en Laravel logs
+
+  - [x]* 16.1 Browser test: selector de idioma muestra affordance correcta
+    - **Verificar que el selector de idioma sigue siendo interactivo y usable tras el ajuste visual**
+    - **Valida: Requisito 1.5**
+    - ✅ **TEST PASADO:** `LanguageSwitcherTest` (1 test, 6 assertions)
+
+- [x] 17. Endurecer el formulario de contacto frente a doble envío rápido
+  - Revisar el flujo del formulario de contacto para evitar envíos duplicados al pulsar dos veces rápidamente el botón de guardar/enviar
+  - Asegurar que la solución no degrada la experiencia en mobile ni el feedback de carga/éxito del formulario
+  - Verificar si hay accesos a base de datos o envíos de correo duplicados y reducir operaciones innecesarias
+  - Comprobar errores/advertencias en la consola del navegador de las páginas afectadas
+  - Comprobar errores/advertencias nuevos en logs de Laravel relacionados con la tarea
+  - _Requisitos: 6.1, 6.3, Convención del proyecto_
+  - ✅ **VERIFICADO:** bloqueo inmediato del botón submit en `/contacto`; deduplicación por sesión+payload durante 15s sin crear `ContactMessage` ni mails duplicados; sin logs nuevos en `storage/logs`
+
+  - [x]* 17.1 Browser test: doble click rápido no duplica envío
+    - **Simular dos pulsaciones rápidas sobre el botón del formulario y verificar que solo se crea un envío válido**
+    - **Valida: Requisitos 6.1, 6.3**
+    - ✅ **TESTS PASADOS:** `tests/Browser/ContactFormTest.php` (3 tests, 7 assertions) y `tests/Feature/ContactFormTest.php` (9 tests, 29 assertions)
+
+- [x] 18. Unificar páginas legal-notice y privacy-policy
+  - Analizar las vistas y rutas de `legal-notice` y `privacy-policy` para extraer la estructura común en una única plantilla o componente reutilizable
+  - Mantener como diferencia únicamente el texto específico mostrado en cada página
+  - Reducir duplicación de markup y traer solo los datos necesarios para cada vista
+  - Comprobar errores/advertencias en la consola del navegador de las páginas afectadas
+  - Comprobar errores/advertencias nuevos en logs de Laravel relacionados con la tarea
+  - _Requisitos: 7.1, 7.2, 10.2, Convención del proyecto_
+  - ✅ **VERIFICADO:** ambas rutas comparten `public/legal-page.blade.php` con contenido y título diferenciados; sin errores nuevos relacionados en logs para `/politica-de-privacidad` y `/aviso-legal`
+
+  - [x]* 18.1 Feature test: páginas legales reutilizan layout común
+    - **Verificar que ambas rutas siguen respondiendo correctamente y muestran su texto diferenciado usando una implementación unificada**
+    - **Valida: Requisitos 7.1, 7.2**
+    - ✅ **TESTS PASADOS:** `tests/Feature/LegalPagesTest.php` (7 tests, 18 assertions), `tests/Feature/SecondaryPagesResponsiveTest.php` (4 tests, 19 assertions) y `tests/Browser/LegalPagesTest.php` (2 tests, 6 assertions)
+
+- [x] 19. Documentación y specs sync
   - Actualizar `.github/specs/community-web/` con cualquier cambio en arquitectura
   - Verificar que design.md refleja las decisiones reales tomadas
   - Documentar fallbacks/decisiones tomadas durante implementación
   - _Requisito: Convención del proyecto_
-  - ✅ **SPECS SINCRONIZADAS:** design docs actualizadas para HeroSlider, hooks `data-*`, smoke suite Dusk y verificación SMTP con MailHog
+  - ✅ **SPECS SINCRONIZADAS:** design docs actualizadas para HeroSlider, hooks `data-*`, smoke suite Dusk, verificación SMTP con MailHog, anti-duplicado del formulario de contacto y plantilla legal pública compartida
 
-- [x] 17. Hacer que los tests pasen con coverage
+- [x] 20. Hacer que los tests pasen con coverage
   - Ejecutar la suite de test con coverage dentro de Docker
   - Corregir los fallos de tests o de configuración que impidan completar la ejecución con coverage
   - Registrar el resultado en `.docs/test_coverage.md` con fecha/hora, número de tests, duración y porcentaje de coverage
   - Comparar el porcentaje con la entrada anterior y documentar si hay regresión de coverage
   - _Requisitos: Convención del proyecto, cobertura de tests_
-  - ✅ **COVERAGE COMPLETO PASADO:** 202 tests, 27.58s, 97.4%
+  - ✅ **COVERAGE COMPLETO PASADO:** 204 tests, 39.77s, 97.6% (mejora sobre 97.4%)
