@@ -184,7 +184,7 @@ new class extends Component {
                 @foreach ($this->images as $image)
                     <div
                         class="group relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-                        <img src="{{ Storage::url($image->path) }}" alt="{{ $image->alt_text }}"
+                        <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
                             loading="lazy" class="h-full w-full object-cover" />
 
                         {{-- Action overlay --}}

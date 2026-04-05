@@ -79,30 +79,8 @@
 
         {{-- Mobile navigation (visible only on md breakpoint below) --}}
         <div class="md:hidden border-t border-gray-200 bg-white max-h-[calc(100vh-4rem-env(safe-area-inset-top))] overflow-y-auto"
-            data-mobile-menu x-cloak x-data="{
-                open: false,
-                toggleMenu() {
-                    this.open = !this.open;
-            
-                    if (!this.open) {
-                        this.$nextTick(() => document.querySelector('[data-hamburger-button]')?.focus());
-                    }
-                },
-                focusFirstMenuItem() {
-                    this.$nextTick(() => setTimeout(() => this.$refs.firstMenuItem?.focus(), 200));
-                },
-                trapMenuFocus(event) {
-                    if (!this.open || event.key !== 'Tab') {
-                        return;
-                    }
-            
-                    const focusableElements = Array.from(
-                            this.$refs.mobileNav.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])') ); if
-            (focusableElements.length===0) { return; } const first=focusableElements[0]; const
-            last=focusableElements[focusableElements.length - 1]; const
-            active=document.activeElement; if (!event.shiftKey && active===last) {
-            event.preventDefault(); first.focus(); return; } if (event.shiftKey && active===first) {
-            event.preventDefault(); last.focus(); } } }" @toggle-mobile-menu.window="toggleMenu()"
+            data-mobile-menu x-cloak x-data="mobileMenu()"
+            @toggle-mobile-menu.window="toggleMenu()"
             @keydown.escape.window="if (open) { toggleMenu() }" @keydown.tab="trapMenuFocus($event)"
             x-effect="if (open) { focusFirstMenuItem() }" x-show="open" x-transition>
             <nav class="px-4 py-3 flex flex-col gap-1" x-ref="mobileNav"
@@ -156,6 +134,58 @@
     </footer>
 
     @fluxScripts
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('mobileMenu', () => ({
+                open: false,
+
+                toggleMenu() {
+                    this.open = !this.open;
+
+                    if (!this.open) {
+                        this.$nextTick(() => document.querySelector(
+                            '[data-hamburger-button]')?.focus());
+                    }
+                },
+
+                focusFirstMenuItem() {
+                    this.$nextTick(() => setTimeout(() => this.$refs.firstMenuItem
+                        ?.focus(), 200));
+                },
+
+                trapMenuFocus(event) {
+                    if (!this.open || event.key !== 'Tab') {
+                        return;
+                    }
+
+                    const focusableElements = Array.from(
+                        this.$refs.mobileNav.querySelectorAll(
+                            'a, button, [tabindex]:not([tabindex="-1"])')
+                    );
+
+                    if (focusableElements.length === 0) {
+                        return;
+                    }
+
+                    const first = focusableElements[0];
+                    const last = focusableElements[focusableElements.length - 1];
+                    const active = document.activeElement;
+
+                    if (!event.shiftKey && active === last) {
+                        event.preventDefault();
+                        first.focus();
+
+                        return;
+                    }
+
+                    if (event.shiftKey && active === first) {
+                        event.preventDefault();
+                        last.focus();
+                    }
+                },
+            }));
+        });
+    </script>
 </body>
 
 </html>

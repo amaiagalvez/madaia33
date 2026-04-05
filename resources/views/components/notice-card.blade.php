@@ -11,7 +11,7 @@
         @if ($showImage)
             @if ($image)
                 <div class="relative overflow-hidden bg-gray-100 aspect-video">
-                    <img src="{{ Storage::url($image->path) }}" alt="{{ $image->alt_text }}"
+                    <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
                         class="w-full h-full object-cover" />
                 </div>
             @else

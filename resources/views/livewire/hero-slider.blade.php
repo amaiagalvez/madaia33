@@ -47,7 +47,7 @@
                         'opacity-0 pointer-events-none': currentIndex !==
                             {{ $index }}
                     }">
-                    <img src="{{ Storage::url($image['path']) }}"
+                    <img src="{{ Storage::disk('public')->exists($image['path']) ? Storage::url($image['path']) : asset('favicon.svg') }}"
                         alt="{{ $image['alt_text'] ?? 'Hero slide' }}"
                         class="w-full h-full object-cover" loading="lazy" />
                 </div>

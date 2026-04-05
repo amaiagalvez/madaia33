@@ -10,10 +10,9 @@
             @foreach ($images as $image)
                 <button type="button" data-gallery-open
                     class="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                    @click="show('{{ Storage::url($image->path) }}', '{{ addslashes($image->alt_text) }}', $event)"
+                    @click="show('{{ $image->public_url }}', '{{ addslashes($image->alt_text) }}', $event)"
                     aria-label="{{ $image->alt_text }}">
-                    <img src="{{ Storage::url($image->path) }}" alt="{{ $image->alt_text }}"
-                        loading="lazy"
+                    <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}" loading="lazy"
                         class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
                 </button>
             @endforeach
@@ -47,14 +46,18 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('imageGallery', () => ({
             open: false,
-            current: { src: '', alt: '' },
+            current: {
+                src: '',
+                alt: ''
+            },
             isLandscape: false,
             touchStartY: null,
             lastActiveElement: null,
 
             init() {
                 this.updateOrientation();
-                window.addEventListener('resize', () => this.updateOrientation());
+                window.addEventListener('resize', () => this
+                .updateOrientation());
             },
 
             updateOrientation() {
@@ -62,16 +65,22 @@
             },
 
             show(src, alt, event) {
-                this.lastActiveElement = event?.currentTarget ?? document.activeElement;
-                this.current = { src, alt };
+                this.lastActiveElement = event?.currentTarget ?? document
+                    .activeElement;
+                this.current = {
+                    src,
+                    alt
+                };
                 this.updateOrientation();
                 this.open = true;
                 document.body.style.overflow = 'hidden';
-                setTimeout(() => document.querySelector('[data-lightbox-close]')?.focus(), 180);
+                setTimeout(() => document.querySelector('[data-lightbox-close]')
+                    ?.focus(), 180);
             },
 
             focusCloseButton() {
-                this.$nextTick(() => setTimeout(() => this.$refs.lightboxClose?.focus(), 300));
+                this.$nextTick(() => setTimeout(() => this.$refs.lightboxClose
+                    ?.focus(), 300));
             },
 
             close() {
@@ -106,7 +115,8 @@
                 }
 
                 const focusableElements = Array.from(
-                    this.$refs.lightboxPanel.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])')
+                    this.$refs.lightboxPanel.querySelectorAll(
+                        'button, [href], [tabindex]:not([tabindex="-1"])')
                 );
 
                 if (focusableElements.length === 0) {

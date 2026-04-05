@@ -24,6 +24,7 @@ debconf: delaying package configuration, since apt-utils is not installed"
 [ ] comments en ingles
 [x] separar la base de datos laravel con la que usa dusk-test para no machacar mis datos
 [ ] añadir un editor al campo de texto legal de los settings
+[ ] comprobar siempre los errores en la consola del navegoador
 
 ## Txuletak
 /dusk-test pasar los dusk test
