@@ -9,10 +9,10 @@ use Laravel\Dusk\Browser;
 
 test('admin can upload an image and it appears in the public gallery', function () {
     $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
-    $altText = 'Dusk test irudia ' . time();
+    $altText = 'Dusk test irudia '.time();
 
     // Create a temporary test image inside the container's temp dir
-    $tmpImage = '/tmp/dusk_test_' . time() . '.jpg';
+    $tmpImage = '/tmp/dusk_test_'.time().'.jpg';
     $img = imagecreatetruecolor(100, 100);
     $color = imagecolorallocate($img, 100, 150, 200);
     imagefill($img, 0, 0, $color);
@@ -31,13 +31,13 @@ test('admin can upload an image and it appears in the public gallery', function 
         // Fill alt text and submit
         $browser->type('#altEu', $altText)
             ->press('Argazkia igo')
-            ->waitFor('img[alt="' . $altText . '"]', 30)
-            ->assertPresent('img[alt="' . $altText . '"]');
+            ->waitFor('img[alt="'.$altText.'"]', 30)
+            ->assertPresent('img[alt="'.$altText.'"]');
 
         // Verify in public gallery
         $browser->visit('/galeria')
-            ->waitFor('img[alt="' . $altText . '"]', 30)
-            ->assertPresent('img[alt="' . $altText . '"]');
+            ->waitFor('img[alt="'.$altText.'"]', 30)
+            ->assertPresent('img[alt="'.$altText.'"]');
     });
 
     @unlink($tmpImage);
