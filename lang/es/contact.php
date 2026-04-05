@@ -2,6 +2,21 @@
 
 return [
     'title' => 'Contacto',
+    'seo_description' => 'Contacta con la comunidad mediante un formulario seguro para consultas, incidencias o sugerencias.',
+    'subtitle' => 'Envía tu mensaje de forma segura, clara y con el mismo tono cuidado que el resto de la web.',
+    'intro' => 'Estamos aquí para ayudarte: completa los datos y tu mensaje llegará de forma ordenada y directa.',
+    'required_hint' => '* Los campos marcados son obligatorios.',
+    'support_badge' => 'Atención directa',
+    'support_title' => 'Una vía clara para hablar con la comunidad',
+    'support_summary' => 'Envía dudas, incidencias o propuestas desde un único punto, con un formato claro y fiable.',
+    'trust_note' => 'Este formulario prioriza claridad, privacidad y una lectura cómoda para quien lo recibe.',
+    'benefits' => [
+        'response' => 'Un único canal para recibir una respuesta útil y directa.',
+        'secure' => 'Formulario protegido y alineado con la política de privacidad.',
+        'clarity' => 'Asunto y mensaje separados para que la comunicación sea más clara.',
+    ],
+    'subject_count' => 'Asunto',
+    'message_count' => 'Mensaje',
     'name' => 'Nombre completo',
     'email' => 'Correo electrónico',
     'subject' => 'Asunto',

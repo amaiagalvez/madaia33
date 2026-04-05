@@ -2,11 +2,12 @@
     'notice' => null,
     'showImage' => true,
     'image' => null,
+    'featured' => false,
 ])
 
 @if ($notice)
-    <div
-        class="flex flex-col bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+    <article
+        class="elevated-card group flex flex-col overflow-hidden {{ $featured ? 'sm:col-span-2 lg:col-span-3 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]' : '' }}">
         {{-- Image Header --}}
         @if ($showImage)
             @if ($image)
@@ -14,42 +15,69 @@
                     $imageUrl =
                         data_get($image, 'public_url') ??
                         (data_get($image, 'path') ?? asset('favicon.svg'));
-                    $imageAlt = data_get($image, 'alt_text', '');
+                    $imageAlt = data_get($image, 'alt_text') ?: $notice->title;
                 @endphp
-                <div class="relative overflow-hidden bg-gray-100 aspect-video">
+                <div
+                    class="relative overflow-hidden bg-gray-100 aspect-video {{ $featured ? 'lg:aspect-auto lg:min-h-[20rem]' : '' }}">
                     <img src="{{ $imageUrl }}" alt="{{ $imageAlt }}"
-                        class="w-full h-full object-cover" />
+                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy" decoding="async" />
+                    <div
+                        class="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-slate-950/35 to-transparent">
+                    </div>
                 </div>
             @else
                 <div
-                    class="relative overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 aspect-video flex items-center justify-center">
-                    <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
+                    class="relative flex aspect-video items-center justify-center overflow-hidden bg-linear-to-br from-indigo-50 via-gray-100 to-gray-200 {{ $featured ? 'lg:aspect-auto lg:min-h-[20rem]' : '' }}">
+                    <svg class="h-10 w-10 text-indigo-200" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
-                            d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-12-7.5h12a2.25 2.25 0 0 1 2.25 2.25v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 19.5V5.25a2.25 2.25 0 0 1 2.25-2.25Z" />
+                            d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                     </svg>
                 </div>
             @endif
         @endif
 
         {{-- Content Container --}}
-        <div class="flex-1 p-4 flex flex-col gap-2">
+        <div class="flex flex-1 flex-col gap-2 p-4 {{ $featured ? 'lg:p-6' : '' }}">
+            {{-- Date --}}
+            @if ($notice->published_at)
+                <div class="flex items-center justify-between gap-3">
+                    <time datetime="{{ $notice->published_at->toIso8601String() }}"
+                        class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600">
+                        {{ $notice->published_at->translatedFormat('j M Y') }}
+                    </time>
+                    @if ($featured)
+                        <span class="feature-chip border-amber-100 bg-amber-50 text-amber-700">
+                            {{ __('notices.featured_badge') }}
+                        </span>
+                    @else
+                        <span
+                            class="text-xs font-medium text-gray-300 transition-colors duration-200 group-hover:text-indigo-500">
+                            &rarr;
+                        </span>
+                    @endif
+                </div>
+            @endif
+
             {{-- Title --}}
-            <h3 class="text-base md:text-lg font-bold text-gray-900 line-clamp-2">
+            <h3
+                class="font-bold text-gray-900 line-clamp-2 {{ $featured ? 'text-xl md:text-2xl lg:text-3xl' : 'text-base md:text-lg' }}">
                 {{ $notice->title }}
             </h3>
 
             {{-- Excerpt --}}
-            <p class="text-sm md:text-base leading-relaxed text-gray-600 line-clamp-3">
+            <p
+                class="leading-relaxed text-gray-600 {{ $featured ? 'text-sm md:text-base lg:text-lg line-clamp-4' : 'text-sm md:text-base line-clamp-3' }}">
                 {{ Str::limit($notice->content, 120, '...') }}
             </p>
 
             {{-- Location Badges --}}
             @if ($notice->locations && $notice->locations->count() > 0)
-                <div class="flex flex-wrap gap-2 mt-auto pt-2">
+                <div class="mt-auto flex flex-wrap gap-1.5 pt-2">
                     @foreach ($notice->locations as $location)
                         <span
-                            class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                            class="inline-flex items-center rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
                             @if ($location->location_type === 'portal')
                                 {{ __('notices.portal') }} {{ $location->location_code }}
                             @elseif ($location->location_type === 'garage')
@@ -63,5 +91,5 @@
                 </div>
             @endif
         </div>
-    </div>
+    </article>
 @endif

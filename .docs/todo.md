@@ -5,7 +5,6 @@
 [ ] seo
 [ ] acceesibilidad
 [ ] traducciones repetidas
-[ ] recorrer todas las rutas una por una probar que se carga correctamente y comprobar el log de laravel
 [ ] añadir en la documentación /dusk-test pasar los dusk test para que siempre ejecute esto para pasar los dusk test
 [ ] añadir el MCP para que consulte la documentación de laravel
 [ ] cachear los settings

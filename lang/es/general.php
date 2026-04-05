@@ -30,6 +30,8 @@ return [
     'footer' => [
         'privacy_policy' => 'Política de privacidad',
         'legal_notice' => 'Aviso legal',
+        'privacy_policy_description' => 'Politica de privacidad oficial: tratamiento de datos personales, derechos y condiciones de uso.',
+        'legal_notice_description' => 'Aviso legal oficial: identificacion del sitio web, condiciones de uso y responsabilidad juridica.',
     ],
     'pagination' => [
         'previous' => 'Anterior',
@@ -46,5 +48,6 @@ return [
         'guest_message' => 'Para acceder a esta zona, debes iniciar sesión.',
         'auth_message' => 'La zona privada está en desarrollo.',
         'login_cta' => 'Iniciar sesión',
+        'seo_description' => 'Accede a la zona privada de la comunidad para iniciar sesion y gestionar tu area personal.',
     ],
 ];

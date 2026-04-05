@@ -35,7 +35,18 @@ test('notices page renders notice cards with responsive classes', function () {
     $response->assertSuccessful();
     // Should use notice-card component classes
     $response->assertSee('line-clamp-2');
-    $response->assertSee('line-clamp-3');
+    $response->assertSee('line-clamp-4');
+});
+
+test('notices page renders a featured editorial notice block', function () {
+    Notice::factory()->public()->count(3)->create();
+
+    $response = $this->get('/avisos');
+
+    $response->assertSuccessful();
+    $response->assertSee('data-featured-notice', false);
+    $response->assertSee(__('notices.featured_badge'));
+    $response->assertSee('lg:col-span-3');
 });
 
 test('notices page filter selector is visible and responsive', function () {
@@ -44,6 +55,7 @@ test('notices page filter selector is visible and responsive', function () {
     $response = $this->get('/avisos');
 
     $response->assertSuccessful();
+    $response->assertSee('data-notices-filter', false);
     $response->assertSee('sm:w-64');
     $response->assertSee(__('notices.filter.label'));
 });
@@ -116,5 +128,6 @@ test('notices page grid maintains responsive gap spacing', function () {
     $response = $this->get('/avisos');
 
     $response->assertSuccessful();
+    $response->assertSee('data-notices-grid', false);
     $response->assertSee('gap-4 sm:gap-6');
 });

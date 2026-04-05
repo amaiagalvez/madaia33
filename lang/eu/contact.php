@@ -2,6 +2,21 @@
 
 return [
     'title' => 'Kontaktua',
+    'seo_description' => 'Jarri komunitatearekin harremanetan formulario seguru baten bidez, zure kontsulta edo iradokizunetarako.',
+    'subtitle' => 'Bidali zure mezua modu seguruan, argian eta komunitatearen tonu zaindu berarekin.',
+    'intro' => 'Lagundu nahi dizugu: bete datuak eta zure mezua modu ordenatuan eta zuzen batean iritsiko da.',
+    'required_hint' => '* Ikurra duten eremuak derrigorrezkoak dira.',
+    'support_badge' => 'Laguntza zuzena',
+    'support_title' => 'Komunitatearekin hitz egiteko bide argia',
+    'support_summary' => 'Galderak, gorabeherak eta proposamenak toki bakarrean bidali, modu argi eta fidagarrian.',
+    'trust_note' => 'Formulario honek argitasuna, pribatutasuna eta irakurketa erraza lehenesten ditu.',
+    'benefits' => [
+        'response' => 'Erantzun erabilgarria eta zuzena jasotzeko kanal bakarra.',
+        'secure' => 'Formulario babestua eta pribatutasun-politikarekin lerrokatua.',
+        'clarity' => 'Mezuaren gaia eta edukia bereizita, komunikazioa argiago egiteko.',
+    ],
+    'subject_count' => 'Gaia',
+    'message_count' => 'Mezua',
     'name' => 'Izen-abizenak',
     'email' => 'Helbide elektronikoa',
     'subject' => 'Gaia',

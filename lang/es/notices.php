@@ -2,6 +2,13 @@
 
 return [
     'title' => 'Avisos',
+    'seo_description' => 'Consulta los avisos publicos de la comunidad, ordenados por fecha y filtrados por ubicacion.',
+    'subtitle' => 'Consulta los comunicados importantes de la comunidad con una presentación clara y ordenada.',
+    'editorial_badge' => 'Comunicación clara',
+    'editorial_summary' => 'Cada aviso se presenta para que resulte fácil de localizar, leer y revisar, aportando más orden a la vida diaria de la comunidad.',
+    'featured_badge' => 'Aviso destacado',
+    'featured_summary' => 'La primera pieza lleva al frente el mensaje más relevante de este momento.',
+    'filter_hint' => 'Elige una ubicación y encuentra antes la información que te afecta.',
     'empty' => 'No hay avisos disponibles en este momento.',
     'no_translation' => 'Este aviso no está disponible en castellano.',
     'published_at' => 'Fecha de publicación',

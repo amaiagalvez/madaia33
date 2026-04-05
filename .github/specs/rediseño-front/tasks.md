@@ -103,7 +103,7 @@ Rediseño responsive incremental de la parte pública de la web, partiendo de lo
 - [x] 6. Refactorizar `public/home.blade.php`
   - Insertar componente `<livewire:hero-slider />` antes del contenido actual
   - Añadir sección "Últimos Avisos" después del Hero_Slider:
-    - Título: `<h2 class="text-lg md:text-2xl font-bold uppercase mb-8">{{ __('home.latest_notices') }}</h2>`
+    - Título: `<h2 class="text-lg md:text-2xl font-bold uppercase mb-8">{{ __('home.notices') }}</h2>`
     - Grid de Tarjeta_Aviso: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6`
     - Cargar últimos 6 avisos: `Notice::public()->latest()->limit(6)->get()`
   - Envolver en `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12`

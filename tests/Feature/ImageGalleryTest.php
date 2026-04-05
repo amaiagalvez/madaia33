@@ -71,6 +71,7 @@ it('la galería pública es accesible', function () {
     $response = $this->get(route('gallery'));
 
     $response->assertOk();
+    $response->assertSee(__('gallery.editorial_summary'));
 });
 
 it('las imágenes se ordenan por created_at descendente', function () {

@@ -4,6 +4,7 @@
     autoplayEnabled: @entangle('autoplayEnabled'),
     autoplayInterval: @js($autoplayInterval),
     autoplayTimer: null,
+    touchStartX: null,
 
     startAutoplay() {
         if (!this.autoplayEnabled || this.images.length === 0) return;
@@ -27,13 +28,41 @@
     handleKeydown(e) {
         if (e.key === 'ArrowLeft') @this.call('previousImage');
         if (e.key === 'ArrowRight') @this.call('nextImage');
+    },
+
+    handleTouchStart(e) {
+        this.touchStartX = e.touches?.[0]?.clientX ?? null;
+    },
+
+    handleTouchEnd(e) {
+        if (this.touchStartX === null) {
+            return;
+        }
+
+        const touchEndX = e.changedTouches?.[0]?.clientX ?? this.touchStartX;
+        const deltaX = touchEndX - this.touchStartX;
+
+        if (Math.abs(deltaX) > 50) {
+            if (deltaX > 0) {
+                @this.call('previousImage');
+            } else {
+                @this.call('nextImage');
+            }
+
+            this.resetAutoplay();
+        }
+
+        this.touchStartX = null;
     }
-}" @keydown="handleKeydown" @autoplay-reset.window="resetAutoplay()"
+}" @keydown="handleKeydown" @touchstart.passive="handleTouchStart($event)"
+    @touchend="handleTouchEnd($event)" @autoplay-reset.window="resetAutoplay()"
     @start-autoplay.window="startAutoplay()" data-hero-slider
-    class="relative w-screen left-1/2 right-1/2 -mx-[50vw] h-64 sm:h-80 md:h-96 lg:h-[500px] bg-gray-900 overflow-hidden">
+    class="relative left-1/2 right-1/2 -mx-[50vw] h-64 w-screen overflow-hidden bg-gray-900 sm:h-80 md:h-96 lg:h-[35rem]"
+    role="region" aria-roledescription="carousel" aria-label="{{ __('hero_slider.gallery_title') }}"
+    tabindex="0">
     @if (empty($images))
         <div
-            class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+            class="flex h-full w-full items-center justify-center bg-linear-to-br from-gray-800 to-gray-900">
             <p class="text-gray-400 text-center">{{ __('hero_slider.no_images') }}</p>
         </div>
     @else
@@ -49,34 +78,44 @@
                     }">
                     <img src="{{ Storage::disk('public')->exists($image['path']) ? Storage::url($image['path']) : asset('favicon.svg') }}"
                         alt="{{ $image['alt_text'] ?? 'Hero slide' }}"
-                        class="w-full h-full object-cover" loading="lazy" />
+                        class="w-full h-full object-cover"
+                        loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                        fetchpriority="{{ $index === 0 ? 'high' : 'auto' }}" />
                 </div>
             @endforeach
 
             <!-- Dark Gradient Overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div
+                class="absolute inset-0 bg-linear-to-r from-slate-950/80 via-slate-950/30 to-transparent">
+            </div>
+            <div
+                class="absolute inset-0 bg-linear-to-t from-slate-950/70 via-transparent to-slate-950/20">
+            </div>
 
             <!-- Text Overlay (Optional) -->
-            <div
-                class="absolute inset-0 flex flex-col items-center justify-center text-center px-4 sm:px-6">
-                <h2
-                    class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-4 line-clamp-3">
-                    {{ __('hero_slider.gallery_title') }}
-                </h2>
-                <p class="text-sm sm:text-base text-gray-200 mb-6 sm:mb-8 hidden sm:block">
-                    {{ __('hero_slider.gallery_subtitle') }}
-                </p>
-
-                <!-- CTA Button -->
-                <a href="{{ route('gallery') }}"
-                    class="inline-flex items-center px-6 sm:px-8 py-2 sm:py-3 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
-                    {{ __('hero_slider.view_more_images') }}
-                    <svg class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                    </svg>
-                </a>
+            <div class="absolute inset-0 px-4 sm:px-6 lg:px-10">
+                <div class="mx-auto flex h-full max-w-7xl items-end pb-8 sm:pb-10 lg:pb-14">
+                    <div class="w-full">
+                        <div
+                            class="animate-soft-rise-delayed max-w-3xl px-5 py-5 sm:px-7 sm:py-6">
+                            <h2
+                                class="mb-2 line-clamp-3 text-left text-2xl font-bold text-white sm:text-3xl md:text-4xl lg:text-5xl">
+                                {{ __('hero_slider.gallery_title') }}
+                            </h2>
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                                <a href="{{ route('gallery') }}"
+                                    class="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 font-semibold text-gray-900 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900">
+                                    {{ __('hero_slider.view_more_images') }}
+                                    <svg class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -101,6 +140,28 @@
             </svg>
         </button>
 
+        <!-- Mobile Touch Controls -->
+        <div class="absolute inset-x-0 bottom-18 z-10 flex justify-between px-4 md:hidden">
+            <button @click="resetAutoplay()" wire:click="previousImage"
+                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+                aria-label="{{ __('hero_slider.previous') }}">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </button>
+            <button @click="resetAutoplay()" wire:click="nextImage"
+                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+                aria-label="{{ __('hero_slider.next') }}">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8.25 4.5L15.75 12l-7.5 7.5" />
+                </svg>
+            </button>
+        </div>
+
         <!-- Pagination Dots (Always Visible) -->
         <div class="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
             @foreach ($images as $index => $image)
@@ -112,7 +173,7 @@
                             {{ $index }}
                     }"
                     :aria-label="`{{ __('hero_slider.go_to_slide') }} {{ $index + 1 }}`"
-                    aria-current="page"></button>
+                    :aria-current="currentIndex === {{ $index }} ? 'true' : 'false'"></button>
             @endforeach
         </div>
 

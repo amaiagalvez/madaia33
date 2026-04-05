@@ -2,6 +2,11 @@
 
 return [
     'title' => 'Argazki-bilduma',
+    'seo_description' => 'Komunitateko argazki-bilduma arakatu, une eta espazio partekatuen irudiekin.',
+    'subtitle' => 'Komunitateko espazioak eta uneak ikuspegi zainduago batekin arakatu.',
+    'editorial_badge' => 'Irudi hautatuak',
+    'editorial_summary' => 'Galeria honek komunitatearen irudia eraikitzen du: espazioak, jarduerak eta xehetasun partekatuak modu erakargarrian antolatuta.',
+    'mosaic_note' => 'Irudi nagusi batek erritmo bisuala markatzen du eta gainerakoek kontakizuna osatzen dute.',
     'empty' => 'Une honetan ez dago argazkirik.',
     'portal' => 'Portala',
     'garage' => 'Garaje-solairua',

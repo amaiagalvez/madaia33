@@ -23,8 +23,9 @@ it('renders placeholder image when showImage is true but no image provided', fun
 
     $view = $this->blade('<x-notice-card :notice="$notice" show-image />', ['notice' => $notice]);
 
-    // Check for SVG placeholder
-    $view->assertSee('m2.25 15.75');
+    // Check for indigo-tinted placeholder with aspect-video
+    $view->assertSee('from-indigo-50');
+    $view->assertSee('aspect-video');
 });
 
 it('hides image when showImage is false', function () {

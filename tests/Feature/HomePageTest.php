@@ -19,6 +19,26 @@ test('home page displays latest notices grid', function () {
     }
 });
 
+test('home page renders editorial landing section', function () {
+    $response = $this->get('/');
+
+    $response->assertSuccessful();
+    $response->assertSee(__('home.editorial_title'));
+});
+
+test('public layout keeps sticky header solid and prevents horizontal overflow', function () {
+    $response = $this->get('/');
+
+    $response->assertSuccessful();
+    $response->assertSee('overflow-x-clip', false);
+    $response->assertSee('sticky top-0 z-[70]', false);
+    $response->assertSee('public-header', false);
+    $response->assertSee('header-shell', false);
+    $response->assertSee('header-nav-panel', false);
+    $response->assertSee('header-brand-mark', false);
+    $response->assertSee('pt-[env(safe-area-inset-top)]', false);
+});
+
 test('home page shows only latest 6 notices', function () {
     Notice::factory()->public()->count(10)->create();
 
@@ -65,8 +85,8 @@ test('home page renders notice card with correct structure', function () {
     $response = $this->get('/');
 
     $response->assertSuccessful();
-    // Check for notice-card component elements
-    $response->assertSee('bg-white rounded-lg');
+    // Check for notice-card component classes
+    $response->assertSee('elevated-card');
     $response->assertSee('line-clamp-2');
 });
 

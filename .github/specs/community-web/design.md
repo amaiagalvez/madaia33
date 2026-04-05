@@ -207,7 +207,12 @@ La ruta `/admin/imagenes` y su vista existen, pero el componente dedicado de ges
 
 ### Convenciones de testing UI implementadas
 
-- Las vistas públicas exponen atributos `data-*` estables para Dusk en puntos clave (`data-hero-slider`, `data-latest-notices`, `data-notices-grid`).
+- Las vistas públicas exponen atributos `data-*` estables para Dusk y Feature tests en puntos clave (`data-hero-slider`, `data-latest-notices`, `data-notices-grid`, `data-notices-filter`, `data-gallery-grid`, `data-gallery-lightbox`).
+- Las páginas públicas de primer nivel exponen marcadores semánticos (`data-page` y `data-page-hero`) para reducir la dependencia de asserts basados en cadenas largas de clases Tailwind.
+- La home incorpora accesos rápidos estables (`data-home-quick-links`) hacia avisos, galería y contacto para mejorar descubrimiento de contenido.
+- Las metadescripciones públicas se definen por locale en los ficheros de traducción (`home.seo_description`, `notices.seo_description`, `gallery.seo_description`, `contact.seo_description` y claves legales/privadas de `general`).
+- El formulario de contacto muestra microfeedback de completitud (contadores de asunto/mensaje) y estado de envío accesible con `aria-live`.
+- El hero slider público soporta interacción táctil en móvil (swipe izquierda/derecha) además de botones de navegación.
 - Las páginas legales públicas exponen `data-legal-page="privacy-policy|legal-notice"` para validar la plantilla compartida sin depender de texto duplicado.
 - El menú móvil público usa `x-cloak` y altura máxima con scroll para que los tests landscape y la UX móvil no dependan del tiempo de inicialización de Alpine.
 - La comprobación E2E del formulario de contacto en navegador valida el flujo visible, incluido el bloqueo inmediato del botón de envío frente a doble clic rápido.

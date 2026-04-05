@@ -2,8 +2,7 @@
 
 return [
     'title' => 'Hero Slider',
-    'gallery_title' => 'Komunitate-etxea azken irudiak',
-    'gallery_subtitle' => 'Ezagutu gure komunitatearen azken irudiak',
+    'gallery_title' => 'Madaia irudietan',
     'view_more_images' => 'Argazkiak ikus',
     'no_images' => 'Oraingoan ez dago argazkirik.',
     'previous' => 'Aurrekoa',
@@ -11,4 +10,5 @@ return [
     'go_to_slide' => 'Deslizalera joan',
     'play' => 'Erreproduzitu',
     'pause' => 'Pausatu',
+    'swipe_hint' => 'Irristatu ezkerrera edo eskuinera gehiago ikusteko.',
 ];

@@ -23,17 +23,22 @@ Usar siempre el layout correcto según la sección. No crear layouts nuevos sin 
 
 ## Paleta de colores y estilo
 
-La parte pública usa un estilo limpio con fondo blanco y acentos en gris:
+La parte pública mantiene base neutra, pero puede usar acentos visuales modernos para mejorar jerarquía:
 
-- Fondo de página: `bg-white`
-- Texto principal: `text-gray-900`
-- Texto secundario: `text-gray-600`
-- Bordes: `border-gray-200`
-- Tarjetas/paneles: `bg-white border border-gray-200 rounded-lg shadow-sm`
-- Estado activo en nav: `text-gray-900 underline underline-offset-4`
-- Hover en nav: `hover:text-gray-900 transition-colors`
+- Base recomendada: `bg-white`, `text-gray-900`, `text-gray-600`, `border-gray-200`
+- Se permiten fondos de sección con gradientes suaves (`bg-gradient-to-*`) y contraste AA
+- Tarjetas/paneles: `bg-white border border-gray-200 rounded-lg/rounded-2xl shadow-sm`
+- Estado activo en nav: `text-gray-900 underline underline-offset-4` o equivalente accesible
+- Hover y focus siempre visibles (`hover:*` + `focus-visible:ring-*`)
 
 El panel de administración usa `bg-gray-100` como fondo y `bg-white` para sidebar y tarjetas.
+
+## Dirección visual (público)
+
+- Cada página pública debe tener un bloque de cabecera claro (hero o encabezado de sección)
+- Evitar pantallas "planas": usar capas sutiles (gradiente, borde, sombra suave)
+- Priorizar tipografía expresiva en títulos: `tracking-tight`, escala responsiva (`text-3xl md:text-4xl`)
+- Mantener consistencia entre páginas con patrones reutilizables
 
 ## Contenedor principal
 
@@ -82,6 +87,8 @@ No usar librerías de iconos externas. Los paths SVG son de Heroicons.
 - Los SVGs decorativos deben llevar `aria-hidden="true"`.
 - Los elementos interactivos deben tener etiquetas `<label>` asociadas.
 - Usar `focus:outline-none focus:ring-1 focus:ring-gray-500` en inputs.
+- Añadir `aria-current="page"` en navegación activa.
+- Incluir enlace de salto a contenido principal (skip link) en layout público.
 
 ## SEO (vistas públicas)
 
@@ -94,6 +101,14 @@ Cada vista pública debe incluir:
 ```
 
 El `<title>` lo gestiona automáticamente el layout mediante el prop `:title`.
+
+- Incluir un único `<h1>` por página (puede ser `sr-only` si visualmente no conviene mostrarlo).
+- Priorizar descripciones específicas de página; evitar metadescriptions genéricas.
+
+## Selectores estables para tests
+
+- Para zonas críticas usar atributos `data-*` estables (`data-page`, `data-page-hero`, `data-*-grid`).
+- No acoplar tests solo a cadenas largas de clases Tailwind cuando exista alternativa semántica.
 
 ## Estado vacío
 

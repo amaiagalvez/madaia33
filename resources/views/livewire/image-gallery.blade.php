@@ -2,18 +2,50 @@
     x-effect="if (open) { focusCloseButton() }">
     {{-- Image grid --}}
     @if ($images->isEmpty())
-        <div class="rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center">
+        <div
+            class="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
+            <div
+                class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
+                </svg>
+            </div>
             <p class="text-gray-500 text-sm">{{ __('gallery.empty') }}</p>
         </div>
     @else
+        <div class="mb-6 hero-frame px-4 py-4 sm:px-5">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-600">
+                        {{ __('gallery.title') }}</p>
+                    <p class="mt-1 text-sm text-gray-600">{{ __('gallery.subtitle') }}</p>
+                </div>
+                <span class="feature-chip border-emerald-100 bg-emerald-50 text-emerald-700">
+                    {{ $images->count() }} {{ __('gallery.title') }}
+                </span>
+            </div>
+        </div>
+
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" data-gallery-grid>
             @foreach ($images as $image)
                 <button type="button" data-gallery-open
-                    class="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    wire:key="gallery-image-{{ $image->id }}"
+                    class="group relative aspect-square overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'sm:col-span-2 sm:row-span-2 sm:aspect-auto min-h-[18rem]' : '' }}"
                     @click="show('{{ $image->public_url }}', '{{ addslashes($image->alt_text) }}', $event)"
                     aria-label="{{ $image->alt_text }}">
-                    <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}" loading="lazy"
+                    <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
+                        loading="lazy"
                         class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
+                    <span
+                        class="absolute left-3 top-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm">
+                        {{ $loop->first ? __('gallery.title') : __('hero_slider.view_more_images') }}
+                    </span>
+                    <span aria-hidden="true"
+                        class="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent px-2 py-2 text-[11px] font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                        {{ Str::limit($image->alt_text, 40) }}
+                    </span>
                 </button>
             @endforeach
         </div>
@@ -24,7 +56,7 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
         @click.self="close()" @touchstart="handleTouchStart($event)"
         @touchmove="handleTouchMove($event)" role="dialog" aria-modal="true"
-        :aria-label="current.alt">
+        :aria-label="current.alt" data-gallery-lightbox>
         <div class="relative max-h-full max-w-5xl w-full flex items-center justify-center"
             x-ref="lightboxPanel">
             <img :src="current.src" :alt="current.alt"
@@ -57,7 +89,7 @@
             init() {
                 this.updateOrientation();
                 window.addEventListener('resize', () => this
-                .updateOrientation());
+                    .updateOrientation());
             },
 
             updateOrientation() {
