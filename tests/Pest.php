@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Setting;
 use Tests\TestCase;
+use App\Models\Setting;
 use Tests\DuskTestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

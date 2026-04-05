@@ -3,8 +3,8 @@
 // Feature: community-web, Tarea 7: Formulario de contacto
 // Valida: Requisitos 10.1–10.6, 11.1–11.5, 12.1–12.3, 13.1–13.3
 
-use Livewire\Livewire;
 use App\Models\User;
+use Livewire\Livewire;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
