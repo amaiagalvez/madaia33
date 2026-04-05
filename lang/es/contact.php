@@ -19,6 +19,7 @@ return [
         'subject_required' => 'El asunto es obligatorio.',
         'message_required' => 'El mensaje es obligatorio.',
         'message_max' => 'El mensaje no puede superar los 5000 caracteres.',
+        'script_tags_not_allowed' => 'No se permiten etiquetas script en el contenido enviado.',
         'legal_required' => 'Debes aceptar la política de privacidad.',
     ],
     'mail' => [

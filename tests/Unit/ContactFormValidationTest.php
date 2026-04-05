@@ -103,3 +103,47 @@ it('requires legal acceptance', function (mixed $legalAccepted) {
     expect($validator->fails())->toBeTrue()
         ->and($validator->errors()->keys())->toContain('legalAccepted');
 })->with([false, null, '']);
+
+it('rejects script tags in subject and message', function (string $field, string $payload) {
+    $data = [
+        'name' => 'Ane',
+        'email' => 'ane@example.com',
+        'subject' => 'Gaia normala',
+        'message' => 'Mezua normala',
+        'legalAccepted' => true,
+        'recaptchaToken' => 'token',
+    ];
+
+    $data[$field] = $payload;
+
+    $validator = Validator::make(
+        $data,
+        ContactFormValidation::rules(''),
+        ContactFormValidation::messages(),
+    );
+
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->keys())->toContain($field);
+})->with([
+    ['subject', '<script>alert("xss")</script>'],
+    ['message', '<ScRiPt>alert("xss")</sCrIpT>'],
+]);
+
+it('allows sql-like plain text payloads', function () {
+    $data = [
+        'name' => 'Ane',
+        'email' => 'ane@example.com',
+        'subject' => 'Consulta',
+        'message' => "' OR 1=1 --",
+        'legalAccepted' => true,
+        'recaptchaToken' => 'token',
+    ];
+
+    $validator = Validator::make(
+        $data,
+        ContactFormValidation::rules(''),
+        ContactFormValidation::messages(),
+    );
+
+    expect($validator->fails())->toBeFalse();
+});

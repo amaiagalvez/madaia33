@@ -1,14 +1,13 @@
 <?php
 
 use App\Models\Setting;
+use Tests\TestCase;
+use Tests\DuskTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 pest()->extend(DuskTestCase::class)
     //  ->use(Illuminate\Foundation\Testing\DatabaseMigrations::class)
     ->in('Browser');
-
-use Tests\TestCase;
-use Tests\DuskTestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /*
 |--------------------------------------------------------------------------

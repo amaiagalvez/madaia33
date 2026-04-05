@@ -4,6 +4,7 @@
 // Valida: Requisitos 10.1–10.6, 11.1–11.5, 12.1–12.3, 13.1–13.3
 
 use Livewire\Livewire;
+use App\Models\User;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
@@ -150,4 +151,46 @@ it('fallo de reCAPTCHA por error externo: rechaza el envío', function () {
 
     $component->assertSet('statusType', 'error');
     expect(ContactMessage::count())->toBe(0);
+});
+
+it('rechaza payload xss con script tags y no guarda el mensaje', function () {
+    Mail::fake();
+
+    $payload = '<script>alert("xss")</script>';
+
+    Livewire::test('contact-form')
+        ->set('name', 'Ane Etxebarria')
+        ->set('email', 'ane@example.com')
+        ->set('subject', 'Consulta')
+        ->set('message', $payload)
+        ->set('legalAccepted', true)
+        ->set('recaptchaToken', 'skip')
+        ->call('submit')
+        ->assertHasErrors(['message']);
+
+    expect(ContactMessage::count())->toBe(0);
+});
+
+it('trata payload sql-like como texto plano en la bandeja admin', function () {
+    Mail::fake();
+
+    $payload = "' OR 1=1 --";
+
+    Livewire::test('contact-form')
+        ->set('name', 'Ane Etxebarria')
+        ->set('email', 'ane@example.com')
+        ->set('subject', 'Consulta SQL')
+        ->set('message', $payload)
+        ->set('legalAccepted', true)
+        ->set('recaptchaToken', 'skip')
+        ->call('submit');
+
+    $message = ContactMessage::query()->firstOrFail();
+
+    expect($message->message)->toBe($payload);
+
+    Livewire::actingAs(User::factory()->create())
+        ->test('admin-message-inbox')
+        ->call('openMessage', $message->id)
+        ->assertSeeText($payload);
 });

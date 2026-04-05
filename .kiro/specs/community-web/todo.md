@@ -7,5 +7,3 @@
 
 [ ] coverage
 [ ] traducciones repetidas
-
-[ ] pint.json que más añadir?

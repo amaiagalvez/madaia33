@@ -19,6 +19,7 @@ return [
         'subject_required' => 'Gaia beharrezkoa da.',
         'message_required' => 'Mezua beharrezkoa da.',
         'message_max' => 'Mezuak gehienez 5000 karaktere izan ditzake.',
+        'script_tags_not_allowed' => 'Bidalitako edukian script etiketak ez dira onartzen.',
         'legal_required' => 'Pribatutasun-politika onartu behar duzu.',
     ],
     'mail' => [

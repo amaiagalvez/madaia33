@@ -172,6 +172,7 @@ Web pública para la comunidad de vecinos. La web contará con una parte públic
 6. WHEN el visitante envía el formulario correctamente, THE Formulario_Contacto SHALL limpiar todos los campos del formulario.
 7. THE Formulario_Contacto SHALL limitar el campo "mensaje" a un máximo de 5000 caracteres.
 8. THE Formulario_Contacto SHALL mostrar todas las etiquetas, mensajes de error y mensajes de confirmación en el idioma activo seleccionado por el visitante.
+9. WHEN el visitante introduce etiquetas `<script>` en el asunto o en el mensaje, THE Formulario_Contacto SHALL rechazar el envío, mostrar un mensaje de validación y no guardar el mensaje.
 
 ---
 

@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Actions;
-
 namespace App\Validations;
+
+use App\Rules\NoScriptTags;
 
 class ContactFormValidation
 {
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     public static function rules(string $siteKey): array
     {
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:5000',
+            'subject' => ['required', 'string', 'max:255', new NoScriptTags],
+            'message' => ['required', 'string', 'max:5000', new NoScriptTags],
             'legalAccepted' => 'accepted',
             'recaptchaToken' => $siteKey ? 'required|string' : 'nullable|string',
         ];
