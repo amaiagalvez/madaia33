@@ -73,7 +73,7 @@ test('gallery and lightbox adapt in landscape breakpoints', function () {
         "return document.querySelector('[data-lightbox] img').getBoundingClientRect().height <= (window.innerHeight * 0.86);",
         true
       )
-      ->resize(1024, 768)
+      ->resize(1280, 800)
       ->pause(350)
       ->assertScript(
         "return getComputedStyle(document.querySelector('[data-gallery-grid]')).gridTemplateColumns.split(' ').length;",

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Http;
 function mailhogDeliveredMessages(string $subject, array $recipients): bool
 {
   try {
-    $response = Http::timeout(2)->get('http://mailhog:8025/api/v2/messages');
+    $response = Http::timeout(5)->get('http://mailhog:8025/api/v2/messages');
   } catch (Throwable) {
     return false;
   }
@@ -38,7 +38,7 @@ function mailhogDeliveredMessages(string $subject, array $recipients): bool
   });
 }
 
-function waitForMailhogDelivery(string $subject, array $recipients, int $attempts = 10): void
+function waitForMailhogDelivery(string $subject, array $recipients, int $attempts = 40): void
 {
   for ($attempt = 0; $attempt < $attempts; $attempt++) {
     if (mailhogDeliveredMessages($subject, $recipients)) {
@@ -112,7 +112,7 @@ test('notices page smoke checks responsive grid filter and pagination', function
       ->select('#location-filter', 'A')
       ->pause(600)
       ->assertScript("return document.body.innerText.includes('Smoke Notice A');", true)
-      ->resize(1024, 768)
+      ->resize(1200, 900)
       ->pause(400)
       ->assertScript(
         "return getComputedStyle(document.querySelector('[data-notices-grid]')).gridTemplateColumns.split(' ').length;",

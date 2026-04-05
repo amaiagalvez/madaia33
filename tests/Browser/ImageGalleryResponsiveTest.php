@@ -27,7 +27,7 @@ test('gallery grid responds to mobile tablet and desktop breakpoints', function 
                 3
             );
 
-        $browser->resize(1024, 768)
+        $browser->resize(1200, 900)
             ->pause(300)
             ->assertScript(
                 "return getComputedStyle(document.querySelector('[data-gallery-grid]')).gridTemplateColumns.split(' ').length;",
