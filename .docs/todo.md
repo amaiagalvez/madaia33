@@ -17,6 +17,13 @@ debconf: delaying package configuration, since apt-utils is not installed"
 [ ] crea una nueva instrucción para saber cómo crear los dusk test y añade todo lo que has detectado en esta sesión para que lo tengas en cuenta antes de creaar un nuevo dusk test
 [ ] cachear los settings
 [ ] comprobar las consultas la base de datos, evitar repetidas y error N+1
+[ ] puedo ver en pantalla lo que ocurre al ejecutar los dusk test?
+[ ] controlar la barra de desplazamiento horizontal para que no salga
+[ ] cursor mano en los botones de cambiar le idioma
+[ ] probar el formulario dandole dos veces rapidamente al botón de guardar
+[ ] test en ingles
+[ ] comments en ingles
+[ ] separar la base de datos laravel con la que usa dusk-test para no machacar mis datos
 
 ## Txuletak
 /dusk-test pasar los dusk test

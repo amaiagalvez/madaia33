@@ -61,6 +61,73 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
+/* ========================================
+   Safe Area Insets (iOS notch support)
+   ======================================== */
+
+header {
+    padding-top: max(env(safe-area-inset-top), 0.25rem);
+}
+
+footer {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.25rem);
+}
+
+/* ========================================
+   Alpine.js: hide before init
+   ======================================== */
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* ========================================
+   Modal / Lightbox Responsive
+   ======================================== */
+
+/* Block body scroll when modal is open */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Lightbox image max-height responsive */
+@media (max-height: 500px) and (orientation: landscape) {
+    header {
+        max-height: 33vh;
+        overflow-y: auto;
+    }
+
+    .lightbox-image {
+        max-height: 85vh;
+    }
+}
+
+@media (orientation: portrait) {
+    .lightbox-image {
+        max-height: 90vh;
+    }
+}
+
+/* ========================================
+   Typography Responsive
+   ======================================== */
+
+/* Mobile: text-sm (14px) */
+@media (max-width: 767px) {
+    body {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+}
+
+/* Tablet and up: text-base (16px) */
+@media (min-width: 768px) {
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */

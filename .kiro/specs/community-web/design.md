@@ -13,6 +13,8 @@ La web de la comunidad de vecinos es una aplicación Laravel 13 con arquitectura
 - **Envío de emails**: Laravel Mail con driver configurable (SMTP, Mailgun, etc.). Las notificaciones se implementan con `Mailable` classes.
 - **Almacenamiento de imágenes**: disco `public` de Laravel Storage (`storage/app/public`), con enlace simbólico `public/storage`.
 - **Tests de navegador**: Laravel Dusk con ChromeDriver para tests end-to-end de flujos críticos de usuario.
+- **Tests de navegador**: Laravel Dusk con ChromeDriver para tests end-to-end de flujos críticos de usuario. Además de los tests específicos por pantalla, existe una suite smoke `PublicSiteResponsiveTest` que valida los flujos públicos principales en mobile y landscape.
+- **SMTP de pruebas para browser tests**: En los flujos Dusk del formulario de contacto, el entorno Docker puede apuntar `MAIL_HOST=mailhog` y `MAIL_PORT=1025` para comprobar entrega real de emails sin depender de `Mail::fake()`.
 - **SEO**: Cada vista Blade pública usa un stack de Blade (`@stack('meta')`) para inyectar título y meta description únicos por página en el idioma activo. Se genera un `sitemap.xml` dinámico mediante una ruta dedicada y un controlador.
 - **Seguridad**: Cabeceras HTTP de seguridad (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) añadidas mediante middleware. Protección CSRF nativa de Laravel activa en todos los formularios. HTTPS obligatorio en producción mediante configuración de `AppServiceProvider` o `.env`.
 - **Validación defensiva en contacto**: El formulario de contacto rechaza entradas que incluyen etiquetas `<script>` en asunto o mensaje mediante reglas de validación específicas (`not_regex`), como capa adicional frente a XSS, manteniendo además el escape de salida en Blade.
@@ -182,16 +184,17 @@ POST /logout                    → Cerrar sesión
 
 ### Componentes Livewire principales
 
-| Componente           | Ruta                     | Responsabilidad                                                         |
-| -------------------- | ------------------------ | ----------------------------------------------------------------------- |
-| `PublicNotices`      | `/avisos`                | Lista paginada de avisos públicos con filtro por portal/planta          |
-| `ImageGallery`       | `/galeria`               | Galería con lightbox ordenada por fecha                                 |
-| `ContactForm`        | `/contacto`              | Formulario con validación en tiempo real, reCAPTCHA v3, envío de emails |
-| `LanguageSwitcher`   | Global (layout)          | Cambio de idioma EU/ES, persiste en sesión                              |
-| `AdminNoticeManager` | `/admin/avisos`          | CRUD de avisos con publicación/despublicación                           |
-| `AdminMessageInbox`  | `/admin/mensajes`        | Bandeja de mensajes, marcar leído/no leído, eliminar con confirmación   |
-| `AdminSettings`      | `/admin/configuracion`   | Configuración de email, reCAPTCHA, texto legal                          |
-| `AdminLegalPages`    | `/admin/paginas-legales` | Edición de contenido de política de privacidad y aviso legal en EU y ES |
+| Componente           | Ruta                     | Responsabilidad                                                                   |
+| -------------------- | ------------------------ | --------------------------------------------------------------------------------- |
+| `PublicNotices`      | `/avisos`                | Lista paginada de avisos públicos con filtro por portal/planta                    |
+| `HeroSlider`         | `/`                      | Carrusel principal de la home con autoplay coordinado por eventos Alpine/Livewire |
+| `ImageGallery`       | `/galeria`               | Galería con lightbox ordenada por fecha                                           |
+| `ContactForm`        | `/contacto`              | Formulario con validación en tiempo real, reCAPTCHA v3, envío de emails           |
+| `LanguageSwitcher`   | Global (layout)          | Cambio de idioma EU/ES, persiste en sesión                                        |
+| `AdminNoticeManager` | `/admin/avisos`          | CRUD de avisos con publicación/despublicación                                     |
+| `AdminMessageInbox`  | `/admin/mensajes`        | Bandeja de mensajes, marcar leído/no leído, eliminar con confirmación             |
+| `AdminSettings`      | `/admin/configuracion`   | Configuración de email, reCAPTCHA, texto legal                                    |
+| `AdminLegalPages`    | `/admin/paginas-legales` | Edición de contenido de política de privacidad y aviso legal en EU y ES           |
 
 La ruta `/admin/imagenes` y su vista existen, pero el componente dedicado de gestión administrativa de imágenes sigue pendiente en el estado actual del código.
 
@@ -199,6 +202,12 @@ La ruta `/admin/imagenes` y su vista existen, pero el componente dedicado de ges
 
 - `layouts/public.blade.php` — Layout para la parte pública (nav con selector de idioma, footer)
 - `layouts/admin.blade.php` — Layout para el panel de administración (sidebar, nav admin)
+
+### Convenciones de testing UI implementadas
+
+- Las vistas públicas exponen atributos `data-*` estables para Dusk en puntos clave (`data-hero-slider`, `data-latest-notices`, `data-notices-grid`).
+- El menú móvil público usa `x-cloak` y altura máxima con scroll para que los tests landscape y la UX móvil no dependan del tiempo de inicialización de Alpine.
+- La comprobación E2E del formulario de contacto en navegador valida tanto la persistencia de `ContactMessage` como la llegada del email a MailHog.
 
 ---
 

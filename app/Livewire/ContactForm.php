@@ -51,6 +51,7 @@ class ContactForm extends Component
         if (! $this->verifyRecaptcha()) {
             $this->statusType = 'error';
             $this->statusMessage = __('contact.spam_error');
+            $this->dispatch('contact-form-submitted');
 
             return;
         }
@@ -96,6 +97,8 @@ class ContactForm extends Component
             $this->statusType = 'success';
             $this->statusMessage = __('contact.success');
         }
+
+        $this->dispatch('contact-form-submitted');
     }
 
     private function verifyRecaptcha(): bool

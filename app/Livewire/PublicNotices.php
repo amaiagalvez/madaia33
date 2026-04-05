@@ -51,7 +51,7 @@ class PublicNotices extends Component
                 });
             })
             ->orderByDesc('published_at')
-            ->paginate(10);
+            ->paginate(9);
     }
 
     public function render(): View

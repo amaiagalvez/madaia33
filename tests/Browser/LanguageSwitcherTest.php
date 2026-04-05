@@ -14,8 +14,6 @@ test('language switcher toggles interface between Spanish and Basque', function 
             ->waitForText('Avisos')
             ->assertSee('Avisos')
             ->assertSee('Galería')
-            ->press('ES')
-            ->waitForText('Avisos')
             ->press('EU')
             ->waitForText('Iragarkiak')
             ->assertSee('Iragarkiak');

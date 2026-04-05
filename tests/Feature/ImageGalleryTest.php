@@ -83,3 +83,27 @@ it('las imágenes se ordenan por created_at descendente', function () {
         expect($dates[$i]->gte($dates[$i + 1]))->toBeTrue();
     }
 });
+
+it('renderiza la galería con grid responsive esperado', function () {
+    Image::factory()->count(2)->create();
+
+    $response = $this->get(route('gallery'));
+
+    $response->assertOk();
+    $response->assertSee('grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4', false);
+    $response->assertSee('data-gallery-grid', false);
+});
+
+it('incluye controles avanzados del lightbox responsive', function () {
+    Image::factory()->count(1)->create();
+
+    $response = $this->get(route('gallery'));
+
+    $response->assertOk();
+    $response->assertSee('window.innerHeight < window.innerWidth', false);
+    $response->assertSee("isLandscape ? 'max-h-[85vh]' : 'max-h-[90vh]'", false);
+    $response->assertSee("document.body.style.overflow = 'hidden'", false);
+    $response->assertSee('data-lightbox-close', false);
+    $response->assertSee('min-h-11 min-w-11', false);
+    $response->assertSee('@touchmove="handleTouchMove($event)"', false);
+});

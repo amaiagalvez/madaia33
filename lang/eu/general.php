@@ -35,7 +35,16 @@ return [
         'previous' => 'Aurrekoa',
         'next' => 'Hurrengoa',
     ],
+    'font_sizes' => [
+        'mobile' => 'text-sm',
+        'tablet_up' => 'text-base',
+    ],
     'close' => 'Itxi',
     'sending' => 'Bidaltzen...',
     'privacy_policy' => 'Pribatutasun-politika',
+    'private' => [
+        'guest_message' => 'Eremu honetara sartzeko, saioa hasi behar duzu.',
+        'auth_message' => 'Eremu pribatua oraindik garatzen ari da.',
+        'login_cta' => 'Saioa hasi',
+    ],
 ];

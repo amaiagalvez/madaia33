@@ -35,7 +35,16 @@ return [
         'previous' => 'Anterior',
         'next' => 'Siguiente',
     ],
+    'font_sizes' => [
+        'mobile' => 'text-sm',
+        'tablet_up' => 'text-base',
+    ],
     'close' => 'Cerrar',
     'sending' => 'Enviando...',
     'privacy_policy' => 'Política de privacidad',
+    'private' => [
+        'guest_message' => 'Para acceder a esta zona, debes iniciar sesión.',
+        'auth_message' => 'La zona privada está en desarrollo.',
+        'login_cta' => 'Iniciar sesión',
+    ],
 ];
