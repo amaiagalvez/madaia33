@@ -1,5 +1,11 @@
 {
     "preset": "laravel",
+    "exclude": [
+        "vendor",
+        "node_modules",
+        "dc-data",
+        ".git"
+    ],
     "rules": {
         "indentation_type": true,
         "ordered_imports": {
