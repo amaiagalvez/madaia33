@@ -5,6 +5,11 @@
 
 The Laravel Boost guidelines are specifically curated by Laravel maintainers for this application. These guidelines should be followed closely to ensure the best experience when building Laravel applications.
 
+## Quick Checklist
+
+- Work inside Docker only (`docker compose run ...` / `docker compose exec ...`).
+- Do not run `php`, `composer`, `npm`, `artisan`, `pint`, or tests directly on host.
+
 ## Foundational Context
 
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
@@ -16,6 +21,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - livewire/flux (FLUXUI_FREE) - v2
 - livewire/livewire (LIVEWIRE) - v4
 - laravel/boost (BOOST) - v2
+- laravel/dusk (DUSK) - v8
 - laravel/mcp (MCP) - v0
 - laravel/pail (PAIL) - v1
 - laravel/pint (PINT) - v1
@@ -32,13 +38,24 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `fluxui-development` — Use this skill for Flux UI development in Livewire applications only. Trigger when working with <flux:*> components, building or customizing Livewire component UIs, creating forms, modals, tables, or other interactive elements. Covers: flux: components (buttons, inputs, modals, forms, tables, date-pickers, kanban, badges, tooltips, etc.), component composition, Tailwind CSS styling, Heroicons/Lucide icon integration, validation patterns, responsive design, and theming. Do not use for non-Livewire frameworks or non-component styling.
 - `livewire-development` — Use for any task or question involving Livewire. Activate if user mentions Livewire, wire: directives, or Livewire-specific concepts like wire:model, wire:click, wire:sort, or islands, invoke this skill. Covers building new components, debugging reactivity issues, real-time form validation, drag-and-drop, loading states, migrating from Livewire 3 to 4, converting component formats (SFC/MFC/class-based), and performance optimization. Do not use for non-Livewire reactive UI (React, Vue, Alpine-only, Inertia.js) or standard Laravel forms without Livewire.
 - `pest-testing` — Use this skill for Pest PHP testing in Laravel projects only. Trigger whenever any test is being written, edited, fixed, or refactored — including fixing tests that broke after a code change, adding assertions, converting PHPUnit to Pest, adding datasets, and TDD workflows. Always activate when the user asks how to write something in Pest, mentions test files or directories (tests/Feature, tests/Unit, tests/Browser), or needs browser testing, smoke testing multiple pages for JS errors, or architecture tests. Covers: it()/expect() syntax, datasets, mocking, browser testing (visit/click/fill), smoke testing, arch(), Livewire component tests, RefreshDatabase, and all Pest 4 features. Do not use for factories, seeders, migrations, controllers, models, or non-test PHP code.
+- `dusk-test` — Use this skill when running, fixing, or debugging Browser tests under `tests/Browser/` in this project, especially in Docker. Trigger when Dusk fails with missing ChromeDriver path, missing Chromium binary, or `net::ERR_CONNECTION_REFUSED`. Follow its reproducible workflow: install browser, install matching driver, prepare database with seeds, start in-container app server, run only affected Browser tests, and clean up background processes.
 - `tailwindcss-development` — Always invoke when the user's message includes 'tailwind' in any form. Also invoke for: building responsive grid layouts (multi-column card grids, product grids), flex/grid page structures (dashboards with sidebars, fixed topbars, mobile-toggle navs), styling UI components (cards, tables, navbars, pricing sections, forms, inputs, badges), adding dark mode variants, fixing spacing or typography, and Tailwind v3/v4 work. The core use case: writing or fixing Tailwind utility classes in HTML templates (Blade, JSX, Vue). Skip for backend PHP logic, database queries, API routes, JavaScript with no HTML/CSS component, CSS file audits, build tool configuration, and vanilla CSS.
 
 ## Conventions
 
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
+- **Docker-first workflow**: Always run project commands inside Docker (`docker compose run ...` / `docker compose exec ...`). Do not run `php`, `composer`, `npm`, `artisan`, `pint`, or tests directly on the host.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
+- **Query minimization**: Prioritize speed by reducing database round-trips whenever possible. Batch related reads/writes (e.g., one `whereIn`/`upsert` instead of repeated single-key queries) and avoid repeated queries in the same request lifecycle.
+- **Settings batch access**: For multiple settings keys, prefer explicit in-context queries using `whereIn('key', [...])->get(['key', 'value'])->pluck('value', 'key')` and batch writes with `upsert(...)`; avoid introducing generic model helpers like `getMany`/`setMany` unless explicitly requested.
+- **SoftDeletes**: Every Eloquent model in this application uses `SoftDeletes`. When creating a new model, always add `use SoftDeletes;` and add `$table->softDeletes()` to its migration. Never use hard deletes unless explicitly requested.
+- **Unit vs Feature tests**: Prefer Unit tests (`tests/Unit/`) for logic that does not require the database: model accessors, pure classes, value objects, static helpers. Only use Feature tests (which receive `RefreshDatabase` automatically via `Pest.php`) when DB, HTTP, or Livewire is genuinely needed. Never add `uses(RefreshDatabase::class)` inside individual test files.
+- **Test split policy (general)**: When a Feature test validates both end-to-end flow and internal pure logic, keep only the end-to-end assertions in Feature and move the pure logic checks to Unit tests (mailables, value objects, transformers, helper methods, locale mapping, formatting rules). Apply this split progressively to all test files touched in future changes.
+- **Validation testing policy**: When form/component validation rules are deterministic and independent from persistence, extract rules/messages into a reusable class under `app/Validations/` and test them in `tests/Unit/` with `Validator::make(...)`. Keep Feature tests for submission flow, side effects, and integration behaviour.
+- **Test readability for settings**: In tests, avoid repeating `Setting::where('key', ...)->value('value')` and ad-hoc settings seeding; use shared Pest helpers (for example `settingValue(...)` and `createSetting(...)`) to keep assertions and setup concise and consistent.
+- **Specs sync after code changes**: After any code change that affects documented behaviour, review `.kiro/specs/community-web/` and update `design.md`, plus `requirements.md` or `tasks.md` when affected, so the specs stay aligned with the implemented code before finishing.
+- **`->repeat()` in tests**: Only use `->repeat()` on property-based tests that randomise inputs with `rand()` or `fake()`. Never use on deterministic tests. Keep the count at 2 or below.
 
 ## Verification Scripts
 
@@ -60,6 +77,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Replies
 
 - Be concise in your explanations - focus on what's important rather than explaining obvious details.
+- At the end of each correction response, add a final line starting with `Explicit rule applied:` followed by the concrete rule used for that correction.
 
 === boost rules ===
 
@@ -172,3 +190,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 - Do NOT delete tests without approval.
 
 </laravel-boost-guidelines>
+
+```
+Reduce the number of examples, and re-run the tests, so that it runs faster.
+```

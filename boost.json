@@ -7,8 +7,9 @@
     "nightwatch_mcp": false,
     "sail": false,
     "skills": [
-        "laravel-best-practices",
+        "dusk-testing",
         "fluxui-development",
+        "laravel-best-practices",
         "livewire-development",
         "pest-testing",
         "tailwindcss-development"
