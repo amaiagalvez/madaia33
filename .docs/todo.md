@@ -12,18 +12,18 @@
 [ ] antes de empezar a pasar los dusk test, vaciar la carpeta de screenshots
 [ ] añadir el MCP para que consulte la documentación de laravel
 [ ] añadir validaciones de calidad del código, número de returns en una función, número de parámetros, longitud de una función o una clase, ...
-[ ] error al pasar los dusk test "W: https://packages.tideways.com/apt-packages-main/dists/any-version/InRelease: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+[x] error al pasar los dusk test "W: https://packages.tideways.com/apt-packages-main/dists/any-version/InRelease: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
 debconf: delaying package configuration, since apt-utils is not installed"
-[ ] crea una nueva instrucción para saber cómo crear los dusk test y añade todo lo que has detectado en esta sesión para que lo tengas en cuenta antes de creaar un nuevo dusk test
 [ ] cachear los settings
 [ ] comprobar las consultas la base de datos, evitar repetidas y error N+1
-[ ] puedo ver en pantalla lo que ocurre al ejecutar los dusk test?
+[x] puedo ver en pantalla lo que ocurre en el navegadorr al ejecutar los dusk test?
 [ ] controlar la barra de desplazamiento horizontal para que no salga
 [ ] cursor mano en los botones de cambiar le idioma
 [ ] probar el formulario dandole dos veces rapidamente al botón de guardar
 [ ] test en ingles
 [ ] comments en ingles
-[ ] separar la base de datos laravel con la que usa dusk-test para no machacar mis datos
+[x] separar la base de datos laravel con la que usa dusk-test para no machacar mis datos
+[ ] añadir un editor al campo de texto legal de los settings
 
 ## Txuletak
 /dusk-test pasar los dusk test

@@ -11,13 +11,25 @@ use Facebook\WebDriver\Remote\DesiredCapabilities;
 
 abstract class DuskTestCase extends BaseTestCase
 {
+    protected function driverUrl(): string
+    {
+        return $_ENV['DUSK_DRIVER_URL'] ?? env('DUSK_DRIVER_URL') ?? 'http://localhost:9515';
+    }
+
+    protected static function shouldUseRemoteDriver(): bool
+    {
+        $driverUrl = $_ENV['DUSK_DRIVER_URL'] ?? env('DUSK_DRIVER_URL') ?? '';
+
+        return filled($driverUrl) && ! str_contains($driverUrl, 'localhost:9515');
+    }
+
     /**
      * Prepare for Dusk test execution.
      */
     #[BeforeClass]
     public static function prepare(): void
     {
-        if (! static::runningInSail()) {
+        if (! static::runningInSail() && ! static::shouldUseRemoteDriver()) {
             static::startChromeDriver(['--port=9515']);
         }
     }
@@ -40,12 +52,15 @@ abstract class DuskTestCase extends BaseTestCase
             ]);
         })->all());
 
-        $options->setBinary('/usr/bin/chromium');
+        if (! static::shouldUseRemoteDriver()) {
+            $options->setBinary('/usr/bin/chromium');
+        }
 
         return RemoteWebDriver::create(
-            $_ENV['DUSK_DRIVER_URL'] ?? env('DUSK_DRIVER_URL') ?? 'http://localhost:9515',
+            $this->driverUrl(),
             DesiredCapabilities::chrome()->setCapability(
-                ChromeOptions::CAPABILITY, $options
+                ChromeOptions::CAPABILITY,
+                $options
             )
         );
     }

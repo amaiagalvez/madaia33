@@ -178,5 +178,18 @@ services:
         networks:
             - frontend
 
+    selenium:
+        image: selenium/standalone-chromium:latest
+        shm_size: 2gb
+        environment:
+            SE_NODE_MAX_SESSIONS: 1
+            SE_NODE_OVERRIDE_MAX_SESSIONS: true
+            SE_VNC_NO_PASSWORD: 1
+        ports:
+            - "${SELENIUM_PORT:-4444}:4444"
+            - "${SELENIUM_NOVNC_PORT:-7900}:7900"
+        networks:
+            - frontend
+
 networks:
     frontend: null

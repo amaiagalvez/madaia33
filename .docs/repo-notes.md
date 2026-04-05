@@ -12,3 +12,8 @@
 
 - Keep shared domain constants such as community location codes in a single shared class, not duplicated across Livewire classes, view-based components, or tests.
 - In this repo the single source of truth is App\\CommunityLocations.
+
+## Execution Preferences
+
+- User preference: never run commands as root.
+- Use host user context or Docker container user `application` for project commands.
