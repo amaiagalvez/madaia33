@@ -42,6 +42,14 @@ Reglas para las tareas:
 - Los pasos son acciones concretas y ejecutables, no descripciones vagas
 - Incluir los comandos Artisan necesarios (p.ej. `php artisan make:model X --migration --factory`)
 - Tests Unit para lógica pura; Feature para rutas, Livewire, y DB; Browser (Dusk) para flujos E2E críticos
+- Si una tarea accede a base de datos, incluir pasos explícitos para:
+  - reducir el número de consultas siempre que mejore el rendimiento
+  - evitar problemas N+1 siempre que no empeore la velocidad global
+  - traer solo los campos necesarios en cada consulta (evitar sobrecarga de datos)
+- Al final de cada tarea definida, añadir un paso explícito de verificación que revise:
+  - errores/advertencias en la consola del navegador de las páginas afectadas
+  - errores/advertencias nuevos en logs de Laravel relacionados con la tarea
+- La última tarea del plan debe ser siempre ejecutar los tests con coverage.
 
 Convenciones del proyecto:
 
