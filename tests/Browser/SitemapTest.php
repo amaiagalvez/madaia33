@@ -7,6 +7,7 @@
 use Laravel\Dusk\Browser;
 
 test('sitemap.xml is publicly accessible and contains public URLs', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/sitemap.xml');
 

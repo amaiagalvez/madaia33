@@ -4,8 +4,8 @@ namespace App\Livewire;
 
 use App\Models\Image;
 use Livewire\Component;
-use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
+use Illuminate\Contracts\View\View;
 
 class HeroSlider extends Component
 {

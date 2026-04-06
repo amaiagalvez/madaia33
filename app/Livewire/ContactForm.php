@@ -57,33 +57,56 @@ class ContactForm extends Component
         $this->validate();
 
         if (! $this->verifyRecaptcha()) {
-            $this->statusType = 'error';
-            $this->statusMessage = __('contact.spam_error');
-            $this->dispatch('contact-form-submitted');
+            $this->markAsSpamRejected();
 
             return;
         }
 
         if ($this->hasRecentDuplicateSubmission()) {
-            $this->reset(['name', 'email', 'subject', 'message', 'legalAccepted', 'recaptchaToken']);
-            $this->statusType = 'success';
-            $this->statusMessage = __('contact.success');
-            $this->dispatch('contact-form-submitted');
+            $this->markAsSuccessfulSubmission();
 
             return;
         }
 
         $this->rememberRecentSubmission();
+        $contactMessage = $this->storeContactMessage();
+        $emailFailed = $this->sendContactEmails($contactMessage);
 
-        $contactMessage = ContactMessage::create([
+        $this->markSubmissionAsCompleted($emailFailed);
+    }
+
+    private function markAsSpamRejected(): void
+    {
+        $this->statusType = 'error';
+        $this->statusMessage = __('contact.spam_error');
+        $this->dispatch('contact-form-submitted');
+    }
+
+    private function markAsSuccessfulSubmission(): void
+    {
+        $this->resetFormFields();
+        $this->statusType = 'success';
+        $this->statusMessage = __('contact.success');
+        $this->dispatch('contact-form-submitted');
+    }
+
+    private function resetFormFields(): void
+    {
+        $this->reset(['name', 'email', 'subject', 'message', 'legalAccepted', 'recaptchaToken']);
+    }
+
+    private function storeContactMessage(): ContactMessage
+    {
+        return ContactMessage::create([
             'name' => $this->name,
             'email' => $this->email,
             'subject' => $this->subject,
             'message' => $this->message,
         ]);
+    }
 
-        $emailFailed = false;
-
+    private function sendContactEmails(ContactMessage $contactMessage): bool
+    {
         try {
             $adminEmail = Setting::where('key', 'admin_email')->value('value') ?? config('mail.from.address');
 
@@ -93,30 +116,24 @@ class ContactForm extends Component
                 messageBody: $this->message,
             ));
 
-            Mail::to($adminEmail)->send(new ContactNotification(
-                visitorName: $this->name,
-                visitorEmail: $this->email,
-                messageSubject: $this->subject,
-                messageBody: $this->message,
-            ));
+            Mail::to($adminEmail)->send(new ContactNotification($contactMessage));
+
+            return false;
         } catch (\Throwable $e) {
             Log::error('ContactForm: email send failed', [
                 'message_id' => $contactMessage->id,
                 'error' => $e->getMessage(),
             ]);
-            $emailFailed = true;
+
+            return true;
         }
+    }
 
-        $this->reset(['name', 'email', 'subject', 'message', 'legalAccepted', 'recaptchaToken']);
-
-        if ($emailFailed) {
-            $this->statusType = 'warning';
-            $this->statusMessage = __('contact.email_error');
-        } else {
-            $this->statusType = 'success';
-            $this->statusMessage = __('contact.success');
-        }
-
+    private function markSubmissionAsCompleted(bool $emailFailed): void
+    {
+        $this->resetFormFields();
+        $this->statusType = $emailFailed ? 'warning' : 'success';
+        $this->statusMessage = $emailFailed ? __('contact.email_error') : __('contact.success');
         $this->dispatch('contact-form-submitted');
     }
 
@@ -146,10 +163,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn(mixed $timestamp): int => (int) $timestamp)
+            ->map(fn (mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 
@@ -171,12 +188,22 @@ class ContactForm extends Component
             return true;
         }
 
-        $secretKey = Setting::where('key', 'recaptcha_secret_key')->value('value') ?? '';
+        $secretKey = $this->recaptchaSecretKey();
 
         if (empty($secretKey)) {
             return true;
         }
 
+        return $this->verifyRecaptchaToken($secretKey);
+    }
+
+    private function recaptchaSecretKey(): string
+    {
+        return (string) (Setting::where('key', 'recaptcha_secret_key')->value('value') ?? '');
+    }
+
+    private function verifyRecaptchaToken(string $secretKey): bool
+    {
         try {
             $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
                 'secret' => $secretKey,

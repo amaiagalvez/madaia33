@@ -10,6 +10,7 @@ use Laravel\Dusk\Browser;
 test('gallery grid responds to mobile tablet and desktop breakpoints', function () {
     Image::factory()->count(8)->create();
 
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/galeria');
 
@@ -39,6 +40,7 @@ test('gallery grid responds to mobile tablet and desktop breakpoints', function 
 test('lightbox adapts orientation and closes with escape and outside click', function () {
     Image::factory()->create();
 
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/galeria')
             ->resize(390, 844)
@@ -98,6 +100,7 @@ test('lightbox adapts orientation and closes with escape and outside click', fun
 test('lightbox closes with swipe down gesture', function () {
     Image::factory()->create();
 
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/galeria')
             ->resize(390, 844)

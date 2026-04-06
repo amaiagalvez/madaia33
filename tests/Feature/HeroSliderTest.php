@@ -30,6 +30,22 @@ describe('HeroSlider image loading', function () {
         Livewire::test(HeroSlider::class)
             ->assertSet('currentIndex', 0);
     });
+
+    test('currentImage returns null when there are no images', function () {
+        $component = Livewire::test(HeroSlider::class);
+
+        expect($component->instance()->currentImage())->toBeNull();
+    });
+
+    test('currentImage returns first image payload when images exist', function () {
+        $image = Image::factory()->create();
+        $component = Livewire::test(HeroSlider::class);
+
+        expect($component->instance()->currentImage())
+            ->not->toBeNull()
+            ->and($component->instance()->currentImage()['id'] ?? null)
+            ->toBe($image->id);
+    });
 });
 
 describe('HeroSlider navigation', function () {

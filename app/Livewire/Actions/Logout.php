@@ -3,9 +3,9 @@
 namespace App\Livewire\Actions;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Session;
 use Livewire\Features\SupportRedirects\Redirector;
-use Illuminate\Http\RedirectResponse;
 
 class Logout
 {

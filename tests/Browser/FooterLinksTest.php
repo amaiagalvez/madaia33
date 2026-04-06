@@ -7,6 +7,7 @@
 use Laravel\Dusk\Browser;
 
 test('footer shows legal links with correct urls and labels in Basque', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->assertPresent('footer a[href*="politica-de-privacidad"]')

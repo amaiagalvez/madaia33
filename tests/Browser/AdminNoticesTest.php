@@ -11,6 +11,7 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
     $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
     $title = 'Dusk Test Iragarkia '.now()->timestamp;
 
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $title) {
         // Login and go to notices admin
         $browser->loginAs($admin)

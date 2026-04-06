@@ -8,6 +8,7 @@ use App\Models\Image;
 use Laravel\Dusk\Browser;
 
 test('mobile menu moves focus on open, restores on close and traps tab focus', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->resize(375, 812);
@@ -30,6 +31,7 @@ test('mobile menu moves focus on open, restores on close and traps tab focus', f
 test('lightbox moves focus on open, restores on close and keeps focus inside', function () {
     Image::factory()->create();
 
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/galeria')
             ->resize(390, 844)

@@ -7,6 +7,7 @@
 use Laravel\Dusk\Browser;
 
 test('public navigation reaches notices, gallery and contact pages', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->clickLink('Iragarkiak')

@@ -7,6 +7,7 @@
 use Laravel\Dusk\Browser;
 
 test('language switcher toggles interface between Spanish and Basque', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->assertScript("return getComputedStyle(document.querySelector('[data-language-option=\"es\"]')).cursor;", 'pointer')

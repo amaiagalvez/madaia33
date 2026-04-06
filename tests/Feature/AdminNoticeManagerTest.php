@@ -184,3 +184,41 @@ it('edita un aviso existente y reemplaza sus ubicaciones al guardar', function (
         ->and($notice->published_at?->toDateTimeString())->toBe($originalPublishedAt?->toDateTimeString())
         ->and($notice->locations->pluck('location_code')->values()->toArray())->toBe(['P-1']);
 });
+
+it('crea slug UUID cuando el título no produce slug válido', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->set('titleEu', '###')
+        ->set('contentEu', 'Edukia')
+        ->set('isPublic', false)
+        ->call('saveNotice');
+
+    $notice = Notice::latest('id')->firstOrFail();
+
+    expect($notice->slug)->toMatch('/^[0-9a-fA-F-]{36}$/')
+        ->and($notice->published_at)->toBeNull();
+});
+
+it('al editar y mantener privado conserva published_at existente', function () {
+    $user = User::factory()->create();
+    $notice = Notice::factory()->public()->create([
+        'published_at' => now()->subHour(),
+    ]);
+
+    $originalPublishedAt = $notice->published_at?->toDateTimeString();
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('editNotice', $notice->id)
+        ->set('titleEu', 'Editatua')
+        ->set('contentEu', 'Edukia berria')
+        ->set('isPublic', false)
+        ->call('saveNotice');
+
+    $notice->refresh();
+
+    expect($notice->published_at?->toDateTimeString())->toBe($originalPublishedAt)
+        ->and($notice->is_public)->toBeFalse();
+});

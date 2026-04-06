@@ -101,7 +101,7 @@ new class extends Component {
             Mail::to($this->email)->send(new ContactConfirmation(visitorName: $this->name, messageSubject: $this->subject, messageBody: $this->message));
 
             if ($adminEmail) {
-                Mail::to($adminEmail)->send(new ContactNotification(visitorName: $this->name, visitorEmail: $this->email, messageSubject: $this->subject, messageBody: $this->message));
+                Mail::to($adminEmail)->send(new ContactNotification($contactMessage));
             }
         } catch (\Throwable $e) {
             Log::error('ContactForm: email send failed', [
@@ -174,7 +174,11 @@ new class extends Component {
                 {{ __('contact.name') }} <span class="text-red-500" aria-hidden="true">*</span>
             </label>
             <input id="contact-name" type="text" wire:model="name" autocomplete="name"
-                class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 @error('name') border-red-500 @enderror"
+                @class([
+                    'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
+                    'border-red-500' => $errors->has('name'),
+                    'border-gray-300' => ! $errors->has('name'),
+                ])
                 aria-describedby="@error('name') contact-name-error @enderror" aria-required="true">
             @error('name')
                 <p id="contact-name-error" class="mt-1 text-xs text-red-600" role="alert">
@@ -188,7 +192,11 @@ new class extends Component {
                 {{ __('contact.email') }} <span class="text-red-500" aria-hidden="true">*</span>
             </label>
             <input id="contact-email" type="email" wire:model="email" autocomplete="email"
-                class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 @error('email') border-red-500 @enderror"
+                @class([
+                    'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
+                    'border-red-500' => $errors->has('email'),
+                    'border-gray-300' => ! $errors->has('email'),
+                ])
                 aria-describedby="@error('email') contact-email-error @enderror"
                 aria-required="true">
             @error('email')
@@ -203,7 +211,11 @@ new class extends Component {
                 {{ __('contact.subject') }} <span class="text-red-500" aria-hidden="true">*</span>
             </label>
             <input id="contact-subject" type="text" wire:model="subject"
-                class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 @error('subject') border-red-500 @enderror"
+                @class([
+                    'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
+                    'border-red-500' => $errors->has('subject'),
+                    'border-gray-300' => ! $errors->has('subject'),
+                ])
                 aria-describedby="@error('subject') contact-subject-error @enderror"
                 aria-required="true">
             @error('subject')
@@ -218,7 +230,11 @@ new class extends Component {
                 {{ __('contact.message') }} <span class="text-red-500" aria-hidden="true">*</span>
             </label>
             <textarea id="contact-message" wire:model="message" rows="6"
-                class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 @error('message') border-red-500 @enderror"
+                @class([
+                    'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
+                    'border-red-500' => $errors->has('message'),
+                    'border-gray-300' => ! $errors->has('message'),
+                ])
                 aria-describedby="@error('message') contact-message-error @enderror" aria-required="true"
                 maxlength="5000"></textarea>
             @error('message')
@@ -231,7 +247,11 @@ new class extends Component {
         <div class="mb-6">
             <div class="flex items-start gap-3">
                 <input id="contact-legal" type="checkbox" wire:model="legalAccepted"
-                    class="mt-0.5 h-4 w-4 rounded border-gray-300 text-gray-800 focus:ring-gray-500 @error('legalAccepted') border-red-500 @enderror"
+                    @class([
+                        'mt-0.5 h-4 w-4 rounded text-gray-800 focus:ring-gray-500',
+                        'border-red-500' => $errors->has('legalAccepted'),
+                        'border-gray-300' => ! $errors->has('legalAccepted'),
+                    ])
                     aria-describedby="@error('legalAccepted') contact-legal-error @enderror"
                     aria-required="true">
                 <label for="contact-legal" class="text-sm text-gray-700">

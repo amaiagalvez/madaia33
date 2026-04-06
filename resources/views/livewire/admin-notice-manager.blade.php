@@ -32,7 +32,11 @@
                             {{ __('notices.admin.title_eu') }} <span class="text-red-500">*</span>
                         </label>
                         <input id="titleEu" type="text" wire:model="titleEu"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('titleEu') border-red-500 @enderror" />
+                            @class([
+                                'mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+                                'border-red-500' => $errors->has('titleEu'),
+                                'border-gray-300' => !$errors->has('titleEu'),
+                            ]) />
                         @error('titleEu')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
@@ -52,8 +56,11 @@
                         <label for="contentEu" class="block text-sm font-medium text-gray-700">
                             {{ __('notices.admin.content_eu') }} <span class="text-red-500">*</span>
                         </label>
-                        <textarea id="contentEu" wire:model="contentEu" rows="4"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('contentEu') border-red-500 @enderror"></textarea>
+                        <textarea id="contentEu" wire:model="contentEu" rows="4" @class([
+                            'mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+                            'border-red-500' => $errors->has('contentEu'),
+                            'border-gray-300' => !$errors->has('contentEu'),
+                        ])></textarea>
                         @error('contentEu')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
@@ -197,11 +204,14 @@
 
                                 {{-- Delete --}}
                                 @if ($confirmingDeleteId === $notice->id)
-                                    <span class="text-sm text-gray-600">{{ __('notices.admin.confirm_delete') }}</span>
-                                    <button wire:click="deleteNotice" class="text-red-600 hover:text-red-900">
+                                    <span
+                                        class="text-sm text-gray-600">{{ __('notices.admin.confirm_delete') }}</span>
+                                    <button wire:click="deleteNotice"
+                                        class="text-red-600 hover:text-red-900">
                                         {{ __('general.buttons.delete') }}
                                     </button>
-                                    <button wire:click="cancelDelete" class="text-gray-500 hover:text-gray-700">
+                                    <button wire:click="cancelDelete"
+                                        class="text-gray-500 hover:text-gray-700">
                                         {{ __('general.buttons.cancel') }}
                                     </button>
                                 @else

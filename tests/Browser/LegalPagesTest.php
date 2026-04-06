@@ -7,6 +7,7 @@
 use Laravel\Dusk\Browser;
 
 test('legal pages are accessible and rendered in Basque', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/politica-de-privacidad')
             ->assertPathIs('/politica-de-privacidad')
@@ -18,6 +19,7 @@ test('legal pages are accessible and rendered in Basque', function () {
 });
 
 test('legal pages are rendered in Spanish after switching language', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->press('ES')

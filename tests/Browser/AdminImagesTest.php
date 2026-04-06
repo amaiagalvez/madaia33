@@ -19,6 +19,7 @@ test('admin can upload an image and it appears in the public gallery', function 
     imagejpeg($img, $tmpImage);
     imagedestroy($img);
 
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $tmpImage, $altText) {
         $browser->loginAs($admin)
             ->visit('/admin/imagenes')

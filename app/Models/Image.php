@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Database\Factories\ImageFactory;
 use Illuminate\Support\Facades\App;
+use Database\Factories\ImageFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;

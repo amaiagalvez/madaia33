@@ -11,6 +11,7 @@ use App\Mail\ContactNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Route;
 
 beforeEach(function () {
     config(['app.recaptcha_skip' => true]);
@@ -230,4 +231,34 @@ it('trata payload sql-like como texto plano en la bandeja admin', function () {
         ->test('admin-message-inbox')
         ->call('openMessage', $message->id)
         ->assertSeeText($payload);
+});
+
+it('si reCAPTCHA lanza excepción rechaza el envío y no guarda mensaje', function () {
+    config(['app.recaptcha_skip' => false]);
+    createSetting('recaptcha_secret_key', 'test-secret');
+
+    Http::fake(function () {
+        throw new RuntimeException('Recaptcha service unavailable');
+    });
+
+    Livewire::test('contact-form')
+        ->set('name', 'Ane')
+        ->set('email', 'ane@example.com')
+        ->set('subject', 'Gaia')
+        ->set('message', 'Mezua')
+        ->set('legalAccepted', true)
+        ->set('recaptchaToken', 'bad-token')
+        ->call('submit')
+        ->assertSet('statusType', 'error');
+
+    expect(ContactMessage::count())->toBe(0);
+});
+
+it('render usa fallback de legal text y privacy policy cuando faltan settings', function () {
+    Route::get('/privacy-policy', fn () => 'ok')->name('privacy-policy');
+
+    Livewire::test('contact-form')
+        ->assertViewHas('legalText', __('contact.legal_text'))
+        ->assertViewHas('legalUrl', route('privacy-policy'))
+        ->assertViewHas('siteKey', '');
 });

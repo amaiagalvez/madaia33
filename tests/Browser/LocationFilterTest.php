@@ -46,6 +46,7 @@ test('location filter on notices page filters results in real time', function ()
     $titleA = 'Portal 33-A Iragarkia '.$ts;
     $titleB = 'Portal 33-B Iragarkia '.$ts;
 
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($titleA, $titleB) {
         $browser->visit('/avisos')
             ->waitForText($titleA, 5)

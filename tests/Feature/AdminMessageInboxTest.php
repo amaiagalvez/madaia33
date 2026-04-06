@@ -160,3 +160,31 @@ it('los mensajes no leídos tienen clase de diferenciación visual en el HTML', 
         ->test('admin-message-inbox')
         ->assertSeeHtml('bg-blue-50');
 });
+
+it('alterna dirección al ordenar por la misma columna y reinicia al cambiar de columna', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->assertSet('sortBy', 'created_at')
+        ->assertSet('sortDir', 'desc')
+        ->call('sortBy', 'created_at')
+        ->assertSet('sortDir', 'asc')
+        ->call('sortBy', 'created_at')
+        ->assertSet('sortDir', 'desc')
+        ->call('sortBy', 'is_read')
+        ->assertSet('sortBy', 'is_read')
+        ->assertSet('sortDir', 'desc');
+});
+
+it('deleteMessage no hace nada si no hay confirmación activa', function () {
+    $user = User::factory()->create();
+    $message = ContactMessage::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->assertSet('confirmingDeleteId', null)
+        ->call('deleteMessage');
+
+    expect(ContactMessage::find($message->id))->not->toBeNull();
+});

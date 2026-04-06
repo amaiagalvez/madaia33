@@ -2,15 +2,21 @@
 
 namespace App\Mail;
 
+use App\Models\ContactMessage;
+
 class ContactNotification extends AbstractContactMail
 {
-    public function __construct(
-        string $visitorName,
-        public readonly string $visitorEmail,
-        string $messageSubject,
-        string $messageBody,
-    ) {
-        parent::__construct($visitorName, $messageSubject, $messageBody);
+    public readonly string $visitorEmail;
+
+    public function __construct(ContactMessage $contactMessage)
+    {
+        $this->visitorEmail = $contactMessage->email;
+
+        parent::__construct(
+            visitorName: $contactMessage->name,
+            messageSubject: $contactMessage->subject,
+            messageBody: $contactMessage->message,
+        );
     }
 
     protected function viewName(): string

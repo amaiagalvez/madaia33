@@ -49,6 +49,7 @@ Reglas para las tareas:
 - Al final de cada tarea definida, añadir un paso explícito de verificación que revise:
   - errores/advertencias en la consola del navegador de las páginas afectadas
   - errores/advertencias nuevos en logs de Laravel relacionados con la tarea
+  - errores/advertencias nuevos en la pestaña PROBLEMS del panel de VS Code relacionados con la tarea
 - Antes de cerrar el conjunto final de tareas del spec, añadir un quality gate obligatorio **antes** de documentación y **antes** de tests con este comando:
   - `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
 - La última tarea del plan debe ser siempre ejecutar los tests con coverage.

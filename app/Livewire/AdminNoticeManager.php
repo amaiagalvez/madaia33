@@ -73,35 +73,55 @@ class AdminNoticeManager extends Component
     {
         $this->validate();
 
-        $slug = Str::slug($this->titleEu);
-
-        if ($this->editingId) {
-            $notice = Notice::findOrFail($this->editingId);
-            $notice->update([
-                'slug' => $slug ?: $notice->slug,
-                'title_eu' => $this->titleEu,
-                'title_es' => $this->titleEs ?: null,
-                'content_eu' => $this->contentEu,
-                'content_es' => $this->contentEs ?: null,
-                'is_public' => $this->isPublic,
-                'published_at' => $this->isPublic && ! $notice->published_at ? now() : $notice->published_at,
-            ]);
-        } else {
-            $notice = Notice::create([
-                'slug' => $slug ?: Str::uuid(),
-                'title_eu' => $this->titleEu,
-                'title_es' => $this->titleEs ?: null,
-                'content_eu' => $this->contentEu,
-                'content_es' => $this->contentEs ?: null,
-                'is_public' => $this->isPublic,
-                'published_at' => $this->isPublic ? now() : null,
-            ]);
-        }
+        $notice = $this->upsertNotice();
 
         $this->syncLocations($notice);
 
         $this->resetForm();
         $this->showForm = false;
+    }
+
+    private function upsertNotice(): Notice
+    {
+        if ($this->editingId !== null) {
+            $notice = Notice::findOrFail($this->editingId);
+            $notice->update($this->noticePayload($notice));
+
+            return $notice;
+        }
+
+        return Notice::create($this->noticePayload());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function noticePayload(?Notice $existingNotice = null): array
+    {
+        $slug = Str::slug($this->titleEu);
+
+        return [
+            'slug' => $slug ?: ($existingNotice !== null ? $existingNotice->slug : (string) Str::uuid()),
+            'title_eu' => $this->titleEu,
+            'title_es' => $this->titleEs ?: null,
+            'content_eu' => $this->contentEu,
+            'content_es' => $this->contentEs ?: null,
+            'is_public' => $this->isPublic,
+            'published_at' => $this->resolvePublishedAt($existingNotice),
+        ];
+    }
+
+    private function resolvePublishedAt(?Notice $existingNotice = null): mixed
+    {
+        if ($existingNotice !== null) {
+            if (! $this->isPublic) {
+                return $existingNotice->published_at;
+            }
+
+            return $existingNotice->published_at ?: now();
+        }
+
+        return $this->isPublic ? now() : null;
     }
 
     public function publishNotice(int $id): void

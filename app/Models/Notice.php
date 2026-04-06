@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Database\Factories\NoticeFactory;
 use Illuminate\Support\Facades\App;
+use Database\Factories\NoticeFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,7 +41,7 @@ class Notice extends Model
     /**
      * Scope to only public notices.
      *
-     * @param Builder<Notice> $query
+     * @param  Builder<Notice>  $query
      * @return Builder<Notice>
      */
     public function scopePublic(Builder $query): Builder

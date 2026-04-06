@@ -7,6 +7,7 @@
 use Laravel\Dusk\Browser;
 
 test('admin can login with valid credentials and is redirected to dashboard', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/login')
             ->waitFor('input[name=email]', 5)
@@ -19,6 +20,7 @@ test('admin can login with valid credentials and is redirected to dashboard', fu
 });
 
 test('admin login with invalid credentials shows error', function () {
+    /** @var \Tests\DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         // Ensure we're logged out before testing invalid login
         $browser->visit('/_dusk/logout')
