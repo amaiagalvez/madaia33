@@ -24,7 +24,7 @@ class AdminSettings extends Component
     public bool $saved = false;
 
     /**
-     * @var array<string, string>
+     * @return array<string, mixed>
      */
     protected function rules(): array
     {
@@ -32,7 +32,7 @@ class AdminSettings extends Component
     }
 
     /**
-     * @var array<string, string>
+     * @return array<string, mixed>
      */
     protected function messages(): array
     {
@@ -50,9 +50,7 @@ class AdminSettings extends Component
             'legal_url',
         ];
 
-        $settings = Setting::whereIn('key', $keys)
-            ->get(['key', 'value'])
-            ->pluck('value', 'key');
+        $settings = Setting::whereIn('key', $keys)->pluck('value', 'key');
 
         $this->adminEmail = $settings['admin_email'] ?? '';
         $this->recaptchaSiteKey = $settings['recaptcha_site_key'] ?? '';

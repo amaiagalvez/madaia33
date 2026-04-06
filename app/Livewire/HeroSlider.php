@@ -4,10 +4,12 @@ namespace App\Livewire;
 
 use App\Models\Image;
 use Livewire\Component;
+use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 
 class HeroSlider extends Component
 {
+    /** @var array<int, array<string, mixed>> */
     public array $images = [];
 
     public int $currentIndex = 0;
@@ -16,8 +18,9 @@ class HeroSlider extends Component
 
     public int $autoplayInterval = 5000;
 
+    /** @return array<string, mixed>|null */
     #[Computed]
-    public function currentImage()
+    public function currentImage(): ?array
     {
         return $this->images[$this->currentIndex] ?? null;
     }
@@ -85,7 +88,7 @@ class HeroSlider extends Component
         $this->dispatch('start-autoplay', interval: $this->autoplayInterval);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.hero-slider');
     }

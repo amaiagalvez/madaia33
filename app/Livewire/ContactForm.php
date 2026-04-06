@@ -34,6 +34,9 @@ class ContactForm extends Component
 
     public string $statusMessage = '';
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function rules(): array
     {
         $siteKey = (string) (Setting::where('key', 'recaptcha_site_key')->value('value') ?? '');
@@ -41,6 +44,9 @@ class ContactForm extends Component
         return ContactFormValidation::rules($siteKey);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function messages(): array
     {
         return ContactFormValidation::messages();
@@ -133,12 +139,17 @@ class ContactForm extends Component
     private function recentSubmissions(): array
     {
         $threshold = now()->subSeconds(self::DUPLICATE_SUBMISSION_WINDOW_SECONDS)->getTimestamp();
+        $storedSubmissions = session('contact_form_recent_submissions', []);
 
-        return collect(session('contact_form_recent_submissions', []))
-            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+        if (! is_array($storedSubmissions)) {
+            return [];
+        }
+
+        return collect($storedSubmissions)
+            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn (mixed $timestamp): int => (int) $timestamp)
+            ->map(fn(mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 
@@ -186,9 +197,7 @@ class ContactForm extends Component
     {
         $locale = app()->getLocale();
         $legalTextKey = "legal_checkbox_text_{$locale}";
-        $settings = Setting::whereIn('key', [$legalTextKey, 'legal_url', 'recaptcha_site_key'])
-            ->get(['key', 'value'])
-            ->pluck('value', 'key');
+        $settings = Setting::whereIn('key', [$legalTextKey, 'legal_url', 'recaptcha_site_key'])->pluck('value', 'key');
         $legalText = (string) ($settings[$legalTextKey] ?? __('contact.legal_text'));
         $legalUrl = (string) ($settings['legal_url'] ?? route('privacy-policy'));
         $siteKey = (string) ($settings['recaptcha_site_key'] ?? '');

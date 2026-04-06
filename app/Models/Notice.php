@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\NoticeFactory;
 use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Notice extends Model
 {
+    /** @use HasFactory<NoticeFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
@@ -28,6 +30,9 @@ class Notice extends Model
         'published_at' => 'datetime',
     ];
 
+    /**
+     * @return HasMany<NoticeLocation, $this>
+     */
     public function locations(): HasMany
     {
         return $this->hasMany(NoticeLocation::class);
@@ -35,6 +40,9 @@ class Notice extends Model
 
     /**
      * Scope to only public notices.
+     *
+     * @param Builder<Notice> $query
+     * @return Builder<Notice>
      */
     public function scopePublic(Builder $query): Builder
     {

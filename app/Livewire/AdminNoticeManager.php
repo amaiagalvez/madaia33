@@ -34,7 +34,7 @@ class AdminNoticeManager extends Component
     public bool $showForm = false;
 
     /**
-     * @var array<string, string>
+     * @return array<string, string>
      */
     protected function rules(): array
     {

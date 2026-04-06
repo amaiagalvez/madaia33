@@ -36,7 +36,7 @@ class PublicNotices extends Component
     }
 
     /**
-     * @return LengthAwarePaginator<Notice>
+     * @return LengthAwarePaginator<int, Notice>
      */
     public function getNoticesProperty(): LengthAwarePaginator
     {
@@ -45,7 +45,7 @@ class PublicNotices extends Component
             ->when($this->locationFilter !== '', function ($query) {
                 $query->where(function ($q) {
                     // Include notices with the selected location
-                    $q->whereHas('locations', fn ($l) => $l->where('location_code', $this->locationFilter));
+                    $q->whereHas('locations', fn($l) => $l->where('location_code', $this->locationFilter));
                     // Also include general notices (no locations)
                     $q->orWhereDoesntHave('locations');
                 });
@@ -57,7 +57,7 @@ class PublicNotices extends Component
     public function render(): View
     {
         return view('livewire.public-notices', [
-            'notices' => $this->notices,
+            'notices' => $this->getNoticesProperty(),
         ]);
     }
 }

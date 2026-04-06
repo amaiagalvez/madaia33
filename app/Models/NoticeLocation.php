@@ -18,6 +18,9 @@ class NoticeLocation extends Model
         'location_code',
     ];
 
+    /**
+     * @return BelongsTo<Notice, $this>
+     */
     public function notice(): BelongsTo
     {
         return $this->belongsTo(Notice::class);

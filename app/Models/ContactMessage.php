@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Database\Factories\ContactMessageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ContactMessage extends Model
 {
+    /** @use HasFactory<ContactMessageFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [

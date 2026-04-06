@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ImageFactory;
 use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Image extends Model
 {
+    /** @use HasFactory<ImageFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [

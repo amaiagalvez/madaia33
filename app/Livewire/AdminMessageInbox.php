@@ -91,7 +91,7 @@ class AdminMessageInbox extends Component
     public function render(): View
     {
         return view('livewire.admin-message-inbox', [
-            'messages' => $this->messages,
+            'messages' => $this->getMessagesProperty(),
         ]);
     }
 }
