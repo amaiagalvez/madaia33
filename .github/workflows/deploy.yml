@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -114,6 +116,24 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
+      - name: Determine vendor upload
+        id: vendor_upload
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+        run: |
+          upload_vendor="true"
+
+          if [[ "$GITHUB_EVENT_NAME" == "push" && -n "$GITHUB_EVENT_BEFORE" && "$GITHUB_EVENT_BEFORE" != "0000000000000000000000000000000000000000" ]]; then
+            if git diff --name-only "$GITHUB_EVENT_BEFORE" HEAD | grep -Eq '^(composer\.json|composer\.lock)$'; then
+              upload_vendor="true"
+            else
+              upload_vendor="false"
+            fi
+          fi
+
+          echo "upload_vendor=$upload_vendor" >> "$GITHUB_OUTPUT"
+
       - name: Deploy files via FTPS
         timeout-minutes: 30
         env:
@@ -122,8 +142,17 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_PORT: ${{ steps.ftp_host.outputs.port }}
           FTP_SERVER_DIR: ${{ steps.ftp_dir.outputs.server_dir }}
+          UPLOAD_VENDOR: ${{ steps.vendor_upload.outputs.upload_vendor }}
         run: |
           set +e
+
+          vendor_exclude=""
+          if [[ "$UPLOAD_VENDOR" != "true" ]]; then
+            vendor_exclude="--exclude-glob vendor/**"
+            echo "Skipping vendor upload because composer files did not change."
+          else
+            echo "Uploading vendor because composer files changed or diff is unavailable."
+          fi
 
           fallback_port="$FTP_PORT"
           if [[ -z "$fallback_port" || "$fallback_port" == "990" ]]; then
@@ -146,7 +175,7 @@ jobs:
             echo 'Connected with FTPS';
             pwd;
             cls -la;
-            mirror -R --delete --verbose \
+            mirror -R --delete --verbose $vendor_exclude \
               --exclude-glob '.docs/**' \
               --exclude-glob '.git*' \
               --exclude-glob '.github/**' \
@@ -157,10 +186,10 @@ jobs:
               --exclude-glob 'tests/**' \
               --exclude-glob 'dc-data/**' \
               --exclude-glob '.env' \
-              --exclude-glob 'storage/logs/**' \
-              --exclude-glob 'storage/framework/cache/**' \
-              --exclude-glob 'storage/framework/sessions/**' \
-              --exclude-glob 'storage/framework/views/**' \
+              --exclude-glob 'storage/logs/*' \
+              --exclude-glob 'storage/framework/cache/*' \
+              --exclude-glob 'storage/framework/sessions/*' \
+              --exclude-glob 'storage/framework/views/*' \
               . '$FTP_SERVER_DIR';
             bye
           "
@@ -190,7 +219,7 @@ jobs:
             echo 'Connected with FTP fallback';
             pwd;
             cls -la;
-            mirror -R --delete --verbose \
+            mirror -R --delete --verbose $vendor_exclude \
               --exclude-glob '.docs/**' \
               --exclude-glob '.git*' \
               --exclude-glob '.github/**' \
@@ -201,10 +230,10 @@ jobs:
               --exclude-glob 'tests/**' \
               --exclude-glob 'dc-data/**' \
               --exclude-glob '.env' \
-              --exclude-glob 'storage/logs/**' \
-              --exclude-glob 'storage/framework/cache/**' \
-              --exclude-glob 'storage/framework/sessions/**' \
-              --exclude-glob 'storage/framework/views/**' \
+              --exclude-glob 'storage/logs/*' \
+              --exclude-glob 'storage/framework/cache/*' \
+              --exclude-glob 'storage/framework/sessions/*' \
+              --exclude-glob 'storage/framework/views/*' \
               . '$FTP_SERVER_DIR';
             bye
           "
