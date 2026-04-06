@@ -74,12 +74,17 @@ jobs:
         run: |
           set +e
 
+          fallback_port="$FTP_PORT"
+          if [[ -z "$fallback_port" || "$fallback_port" == "990" ]]; then
+            fallback_port="21"
+          fi
+
           lftp -c "
             set ssl:verify-certificate no;
             set ftp:ssl-force true;
             set ftp:ssl-protect-data true;
             set ftp:passive-mode true;
-            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' '$FTP_SERVER';
+            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftps://$FTP_SERVER';
             mirror -R --delete --verbose \
               --exclude-glob '.docs/**' \
               --exclude-glob '.git*' \
@@ -110,8 +115,10 @@ jobs:
 
           lftp -c "
             set ftp:ssl-allow false;
+            set ftp:ssl-force false;
+            set ftp:ssl-protect-data false;
             set ftp:passive-mode true;
-            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' '$FTP_SERVER';
+            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$fallback_port' 'ftp://$FTP_SERVER';
             mirror -R --delete --verbose \
               --exclude-glob '.docs/**' \
               --exclude-glob '.git*' \
