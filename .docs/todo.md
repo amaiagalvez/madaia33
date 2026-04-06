@@ -15,6 +15,7 @@
 [ ] color granate, marron
 [ ] añadir espacio de historia
 [ ] añadir espacio para comercios
+[ ] cookies
 
 ## Txuletak
 /dusk-test pasar los dusk test
