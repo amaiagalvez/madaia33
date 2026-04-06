@@ -72,10 +72,44 @@ jobs:
           FTP_PORT: ${{ secrets.FTP_PORT }}
           FTP_SERVER_DIR: ${{ steps.ftp_dir.outputs.server_dir }}
         run: |
+          set +e
+
           lftp -c "
             set ssl:verify-certificate no;
             set ftp:ssl-force true;
             set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' '$FTP_SERVER';
+            mirror -R --delete --verbose \
+              --exclude-glob '.docs/**' \
+              --exclude-glob '.git*' \
+              --exclude-glob '.github/**' \
+              --exclude-glob '.githooks/**' \
+              --exclude-glob '.kiro/**' \
+              --exclude-glob '.vscode/**' \
+              --exclude-glob 'node_modules/**' \
+              --exclude-glob 'tests/**' \
+              --exclude-glob 'dc-data/**' \
+              --exclude-glob '.env' \
+              --exclude-glob 'storage/logs/**' \
+              --exclude-glob 'storage/framework/cache/**' \
+              --exclude-glob 'storage/framework/sessions/**' \
+              --exclude-glob 'storage/framework/views/**' \
+              . '$FTP_SERVER_DIR';
+            bye
+          "
+
+          ftps_exit_code=$?
+
+          if [[ $ftps_exit_code -eq 0 ]]; then
+            echo "Deploy completed using FTPS."
+            exit 0
+          fi
+
+          echo "FTPS failed (exit code: $ftps_exit_code). Trying FTP fallback..."
+
+          lftp -c "
+            set ftp:ssl-allow false;
             set ftp:passive-mode true;
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' '$FTP_SERVER';
             mirror -R --delete --verbose \
