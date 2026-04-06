@@ -103,13 +103,33 @@ jobs:
           FTP_HOST: ${{ steps.ftp_host.outputs.host }}
           FTP_PORT: ${{ steps.ftp_host.outputs.port }}
         run: |
-          test_port="$FTP_PORT"
+          preferred_port="$FTP_PORT"
 
           echo "Checking DNS for host: $FTP_HOST"
-          timeout 15 getent ahostsv4 "$FTP_HOST"
+          if ! timeout 15 getent ahostsv4 "$FTP_HOST"; then
+            echo "::warning::DNS lookup failed for $FTP_HOST. Continuing and letting lftp perform final connection checks."
+          fi
 
-          echo "Checking TCP connectivity to $FTP_HOST:$test_port"
-          timeout 15 bash -lc "</dev/tcp/$FTP_HOST/$test_port"
+          ports_to_try=("$preferred_port" "990" "21")
+          reachable_port=""
+
+          for candidate_port in "${ports_to_try[@]}"; do
+            if [[ -z "$candidate_port" ]]; then
+              continue
+            fi
+
+            echo "Checking TCP connectivity to $FTP_HOST:$candidate_port"
+            if timeout 8 bash -lc "</dev/tcp/$FTP_HOST/$candidate_port"; then
+              reachable_port="$candidate_port"
+              break
+            fi
+          done
+
+          if [[ -n "$reachable_port" ]]; then
+            echo "Preflight connectivity succeeded on port $reachable_port"
+          else
+            echo "::warning::No FTP port responded during preflight. Continuing with deploy attempts (FTPS/FTP fallback)."
+          fi
 
       - name: Install lftp
         run: |
