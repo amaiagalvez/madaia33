@@ -82,6 +82,7 @@ jobs:
 
           timeout 120 lftp -d -c "
             set cmd:fail-exit true;
+            set dns:order inet;
             set net:timeout 20;
             set net:max-retries 1;
             set net:reconnect-interval-base 5;
@@ -90,6 +91,7 @@ jobs:
             set ftp:ssl-force true;
             set ftp:ssl-protect-data true;
             set ftp:passive-mode true;
+            set ftp:prefer-epsv false;
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftps://$FTP_SERVER';
             echo 'Connected with FTPS';
             pwd;
@@ -124,6 +126,7 @@ jobs:
 
           timeout 120 lftp -d -c "
             set cmd:fail-exit true;
+            set dns:order inet;
             set net:timeout 20;
             set net:max-retries 1;
             set net:reconnect-interval-base 5;
@@ -132,6 +135,7 @@ jobs:
             set ftp:ssl-force false;
             set ftp:ssl-protect-data false;
             set ftp:passive-mode true;
+            set ftp:prefer-epsv false;
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$fallback_port' 'ftp://$FTP_SERVER';
             echo 'Connected with FTP fallback';
             pwd;
