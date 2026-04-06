@@ -59,28 +59,40 @@ jobs:
 
           echo "server_dir=$normalized_dir" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy files via FTP/FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ${{ secrets.FTP_PROTOCOL }}
-          server-dir: ${{ steps.ftp_dir.outputs.server_dir }}
-          state-name: .ftp-deploy-sync-state.json
-          exclude: |
-            **/.docs/**
-            **/.git*/**
-            **/.github/**
-            **/.githooks/**            
-            **/.kiro/**
-            **/.vscode/**
-            **/node_modules/**
-            **/tests/**
-            **/dc-data/**
-            **/.env
-            **/storage/logs/**
-            **/storage/framework/cache/**
-            **/storage/framework/sessions/**
-            **/storage/framework/views/**
+      - name: Install lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Deploy files via FTPS
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_SERVER_DIR: ${{ steps.ftp_dir.outputs.server_dir }}
+        run: |
+          lftp -c "
+            set ssl:verify-certificate no;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' '$FTP_SERVER';
+            mirror -R --delete --verbose \
+              --exclude-glob '.docs/**' \
+              --exclude-glob '.git*' \
+              --exclude-glob '.github/**' \
+              --exclude-glob '.githooks/**' \
+              --exclude-glob '.kiro/**' \
+              --exclude-glob '.vscode/**' \
+              --exclude-glob 'node_modules/**' \
+              --exclude-glob 'tests/**' \
+              --exclude-glob 'dc-data/**' \
+              --exclude-glob '.env' \
+              --exclude-glob 'storage/logs/**' \
+              --exclude-glob 'storage/framework/cache/**' \
+              --exclude-glob 'storage/framework/sessions/**' \
+              --exclude-glob 'storage/framework/views/**' \
+              . '$FTP_SERVER_DIR';
+            bye
+          "
