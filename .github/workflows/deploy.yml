@@ -21,6 +21,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Install PHP dependencies (production)
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
@@ -52,7 +55,6 @@ jobs:
             **/node_modules/**
             **/tests/**
             **/dc-data/**
-            **/vendor/**
             **/.env
             **/storage/logs/**
             **/storage/framework/cache/**
