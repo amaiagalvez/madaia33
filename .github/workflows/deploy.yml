@@ -63,13 +63,30 @@ jobs:
         id: ftp_host
         env:
           FTP_SERVER_RAW: ${{ secrets.FTP_SERVER }}
+          FTP_PORT_RAW: ${{ secrets.FTP_PORT }}
         run: |
           ftp_host="$FTP_SERVER_RAW"
+          ftp_port="$FTP_PORT_RAW"
 
           ftp_host="${ftp_host#ftp://}"
           ftp_host="${ftp_host#ftps://}"
           ftp_host="${ftp_host%%/*}"
           ftp_host="$(echo "$ftp_host" | tr -d '[:space:]')"
+
+          if [[ "$ftp_host" == *:* ]]; then
+            host_from_secret="${ftp_host%%:*}"
+            port_from_secret="${ftp_host##*:}"
+
+            ftp_host="$host_from_secret"
+
+            if [[ -z "$ftp_port" && "$port_from_secret" =~ ^[0-9]+$ ]]; then
+              ftp_port="$port_from_secret"
+            fi
+          fi
+
+          if [[ -z "$ftp_port" ]]; then
+            ftp_port="21"
+          fi
 
           if [[ -z "$ftp_host" ]]; then
             echo "FTP_SERVER is empty after normalization."
@@ -77,16 +94,14 @@ jobs:
           fi
 
           echo "host=$ftp_host" >> "$GITHUB_OUTPUT"
+          echo "port=$ftp_port" >> "$GITHUB_OUTPUT"
 
       - name: Preflight FTP connectivity
         env:
           FTP_HOST: ${{ steps.ftp_host.outputs.host }}
-          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_PORT: ${{ steps.ftp_host.outputs.port }}
         run: |
           test_port="$FTP_PORT"
-          if [[ -z "$test_port" ]]; then
-            test_port="21"
-          fi
 
           echo "Checking DNS for host: $FTP_HOST"
           timeout 15 getent ahostsv4 "$FTP_HOST"
@@ -105,7 +120,7 @@ jobs:
           FTP_SERVER: ${{ steps.ftp_host.outputs.host }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_PORT: ${{ steps.ftp_host.outputs.port }}
           FTP_SERVER_DIR: ${{ steps.ftp_dir.outputs.server_dir }}
         run: |
           set +e
