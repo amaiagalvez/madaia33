@@ -42,6 +42,23 @@ jobs:
           npm ci
           npm run build
 
+      - name: Normalize FTP server directory
+        id: ftp_dir
+        env:
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+        run: |
+          normalized_dir="$FTP_SERVER_DIR"
+
+          if [[ -z "$normalized_dir" ]]; then
+            normalized_dir="/"
+          fi
+
+          if [[ "$normalized_dir" != */ ]]; then
+            normalized_dir="$normalized_dir/"
+          fi
+
+          echo "server_dir=$normalized_dir" >> "$GITHUB_OUTPUT"
+
       - name: Deploy files via FTP/FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
@@ -50,7 +67,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ${{ secrets.FTP_PROTOCOL }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          server-dir: ${{ steps.ftp_dir.outputs.server_dir }}
           state-name: .ftp-deploy-sync-state.json
           exclude: |
             **/.docs/**
