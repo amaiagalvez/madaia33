@@ -80,7 +80,7 @@ jobs:
             fallback_port="21"
           fi
 
-          lftp -c "
+          timeout 120 lftp -d -c "
             set cmd:fail-exit true;
             set net:timeout 20;
             set net:max-retries 1;
@@ -122,7 +122,7 @@ jobs:
 
           echo "FTPS failed (exit code: $ftps_exit_code). Trying FTP fallback..."
 
-          lftp -c "
+          timeout 120 lftp -d -c "
             set cmd:fail-exit true;
             set net:timeout 20;
             set net:max-retries 1;
