@@ -57,6 +57,24 @@ it('rejects invalid legal url format', function () {
         ->and($validator->errors()->keys())->toContain('legalUrl');
 });
 
+it('rejects script tags in legal texts', function () {
+    $validator = Validator::make(
+        [
+            'adminEmail' => 'admin@example.com',
+            'recaptchaSiteKey' => null,
+            'recaptchaSecretKey' => null,
+            'legalCheckboxTextEu' => '<script>alert(1)</script>',
+            'legalCheckboxTextEs' => null,
+            'legalUrl' => null,
+        ],
+        AdminSettingsValidation::rules(),
+        AdminSettingsValidation::messages(),
+    );
+
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->keys())->toContain('legalCheckboxTextEu');
+});
+
 it('accepts valid admin settings payload', function () {
     $validator = Validator::make(
         [

@@ -62,6 +62,26 @@ it('el campo recaptcha_secret_key se renderiza como type=password', function () 
         ->assertSeeHtml('type="password"');
 });
 
+it('renderiza un editor enriquecido para los textos legales', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->assertSeeHtml('contenteditable="true"')
+        ->assertSeeHtml('role="toolbar"');
+});
+
+it('rechaza scripts en los textos legales de settings', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->set('adminEmail', 'admin@example.com')
+        ->set('legalCheckboxTextEu', '<script>alert(1)</script>')
+        ->call('save')
+        ->assertHasErrors(['legalCheckboxTextEu']);
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Dashboard — estadísticas reales
 // ─────────────────────────────────────────────────────────────────────────────

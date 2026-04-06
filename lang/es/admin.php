@@ -22,6 +22,12 @@ return [
         'legal_text_eu' => 'Texto legal (EU)',
         'legal_text_es' => 'Texto legal (ES)',
         'legal_url' => 'URL del documento legal',
+        'editor_toolbar' => 'Herramientas del editor',
+        'editor_bold' => 'Negrita',
+        'editor_italic' => 'Cursiva',
+        'editor_underline' => 'Subrayado',
+        'editor_link' => 'Enlace',
+        'editor_link_prompt' => 'Introduce la URL del enlace',
     ],
     'stats' => [
         'published_notices' => 'Avisos publicados',

@@ -57,7 +57,7 @@
 }" @keydown="handleKeydown" @touchstart.passive="handleTouchStart($event)"
     @touchend="handleTouchEnd($event)" @autoplay-reset.window="resetAutoplay()"
     @start-autoplay.window="startAutoplay()" data-hero-slider
-    class="relative left-1/2 right-1/2 -mx-[50vw] h-64 w-screen overflow-hidden bg-gray-900 sm:h-80 md:h-96 lg:h-[35rem]"
+    class="relative left-1/2 right-1/2 -mx-[50vw] h-56 w-screen overflow-hidden bg-gray-900 sm:h-72 md:h-[22rem] lg:h-[30rem]"
     role="region" aria-roledescription="carousel" aria-label="{{ __('hero_slider.gallery_title') }}"
     tabindex="0">
     @if (empty($images))
@@ -67,7 +67,7 @@
         </div>
     @else
         <!-- Image Container -->
-        <div class="relative w-full h-full overflow-hidden">
+        <div class="relative w-full h-full overflow-hidden bg-stone-950">
             @foreach ($images as $index => $image)
                 <div class="absolute inset-0 transition-opacity duration-500 ease-in-out"
                     :class="{
@@ -76,11 +76,13 @@
                         'opacity-0 pointer-events-none': currentIndex !==
                             {{ $index }}
                     }">
-                    <img src="{{ Storage::disk('public')->exists($image['path']) ? Storage::url($image['path']) : asset('favicon.svg') }}"
-                        alt="{{ $image['alt_text'] ?? 'Hero slide' }}"
-                        class="w-full h-full object-cover"
-                        loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                        fetchpriority="{{ $index === 0 ? 'high' : 'auto' }}" />
+                    <div class="flex h-full w-full items-center justify-center">
+                        <img src="{{ Storage::disk('public')->exists($image['path']) ? Storage::url($image['path']) : asset('favicon.svg') }}"
+                            alt="{{ $image['alt_text'] ?? 'Hero slide' }}"
+                            class="h-full w-full object-contain"
+                            loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                            fetchpriority="{{ $index === 0 ? 'high' : 'auto' }}" />
+                    </div>
                 </div>
             @endforeach
 
@@ -96,8 +98,7 @@
             <div class="absolute inset-0 px-4 sm:px-6 lg:px-10">
                 <div class="mx-auto flex h-full max-w-7xl items-end pb-8 sm:pb-10 lg:pb-14">
                     <div class="w-full">
-                        <div
-                            class="animate-soft-rise-delayed max-w-3xl px-5 py-5 sm:px-7 sm:py-6">
+                        <div class="animate-soft-rise-delayed max-w-3xl px-5 py-5 sm:px-7 sm:py-6">
                             <h2
                                 class="mb-2 line-clamp-3 text-left text-2xl font-bold text-white sm:text-3xl md:text-4xl lg:text-5xl">
                                 {{ __('hero_slider.gallery_title') }}

@@ -22,6 +22,12 @@ return [
         'legal_text_eu' => 'Testu legala (EU)',
         'legal_text_es' => 'Testu legala (ES)',
         'legal_url' => 'Dokumentu legalaren URLa',
+        'editor_toolbar' => 'Editoreko tresnak',
+        'editor_bold' => 'Lodia',
+        'editor_italic' => 'Etzana',
+        'editor_underline' => 'Azpimarratua',
+        'editor_link' => 'Esteka',
+        'editor_link_prompt' => 'Sartu estekaren URLa',
     ],
     'stats' => [
         'published_notices' => 'Argitaratutako iragarkiak',

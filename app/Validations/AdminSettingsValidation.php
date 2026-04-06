@@ -2,6 +2,8 @@
 
 namespace App\Validations;
 
+use App\Rules\NoScriptTags;
+
 class AdminSettingsValidation
 {
     /**
@@ -13,8 +15,8 @@ class AdminSettingsValidation
             'adminEmail' => 'required|email|max:255',
             'recaptchaSiteKey' => 'nullable|string|max:255',
             'recaptchaSecretKey' => 'nullable|string|max:255',
-            'legalCheckboxTextEu' => 'nullable|string|max:1000',
-            'legalCheckboxTextEs' => 'nullable|string|max:1000',
+            'legalCheckboxTextEu' => ['nullable', 'string', 'max:1000', new NoScriptTags],
+            'legalCheckboxTextEs' => ['nullable', 'string', 'max:1000', new NoScriptTags],
             'legalUrl' => 'nullable|url|max:255',
         ];
     }

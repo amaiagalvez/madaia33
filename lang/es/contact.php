@@ -4,7 +4,6 @@ return [
     'title' => 'Contacto',
     'seo_description' => 'Contacta con la comunidad mediante un formulario seguro para consultas, incidencias o sugerencias.',
     'subtitle' => 'Envía tu mensaje de forma segura, clara y con el mismo tono cuidado que el resto de la web.',
-    'intro' => 'Estamos aquí para ayudarte: completa los datos y tu mensaje llegará de forma ordenada y directa.',
     'required_hint' => '* Los campos marcados son obligatorios.',
     'support_badge' => 'Atención directa',
     'support_title' => 'Una vía clara para hablar con la comunidad',

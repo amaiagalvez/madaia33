@@ -193,7 +193,7 @@ POST /logout                    → Cerrar sesión
 | `LanguageSwitcher`   | Global (layout)          | Cambio de idioma EU/ES, persiste en sesión                                        |
 | `AdminNoticeManager` | `/admin/avisos`          | CRUD de avisos con publicación/despublicación                                     |
 | `AdminMessageInbox`  | `/admin/mensajes`        | Bandeja de mensajes, marcar leído/no leído, eliminar con confirmación             |
-| `AdminSettings`      | `/admin/configuracion`   | Configuración de email, reCAPTCHA, texto legal                                    |
+| `AdminSettings`      | `/admin/configuracion`   | Configuración de email, reCAPTCHA y texto legal con editor enriquecido (EU/ES)    |
 | `AdminLegalPages`    | `/admin/paginas-legales` | Edición de contenido de política de privacidad y aviso legal en EU y ES           |
 
 La ruta `/admin/imagenes` y su vista existen, pero el componente dedicado de gestión administrativa de imágenes sigue pendiente en el estado actual del código.

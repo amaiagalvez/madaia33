@@ -30,7 +30,7 @@
     </a>
 
     {{-- Brand top bar --}}
-    <div class="h-1 bg-linear-to-r from-indigo-500 via-indigo-600 to-cyan-500" aria-hidden="true">
+    <div class="h-1 bg-linear-to-r from-amber-700 via-orange-700 to-emerald-700" aria-hidden="true">
     </div>
 
     {{-- Header / Navigation --}}
@@ -38,20 +38,19 @@
         class="public-header sticky top-0 z-[70] isolate border-b border-gray-200 bg-white pt-[env(safe-area-inset-top)] shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div
-                class="header-shell flex items-center justify-between min-h-16 transition-all duration-200">
+                class="header-shell flex items-center justify-between gap-2 min-h-16 transition-all duration-200">
 
                 {{-- Logo / Site name (left) --}}
                 <a href="{{ route('home') }}"
-                    class="flex shrink-0 items-center gap-3 rounded-sm transition-colors hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    <span
-                        class="header-brand-mark flex h-10 w-10 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-600 via-indigo-500 to-cyan-500 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition-all duration-200">
-                        M
-                    </span>
-                    <span class="flex flex-col leading-none">
+                    class="flex min-w-0 items-center gap-2 sm:gap-3 rounded-sm transition-colors hover:text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2">
+                    <img src="{{ asset('storage/madaia33/madaia33.png') }}"
+                        alt="{{ config('app.name', 'Madaia') }} logo"
+                        class="header-brand-mark h-10 w-10 sm:h-12 sm:w-12 rounded-2xl object-cover shadow-lg shadow-amber-900/20 transition-all duration-200" />
+                    <span class="hidden sm:flex flex-col leading-none">
                         <span
                             class="text-lg font-semibold text-gray-900">{{ config('app.name', 'Madaia') }}</span>
                         <span
-                            class="header-brand-subtitle text-[11px] uppercase tracking-[0.18em] text-gray-400 transition-all duration-200">Labeaga
+                            class="header-brand-subtitle text-[11px] uppercase tracking-[0.18em] text-stone-500 transition-all duration-200">Labeaga
                             33, Urretxu</span>
                     </span>
                 </a>
@@ -62,22 +61,22 @@
                     <div
                         class="header-nav-panel glass-panel flex items-center gap-1 px-2 py-1.5 transition-all duration-200">
                         <a href="{{ route('notices') }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {{ request()->routeIs('notices') ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/20' : 'text-gray-600 hover:bg-white hover:text-gray-900' }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('notices') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
                             aria-current="{{ request()->routeIs('notices') ? 'page' : 'false' }}">
                             {{ __('general.nav.notices') }}
                         </a>
                         <a href="{{ route('gallery') }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {{ request()->routeIs('gallery') ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/20' : 'text-gray-600 hover:bg-white hover:text-gray-900' }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('gallery') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
                             aria-current="{{ request()->routeIs('gallery') ? 'page' : 'false' }}">
                             {{ __('general.nav.gallery') }}
                         </a>
                         <a href="{{ route('contact') }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {{ request()->routeIs('contact') ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/20' : 'text-gray-600 hover:bg-white hover:text-gray-900' }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('contact') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
                             aria-current="{{ request()->routeIs('contact') ? 'page' : 'false' }}">
                             {{ __('general.nav.contact') }}
                         </a>
                         <a href="{{ route('private') }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {{ request()->routeIs('private') ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/20' : 'text-gray-600 hover:bg-white hover:text-gray-900' }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('private') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
                             aria-current="{{ request()->routeIs('private') ? 'page' : 'false' }}">
                             {{ __('general.nav.private') }}
                         </a>
@@ -85,7 +84,7 @@
                 </nav>
 
                 {{-- Right section: Language switcher + Mobile menu button --}}
-                <div class="flex items-center gap-4 ml-auto">
+                <div class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
                     {{-- Language switcher (always visible) --}}
                     <livewire:language-switcher />
 
@@ -113,23 +112,23 @@
             <nav class="px-4 py-3 flex flex-col gap-1" x-ref="mobileNav"
                 aria-label="{{ __('general.nav.main') ?? 'Nabigazio nagusia' }}">
                 <a href="{{ route('notices') }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors min-h-11 {{ request()->routeIs('notices') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('notices') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
                     aria-current="{{ request()->routeIs('notices') ? 'page' : 'false' }}"
                     data-first-menu-item x-ref="firstMenuItem">
                     {{ __('general.nav.notices') }}
                 </a>
                 <a href="{{ route('gallery') }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors min-h-11 {{ request()->routeIs('gallery') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('gallery') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
                     aria-current="{{ request()->routeIs('gallery') ? 'page' : 'false' }}">
                     {{ __('general.nav.gallery') }}
                 </a>
                 <a href="{{ route('contact') }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors min-h-11 {{ request()->routeIs('contact') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('contact') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
                     aria-current="{{ request()->routeIs('contact') ? 'page' : 'false' }}">
                     {{ __('general.nav.contact') }}
                 </a>
                 <a href="{{ route('private') }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors min-h-11 {{ request()->routeIs('private') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-700' }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('private') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
                     aria-current="{{ request()->routeIs('private') ? 'page' : 'false' }}">
                     {{ __('general.nav.private') }}
                 </a>
@@ -140,10 +139,10 @@
     {{-- Main content --}}
     <main id="main-content" class="relative flex-1 overflow-x-clip" tabindex="-1">
         <div aria-hidden="true"
-            class="pointer-events-none absolute left-[-8rem] top-20 -z-10 h-72 w-72 rounded-full bg-indigo-200/25 blur-3xl">
+            class="pointer-events-none absolute left-[-8rem] top-20 -z-10 h-72 w-72 rounded-full bg-amber-200/25 blur-3xl">
         </div>
         <div aria-hidden="true"
-            class="pointer-events-none absolute right-[-6rem] top-[28rem] -z-10 h-80 w-80 rounded-full bg-cyan-200/20 blur-3xl">
+            class="pointer-events-none absolute right-[-6rem] top-[28rem] -z-10 h-80 w-80 rounded-full bg-emerald-200/20 blur-3xl">
         </div>
         <div aria-hidden="true"
             class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-linear-to-b from-white/90 to-transparent">
@@ -155,16 +154,15 @@
 
     {{-- Footer --}}
     <footer class="mt-auto border-t border-gray-200 bg-gray-50/90 pb-[env(safe-area-inset-bottom)]">
-        <div class="h-0.5 bg-linear-to-r from-indigo-500 via-indigo-600 to-purple-600"></div>
+        <div class="h-0.5 bg-linear-to-r from-stone-600 via-amber-700 to-emerald-700"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div
                 class="flex flex-col items-stretch gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div
                     class="glass-panel flex w-full max-w-md items-center gap-4 px-4 py-3 sm:w-auto">
-                    <span
-                        class="flex h-10 w-10 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-600 via-indigo-500 to-cyan-500 text-sm font-bold text-white shadow-lg shadow-indigo-600/20">
-                        M
-                    </span>
+                    <img src="{{ asset('storage/madaia33/madaia33.png') }}"
+                        alt="{{ config('app.name', 'Madaia') }} logo"
+                        class="h-12 w-12 rounded-2xl object-cover shadow-lg shadow-amber-900/20" />
                     <div class="flex flex-col gap-1 text-left">
                         <span
                             class="text-sm font-semibold text-gray-800">{{ config('app.name', 'Komunitatea') }}</span>
@@ -174,14 +172,14 @@
                 </div>
                 <nav class="grid gap-3 sm:grid-cols-2" aria-label="Footer">
                     <a href="{{ route('privacy-policy') }}"
-                        class="hero-frame px-4 py-3 transition-colors hover:border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        class="hero-frame px-4 py-3 transition-colors hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2">
                         <p class="text-sm font-semibold text-gray-800">
                             {{ __('general.footer.privacy_policy') }}</p>
                         <p class="mt-1 text-xs leading-relaxed text-gray-500">
                             {{ __('general.footer.privacy_policy_description') }}</p>
                     </a>
                     <a href="{{ route('legal-notice') }}"
-                        class="hero-frame px-4 py-3 transition-colors hover:border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        class="hero-frame px-4 py-3 transition-colors hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2">
                         <p class="text-sm font-semibold text-gray-800">
                             {{ __('general.footer.legal_notice') }}</p>
                         <p class="mt-1 text-xs leading-relaxed text-gray-500">

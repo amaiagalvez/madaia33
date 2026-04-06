@@ -13,17 +13,6 @@
     syncCounters();
 })"
     @contact-form-submitted.window="focusFirstField()">
-    <div class="mb-6 hero-frame px-4 py-4 sm:px-5" data-contact-intro>
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-800">{{ __('contact.intro') }}</p>
-                <p class="mt-1 text-xs text-gray-600">{{ __('contact.required_hint') }}</p>
-            </div>
-            <span
-                class="feature-chip border-indigo-100 bg-indigo-50 text-indigo-700">{{ __('contact.support_badge') }}</span>
-        </div>
-    </div>
-
     {{-- Status message --}}
     @if ($statusType)
         <div role="alert" aria-live="polite"
@@ -35,8 +24,8 @@
         </div>
     @endif
 
-    <form wire:submit="submit"
-        x-on:submit="$refs.submitButton?.setAttribute('disabled', 'disabled')" novalidate>
+    <form wire:submit="submit" x-on:submit="$refs.submitButton?.setAttribute('disabled', 'disabled')"
+        novalidate>
         {{-- Name --}}
         <div class="mb-4">
             <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-1">

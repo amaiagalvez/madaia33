@@ -4,7 +4,6 @@ return [
     'title' => 'Kontaktua',
     'seo_description' => 'Jarri komunitatearekin harremanetan formulario seguru baten bidez, zure kontsulta edo iradokizunetarako.',
     'subtitle' => 'Bidali zure mezua modu seguruan, argian eta komunitatearen tonu zaindu berarekin.',
-    'intro' => 'Lagundu nahi dizugu: bete datuak eta zure mezua modu ordenatuan eta zuzen batean iritsiko da.',
     'required_hint' => '* Ikurra duten eremuak derrigorrezkoak dira.',
     'support_badge' => 'Laguntza zuzena',
     'support_title' => 'Komunitatearekin hitz egiteko bide argia',

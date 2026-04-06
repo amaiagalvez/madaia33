@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'title' => 'Etxea',
+    'title' => 'Hasiera',
     'seo_description' => 'Komunitateko azken berriak, iragarkiak eta informazio garrantzitsua leku bakarrean.',
     'section_kicker' => 'Komunitatea',
     'editorial_badge' => 'Bizilagunentzako espazio digitala',
