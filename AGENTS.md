@@ -20,6 +20,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/prompts (PROMPTS) - v0
 - livewire/flux (FLUXUI_FREE) - v2
 - livewire/livewire (LIVEWIRE) - v4
+- larastan/larastan (LARASTAN) - v3
 - laravel/boost (BOOST) - v2
 - laravel/dusk (DUSK) - v8
 - laravel/mcp (MCP) - v0
@@ -27,6 +28,8 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/pint (PINT) - v1
 - laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v4
+- phpmd/phpmd (PHPMD) -v2
+- phpstan/phpstan (PHPSTAN)  -v2
 - phpunit/phpunit (PHPUNIT) - v12
 - tailwindcss (TAILWINDCSS) - v4
 
@@ -56,6 +59,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 - **Input hardening policy (future forms)**: For user-controlled free-text fields (contact, settings text, admin notes, etc.), use reusable validation rules under `app/Rules/` (for example, `NoScriptTags`) instead of repeating inline regex rules. Keep Blade escaped output (`{{ }}`), reject unsafe payloads at validation time when applicable, and cover the rule with focused Unit tests plus one integration test in the affected flow.
 - **Test readability for settings**: In tests, avoid repeating `Setting::where('key', ...)->value('value')` and ad-hoc settings seeding; use shared Pest helpers (for example `settingValue(...)` and `createSetting(...)`) to keep assertions and setup concise and consistent.
 - **Specs sync after code changes**: After any code change that affects documented behaviour, review `.kiro/specs/community-web/` and update `design.md`, plus `requirements.md` or `tasks.md` when affected, so the specs stay aligned with the implemented code before finishing.
+- **Spec completion quality gate**: At the end of each spec task set, before updating documentation and before running tests, execute quality checks inside Docker with a non-root user. Minimum required gate: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
 - **`->repeat()` in tests**: Only use `->repeat()` on property-based tests that randomise inputs with `rand()` or `fake()`. Never use on deterministic tests. Keep the count at 2 or below.
 
 ## Verification Scripts
