@@ -59,6 +59,41 @@ jobs:
 
           echo "server_dir=$normalized_dir" >> "$GITHUB_OUTPUT"
 
+      - name: Normalize FTP host
+        id: ftp_host
+        env:
+          FTP_SERVER_RAW: ${{ secrets.FTP_SERVER }}
+        run: |
+          ftp_host="$FTP_SERVER_RAW"
+
+          ftp_host="${ftp_host#ftp://}"
+          ftp_host="${ftp_host#ftps://}"
+          ftp_host="${ftp_host%%/*}"
+          ftp_host="$(echo "$ftp_host" | tr -d '[:space:]')"
+
+          if [[ -z "$ftp_host" ]]; then
+            echo "FTP_SERVER is empty after normalization."
+            exit 1
+          fi
+
+          echo "host=$ftp_host" >> "$GITHUB_OUTPUT"
+
+      - name: Preflight FTP connectivity
+        env:
+          FTP_HOST: ${{ steps.ftp_host.outputs.host }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+        run: |
+          test_port="$FTP_PORT"
+          if [[ -z "$test_port" ]]; then
+            test_port="21"
+          fi
+
+          echo "Checking DNS for host: $FTP_HOST"
+          timeout 15 getent ahostsv4 "$FTP_HOST"
+
+          echo "Checking TCP connectivity to $FTP_HOST:$test_port"
+          timeout 15 bash -lc "</dev/tcp/$FTP_HOST/$test_port"
+
       - name: Install lftp
         run: |
           sudo apt-get update
@@ -67,7 +102,7 @@ jobs:
       - name: Deploy files via FTPS
         timeout-minutes: 15
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_SERVER: ${{ steps.ftp_host.outputs.host }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_PORT: ${{ secrets.FTP_PORT }}
