@@ -115,7 +115,7 @@ jobs:
           sudo apt-get install -y lftp
 
       - name: Deploy files via FTPS
-        timeout-minutes: 15
+        timeout-minutes: 30
         env:
           FTP_SERVER: ${{ steps.ftp_host.outputs.host }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -130,7 +130,7 @@ jobs:
             fallback_port="21"
           fi
 
-          timeout 120 lftp -d -c "
+          lftp -d -c "
             set cmd:fail-exit true;
             set dns:order inet;
             set net:timeout 20;
@@ -174,7 +174,7 @@ jobs:
 
           echo "FTPS failed (exit code: $ftps_exit_code). Trying FTP fallback..."
 
-          timeout 120 lftp -d -c "
+          lftp -d -c "
             set cmd:fail-exit true;
             set dns:order inet;
             set net:timeout 20;
