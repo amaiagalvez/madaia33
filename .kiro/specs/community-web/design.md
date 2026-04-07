@@ -209,8 +209,8 @@ La ruta `/admin/imagenes` y su vista existen, pero el componente dedicado de ges
 - El menú móvil público usa `x-cloak` y altura máxima con scroll para que los tests landscape y la UX móvil no dependan del tiempo de inicialización de Alpine.
 - La comprobación E2E del formulario de contacto en navegador valida tanto la persistencia de `ContactMessage` como la llegada del email a MailHog.
 - La parte pública usa una dirección visual más editorial y premium: cabecera translúcida, héroes con métricas/resúmenes, tarjetas elevadas y paneles tipo glass para reforzar jerarquía sin perder accesibilidad.
-- La home combina el `HeroSlider` a pantalla completa con métricas rápidas de avisos/galería/ubicaciones y accesos directos visuales a las secciones públicas.
-- La home añade una segunda capa editorial bajo el slider: manifiesto breve de la comunidad digital, promesas de valor y bloques de descubrimiento para que la primera visita transmita más ambición y claridad.
+- La home combina el `HeroSlider` a pantalla completa con una presentación visual limpia y desplaza el foco de contenido al bloque principal de avisos.
+- Bajo el slider, la home organiza el contenido en una composición 8/4 en escritorio: sección de `Iragarkiak` a la izquierda y un panel `Un poco de historia` a la derecha, con ligero solape vertical para reforzar jerarquía visual.
 - La página de avisos trata la primera noticia como pieza destacada dentro del grid responsive, acercando la percepción a una portada editorial sin perder la estructura validada por tests.
 - La página de contacto se resuelve como composición en dos columnas: bloque lateral de confianza y panel principal del formulario con microfeedback de completitud, estados accesibles y CTA principal destacado.
 - La galería pública prioriza un primer elemento destacado dentro del grid responsive para generar una percepción más curada sin romper el layout validado por tests.

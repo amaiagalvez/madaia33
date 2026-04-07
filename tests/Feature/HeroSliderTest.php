@@ -132,6 +132,7 @@ describe('HeroSlider navigation', function () {
         Livewire::test(HeroSlider::class)
             ->assertViewIs('livewire.hero-slider')
             ->assertSee('absolute inset-0')
-            ->assertSee('object-contain');
+            ->assertSee('object-contain')
+            ->assertDontSee(route('gallery'));
     });
 });

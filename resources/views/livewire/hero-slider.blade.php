@@ -93,31 +93,6 @@
             <div
                 class="absolute inset-0 bg-linear-to-t from-slate-950/70 via-transparent to-slate-950/20">
             </div>
-
-            <!-- Text Overlay (Optional) -->
-            <div class="absolute inset-0 px-4 sm:px-6 lg:px-10">
-                <div class="mx-auto flex h-full max-w-7xl items-end pb-8 sm:pb-10 lg:pb-14">
-                    <div class="w-full">
-                        <div class="animate-soft-rise-delayed max-w-3xl px-5 py-5 sm:px-7 sm:py-6">
-                            <h2
-                                class="mb-2 line-clamp-3 text-left text-2xl font-bold text-white sm:text-3xl md:text-4xl lg:text-5xl">
-                                {{ __('hero_slider.gallery_title') }}
-                            </h2>
-                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                <a href="{{ route('gallery') }}"
-                                    class="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 font-semibold text-gray-900 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900">
-                                    {{ __('hero_slider.view_more_images') }}
-                                    <svg class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Navigation Buttons (Hidden on mobile, visible on md+) -->

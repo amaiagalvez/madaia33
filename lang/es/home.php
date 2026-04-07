@@ -18,6 +18,9 @@ return [
     'discovery_summary' => 'Los avisos recientes, las imágenes de los espacios compartidos y el contacto directo conviven en una misma navegación para que todo resulte más claro.',
     'discovery_notice' => 'Consulta novedades y comunicados en una cronología clara y fácil de revisar.',
     'discovery_gallery' => 'Recorre los espacios y momentos de la comunidad con una capa visual más cuidada.',
+    'history_title' => 'Un poco de historia',
+    'history_summary' => 'Un recorrido breve por los inicios de la comunidad: espacios compartidos, primeros encuentros y la evolución que nos ha traído hasta hoy.',
+    'history_image_alt' => 'Imagen representativa de la historia de la comunidad',
     'promises' => [
         'informed_title' => 'Mantenerse al día',
         'informed_body' => 'Los avisos recientes y la información útil aparecen en primer plano.',

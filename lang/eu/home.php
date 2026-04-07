@@ -18,6 +18,9 @@ return [
     'discovery_summary' => 'Ohar berriak, espazio partekatuen argazkiak eta komunikazio zuzena nabigazio berean lotzen dira, dena azkar aurkitzeko.',
     'discovery_notice' => 'Azken berriak eta oharrak kronologia argi batean ikusi.',
     'discovery_gallery' => 'Komunitatearen uneak eta espazioak irudi zainduen bidez arakatu.',
+    'history_title' => 'Historia apur bat',
+    'history_summary' => 'Komunitatearen hastapenetara begirada laburra: espazio partekatuak, lehen topaketak eta gaur arte ekarri gaituen bilakaera.',
+    'history_image_alt' => 'Komunitatearen historiaren irudi adierazgarria',
     'promises' => [
         'informed_title' => 'Eguneratuta egoteko',
         'informed_body' => 'Iragarki berriak eta informazio erabilgarria lehen planoan ikusten dira.',

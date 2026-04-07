@@ -19,11 +19,14 @@ test('home page displays latest notices grid', function () {
     }
 });
 
-test('home page renders editorial landing section', function () {
+test('home page renders notices section with history block', function () {
     $response = $this->get('/');
 
     $response->assertSuccessful();
-    $response->assertSee(__('home.editorial_title'));
+    $response->assertSee(__('home.notices'));
+    $response->assertSee(__('home.history_title'));
+    $response->assertSee(__('home.history_summary'));
+    $response->assertSee('data-home-history', false);
 });
 
 test('public layout keeps sticky header solid and prevents horizontal overflow', function () {
