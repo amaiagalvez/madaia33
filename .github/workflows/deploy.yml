@@ -147,10 +147,7 @@ jobs:
         run: |
           set +e
 
-          fallback_port="$FTP_PORT"
-          if [[ -z "$fallback_port" || "$fallback_port" == "990" ]]; then
-            fallback_port="21"
-          fi
+          fallback_port="21"
 
           lftp -d -c "
             set cmd:fail-exit true;
@@ -196,6 +193,7 @@ jobs:
           fi
 
           echo "FTPS failed (exit code: $ftps_exit_code). Trying FTP fallback..."
+          echo "Using FTP fallback port: $fallback_port"
 
           lftp -d -c "
             set cmd:fail-exit true;
