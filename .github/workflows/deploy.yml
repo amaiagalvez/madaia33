@@ -44,158 +44,20 @@ jobs:
           npm ci
           npm run build
 
-      - name: Normalize FTP server directory
-        id: ftp_dir
-        env:
-          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
-        run: |
-          normalized_dir="$FTP_SERVER_DIR"
-
-          if [[ -z "$normalized_dir" ]]; then
-            normalized_dir="/"
-          fi
-
-          if [[ "$normalized_dir" != */ ]]; then
-            normalized_dir="$normalized_dir/"
-          fi
-
-          echo "server_dir=$normalized_dir" >> "$GITHUB_OUTPUT"
-
-      - name: Normalize FTP host
-        id: ftp_host
-        env:
-          FTP_SERVER_RAW: ${{ secrets.FTP_SERVER }}
-          FTP_PORT_RAW: ${{ secrets.FTP_PORT }}
-        run: |
-          ftp_host="$FTP_SERVER_RAW"
-          ftp_port="$FTP_PORT_RAW"
-
-          ftp_host="${ftp_host#ftp://}"
-          ftp_host="${ftp_host#ftps://}"
-          ftp_host="${ftp_host%%/*}"
-          ftp_host="$(echo "$ftp_host" | tr -d '[:space:]')"
-
-          if [[ "$ftp_host" == *:* ]]; then
-            host_from_secret="${ftp_host%%:*}"
-            port_from_secret="${ftp_host##*:}"
-
-            ftp_host="$host_from_secret"
-
-            if [[ -z "$ftp_port" && "$port_from_secret" =~ ^[0-9]+$ ]]; then
-              ftp_port="$port_from_secret"
-            fi
-          fi
-
-          if [[ -z "$ftp_port" ]]; then
-            ftp_port="21"
-          fi
-
-          if [[ -z "$ftp_host" ]]; then
-            echo "FTP_SERVER is empty after normalization."
-            exit 1
-          fi
-
-          echo "host=$ftp_host" >> "$GITHUB_OUTPUT"
-          echo "port=$ftp_port" >> "$GITHUB_OUTPUT"
-
-      - name: Preflight FTP connectivity
-        env:
-          FTP_HOST: ${{ steps.ftp_host.outputs.host }}
-          FTP_PORT: ${{ steps.ftp_host.outputs.port }}
-        run: |
-          preferred_port="$FTP_PORT"
-
-          echo "Checking DNS for host: $FTP_HOST"
-          if ! timeout 15 getent ahostsv4 "$FTP_HOST"; then
-            echo "::warning::DNS lookup failed for $FTP_HOST. Continuing and letting lftp perform final connection checks."
-          fi
-
-          ports_to_try=("$preferred_port" "990" "21")
-          reachable_port=""
-
-          for candidate_port in "${ports_to_try[@]}"; do
-            if [[ -z "$candidate_port" ]]; then
-              continue
-            fi
-
-            echo "Checking TCP connectivity to $FTP_HOST:$candidate_port"
-            if timeout 8 bash -lc "</dev/tcp/$FTP_HOST/$candidate_port"; then
-              reachable_port="$candidate_port"
-              break
-            fi
-          done
-
-          if [[ -n "$reachable_port" ]]; then
-            echo "Preflight connectivity succeeded on port $reachable_port"
-          else
-            echo "::warning::No FTP port responded during preflight. Continuing with deploy attempts (FTPS/FTP fallback)."
-          fi
-
       - name: Install lftp
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      - name: Deploy files via FTPS
+      - name: Deploy files via FTP
         timeout-minutes: 30
         env:
-          FTP_SERVER: ${{ steps.ftp_host.outputs.host }}
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_PORT: ${{ steps.ftp_host.outputs.port }}
-          FTP_SERVER_DIR: ${{ steps.ftp_dir.outputs.server_dir }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
-          set +e
-
-          fallback_port="$FTP_PORT"
-          if [[ -z "$fallback_port" || "$fallback_port" == "990" ]]; then
-            fallback_port="21"
-          fi
-
-          lftp -d -c "
-            set cmd:fail-exit true;
-            set dns:order inet;
-            set net:timeout 20;
-            set net:max-retries 1;
-            set net:reconnect-interval-base 5;
-            set net:reconnect-interval-max 10;
-            set ssl:verify-certificate no;
-            set ftp:ssl-force true;
-            set ftp:ssl-protect-data true;
-            set ftp:passive-mode true;
-            set ftp:prefer-epsv false;
-            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftps://$FTP_SERVER';
-            echo 'Connected with FTPS';
-            pwd;
-            cls -la;
-            mirror -R --delete --verbose \
-              --exclude-glob '.docs/**' \
-              --exclude-glob '.git*' \
-              --exclude-glob '.github/**' \
-              --exclude-glob '.githooks/**' \
-              --exclude-glob '.kiro/**' \
-              --exclude-glob '.vscode/**' \
-              --exclude-glob 'node_modules/**' \
-              --exclude-glob 'tests/**' \
-              --exclude-glob 'dc-data/**' \
-              --exclude-glob '.env' \
-              --exclude-glob 'storage/logs/*' \
-              --exclude-glob 'storage/framework/cache/*' \
-              --exclude-glob 'storage/framework/sessions/*' \
-              --exclude-glob 'storage/framework/views/*' \
-              . '$FTP_SERVER_DIR';
-            bye
-          "
-
-          ftps_exit_code=$?
-
-          if [[ $ftps_exit_code -eq 0 ]]; then
-            echo "Deploy completed using FTPS."
-            exit 0
-          fi
-
-          echo "FTPS failed (exit code: $ftps_exit_code). Trying FTP fallback..."
-
           lftp -d -c "
             set cmd:fail-exit true;
             set dns:order inet;
@@ -208,11 +70,9 @@ jobs:
             set ftp:ssl-protect-data false;
             set ftp:passive-mode true;
             set ftp:prefer-epsv false;
-            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$fallback_port' 'ftp://$FTP_SERVER';
-            echo 'Connected with FTP fallback';
-            pwd;
-            cls -la;
+            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftp://$FTP_SERVER';
             mirror -R --delete --verbose \
+              --exclude-glob 'vendor/**' \
               --exclude-glob '.docs/**' \
               --exclude-glob '.git*' \
               --exclude-glob '.github/**' \
