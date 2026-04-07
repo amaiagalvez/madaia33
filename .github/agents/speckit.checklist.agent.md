@@ -31,6 +31,11 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Global Speckit Rules
+
+- Maintain style coherence with existing sibling artifacts and project conventions. New or updated specs, plans, tasks, checklists, contracts, translations, and reports must preserve established structure, naming, tone, and formatting unless the user explicitly requests a change.
+- Optimize every Speckit run for minimum token usage. Reuse existing context, avoid rereading unchanged files, keep outputs terse, and avoid redundant explanations, examples, or file operations.
+
 ## Execution Steps
 
 1. **Setup**: Run `.specify/scripts/bash/check-prerequisites.sh --json` from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS list.

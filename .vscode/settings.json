@@ -33,6 +33,10 @@
         "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json --require-tasks --include-tasks$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json --require-tasks --include-tasks 2>&1 \\| head -80$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     },
     "chat.promptFilesRecommendations": {

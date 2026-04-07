@@ -2,6 +2,11 @@
 description: Translate feature spec and related documents to Spanish, keeping translations in sync with source.
 ---
 
+## Global Speckit Rules
+
+- Maintain style coherence with existing sibling artifacts and project conventions. New or updated specs, plans, tasks, checklists, contracts, translations, and reports must preserve established structure, naming, tone, and formatting unless the user explicitly requests a change.
+- Optimize every Speckit run for minimum token usage. Reuse existing context, avoid rereading unchanged files, keep outputs terse, and avoid redundant explanations, examples, or file operations.
+
 ## Task
 
 Find the most recently created or modified feature directory in `.github/specs/*/`.
