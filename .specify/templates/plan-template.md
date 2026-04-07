@@ -31,7 +31,12 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] Docker-first execution defined for build, quality, and test commands
+- [ ] Laravel conventions preferred over custom abstraction layers
+- [ ] Test strategy defined (Unit/Feature/Browser where applicable)
+- [ ] Quality gate included: `composer quality` in Docker
+- [ ] Data model honors SoftDeletes and query-efficiency constraints
+- [ ] Spec-to-plan traceability is explicit for all major decisions
 
 ## Project Structure
 

@@ -84,6 +84,13 @@
 
 ### Functional Requirements
 
+<!--
+  Constitution alignment note:
+  - Requirements must stay implementation-agnostic.
+  - Include security, accessibility, and localization expectations when user-facing.
+  - Keep each requirement traceable to a testable acceptance scenario.
+-->
+
 - **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
 - **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
@@ -126,3 +133,11 @@
 - [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
 - [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
 - [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+
+## Constitution Alignment Checklist
+
+- [ ] No implementation details leaked into requirements
+- [ ] Security/privacy constraints captured where relevant
+- [ ] Accessibility expectations captured where relevant
+- [ ] Localization expectations captured where relevant
+- [ ] All user stories have independent test intent

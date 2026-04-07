@@ -249,3 +249,7 @@ With multiple developers:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- For this repository, run implementation and validation commands in Docker
+- Include quality gate before documentation/final validation:
+  - `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
+- Include a final coverage task as the last task in the generated plan

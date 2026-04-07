@@ -8,6 +8,9 @@ En este repositorio ya esta inicializado Spec Kit para GitHub Copilot:
 - Comandos de Copilot en `.github/prompts/speckit.*.prompt.md`.
 - Agentes de Spec Kit en `.github/agents/speckit.*.agent.md`.
 
+Tambien tienes una constitucion base ya rellenada en `.specify/memory/constitution.md`
+con lo que se conoce hoy de tu repo.
+
 Comandos principales disponibles:
 
 - `/speckit.constitution` para fijar principios del proyecto.
@@ -67,3 +70,38 @@ Para cada feature, Spec Kit creara artefactos bajo `specs/<numero-feature>/`:
 - Si no te aparecen comandos `/speckit.*`, recarga ventana de VS Code (`Developer: Reload Window`).
 - Si una fase falla por prerequisitos, revisa que existan los artefactos previos (`spec.md`, `plan.md`, `tasks.md`).
 - Si trabajas fuera de rama de feature, Spec Kit puede pedir contexto de feature; crea o cambia a una rama de feature.
+
+## 6) Que se sabe ya de tu proyecto
+
+Datos inferidos automaticamente desde el repo (AGENTS.md, composer.json, estructura y reglas):
+
+- Stack: Laravel 13, PHP 8.4, Livewire 4, Flux UI v2, Tailwind v4.
+- Testing: Pest (Unit/Feature) y Dusk para Browser.
+- Flujo de ejecucion: Docker-first.
+- Reglas de datos: SoftDeletes por defecto + evitar N+1 + minimizar consultas.
+- Reglas de calidad: quality gate y tests antes de cerrar tareas.
+- i18n: Euskera y Espanol.
+
+Esto ya esta pasado a la constitucion y a las plantillas de plan/spec/tasks.
+
+## 7) Como rellenar la constitucion con lo que ya tienes
+
+Usa este enfoque para no inventar:
+
+1. Fuente de verdad tecnica:
+   - AGENTS.md
+   - composer.json y package.json
+   - tests/ y herramientas de calidad configuradas
+
+2. Pasa esas reglas a principios declarativos (MUST/SHOULD):
+   - Ejemplo: "Docker-first" -> "All project commands MUST run in Docker".
+
+3. Mueve requisitos operativos a "Workflow and Delivery Rules":
+   - quality gate
+   - orden de validacion
+   - cobertura al final
+
+4. Si cambias un principio:
+   - actualiza `.specify/memory/constitution.md`
+   - revisa plantillas `.specify/templates/*.md`
+   - deja trazabilidad en el comentario "Sync Impact Report"
