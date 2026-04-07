@@ -15,28 +15,14 @@
             <p class="text-gray-500 text-sm">{{ __('gallery.empty') }}</p>
         </div>
     @else
-        <div class="mb-6 hero-frame px-4 py-4 sm:px-5">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-600">
-                        {{ __('gallery.title') }}</p>
-                    <p class="mt-1 text-sm text-gray-600">{{ __('gallery.subtitle') }}</p>
-                </div>
-                <span class="feature-chip border-emerald-100 bg-emerald-50 text-emerald-700">
-                    {{ $images->count() }} {{ __('gallery.title') }}
-                </span>
-            </div>
-        </div>
-
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" data-gallery-grid>
             @foreach ($images as $image)
                 <button type="button" data-gallery-open
                     wire:key="gallery-image-{{ $image->id }}"
-                    class="group relative aspect-square overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'sm:col-span-2 sm:row-span-2 sm:aspect-auto min-h-[18rem]' : '' }}"
+                    class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'col-span-2 min-h-[14rem] sm:row-span-2 sm:min-h-[18rem]' : 'aspect-square' }}"
                     @click="show('{{ $image->public_url }}', '{{ addslashes($image->alt_text) }}', $event)"
                     aria-label="{{ $image->alt_text }}">
-                    <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
-                        loading="lazy"
+                    <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}" loading="lazy"
                         class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
                     <span
                         class="absolute left-3 top-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm">

@@ -3,7 +3,7 @@
 return [
     'title' => 'Avisos',
     'seo_description' => 'Consulta los avisos publicos de la comunidad, ordenados por fecha y filtrados por ubicacion.',
-    'subtitle' => 'Consulta los comunicados importantes de la comunidad con una presentación clara y ordenada.',
+    'subtitle' => 'Consulta los comunicados importantes de la comunidad',
     'editorial_badge' => 'Comunicación clara',
     'editorial_summary' => 'Cada aviso se presenta para que resulte fácil de localizar, leer y revisar, aportando más orden a la vida diaria de la comunidad.',
     'featured_badge' => 'Aviso destacado',

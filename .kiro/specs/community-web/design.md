@@ -19,7 +19,7 @@ La web de la comunidad de vecinos es una aplicación Laravel 13 con arquitectura
 - **Seguridad**: Cabeceras HTTP de seguridad (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) añadidas mediante middleware. Protección CSRF nativa de Laravel activa en todos los formularios. HTTPS obligatorio en producción mediante configuración de `AppServiceProvider` o `.env`.
 - **Validación defensiva en contacto**: El formulario de contacto rechaza entradas que incluyen etiquetas `<script>` en asunto o mensaje mediante reglas de validación específicas (`not_regex`), como capa adicional frente a XSS, manteniendo además el escape de salida en Blade.
 - **Paginación**: Los avisos se paginan a 10 por página usando el paginador de Laravel/Livewire. Las imágenes se muestran en grid sin paginación pero con lazy loading.
-- **Filtrado público**: El componente `PublicNotices` expone un selector de portal/planta que filtra los avisos en tiempo real mediante Livewire. La galería pública de imágenes no filtra por ubicación en el estado actual del código.
+- **Filtrado público**: El componente `PublicNotices` expone un selector de portal/planta integrado en la cabecera de `/avisos`, de modo que el filtrado en tiempo real mediante Livewire queda visible sin desplazar el listado inicial. La galería pública de imágenes no filtra por ubicación en el estado actual del código.
 - **Seeders de desarrollo**: `DevSeeder` genera datos de prueba realistas (avisos con y sin traducción, imágenes, mensajes de contacto leídos y no leídos). `DatabaseSeeder` lo invoca condicionalmente con `if (app()->isLocal())`, de modo que nunca se ejecuta en producción ni en el entorno de test Dusk (que usa `APP_ENV=testing`).
 
 ---

@@ -3,7 +3,7 @@
 return [
     'title' => 'Iragarkiak',
     'seo_description' => 'Komunitateko iragarki publikoak kontsultatu, dataz ordenatuta eta kokapenaren arabera iragazita.',
-    'subtitle' => 'Komunitateko ohar garrantzitsuak ikuspegi argi eta antolatu batean kontsultatu.',
+    'subtitle' => 'Komunitateko ohar garrantzitsuak kontsultatu.',
     'editorial_badge' => 'Komunikazio argia',
     'editorial_summary' => 'Iragarki bakoitza aurkitzeko, irakurtzeko eta partekatzeko moduan aurkezten da, komunitatearen egunerokoari ordena emanez.',
     'featured_badge' => 'Azpimarratutako iragarkia',

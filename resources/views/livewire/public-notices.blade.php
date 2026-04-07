@@ -1,41 +1,42 @@
 <div>
-    {{-- Filter by location --}}
-    <div class="mb-8 section-shell p-4 sm:p-5" data-notices-filter>
-        <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)] lg:items-end">
+    <section class="mb-8 section-shell overflow-hidden p-6 sm:p-8" data-page-hero="notices">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <div class="mb-3 flex flex-wrap gap-2">
-                    <span
-                        class="feature-chip border-amber-100 bg-amber-50 text-amber-700">{{ __('notices.title') }}</span>
-                    <span class="feature-chip">{{ __('notices.portal') }}</span>
-                    <span class="feature-chip">{{ __('notices.garage') }}</span>
-                </div>
-                <label for="location-filter" class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ __('notices.filter.label') }}
-                </label>
-                <p class="mb-3 text-xs sm:text-sm text-gray-500">{{ __('notices.filter_hint') }}</p>
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
+                    {{ __('notices.title') }}
+                </h1>
+                <p class="mt-1 max-w-2xl text-sm text-gray-600 sm:text-base">
+                    {{ __('notices.subtitle') }}
+                </p>
             </div>
 
-            <div class="glass-panel p-3 sm:p-4">
-                <select id="location-filter" wire:model.live="locationFilter"
-                    aria-controls="notices-list"
-                    class="block w-full sm:w-64 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors">
-                    <option value="">{{ __('notices.filter.all') }}</option>
-                    <optgroup label="{{ __('notices.portal') }}">
-                        @foreach (\App\CommunityLocations::PORTALS as $portal)
-                            <option value="{{ $portal }}">{{ __('notices.portal') }}
-                                {{ $portal }}</option>
-                        @endforeach
-                    </optgroup>
-                    <optgroup label="{{ __('notices.garage') }}">
-                        @foreach (\App\CommunityLocations::GARAGES as $floor)
-                            <option value="{{ $floor }}">{{ __('notices.garage') }}
-                                {{ $floor }}</option>
-                        @endforeach
-                    </optgroup>
-                </select>
+            <div class="w-full lg:w-auto" data-notices-filter>
+                <label for="location-filter" class="mb-1 block text-sm font-medium text-gray-700">
+                    {{ __('notices.filter.label') }}
+                </label>
+                <p class="mb-3 text-xs text-gray-500 sm:text-sm">{{ __('notices.filter_hint') }}</p>
+                <div class="glass-panel p-3 sm:p-4">
+                    <select id="location-filter" wire:model.live="locationFilter"
+                        aria-controls="notices-list"
+                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:w-64">
+                        <option value="">{{ __('notices.filter.all') }}</option>
+                        <optgroup label="{{ __('notices.portal') }}">
+                            @foreach (\App\CommunityLocations::PORTALS as $portal)
+                                <option value="{{ $portal }}">{{ __('notices.portal') }}
+                                    {{ $portal }}</option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="{{ __('notices.garage') }}">
+                            @foreach (\App\CommunityLocations::GARAGES as $floor)
+                                <option value="{{ $floor }}">{{ __('notices.garage') }}
+                                    {{ $floor }}</option>
+                            @endforeach
+                        </optgroup>
+                    </select>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
     {{-- Notices list --}}
     {{-- Notices grid --}}
@@ -65,22 +66,6 @@
                     wire:key="notice-card-{{ $notice->id }}" />
             @endforeach
         </div>
-
-        @if ($featuredNotice)
-            <div class="hero-frame mb-8 px-5 py-5 sm:px-6" data-featured-notice>
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-600">
-                            {{ __('notices.featured_badge') }}</p>
-                        <p class="mt-1 text-sm text-gray-600">{{ __('notices.featured_summary') }}
-                        </p>
-                    </div>
-                    <span class="feature-chip border-amber-100 bg-amber-50 text-amber-700">
-                        {{ $featuredNotice->title }}
-                    </span>
-                </div>
-            </div>
-        @endif
 
         {{-- Pagination --}}
         <div class="mt-8 flex justify-center">
