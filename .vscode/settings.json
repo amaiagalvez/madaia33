@@ -1,8 +1,17 @@
 {
-  "LaravelExtraIntellisense.phpCommand": "docker compose run --rm madaia33 php -r \"{code}\"",
-  "LaravelExtraIntellisense.basePathForCode": "/docker",
-  "chat.tools.terminal.autoApprove": {
-    "docker compose": true,
-    "timeout": true
-  }
+    "LaravelExtraIntellisense.phpCommand": "docker compose run --rm madaia33 php -r \"{code}\"",
+    "LaravelExtraIntellisense.basePathForCode": "/docker",
+    "chat.tools.terminal.autoApprove": {
+        "docker compose": true,
+        "timeout": true,
+        ".specify/scripts/bash/": true,
+        ".specify/scripts/powershell/": true
+    },
+    "chat.promptFilesRecommendations": {
+        "speckit.constitution": true,
+        "speckit.specify": true,
+        "speckit.plan": true,
+        "speckit.tasks": true,
+        "speckit.implement": true
+    }
 }
