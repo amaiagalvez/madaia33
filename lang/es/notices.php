@@ -6,7 +6,6 @@ return [
     'subtitle' => 'Consulta los comunicados importantes de la comunidad',
     'editorial_badge' => 'Comunicación clara',
     'editorial_summary' => 'Cada aviso se presenta para que resulte fácil de localizar, leer y revisar, aportando más orden a la vida diaria de la comunidad.',
-    'featured_badge' => 'Aviso destacado',
     'featured_summary' => 'La primera pieza lleva al frente el mensaje más relevante de este momento.',
     'filter_hint' => 'Elige una ubicación y encuentra antes la información que te afecta.',
     'empty' => 'No hay avisos disponibles en este momento.',

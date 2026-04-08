@@ -6,7 +6,6 @@ return [
     'subtitle' => 'Komunitateko ohar garrantzitsuak kontsultatu.',
     'editorial_badge' => 'Komunikazio argia',
     'editorial_summary' => 'Iragarki bakoitza aurkitzeko, irakurtzeko eta partekatzeko moduan aurkezten da, komunitatearen egunerokoari ordena emanez.',
-    'featured_badge' => 'Azpimarratutako iragarkia',
     'featured_summary' => 'Lehen pieza honek une honetako mezu nabarmenena lehen planoan jartzen du.',
     'filter_hint' => 'Aukeratu kokapena eta aurkitu dagokizun informazioa azkarrago.',
     'empty' => 'Une honetan ez dago iragarkirik.',

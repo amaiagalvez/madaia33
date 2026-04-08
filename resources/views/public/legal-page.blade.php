@@ -12,22 +12,8 @@
 
     <div class="max-w-prose mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14"
         data-legal-page="{{ $pageSlug }}">
-        <section
-            class="mb-6 rounded-2xl border border-gray-200 bg-linear-to-br from-white via-gray-50 to-gray-100 p-6 shadow-sm"
-            data-page-hero="legal">
-            <div class="mb-3 flex flex-wrap gap-2">
-                <span class="feature-chip border-indigo-100 bg-indigo-50 text-indigo-700">
-                    {{ __('general.footer.legal_notice') }}
-                </span>
-                <span class="feature-chip">{{ __('general.footer.privacy_policy') }}</span>
-            </div>
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-                {{ __($titleKey) }}
-            </h1>
-            <p class="mt-2 text-sm leading-relaxed text-gray-600">
-                {{ __($descriptionKey) }}
-            </p>
-        </section>
+        <x-public-page-header hero="legal" variant="legal" :show-legal-chips="true" :title="__($titleKey)"
+            :description="__($descriptionKey)" />
 
         <div class="hero-frame px-5 py-5 sm:px-6">
             <div class="space-y-4 text-base leading-relaxed text-gray-700">

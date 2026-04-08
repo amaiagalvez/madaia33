@@ -1,15 +1,6 @@
 <div>
-    <section class="mb-8 section-shell overflow-hidden p-6 sm:p-8" data-page-hero="notices">
-        <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
-                    {{ __('notices.title') }}
-                </h1>
-                <p class="mt-1 max-w-2xl text-sm text-gray-600 sm:text-base">
-                    {{ __('notices.subtitle') }}
-                </p>
-            </div>
-
+    <x-public-page-header hero="notices" :title="__('notices.title')" :subtitle="__('notices.subtitle')">
+        <x-slot:actions>
             <div class="w-full lg:w-auto" data-notices-filter>
                 <label for="location-filter" class="mb-1 block text-sm font-medium text-gray-700">
                     {{ __('notices.filter.label') }}
@@ -35,8 +26,8 @@
                     </select>
                 </div>
             </div>
-        </div>
-    </section>
+        </x-slot:actions>
+    </x-public-page-header>
 
     {{-- Notices list --}}
     {{-- Notices grid --}}

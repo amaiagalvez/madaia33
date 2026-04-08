@@ -1,0 +1,73 @@
+@props([
+    'hero' => 'page',
+    'title' => '',
+    'subtitle' => null,
+    'summary' => null,
+    'description' => null,
+    'variant' => 'default',
+    'showLegalChips' => false,
+])
+
+@php
+    $isLegal = $variant === 'legal';
+    $hasIcon = isset($icon) && trim((string) $icon) !== '';
+    $hasActions = isset($actions) && trim((string) $actions) !== '';
+
+    $sectionClasses = $isLegal
+        ? 'mb-6 rounded-2xl border border-gray-200 bg-linear-to-br from-white via-gray-50 to-gray-100 p-6 shadow-sm'
+        : 'mb-8 section-shell overflow-hidden p-6 sm:p-8';
+@endphp
+
+<section class="{{ $sectionClasses }}" data-page-hero="{{ $hero }}">
+    @if ($isLegal)
+        @if ($showLegalChips)
+            <div class="mb-3 flex flex-wrap gap-2">
+                <span class="feature-chip border-indigo-100 bg-indigo-50 text-indigo-700">
+                    {{ __('general.footer.legal_notice') }}
+                </span>
+                <span class="feature-chip">{{ __('general.footer.privacy_policy') }}</span>
+            </div>
+        @endif
+
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+            {{ $title }}
+        </h1>
+
+        @if ($description)
+            <p class="mt-2 text-sm leading-relaxed text-gray-600">
+                {{ $description }}
+            </p>
+        @endif
+    @else
+        <div
+            class="{{ $hasActions ? 'flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between' : '' }}">
+            <div class="{{ $hasIcon ? 'flex items-start gap-4' : '' }}">
+                @if ($hasIcon)
+                    {{ $icon }}
+                @endif
+
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
+                        {{ $title }}
+                    </h1>
+
+                    @if ($subtitle)
+                        <p class="mt-1 max-w-2xl text-sm sm:text-base text-gray-600">
+                            {{ $subtitle }}
+                        </p>
+                    @endif
+
+                    @if ($summary)
+                        <p class="mt-3 max-w-2xl text-sm leading-relaxed text-gray-500">
+                            {{ $summary }}
+                        </p>
+                    @endif
+                </div>
+            </div>
+
+            @if ($hasActions)
+                {{ $actions }}
+            @endif
+        </div>
+    @endif
+</section>

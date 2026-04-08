@@ -47,24 +47,14 @@
                         class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600">
                         {{ $notice->published_at->translatedFormat('j M Y') }}
                     </time>
-                    @if ($featured)
-                        <span class="feature-chip border-amber-100 bg-amber-50 text-amber-700">
-                            {{ __('notices.featured_badge') }}
-                        </span>
-                    @else
-                        <span
-                            class="text-xs font-medium text-gray-300 transition-colors duration-200 group-hover:text-indigo-500">
-                            &rarr;
-                        </span>
-                    @endif
                 </div>
             @endif
 
             {{-- Title --}}
-            <h3
+            <h2
                 class="font-bold text-gray-900 line-clamp-2 {{ $featured ? 'text-xl md:text-2xl lg:text-3xl' : 'text-base md:text-lg' }}">
                 {{ $notice->title }}
-            </h3>
+            </h2>
 
             {{-- Excerpt --}}
             <p
