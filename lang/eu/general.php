@@ -2,6 +2,7 @@
 
 return [
     'nav' => [
+        'home' => 'Hasiera',
         'notices' => 'Iragarkiak',
         'gallery' => 'Argazki-bilduma',
         'contact' => 'Kontaktua',

@@ -2,6 +2,7 @@
 
 return [
     'nav' => [
+        'home' => 'Inicio',
         'notices' => 'Avisos',
         'gallery' => 'Galería',
         'contact' => 'Contacto',

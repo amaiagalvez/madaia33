@@ -70,6 +70,11 @@
                     aria-label="{{ __('general.nav.main') ?? 'Nabigazio nagusia' }}">
                     <div
                         class="header-nav-panel glass-panel flex items-center gap-1 px-2 py-1.5 transition-all duration-200">
+                        <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('home.*') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
+                            aria-current="{{ request()->routeIs('home.*') ? 'page' : 'false' }}">
+                            {{ __('general.nav.home') }}
+                        </a>
                         <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
                             class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('notices.*') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
                             aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}">
@@ -121,10 +126,15 @@
             x-effect="if (open) { focusFirstMenuItem() }" x-show="open" x-transition>
             <nav class="px-4 py-3 flex flex-col gap-1" x-ref="mobileNav"
                 aria-label="{{ __('general.nav.main') ?? 'Nabigazio nagusia' }}">
+                <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('home.*') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
+                    aria-current="{{ request()->routeIs('home.*') ? 'page' : 'false' }}"
+                    data-first-menu-item x-ref="firstMenuItem">
+                    {{ __('general.nav.home') }}
+                </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
                     class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('notices.*') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
-                    aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}"
-                    data-first-menu-item x-ref="firstMenuItem">
+                    aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}">
                     {{ __('general.nav.notices') }}
                 </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
