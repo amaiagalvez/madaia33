@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Setting;
 use Livewire\Component;
+use App\SupportedLocales;
 use Illuminate\Contracts\View\View;
 use App\Validations\AdminSettingsValidation;
 
@@ -176,6 +177,27 @@ class AdminSettings extends Component
         Setting::upsert($this->buildUpsertRows($map), ['key'], ['value', 'updated_at']);
 
         $this->saved = true;
+    }
+
+    /**
+     * @return array<string, array{field: string, fieldLabel: string, value: string}>
+     */
+    public function localeConfigsFor(string $propertyBase, string $labelKeyBase): array
+    {
+        return collect(SupportedLocales::all())
+            ->mapWithKeys(function (string $locale) use ($propertyBase, $labelKeyBase): array {
+                $suffix = SupportedLocales::propertySuffix($locale);
+                $field = "{$propertyBase}{$suffix}";
+
+                return [
+                    $locale => [
+                        'field' => $field,
+                        'fieldLabel' => __("{$labelKeyBase}_{$locale}"),
+                        'value' => (string) ($this->{$field} ?? ''),
+                    ],
+                ];
+            })
+            ->all();
     }
 
     public function render(): View

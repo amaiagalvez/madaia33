@@ -5,6 +5,7 @@
 
 use App\Models\Notice;
 use Livewire\Livewire;
+use App\SupportedLocales;
 use App\Models\NoticeLocation;
 use Illuminate\Support\Facades\App;
 
@@ -12,7 +13,7 @@ it('no muestra avisos privados en la ruta pública de avisos', function () {
     Notice::factory()->private()->create(['title_eu' => 'Aviso privado']);
     Notice::factory()->public()->create(['title_eu' => 'Aviso público']);
 
-    $response = $this->get(route('notices'));
+    $response = test()->get(route('notices'));
 
     $response->assertOk();
     $response->assertSee('Aviso público');
@@ -85,7 +86,7 @@ it('muestra mensaje de vacío cuando no hay avisos públicos', function () {
 });
 
 it('muestra el indicador de sin traducción cuando el aviso no tiene traducción al locale activo', function () {
-    App::setLocale('es');
+    App::setLocale(SupportedLocales::SPANISH);
 
     // Notice with only EU translation
     Notice::factory()->public()->euOnly()->create(['title_eu' => 'Izenburua']);
@@ -98,7 +99,7 @@ it('muestra el indicador de sin traducción cuando el aviso no tiene traducción
 });
 
 it('no muestra el indicador de sin traducción cuando el aviso tiene traducción al locale activo', function () {
-    App::setLocale('es');
+    App::setLocale(SupportedLocales::SPANISH);
 
     Notice::factory()->public()->create([
         'title_eu' => 'Izenburua',

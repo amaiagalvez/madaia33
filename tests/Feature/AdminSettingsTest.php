@@ -8,7 +8,10 @@ use App\Models\Image;
 use App\Models\Notice;
 use Livewire\Livewire;
 use App\Models\Setting;
+use App\SupportedLocales;
 use App\Models\ContactMessage;
+use App\Livewire\AdminSettings;
+use App\Validations\AdminSettingsValidation;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AdminSettings — guardar configuración
@@ -127,16 +130,16 @@ it('renderiza tabs de idioma EUS/CAS en los bloques bilingües de settings', fun
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_FRONT)
-        ->assertSee(__('admin.settings_form.language_tab_eus'))
-        ->assertSee(__('admin.settings_form.language_tab_cas'))
+        ->assertSee(SupportedLocales::BASQUE)
+        ->assertSee(SupportedLocales::SPANISH)
         ->assertSeeHtml('data-bilingual-field="privacyContentEu"')
         ->assertSeeHtml('data-bilingual-field="legalNoticeContentEu"');
 
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_CONTACT_FORM)
-        ->assertSee(__('admin.settings_form.language_tab_eus'))
-        ->assertSee(__('admin.settings_form.language_tab_cas'))
+        ->assertSee(SupportedLocales::BASQUE)
+        ->assertSee(SupportedLocales::SPANISH)
         ->assertSeeHtml('data-bilingual-field="legalCheckboxTextEu"');
 });
 
@@ -284,6 +287,29 @@ it('save de recaptcha solo escribe sus claves sin afectar contact_form', functio
 
     expect(settingValue('recaptcha_site_key'))->toBe('new-site-key')
         ->and(settingValue('admin_email'))->toBe('contact@example.com');
+});
+
+it('expone reglas y mensajes de validación de AdminSettingsValidation', function () {
+    $component = new class extends AdminSettings {
+        /**
+         * @return array<string, mixed>
+         */
+        public function exposedRules(): array
+        {
+            return $this->rules();
+        }
+
+        /**
+         * @return array<string, mixed>
+         */
+        public function exposedMessages(): array
+        {
+            return $this->messages();
+        }
+    };
+
+    expect($component->exposedRules())->toEqual(AdminSettingsValidation::rules())
+        ->and($component->exposedMessages())->toBe(AdminSettingsValidation::messages());
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

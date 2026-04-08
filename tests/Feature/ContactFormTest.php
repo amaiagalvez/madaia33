@@ -262,3 +262,45 @@ it('render usa fallback de legal text y privacy policy cuando faltan settings', 
         ->assertViewHas('legalUrl', route('privacy-policy'))
         ->assertViewHas('siteKey', '');
 });
+
+it('ignora recent submissions inválidas en sesión y permite el envío', function () {
+    Mail::fake();
+
+    session(['contact_form_recent_submissions' => 'invalid']);
+
+    Livewire::test('contact-form')
+        ->set('name', 'Ane Etxebarria')
+        ->set('email', 'ane@example.com')
+        ->set('subject', 'Proba')
+        ->set('message', 'Kaixo!')
+        ->set('legalAccepted', true)
+        ->set('recaptchaToken', 'skip')
+        ->call('submit')
+        ->assertSet('statusType', 'success');
+
+    expect(ContactMessage::count())->toBe(1);
+});
+
+it('si no hay recaptcha secret key acepta el envío aunque recaptcha_skip sea false', function () {
+    Mail::fake();
+    config(['app.recaptcha_skip' => false]);
+
+    Livewire::test('contact-form')
+        ->set('name', 'Ane Etxebarria')
+        ->set('email', 'ane@example.com')
+        ->set('subject', 'Sin secret')
+        ->set('message', 'Kaixo!')
+        ->set('legalAccepted', true)
+        ->set('recaptchaToken', 'token-cualquiera')
+        ->call('submit')
+        ->assertSet('statusType', 'success');
+
+    expect(ContactMessage::count())->toBe(1);
+});
+
+it('render usa el primer legal text disponible de la cadena de fallback', function () {
+    createSetting('legal_checkbox_text_es', 'Texto legal ES desde settings');
+
+    Livewire::test('contact-form')
+        ->assertViewHas('legalText', 'Texto legal ES desde settings');
+});

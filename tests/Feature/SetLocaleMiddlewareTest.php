@@ -1,5 +1,6 @@
 <?php
 
+use App\SupportedLocales;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
@@ -8,9 +9,9 @@ it('uses eu as default locale when session locale is missing', function () {
         return response()->json(['locale' => app()->getLocale()]);
     });
 
-    $this->get('/__test-set-locale-default')
+    test()->get('/__test-set-locale-default')
         ->assertSuccessful()
-        ->assertJsonPath('locale', 'eu');
+        ->assertJsonPath('locale', SupportedLocales::default());
 });
 
 it('uses the session locale when it is valid', function () {
@@ -18,10 +19,10 @@ it('uses the session locale when it is valid', function () {
         return response()->json(['locale' => app()->getLocale()]);
     });
 
-    $this->withSession(['locale' => 'es'])
+    test()->withSession(['locale' => SupportedLocales::SPANISH])
         ->get('/__test-set-locale-valid')
         ->assertSuccessful()
-        ->assertJsonPath('locale', 'es');
+        ->assertJsonPath('locale', SupportedLocales::SPANISH);
 });
 
 it('falls back to eu when the session locale is invalid', function () {
@@ -29,8 +30,8 @@ it('falls back to eu when the session locale is invalid', function () {
         return response()->json(['locale' => app()->getLocale()]);
     });
 
-    $this->withSession(['locale' => 'fr'])
+    test()->withSession(['locale' => 'fr'])
         ->get('/__test-set-locale-invalid')
         ->assertSuccessful()
-        ->assertJsonPath('locale', 'eu');
+        ->assertJsonPath('locale', SupportedLocales::default());
 });

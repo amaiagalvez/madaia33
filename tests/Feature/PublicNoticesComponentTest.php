@@ -2,6 +2,7 @@
 
 use App\Models\Notice;
 use Livewire\Livewire;
+use App\SupportedLocales;
 use App\Models\NoticeLocation;
 use App\Livewire\PublicNotices;
 use Illuminate\Support\Facades\App;
@@ -80,7 +81,7 @@ test('livewire public notices has translation check method', function () {
 });
 
 test('livewire public notices reports missing translation when active locale fields are empty', function () {
-    App::setLocale('es');
+    App::setLocale(SupportedLocales::SPANISH);
 
     $notice = Notice::factory()->public()->euOnly()->make();
     $component = app(PublicNotices::class);
@@ -89,7 +90,7 @@ test('livewire public notices reports missing translation when active locale fie
 });
 
 test('livewire public notices reports translation when active locale has title or content', function () {
-    App::setLocale('es');
+    App::setLocale(SupportedLocales::SPANISH);
 
     $notice = Notice::factory()->public()->make([
         'title_eu' => 'Izenburua',

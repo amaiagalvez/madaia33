@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\App;
 use Database\Factories\ImageFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Concerns\ResolvesLocalizedAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Image extends Model
 {
     /** @use HasFactory<ImageFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+
+    use ResolvesLocalizedAttributes;
+    use SoftDeletes;
 
     protected $fillable = [
         'filename',
@@ -26,9 +29,7 @@ class Image extends Model
      */
     public function getAltTextAttribute(): string
     {
-        $locale = App::getLocale();
-
-        return $this->{"alt_text_{$locale}"} ?? $this->alt_text_eu ?? $this->alt_text_es ?? '';
+        return $this->resolveLocalizedAttribute('alt_text');
     }
 
     /**

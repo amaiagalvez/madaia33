@@ -1,5 +1,7 @@
 <?php
 
+use App\SupportedLocales;
+
 dataset('public_seo_pages', [
     ['home', 'home.seo_description'],
     ['notices', 'notices.seo_description'],
@@ -11,14 +13,14 @@ dataset('public_seo_pages', [
 ]);
 
 test('public pages expose specific seo description in eu', function (string $routeName, string $descriptionKey) {
-    $response = $this->withSession(['locale' => 'eu'])->get(route($routeName));
+    $response = test()->withSession(['locale' => SupportedLocales::BASQUE])->get(route($routeName));
 
     $response->assertOk();
     $response->assertSee('<meta name="description" content="'.e(__($descriptionKey)).'">', false);
 })->with('public_seo_pages');
 
 test('public pages expose specific seo description in es', function (string $routeName, string $descriptionKey) {
-    $response = $this->withSession(['locale' => 'es'])->get(route($routeName));
+    $response = test()->withSession(['locale' => SupportedLocales::SPANISH])->get(route($routeName));
 
     $response->assertOk();
     $response->assertSee('<meta name="description" content="'.e(__($descriptionKey)).'">', false);

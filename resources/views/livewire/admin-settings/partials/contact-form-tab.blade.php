@@ -10,9 +10,7 @@
     @enderror
 </div>
 
-<x-admin.bilingual-rich-text-tabs :title="__('admin.settings_form.legal_text')" eu-field="legalCheckboxTextEu"
-    es-field="legalCheckboxTextEs" :eu-label="__('admin.settings_form.legal_text_eu')" :es-label="__('admin.settings_form.legal_text_es')" :eu-value="$legalCheckboxTextEu"
-    :es-value="$legalCheckboxTextEs" />
+<x-admin.bilingual-rich-text-tabs :title="__('admin.settings_form.legal_text')" :locale-configs="$this->localeConfigsFor('legalCheckboxText', 'admin.settings_form.legal_text')" />
 
 {{-- Legal URL --}}
 <div>

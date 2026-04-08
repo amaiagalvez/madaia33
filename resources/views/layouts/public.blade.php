@@ -35,7 +35,7 @@
 
     {{-- Header / Navigation --}}
     <header id="public-header"
-        class="public-header sticky top-0 z-[70] isolate border-b border-gray-200 bg-white pt-[env(safe-area-inset-top)] shadow-md">
+        class="public-header sticky top-0 z-70 isolate border-b border-gray-200 bg-white pt-[env(safe-area-inset-top)] shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div
                 class="header-shell flex items-center justify-between gap-2 min-h-16 transition-all duration-200">
@@ -139,10 +139,10 @@
     {{-- Main content --}}
     <main id="main-content" class="relative flex-1 overflow-x-clip" tabindex="-1">
         <div aria-hidden="true"
-            class="pointer-events-none absolute left-[-8rem] top-20 -z-10 h-72 w-72 rounded-full bg-amber-200/25 blur-3xl">
+            class="pointer-events-none absolute -left-32 top-20 -z-10 h-72 w-72 rounded-full bg-amber-200/25 blur-3xl">
         </div>
         <div aria-hidden="true"
-            class="pointer-events-none absolute right-[-6rem] top-[28rem] -z-10 h-80 w-80 rounded-full bg-emerald-200/20 blur-3xl">
+            class="pointer-events-none absolute -right-24 top-112 -z-10 h-80 w-80 rounded-full bg-emerald-200/20 blur-3xl">
         </div>
         <div aria-hidden="true"
             class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-linear-to-b from-white/90 to-transparent">

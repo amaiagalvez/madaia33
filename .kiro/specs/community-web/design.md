@@ -351,26 +351,26 @@ lang/
 // app/Http/Middleware/SetLocale.php
 public function handle(Request $request, Closure $next): Response
 {
-    $locale = $request->session()->get('locale', 'eu');
-    if (!in_array($locale, ['eu', 'es'])) {
-        $locale = 'eu';
-    }
+    $locale = SupportedLocales::normalize(
+        $request->session()->get('locale', SupportedLocales::default())
+    );
+
     App::setLocale($locale);
+
     return $next($request);
 }
 ```
 
-El componente Livewire `LanguageSwitcher` llama a una acción que guarda el locale en sesión y recarga la página.
+Los identificadores de idioma soportados se centralizan en `App\SupportedLocales`, que actúa como fuente única de verdad para default, validación, etiquetas cortas y cadenas de fallback. El componente Livewire `LanguageSwitcher` consume esa clase para guardar el locale en sesión y recargar la página.
 
 ### Contenido bilingüe en base de datos
 
-Los avisos e imágenes almacenan el contenido en columnas separadas por idioma (`title_eu`, `title_es`, etc.). Los modelos exponen un accessor `title` que devuelve el campo del locale activo:
+Los avisos e imágenes almacenan el contenido en columnas separadas por idioma (`title_eu`, `title_es`, etc.). Los modelos resuelven el accessor del locale activo recorriendo la cadena de fallback definida por `App\SupportedLocales`:
 
 ```php
 public function getTitleAttribute(): string
 {
-    $locale = App::getLocale();
-    return $this->{"title_{$locale}"} ?? $this->title_eu ?? $this->title_es;
+    return $this->resolveLocalizedAttribute('title');
 }
 ```
 

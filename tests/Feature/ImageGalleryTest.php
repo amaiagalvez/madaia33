@@ -5,6 +5,7 @@
 
 use App\Models\Image;
 use Livewire\Livewire;
+use App\SupportedLocales;
 use Illuminate\Support\Facades\App;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -36,7 +37,7 @@ it('no muestra imágenes eliminadas en la galería', function () {
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('todas las imágenes tienen alt text en el locale activo', function () {
-    App::setLocale('eu');
+    App::setLocale(SupportedLocales::BASQUE);
 
     Image::factory()->count(3)->create();
 
@@ -68,7 +69,7 @@ it('muestra mensaje de vacío cuando no hay imágenes', function () {
 });
 
 it('la galería pública es accesible', function () {
-    $response = $this->get(route('gallery'));
+    $response = test()->get(route('gallery'));
 
     $response->assertOk();
     $response->assertSee(__('gallery.editorial_summary'));
@@ -88,7 +89,7 @@ it('las imágenes se ordenan por created_at descendente', function () {
 it('renderiza la galería con grid responsive esperado', function () {
     Image::factory()->count(2)->create();
 
-    $response = $this->get(route('gallery'));
+    $response = test()->get(route('gallery'));
 
     $response->assertOk();
     $response->assertSee('grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4', false);
@@ -98,7 +99,7 @@ it('renderiza la galería con grid responsive esperado', function () {
 it('incluye controles avanzados del lightbox responsive', function () {
     Image::factory()->count(1)->create();
 
-    $response = $this->get(route('gallery'));
+    $response = test()->get(route('gallery'));
 
     $response->assertOk();
     $response->assertSee('window.innerHeight < window.innerWidth', false);

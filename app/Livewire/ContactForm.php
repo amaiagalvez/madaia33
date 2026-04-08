@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Setting;
 use Livewire\Component;
+use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
@@ -222,10 +223,18 @@ class ContactForm extends Component
 
     public function render(): View
     {
-        $locale = app()->getLocale();
-        $legalTextKey = "legal_checkbox_text_{$locale}";
-        $settings = Setting::whereIn('key', [$legalTextKey, 'legal_url', 'recaptcha_site_key'])->pluck('value', 'key');
-        $legalText = (string) ($settings[$legalTextKey] ?? __('contact.legal_text'));
+        $legalTextKeys = SupportedLocales::localizedKeys('legal_checkbox_text');
+        $settings = Setting::whereIn('key', [...$legalTextKeys, 'legal_url', 'recaptcha_site_key'])->pluck('value', 'key');
+        $legalText = __('contact.legal_text');
+
+        foreach ($legalTextKeys as $legalTextKey) {
+            if ($settings->has($legalTextKey)) {
+                $legalText = (string) $settings[$legalTextKey];
+
+                break;
+            }
+        }
+
         $legalUrl = (string) ($settings['legal_url'] ?? route('privacy-policy'));
         $siteKey = (string) ($settings['recaptcha_site_key'] ?? '');
 

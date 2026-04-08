@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\App;
 use Database\Factories\NoticeFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Concerns\ResolvesLocalizedAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Notice extends Model
 {
     /** @use HasFactory<NoticeFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+
+    use ResolvesLocalizedAttributes;
+    use SoftDeletes;
 
     protected $fillable = [
         'slug',
@@ -54,9 +57,7 @@ class Notice extends Model
      */
     public function getTitleAttribute(): string
     {
-        $locale = App::getLocale();
-
-        return $this->{"title_{$locale}"} ?? $this->title_eu ?? $this->title_es ?? '';
+        return $this->resolveLocalizedAttribute('title');
     }
 
     /**
@@ -64,8 +65,6 @@ class Notice extends Model
      */
     public function getContentAttribute(): string
     {
-        $locale = App::getLocale();
-
-        return $this->{"content_{$locale}"} ?? $this->content_eu ?? $this->content_es ?? '';
+        return $this->resolveLocalizedAttribute('content');
     }
 }

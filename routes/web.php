@@ -3,6 +3,7 @@
 use App\Models\Image;
 use App\Models\Notice;
 use App\Models\Setting;
+use App\SupportedLocales;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
@@ -20,17 +21,24 @@ Route::get('/contacto', fn () => view('public.contact'))->name('contact');
 Route::get('/privado', fn () => view('public.private'))->name('private');
 
 $renderLegalPage = function (string $pageKey, string $titleKey, string $pageSlug) {
-    $locale = app()->getLocale();
-    $fallbackLocale = $locale === 'eu' ? 'es' : 'eu';
-    $primaryKey = "legal_page_{$pageKey}_{$locale}";
-    $fallbackKey = "legal_page_{$pageKey}_{$fallbackLocale}";
+    $localizedKeys = SupportedLocales::localizedKeys("legal_page_{$pageKey}");
     $settings = Setting::query()
-        ->whereIn('key', [$primaryKey, $fallbackKey])
+        ->whereIn('key', $localizedKeys)
         ->get(['key', 'value'])
         ->pluck('value', 'key');
 
+    $content = '';
+
+    foreach ($localizedKeys as $localizedKey) {
+        if ($settings->has($localizedKey)) {
+            $content = (string) $settings[$localizedKey];
+
+            break;
+        }
+    }
+
     return view('public.legal-page', [
-        'content' => (string) ($settings[$primaryKey] ?? $settings[$fallbackKey] ?? ''),
+        'content' => $content,
         'pageSlug' => $pageSlug,
         'titleKey' => $titleKey,
     ]);
