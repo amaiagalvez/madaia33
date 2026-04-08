@@ -4,10 +4,11 @@
  * Validates: Requirements 1.2, 1.3
  */
 
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('language switcher toggles interface between Spanish and Basque', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->assertScript("return getComputedStyle(document.querySelector('[data-language-option=\"es\"]')).cursor;", 'pointer')

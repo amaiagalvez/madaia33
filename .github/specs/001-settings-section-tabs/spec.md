@@ -94,7 +94,8 @@ When a new setting is added to the system in future, it includes a section assig
 ## Assumptions
 
 - The initial set of sections is: `front`, `contact_form`, `gallery`. Additional sections may be added in future iterations.
-- The six currently existing settings (`admin_email`, `recaptcha_site_key`, `recaptcha_secret_key`, `legal_checkbox_text_eu`, `legal_checkbox_text_es`, `legal_url`) are all assigned to the `contact_form` section, as they relate to the contact form and legal compliance configuration.
+- The initial `front` section contains `admin_email`, `recaptcha_site_key`, `legal_page_privacy_policy_eu`, `legal_page_privacy_policy_es`, `legal_page_legal_notice_eu`, and `legal_page_legal_notice_es`.
+- The initial `contact_form` section contains `recaptcha_secret_key`, `legal_checkbox_text_eu`, `legal_checkbox_text_es`, and `legal_url`.
 - The admin panel is accessible only to authenticated users with admin privileges; no new authorization layer is needed for this feature.
 - Tab order follows alphabetical order (sorted by section name).
 - The application supports two locales (Basque and Spanish); tab labels must have translations in both.

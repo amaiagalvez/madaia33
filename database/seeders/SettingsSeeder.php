@@ -10,20 +10,63 @@ class SettingsSeeder extends Seeder
     public function run(): void
     {
         $defaults = [
-            'admin_email' => 'admin@madaia33.eus',
-            'recaptcha_site_key' => '',
-            'recaptcha_secret_key' => '',
-            'legal_checkbox_text_eu' => 'Pribatutasun politika irakurri eta onartzen dut.',
-            'legal_checkbox_text_es' => 'He leído y acepto la política de privacidad.',
-            'legal_url' => '/politica-de-privacidad',
-            'legal_page_privacy_policy_eu' => '<p>Pribatutasun politikaren edukia hemen agertuko da.</p>',
-            'legal_page_privacy_policy_es' => '<p>El contenido de la política de privacidad aparecerá aquí.</p>',
-            'legal_page_legal_notice_eu' => '<p>Lege-ohartarazpenaren edukia hemen agertuko da.</p>',
-            'legal_page_legal_notice_es' => '<p>El contenido del aviso legal aparecerá aquí.</p>',
+            [
+                'key' => 'admin_email',
+                'value' => 'admin@madaia33.eus',
+                'section' => Setting::SECTION_CONTACT_FORM,
+            ],
+            [
+                'key' => 'recaptcha_site_key',
+                'value' => '',
+                'section' => Setting::SECTION_RECAPTCHA,
+            ],
+            [
+                'key' => 'recaptcha_secret_key',
+                'value' => '',
+                'section' => Setting::SECTION_RECAPTCHA,
+            ],
+            [
+                'key' => 'legal_checkbox_text_eu',
+                'value' => 'Pribatutasun politika irakurri eta onartzen dut.',
+                'section' => Setting::SECTION_CONTACT_FORM,
+            ],
+            [
+                'key' => 'legal_checkbox_text_es',
+                'value' => 'He leído y acepto la política de privacidad.',
+                'section' => Setting::SECTION_CONTACT_FORM,
+            ],
+            [
+                'key' => 'legal_url',
+                'value' => '/politica-de-privacidad',
+                'section' => Setting::SECTION_CONTACT_FORM,
+            ],
+            [
+                'key' => 'legal_page_privacy_policy_eu',
+                'value' => '<p>Pribatutasun politikaren edukia hemen agertuko da.</p>',
+                'section' => Setting::SECTION_FRONT,
+            ],
+            [
+                'key' => 'legal_page_privacy_policy_es',
+                'value' => '<p>El contenido de la política de privacidad aparecerá aquí.</p>',
+                'section' => Setting::SECTION_FRONT,
+            ],
+            [
+                'key' => 'legal_page_legal_notice_eu',
+                'value' => '<p>Lege-ohartarazpenaren edukia hemen agertuko da.</p>',
+                'section' => Setting::SECTION_FRONT,
+            ],
+            [
+                'key' => 'legal_page_legal_notice_es',
+                'value' => '<p>El contenido del aviso legal aparecerá aquí.</p>',
+                'section' => Setting::SECTION_FRONT,
+            ],
         ];
 
-        foreach ($defaults as $key => $value) {
-            Setting::firstOrCreate(['key' => $key], ['value' => $value]);
+        foreach ($defaults as $data) {
+            Setting::firstOrCreate(
+                ['key' => $data['key']],
+                ['value' => $data['value'], 'section' => $data['section']]
+            );
         }
     }
 }

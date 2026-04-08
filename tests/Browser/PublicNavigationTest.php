@@ -4,10 +4,11 @@
  * Validates: Requirements 2.1, 3.1, 5.2, 5.3
  */
 
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('public navigation reaches notices, gallery and contact pages', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->clickLink('Iragarkiak')

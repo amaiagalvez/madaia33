@@ -5,6 +5,7 @@
  */
 
 use App\Models\User;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 use App\Models\ContactMessage;
 
@@ -19,7 +20,7 @@ test('admin can read a message and it gets marked as read', function () {
         'is_read' => false,
     ]);
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $message) {
         $browser->loginAs($admin)
             ->visit('/admin/mensajes')
@@ -58,7 +59,7 @@ test('admin can delete a message with confirmation', function () {
         'is_read' => false,
     ]);
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin) {
         $browser->loginAs($admin)
             ->visit('/admin/mensajes')

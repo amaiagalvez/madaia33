@@ -71,7 +71,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/imagenes', fn () => view('admin.images'))->name('images');
     Route::get('/mensajes', fn () => view('admin.messages'))->name('messages');
     Route::get('/configuracion', fn () => view('admin.settings'))->name('settings');
-    Route::get('/paginas-legales', fn () => view('admin.legal-pages'))->name('legal-pages');
 });
 
 // ─── Auth (Fortify / Breeze) ───────────────────────────────────────────────────

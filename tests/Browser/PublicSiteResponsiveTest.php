@@ -7,6 +7,7 @@
 use App\Models\Image;
 use App\Models\Notice;
 use App\Models\Setting;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 use App\Models\ContactMessage;
 use App\Models\NoticeLocation;
@@ -57,7 +58,7 @@ test('home page smoke on mobile renders hero latest notices and working mobile m
     Notice::factory()->public()->count(6)->create();
     Image::factory()->count(4)->create();
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->resize(375, 812)
@@ -102,7 +103,7 @@ test('notices page smoke checks responsive grid filter and pagination', function
         'location_code' => 'B',
     ]);
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/avisos')
             ->resize(375, 812)
@@ -130,7 +131,7 @@ test('notices page smoke checks responsive grid filter and pagination', function
 test('gallery smoke opens lightbox closes with escape and works after rotating to landscape', function () {
     Image::factory()->count(6)->create();
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/galeria')
             ->resize(375, 812)
@@ -164,7 +165,7 @@ test('contact form smoke submits successfully and sends both emails', function (
     Setting::updateOrCreate(['key' => 'recaptcha_secret_key'], ['value' => '']);
     Setting::updateOrCreate(['key' => 'recaptcha_site_key'], ['value' => '']);
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($visitorEmail, $subject) {
         $browser->visit('/contacto')
             ->resize(375, 812)

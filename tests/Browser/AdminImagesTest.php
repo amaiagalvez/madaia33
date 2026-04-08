@@ -5,6 +5,7 @@
  */
 
 use App\Models\User;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('admin can upload an image and it appears in the public gallery', function () {
@@ -19,7 +20,7 @@ test('admin can upload an image and it appears in the public gallery', function 
     imagejpeg($img, $tmpImage);
     imagedestroy($img);
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $tmpImage, $altText) {
         $browser->loginAs($admin)
             ->visit('/admin/imagenes')

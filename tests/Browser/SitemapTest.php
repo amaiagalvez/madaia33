@@ -4,10 +4,11 @@
  * Validates: Requirements 16.4
  */
 
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('sitemap.xml is publicly accessible and contains public URLs', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/sitemap.xml');
 

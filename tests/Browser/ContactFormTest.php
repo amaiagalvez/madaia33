@@ -5,13 +5,14 @@
  */
 
 use App\Models\Setting;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('contact form complete flow with recaptcha disabled', function () {
     Setting::updateOrCreate(['key' => 'recaptcha_secret_key'], ['value' => '']);
     Setting::updateOrCreate(['key' => 'recaptcha_site_key'], ['value' => '']);
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/contacto')
             ->assertSee('Kontaktua')
@@ -33,7 +34,7 @@ test('contact form ignores a rapid double click on submit', function () {
     Setting::updateOrCreate(['key' => 'recaptcha_secret_key'], ['value' => '']);
     Setting::updateOrCreate(['key' => 'recaptcha_site_key'], ['value' => '']);
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/contacto')
             ->assertSee('Kontaktua')
@@ -57,7 +58,7 @@ test('contact form ignores a rapid double click on submit', function () {
 });
 
 test('contact form shows validation errors when fields are empty', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/contacto')
             ->press('Bidali')

@@ -169,14 +169,13 @@ GET  /admin/mensajes            → Bandeja de mensajes de contacto
 GET  /admin/mensajes/{id}       → Ver mensaje
 DELETE /admin/mensajes/{id}     → Eliminar mensaje
 
-GET  /admin/configuracion       → Configuración general (email admin, reCAPTCHA, texto legal)
+GET  /admin/configuracion       → Configuración general (email admin, reCAPTCHA, texto legal y páginas legales)
 
 GET  /politica-de-privacidad    → Página de política de privacidad (pública)
 GET  /aviso-legal               → Página de aviso legal (pública)
 GET  /sitemap.xml               → Sitemap XML (pública)
 GET  /robots.txt                → Robots.txt (pública)
 
-GET  /admin/paginas-legales     → Edición de páginas legales (admin)
 
 GET  /login                     → Login admin
 POST /login                     → Autenticar
@@ -185,17 +184,16 @@ POST /logout                    → Cerrar sesión
 
 ### Componentes Livewire principales
 
-| Componente           | Ruta                     | Responsabilidad                                                                   |
-| -------------------- | ------------------------ | --------------------------------------------------------------------------------- |
-| `PublicNotices`      | `/avisos`                | Lista paginada de avisos públicos con filtro por portal/planta                    |
-| `HeroSlider`         | `/`                      | Carrusel principal de la home con autoplay coordinado por eventos Alpine/Livewire |
-| `ImageGallery`       | `/galeria`               | Galería con lightbox ordenada por fecha                                           |
-| `ContactForm`        | `/contacto`              | Formulario con validación en tiempo real, reCAPTCHA v3, envío de emails           |
-| `LanguageSwitcher`   | Global (layout)          | Cambio de idioma EU/ES, persiste en sesión                                        |
-| `AdminNoticeManager` | `/admin/avisos`          | CRUD de avisos con publicación/despublicación                                     |
-| `AdminMessageInbox`  | `/admin/mensajes`        | Bandeja de mensajes, marcar leído/no leído, eliminar con confirmación             |
-| `AdminSettings`      | `/admin/configuracion`   | Configuración de email, reCAPTCHA, texto legal                                    |
-| `AdminLegalPages`    | `/admin/paginas-legales` | Edición de contenido de política de privacidad y aviso legal en EU y ES           |
+| Componente           | Ruta                   | Responsabilidad                                                                                                 |
+| -------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `PublicNotices`      | `/avisos`              | Lista paginada de avisos públicos con filtro por portal/planta                                                  |
+| `HeroSlider`         | `/`                    | Carrusel principal de la home con autoplay coordinado por eventos Alpine/Livewire                               |
+| `ImageGallery`       | `/galeria`             | Galería con lightbox ordenada por fecha                                                                         |
+| `ContactForm`        | `/contacto`            | Formulario con validación en tiempo real, reCAPTCHA v3, envío de emails                                         |
+| `LanguageSwitcher`   | Global (layout)        | Cambio de idioma EU/ES, persiste en sesión                                                                      |
+| `AdminNoticeManager` | `/admin/avisos`        | CRUD de avisos con publicación/despublicación                                                                   |
+| `AdminMessageInbox`  | `/admin/mensajes`      | Bandeja de mensajes, marcar leído/no leído, eliminar con confirmación                                           |
+| `AdminSettings`      | `/admin/configuracion` | Configuración por secciones: contacto, reCAPTCHA, texto legal y edición de política de privacidad y aviso legal |
 
 La ruta `/admin/imagenes` y su vista existen, pero el componente dedicado de gestión administrativa de imágenes sigue pendiente en el estado actual del código.
 

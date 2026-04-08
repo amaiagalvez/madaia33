@@ -5,6 +5,7 @@
 
 use App\Models\User;
 use Livewire\Livewire;
+use App\Models\Setting;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Acceso público a páginas legales
@@ -45,7 +46,9 @@ it('el admin puede guardar el contenido de política de privacidad', function ()
     $user = User::factory()->create();
 
     Livewire::actingAs($user)
-        ->test('admin-legal-pages')
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_FRONT)
+        ->set('adminEmail', 'admin@example.com')
         ->set('privacyContentEu', 'Pribatutasun politika berria')
         ->set('privacyContentEs', 'Nueva política de privacidad')
         ->call('save');
@@ -58,7 +61,9 @@ it('el admin puede guardar el contenido de aviso legal', function () {
     $user = User::factory()->create();
 
     Livewire::actingAs($user)
-        ->test('admin-legal-pages')
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_FRONT)
+        ->set('adminEmail', 'admin@example.com')
         ->set('legalNoticeContentEu', 'Lege oharra berria')
         ->set('legalNoticeContentEs', 'Nuevo aviso legal')
         ->call('save');
@@ -74,11 +79,11 @@ it('el componente carga el contenido existente al montar', function () {
     $user = User::factory()->create();
 
     Livewire::actingAs($user)
-        ->test('admin-legal-pages')
+        ->test('admin-settings')
         ->assertSet('privacyContentEu', 'Eduki existentea')
         ->assertSet('privacyContentEs', 'Contenido existente');
 });
 
-it('la ruta admin de páginas legales requiere autenticación', function () {
-    $this->get(route('admin.legal-pages'))->assertRedirect(route('login'));
+it('la antigua ruta admin de páginas legales ya no existe', function () {
+    $this->get('/admin/paginas-legales')->assertNotFound();
 });

@@ -5,10 +5,11 @@
  */
 
 use App\Models\User;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('private page shows placeholder with login link for unauthenticated visitors', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/privado')
             ->assertPathIs('/privado')
@@ -19,7 +20,7 @@ test('private page shows placeholder with login link for unauthenticated visitor
 test('private page shows development message for authenticated admin', function () {
     $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin) {
         $browser->loginAs($admin)
             ->visit('/privado')

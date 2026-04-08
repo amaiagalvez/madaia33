@@ -5,10 +5,11 @@
  */
 
 use App\Models\Image;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('small iphone landscape keeps header compact and mobile menu scrollable', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
             ->resize(667, 375)
@@ -44,7 +45,7 @@ test('small iphone landscape keeps header compact and mobile menu scrollable', f
 test('gallery and lightbox adapt in landscape breakpoints', function () {
     Image::factory()->count(8)->create();
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/galeria')
             ->resize(667, 375)

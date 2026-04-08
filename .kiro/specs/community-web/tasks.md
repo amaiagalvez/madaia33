@@ -41,7 +41,7 @@ Implementación incremental de la web de la comunidad de vecinos sobre Laravel 1
   - Crear `layouts/admin.blade.php` con sidebar y navegación del panel de administración
   - Definir todas las rutas públicas y de administración en `routes/web.php` según el diseño
   - Añadir las nuevas rutas públicas: `/politica-de-privacidad`, `/aviso-legal`, `/sitemap.xml`, `/robots.txt`
-  - Añadir la ruta admin: `/admin/paginas-legales`
+  - Integrar la edición de páginas legales en `/admin/configuracion`
   - Añadir enlaces al footer en `layouts/public.blade.php` para política de privacidad y aviso legal
   - Implementar el stack Blade `@stack('meta')` en el layout público para inyectar título y meta description por página
   - Crear páginas de error personalizadas: `errors/404.blade.php` y `errors/500.blade.php` con soporte i18n
@@ -233,7 +233,7 @@ Implementación incremental de la web de la comunidad de vecinos sobre Laravel 1
   - [ ]\* 13.3 Escribir tests de ejemplo para páginas legales
     - Verificar acceso público a `/politica-de-privacidad` y `/aviso-legal`
     - Verificar que el contenido se muestra en el idioma activo
-    - Verificar que el administrador puede editar el contenido desde `/admin/paginas-legales`
+    - Verificar que el administrador puede editar el contenido desde `/admin/configuracion`
     - _Requisitos: 15.1, 15.2, 15.3, 15.4_
 
 - [x] 14. Checkpoint — Verificar que todos los tests pasan

@@ -50,6 +50,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 - **Docker-first workflow**: Always run project commands inside Docker (`docker compose run ...` / `docker compose exec ...`). Do not run `php`, `composer`, `npm`, `artisan`, `pint`, or tests directly on the host.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
+- **Bilingual UI dedup rule**: If bilingual logic/UI is repeated across multiple partials, encapsulate it in a reusable Blade component to avoid inconsistencies and layout bugs; in tests, prefer stable `data-*` selectors over internal implementation details (for example Alpine variable names).
 - **Query minimization**: Prioritize speed by reducing database round-trips whenever possible. Batch related reads/writes (e.g., one `whereIn`/`upsert` instead of repeated single-key queries) and avoid repeated queries in the same request lifecycle.
 - **Settings batch access**: For multiple settings keys, prefer explicit in-context queries using `whereIn('key', [...])->get(['key', 'value'])->pluck('value', 'key')` and batch writes with `upsert(...)`; avoid introducing generic model helpers like `getMany`/`setMany` unless explicitly requested.
 - **SoftDeletes**: Every Eloquent model in this application uses `SoftDeletes`. When creating a new model, always add `use SoftDeletes;` and add `$table->softDeletes()` to its migration. Never use hard deletes unless explicitly requested.
