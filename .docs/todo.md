@@ -16,7 +16,6 @@
 [ ] en los test todos los $this-> dan error en PROBLEMS
 [ ] pasar pain no en modo test, dejarle a él que lo corrija
 [ ] user hizkuntza, besdin du front-ekoa
-[ ] home historia toda la parte derecha, en el movil ajusta altura y el espacio de anuncios a dos columnas
 [ ] fotos, se abren muy abajo
 
 ## Txuletak

@@ -21,6 +21,8 @@ return [
     'history_title' => 'Historia apur bat',
     'history_summary' => 'Komunitatearen hastapenetara begirada laburra: espazio partekatuak, lehen topaketak eta gaur arte ekarri gaituen bilakaera.',
     'history_image_alt' => 'Komunitatearen historiaren irudi adierazgarria',
+    'history_photos_title' => 'Komunitateko argazki zaharrak dituzu?',
+    'history_photos_summary' => 'Partekatu nahi badituzu, idatzi :email helbidera eta memoria kolektiboan txertatuko ditugu.',
     'promises' => [
         'informed_title' => 'Eguneratuta egoteko',
         'informed_body' => 'Iragarki berriak eta informazio erabilgarria lehen planoan ikusten dira.',

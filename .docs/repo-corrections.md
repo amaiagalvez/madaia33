@@ -37,3 +37,7 @@
 - When frontend copy blocks are intentionally removed, update Feature tests to assert stable structural markers (`data-*`, layout classes) instead of deleted translation strings; this prevents brittle regressions after UI copy refactors.
 
 - For ownership fixes, run `chown` from a Docker root container and then verify with a root-container `find` count, so host-side permission denials do not hide remaining root-owned paths.
+
+- For asymmetric split layouts on home pages, make the parent grid `lg:items-stretch` and the side panel `lg:flex lg:h-full`; this keeps the right column truly full-height while preserving mobile stacking.
+- When adding new locale-aware Pest tests in this repo, always append `->with('supported_locales')` for closures with a `$locale` argument; otherwise tests fail with `DatasetMissing`.
+- In `routes/web.php`, avoid relying on outer variables inside `Route::prefix(...)->group(function () { ... })` unless explicitly imported with `use (...)`; prefer controller actions for non-trivial page data preparation.

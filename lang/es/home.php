@@ -21,6 +21,8 @@ return [
     'history_title' => 'Un poco de historia',
     'history_summary' => 'Un recorrido breve por los inicios de la comunidad: espacios compartidos, primeros encuentros y la evolución que nos ha traído hasta hoy.',
     'history_image_alt' => 'Imagen representativa de la historia de la comunidad',
+    'history_photos_title' => 'Tienes fotos antiguas de la comunidad?',
+    'history_photos_summary' => 'Si quieres compartirlas, escribenos a :email y las incorporaremos a la memoria colectiva.',
     'promises' => [
         'informed_title' => 'Mantenerse al día',
         'informed_body' => 'Los avisos recientes y la información útil aparecen en primer plano.',

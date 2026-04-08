@@ -184,8 +184,7 @@
                     <div class="flex flex-col gap-1 text-left">
                         <span
                             class="text-sm font-semibold text-gray-800">{{ config('app.name', 'Komunitatea') }}</span>
-                        <p class="text-xs text-gray-400">&copy; {{ date('Y') }} ·
-                            {{ __('general.nav.notices') }} · {{ __('general.nav.gallery') }}</p>
+                        <p class="text-xs text-gray-400">&copy; {{ date('Y') }} </p>
                     </div>
                 </div>
                 <nav class="grid gap-3 sm:grid-cols-2" aria-label="Footer">

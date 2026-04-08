@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Notice;
+use App\Models\NoticeLocation;
 use App\SupportedLocales;
 
 dataset('supported_locales', SupportedLocales::all());
@@ -118,4 +119,46 @@ test('home page latest notices are ordered by latest', function (string $locale)
     $newerPos = strpos($content, $newer->title);
     $olderPos = strpos($content, $older->title);
     expect($newerPos < $olderPos)->toBeTrue();
+})->with('supported_locales');
+
+test('home page separates general notices from notices with location', function (string $locale) {
+    $generalNotice = Notice::factory()->public()->create([
+        'title_eu' => 'Iragarki Orokorra',
+        'title_es' => 'Aviso General',
+    ]);
+
+    $locationNotice = Notice::factory()->public()->create([
+        'title_eu' => 'Kokapeneko Iragarkia',
+        'title_es' => 'Aviso con Ubicacion',
+    ]);
+
+    NoticeLocation::create([
+        'notice_id' => $locationNotice->id,
+        'location_type' => 'portal',
+        'location_code' => 'A',
+    ]);
+
+    $response = test()->get(route(SupportedLocales::routeName('home', $locale)));
+
+    $response->assertSuccessful();
+    $response->assertSee('data-home-notices-general', false);
+    $response->assertSee('data-home-notices-by-location', false);
+    $response->assertSee($generalNotice->title);
+    $response->assertSee($locationNotice->title);
+})->with('supported_locales');
+
+test('home page keeps mobile order general notices then location notices then history', function (string $locale) {
+    $response = test()->get(route(SupportedLocales::routeName('home', $locale)));
+
+    $response->assertSuccessful();
+
+    $content = $response->getContent();
+    $generalPos = strpos($content, 'data-home-notices-general');
+    $locationPos = strpos($content, 'data-home-notices-by-location');
+    $historyPos = strpos($content, 'data-home-history');
+
+    expect($generalPos)->not->toBeFalse();
+    expect($locationPos)->not->toBeFalse();
+    expect($historyPos)->not->toBeFalse();
+    expect($generalPos < $locationPos && $locationPos < $historyPos)->toBeTrue();
 })->with('supported_locales');
