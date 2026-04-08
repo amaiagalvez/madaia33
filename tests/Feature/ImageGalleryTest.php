@@ -74,7 +74,7 @@ it('la galería pública es accesible', function (string $locale) {
     $response = test()->get(route(SupportedLocales::routeName('gallery', $locale)));
 
     $response->assertOk();
-    $response->assertSee(__('gallery.editorial_summary'));
+    $response->assertSee('data-page-hero="gallery"', false);
 })->with('supported_locales');
 
 it('las imágenes se ordenan por created_at descendente', function () {

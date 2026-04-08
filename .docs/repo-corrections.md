@@ -34,3 +34,4 @@
 
 - For locale-prefixed routes, set URL defaults in `tests/TestCase::setUp()` (not only in `tests/Pest.php`) so `route()` calls inside views/Livewire rendering always receive `locale` during Feature tests.
 - If only one public route needs locale-specific slugs, keep route names stable and localize via route parameters + URL defaults; this avoids mass refactors while preserving canonical URLs and SEO consistency.
+- When frontend copy blocks are intentionally removed, update Feature tests to assert stable structural markers (`data-*`, layout classes) instead of deleted translation strings; this prevents brittle regressions after UI copy refactors.

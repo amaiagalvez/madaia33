@@ -41,13 +41,12 @@ test('notices page renders notice cards with responsive classes', function (stri
     $response->assertSee('line-clamp-4');
 })->with('supported_locales');
 
-test('notices page renders a featured editorial notice block', function (string $locale) {
+test('notices page renders a featured notice block layout', function (string $locale) {
     Notice::factory()->public()->count(3)->create();
 
     $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
 
     $response->assertSuccessful();
-    $response->assertSee(__('notices.featured_badge'));
     $response->assertSee('lg:col-span-3');
     $response->assertSee('text-xl md:text-2xl lg:text-3xl');
 })->with('supported_locales');
