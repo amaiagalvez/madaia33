@@ -20,15 +20,6 @@
 
 <section class="{{ $sectionClasses }}" data-page-hero="{{ $hero }}">
     @if ($isLegal)
-        @if ($showLegalChips)
-            <div class="mb-3 flex flex-wrap gap-2">
-                <span class="feature-chip border-indigo-100 bg-indigo-50 text-indigo-700">
-                    {{ __('general.footer.legal_notice') }}
-                </span>
-                <span class="feature-chip">{{ __('general.footer.privacy_policy') }}</span>
-            </div>
-        @endif
-
         <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
             {{ $title }}
         </h1>

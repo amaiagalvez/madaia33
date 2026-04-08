@@ -22,7 +22,7 @@
                 data-page-hero="home">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" data-home-quick-links>
                     <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
-                        class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-amber-50/60 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                         <div class="page-icon-amber shrink-0 h-10 w-10 rounded-lg">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -32,12 +32,12 @@
                         </div>
                         <div>
                             <p
-                                class="text-sm font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                                class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
                                 {{ __('home.explore_notices') }}</p>
                             <p class="mt-0.5 text-xs text-gray-500 line-clamp-2">
                                 {{ __('notices.subtitle') }}</p>
                         </div>
-                        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-indigo-500"
+                        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -45,7 +45,7 @@
                         </svg>
                     </a>
                     <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
-                        class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-emerald-50/60 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/20 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                         <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -55,12 +55,12 @@
                         </div>
                         <div>
                             <p
-                                class="text-sm font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                                class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
                                 {{ __('home.explore_gallery') }}</p>
                             <p class="mt-0.5 text-xs text-gray-500 line-clamp-2">
                                 {{ __('gallery.subtitle') }}</p>
                         </div>
-                        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-indigo-500"
+                        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -68,7 +68,7 @@
                         </svg>
                     </a>
                     <a href="{{ route(\App\SupportedLocales::routeName('contact')) }}"
-                        class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-indigo-50/60 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#f1bd4d]/15 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                         <div class="page-icon-indigo shrink-0 h-10 w-10 rounded-lg">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -78,12 +78,12 @@
                         </div>
                         <div>
                             <p
-                                class="text-sm font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                                class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
                                 {{ __('home.contact_us') }}</p>
                             <p class="mt-0.5 text-xs text-gray-500 line-clamp-2">
                                 {{ __('contact.subtitle') }}</p>
                         </div>
-                        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-indigo-500"
+                        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"

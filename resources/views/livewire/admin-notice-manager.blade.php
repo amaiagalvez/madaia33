@@ -11,7 +11,7 @@
         <h2 class="text-lg font-semibold text-gray-700">{{ __('notices.admin.list') }}</h2>
         @unless ($showForm)
             <button wire:click="createNotice"
-                class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                 {{ __('general.buttons.create') }}
             </button>
         @endunless
@@ -33,7 +33,7 @@
                         </label>
                         <input id="titleEu" type="text" wire:model="titleEu"
                             @class([
-                                'mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+                                'mt-1 block w-full rounded-md shadow-sm focus:border-[#d9755b] focus:ring-[#d9755b] sm:text-sm',
                                 'border-red-500' => $errors->has('titleEu'),
                                 'border-gray-300' => !$errors->has('titleEu'),
                             ]) />
@@ -48,7 +48,7 @@
                             {{ __('notices.admin.title_es') }}
                         </label>
                         <input id="titleEs" type="text" wire:model="titleEs"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#d9755b] focus:ring-[#d9755b] sm:text-sm" />
                     </div>
 
                     {{-- Content EU --}}
@@ -57,7 +57,7 @@
                             {{ __('notices.admin.content_eu') }} <span class="text-red-500">*</span>
                         </label>
                         <textarea id="contentEu" wire:model="contentEu" rows="4" @class([
-                            'mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+                            'mt-1 block w-full rounded-md shadow-sm focus:border-[#d9755b] focus:ring-[#d9755b] sm:text-sm',
                             'border-red-500' => $errors->has('contentEu'),
                             'border-gray-300' => !$errors->has('contentEu'),
                         ])></textarea>
@@ -72,7 +72,7 @@
                             {{ __('notices.admin.content_es') }}
                         </label>
                         <textarea id="contentEs" wire:model="contentEs" rows="4"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#d9755b] focus:ring-[#d9755b] sm:text-sm"></textarea>
                     </div>
 
                     {{-- Locations --}}
@@ -87,7 +87,7 @@
                                         class="inline-flex cursor-pointer items-center gap-1 rounded-full border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50">
                                         <input type="checkbox" wire:model="selectedLocations"
                                             value="{{ $loc['code'] }}"
-                                            class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                                            class="rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]" />
                                         {{ $loc['label'] }}
                                     </label>
                                 @endforeach
@@ -101,17 +101,17 @@
                             {{ __('notices.admin.is_public') }}
                         </label>
                         <input id="isPublic" type="checkbox" wire:model="isPublic"
-                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                            class="h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]" />
                     </div>
                 </div>
 
                 <div class="mt-6 flex gap-3">
                     <button type="submit"
-                        class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                         {{ __('general.buttons.save') }}
                     </button>
                     <button type="button" wire:click="cancelForm"
-                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                         {{ __('general.buttons.cancel') }}
                     </button>
                 </div>
@@ -185,7 +185,7 @@
                             <div class="flex items-center justify-end gap-2">
                                 {{-- Edit --}}
                                 <button wire:click="editNotice({{ $notice->id }})"
-                                    class="text-indigo-600 hover:text-indigo-900">
+                                    class="text-[#d9755b] hover:text-[#793d3d]">
                                     {{ __('general.buttons.edit') }}
                                 </button>
 

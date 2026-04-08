@@ -9,7 +9,7 @@
                 <div class="glass-panel p-3 sm:p-4">
                     <select id="location-filter" wire:model.live="locationFilter"
                         aria-controls="notices-list"
-                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:w-64">
+                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b] sm:w-64">
                         <option value="">{{ __('notices.filter.all') }}</option>
                         <optgroup label="{{ __('notices.portal') }}">
                             @foreach (\App\CommunityLocations::PORTALS as $portal)

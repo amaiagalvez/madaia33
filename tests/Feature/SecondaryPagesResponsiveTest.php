@@ -12,7 +12,6 @@ it('privacy and legal pages use readable responsive layout', function (string $l
     $privacy->assertSee('data-page-hero="legal"', false);
     $privacy->assertSee('text-base leading-relaxed', false);
     $privacy->assertSee('text-2xl md:text-3xl font-bold text-gray-900 tracking-tight', false);
-    $privacy->assertSee(__('general.footer.privacy_policy_description'));
 
     $legal = $this->get(route(SupportedLocales::routeName('legal-notice', $locale)));
     $legal->assertOk();
@@ -20,7 +19,6 @@ it('privacy and legal pages use readable responsive layout', function (string $l
     $legal->assertSee('data-page-hero="legal"', false);
     $legal->assertSee('text-base leading-relaxed', false);
     $legal->assertSee('text-2xl md:text-3xl font-bold text-gray-900 tracking-tight', false);
-    $legal->assertSee(__('general.footer.legal_notice_description'));
 })->with('supported_locales');
 
 it('private page shows centered responsive placeholder', function (string $locale) {

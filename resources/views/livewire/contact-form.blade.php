@@ -18,7 +18,7 @@
         <div role="alert" aria-live="polite"
             class="mb-6 rounded-lg px-4 py-3 text-sm font-medium
             {{ $statusType === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : '' }}
-            {{ $statusType === 'warning' ? 'bg-amber-50 text-amber-800 border border-amber-200' : '' }}
+            {{ $statusType === 'warning' ? 'bg-[#f1bd4d]/15 text-[#793d3d] border border-[#f1bd4d]/50' : '' }}
             {{ $statusType === 'error' ? 'bg-red-50 text-red-800 border border-red-200' : '' }}">
             {{ $statusMessage }}
         </div>
@@ -34,7 +34,7 @@
             <input id="contact-name" type="text" wire:model="name" autocomplete="name"
                 maxlength="255" x-ref="firstField"
                 class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
-                    {{ $errors->has('name') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500' }}"
+                    {{ $errors->has('name') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
                 aria-describedby="{{ $errors->has('name') ? 'contact-name-error' : '' }}"
                 aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}">
             @error('name')
@@ -50,7 +50,7 @@
             <input id="contact-email" type="email" wire:model="email" autocomplete="email"
                 maxlength="255"
                 class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
-                    {{ $errors->has('email') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500' }}"
+                    {{ $errors->has('email') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
                 aria-describedby="{{ $errors->has('email') ? 'contact-email-error' : '' }}"
                 aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}">
             @error('email')
@@ -66,7 +66,7 @@
             <input id="contact-subject" type="text" wire:model="subject" maxlength="255"
                 x-ref="subjectField" @input="subjectCount = $event.target.value.length"
                 class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
-                    {{ $errors->has('subject') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500' }}"
+                    {{ $errors->has('subject') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
                 aria-describedby="{{ $errors->has('subject') ? 'contact-subject-error' : '' }}"
                 aria-invalid="{{ $errors->has('subject') ? 'true' : 'false' }}">
             <p id="contact-subject-counter" class="mt-1 text-xs text-gray-500" aria-live="polite">
@@ -85,7 +85,7 @@
             <textarea id="contact-message" wire:model="message" rows="6" maxlength="5000"
                 x-ref="messageField" @input="messageCount = $event.target.value.length"
                 class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
-                    {{ $errors->has('message') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500' }}"
+                    {{ $errors->has('message') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
                 aria-describedby="{{ $errors->has('message') ? 'contact-message-error' : '' }}"
                 aria-invalid="{{ $errors->has('message') ? 'true' : 'false' }}"></textarea>
             <p id="contact-message-counter" class="mt-1 text-xs text-gray-500" aria-live="polite">
@@ -100,12 +100,12 @@
         <div class="mb-6">
             <div class="flex items-start gap-2">
                 <input id="contact-legal" type="checkbox" wire:model="legalAccepted"
-                    class="mt-0.5 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    class="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]"
                     aria-describedby="{{ $errors->has('legalAccepted') ? 'contact-legal-error' : '' }}"
                     aria-invalid="{{ $errors->has('legalAccepted') ? 'true' : 'false' }}">
                 <label for="contact-legal" class="text-sm text-gray-700">
                     <a href="{{ $legalUrl }}" target="_blank" rel="noopener noreferrer"
-                        class="underline decoration-indigo-300 underline-offset-4 hover:text-indigo-700">{{ $legalText }}</a>
+                        class="underline decoration-[#d9755b]/40 underline-offset-4 hover:text-[#793d3d]">{{ $legalText }}</a>
                     <span aria-hidden="true" class="text-red-500">*</span>
                 </label>
             </div>
@@ -119,7 +119,7 @@
 
         {{-- Submit --}}
         <button type="submit" x-ref="submitButton"
-            class="inline-flex w-full sm:w-auto min-h-11 items-center justify-center rounded-md bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+            class="inline-flex w-full sm:w-auto min-h-11 items-center justify-center rounded-md bg-[#d9755b] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 disabled:opacity-50"
             data-contact-submit wire:loading.attr="disabled" wire:target="submit">
             <span wire:loading.remove>{{ __('contact.send') }}</span>
             <span wire:loading wire:target="submit" class="flex items-center gap-2"

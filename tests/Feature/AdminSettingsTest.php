@@ -203,7 +203,7 @@ it('el dashboard muestra estadísticas reales', function () {
 it('los settings creados con factory tienen sección válida', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -242,8 +242,8 @@ it('los tabs renderizan etiquetas de sección con wire:click', function () {
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->assertSeeHtml('wire:click')
-        ->assertSeeHtml('bg-amber-100 text-amber-900')
-        ->assertSeeHtml('text-stone-600 hover:bg-amber-50 hover:text-stone-900');
+        ->assertSeeHtml('bg-[#edd2c7] text-[#793d3d]')
+        ->assertSeeHtml('text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]');
 });
 
 it('los campos del formulario fuerzan contraste legible en fondo blanco', function () {

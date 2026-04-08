@@ -8,6 +8,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Quick Checklist
 
 - Work inside Docker only (`docker compose run ...` / `docker compose exec ...`).
+- Always run Docker commands as non-root (`--user ${DC_UID:-1000}:${DC_GID:-1000}`) when creating or modifying project files.
 - Do not run `php`, `composer`, `npm`, `artisan`, `pint`, or tests directly on host.
 
 ## Foundational Context
@@ -54,6 +55,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
 - **Bilingual UI dedup rule**: If bilingual logic/UI is repeated across multiple partials, encapsulate it in a reusable Blade component to avoid inconsistencies and layout bugs; in tests, prefer stable `data-*` selectors over internal implementation details (for example Alpine variable names).
+- **Brand palette source of truth**: Store the active frontend palette in `resources/css/app.css` theme tokens and mirror the same palette in `.github/instructions/frontend.instructions.md`. For new UI changes, prefer these tokens/colors instead of introducing ad-hoc color scales.
 - **Query minimization**: Prioritize speed by reducing database round-trips whenever possible. Batch related reads/writes (e.g., one `whereIn`/`upsert` instead of repeated single-key queries) and avoid repeated queries in the same request lifecycle.
 - **Strict DRY rule (mandatory)**: Never duplicate business logic or mapping blocks across files/classes. If the same logic appears twice (or would appear a second time), extract it immediately into a shared class/trait/component/helper and replace all existing duplicates in the touched scope. Ship no intentional copy-paste logic.
 - **KISS rule (mandatory)**: Always choose the simplest solution that fulfils the requirement. Do not introduce extra layers of abstraction (base classes, traits, service containers, pipelines) unless two or more concrete use cases already exist in the codebase. Prefer a plain method over a class, a named route closure over a controller when the handler is trivial, and a single Eloquent query over a repository pattern. If a simpler alternative exists and passes the same tests, use it.

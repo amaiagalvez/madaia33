@@ -40,7 +40,7 @@
             @foreach ($availableSections as $section)
                 <button type="button" wire:click="setSection('{{ $section }}')"
                     data-settings-section="{{ $section }}"
-                    class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors {{ $activeSection === $section ? 'bg-amber-100 text-amber-900' : 'text-stone-600 hover:bg-amber-50 hover:text-stone-900' }}"
+                    class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors {{ $activeSection === $section ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
                     aria-selected="{{ $activeSection === $section ? 'true' : 'false' }}"
                     aria-current="{{ $activeSection === $section ? 'page' : 'false' }}">
                     {{ __('admin.settings_sections.' . $section) }}
@@ -67,7 +67,7 @@
 
         <div>
             <button type="submit"
-                class="rounded-md bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900 transition-colors hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                class="rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                 {{ __('general.buttons.save') }}
             </button>
         </div>

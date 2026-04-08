@@ -8,8 +8,6 @@ dataset('public_seo_pages', [
     ['gallery', 'gallery.seo_description'],
     ['contact', 'contact.seo_description'],
     ['private', 'general.private.seo_description'],
-    ['privacy-policy', 'general.footer.privacy_policy_description'],
-    ['legal-notice', 'general.footer.legal_notice_description'],
 ]);
 
 test('public pages expose specific seo description in eu', function (string $routeName, string $descriptionKey) {
@@ -18,7 +16,7 @@ test('public pages expose specific seo description in eu', function (string $rou
         ->get(route(SupportedLocales::routeName($routeName, SupportedLocales::BASQUE)));
 
     $response->assertOk();
-    $response->assertSee('<meta name="description" content="'.e(__($descriptionKey)).'">', false);
+    $response->assertSee('<meta name="description" content="' . e(__($descriptionKey)) . '">', false);
 })->with('public_seo_pages');
 
 test('public pages expose specific seo description in es', function (string $routeName, string $descriptionKey) {
@@ -27,5 +25,5 @@ test('public pages expose specific seo description in es', function (string $rou
         ->get(route(SupportedLocales::routeName($routeName, SupportedLocales::SPANISH)));
 
     $response->assertOk();
-    $response->assertSee('<meta name="description" content="'.e(__($descriptionKey)).'">', false);
+    $response->assertSee('<meta name="description" content="' . e(__($descriptionKey)) . '">', false);
 })->with('public_seo_pages');

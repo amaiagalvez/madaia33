@@ -55,12 +55,14 @@ new class extends Component {
             <option value="">{{ __('notices.filter.all') }}</option>
             <optgroup label="{{ __('notices.portal') }}">
                 @foreach (\App\CommunityLocations::PORTALS as $portal)
-                    <option value="{{ $portal }}">{{ __('notices.portal') }} {{ $portal }}</option>
+                    <option value="{{ $portal }}">{{ __('notices.portal') }}
+                        {{ $portal }}</option>
                 @endforeach
             </optgroup>
             <optgroup label="{{ __('notices.garage') }}">
                 @foreach (\App\CommunityLocations::GARAGES as $floor)
-                    <option value="{{ $floor }}">{{ __('notices.garage') }} {{ $floor }}</option>
+                    <option value="{{ $floor }}">{{ __('notices.garage') }}
+                        {{ $floor }}</option>
                 @endforeach
             </optgroup>
         </select>
@@ -83,10 +85,10 @@ new class extends Component {
                         {{-- Fallback indicator: shown when no translation exists for the active locale --}}
                         @if (!$this->hasTranslation($notice))
                             <span
-                                class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800"
+                                class="inline-flex items-center gap-1 rounded-full bg-[#f1bd4d]/20 px-2.5 py-0.5 text-xs font-medium text-[#793d3d]"
                                 title="{{ __('notices.no_translation') }}">
-                                <svg class="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                                    stroke="currentColor" aria-hidden="true">
+                                <svg class="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                                 </svg>
@@ -98,7 +100,8 @@ new class extends Component {
                     {{-- Published date --}}
                     <p class="text-xs text-gray-500 mb-3">
                         <time datetime="{{ $notice->published_at?->toIso8601String() }}">
-                            {{ __('notices.published_at') }}: {{ $notice->published_at?->translatedFormat('j F Y') }}
+                            {{ __('notices.published_at') }}:
+                            {{ $notice->published_at?->translatedFormat('j F Y') }}
                         </time>
                     </p>
 
@@ -113,7 +116,7 @@ new class extends Component {
                             @foreach ($notice->locations as $location)
                                 <span
                                     class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                                    {{ $location->location_type === 'portal' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                    {{ $location->location_type === 'portal' ? 'bg-[#d9755b]/15 text-[#793d3d]' : 'bg-[#b9a7a5]/30 text-stone-700' }}">
                                     {{ $location->location_type === 'portal' ? __('notices.portal') : __('notices.garage') }}
                                     {{ $location->location_code }}
                                 </span>

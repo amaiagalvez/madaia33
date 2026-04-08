@@ -31,8 +31,6 @@ return [
     'footer' => [
         'privacy_policy' => 'Política de privacidad',
         'legal_notice' => 'Aviso legal',
-        'privacy_policy_description' => 'Politica de privacidad oficial: tratamiento de datos personales, derechos y condiciones de uso.',
-        'legal_notice_description' => 'Aviso legal oficial: identificacion del sitio web, condiciones de uso y responsabilidad juridica.',
     ],
     'pagination' => [
         'previous' => 'Anterior',

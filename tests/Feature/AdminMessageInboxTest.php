@@ -158,7 +158,7 @@ it('los mensajes no leídos tienen clase de diferenciación visual en el HTML', 
 
     Livewire::actingAs($user)
         ->test('admin-message-inbox')
-        ->assertSeeHtml('bg-blue-50');
+        ->assertSeeHtml('bg-[#edd2c7]/20');
 });
 
 it('alterna dirección al ordenar por la misma columna y reinicia al cambiar de columna', function () {

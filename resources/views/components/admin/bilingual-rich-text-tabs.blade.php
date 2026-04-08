@@ -56,8 +56,8 @@
             @foreach ($tabs as $tabConfig)
                 <button type="button" @click="tab = '{{ $tabConfig['key'] }}'"
                     data-bilingual-tab="{{ $tabConfig['key'] }}"
-                    :class="tab === '{{ $tabConfig['key'] }}' ? 'bg-amber-100 text-amber-900' :
-                        'text-stone-600 hover:bg-amber-50 hover:text-stone-900'"
+                    :class="tab === '{{ $tabConfig['key'] }}' ? 'bg-[#edd2c7] text-[#793d3d]' :
+                        'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]'"
                     class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors"
                     :aria-selected="tab === '{{ $tabConfig['key'] }}' ? 'true' : 'false'">
                     {{ $tabConfig['tabLabel'] }}
@@ -78,7 +78,7 @@
                         @foreach ($toolbarActions as $toolbarAction)
                             <button type="button"
                                 @click="{{ $toolbarAction['type'] === 'link' ? "link('{$tabConfig['field']}')" : "format('{$tabConfig['field']}', '{$toolbarAction['value']}')" }}"
-                                class="rounded border border-gray-300 px-2 py-1 text-xs font-semibold text-stone-700 transition-colors hover:bg-amber-50 hover:text-stone-900">{{ $toolbarAction['label'] }}</button>
+                                class="rounded border border-gray-300 px-2 py-1 text-xs font-semibold text-stone-700 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">{{ $toolbarAction['label'] }}</button>
                         @endforeach
                     </div>
                     <div id="{{ $tabConfig['field'] }}" x-ref="{{ $tabConfig['field'] }}"

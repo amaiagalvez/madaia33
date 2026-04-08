@@ -45,7 +45,7 @@
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse ($messages as $msg)
                     <tr wire:key="msg-{{ $msg->id }}"
-                        class="{{ !$msg->is_read ? 'bg-blue-50 font-semibold' : 'bg-white' }} cursor-pointer hover:bg-gray-50"
+                        class="{{ !$msg->is_read ? 'bg-[#edd2c7]/20 font-semibold' : 'bg-white' }} cursor-pointer hover:bg-gray-50"
                         wire:click="openMessage({{ $msg->id }})">
                         <td class="px-6 py-4 text-sm text-gray-900">{{ $msg->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ $msg->email }}</td>
@@ -61,7 +61,7 @@
                                 </span>
                             @else
                                 <span
-                                    class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                                    class="inline-flex items-center rounded-full bg-[#d9755b]/15 px-2.5 py-0.5 text-xs font-medium text-[#793d3d]">
                                     {{ __('contact.admin.unread') }}
                                 </span>
                             @endif
@@ -70,7 +70,7 @@
                             <div class="flex items-center justify-end gap-2">
                                 {{-- Toggle read/unread --}}
                                 <button wire:click="toggleRead({{ $msg->id }})"
-                                    class="text-indigo-600 hover:text-indigo-900">
+                                    class="text-[#d9755b] hover:text-[#793d3d]">
                                     {{ $msg->is_read ? __('contact.admin.mark_unread') : __('contact.admin.mark_read') }}
                                 </button>
 
@@ -79,10 +79,12 @@
                                     <span class="text-sm text-gray-600">
                                         {{ __('contact.admin.confirm_delete') }}
                                     </span>
-                                    <button wire:click="deleteMessage" class="text-red-600 hover:text-red-900">
+                                    <button wire:click="deleteMessage"
+                                        class="text-red-600 hover:text-red-900">
                                         {{ __('general.buttons.delete') }}
                                     </button>
-                                    <button wire:click="cancelDelete" class="text-gray-500 hover:text-gray-700">
+                                    <button wire:click="cancelDelete"
+                                        class="text-gray-500 hover:text-gray-700">
                                         {{ __('general.buttons.cancel') }}
                                     </button>
                                 @else
@@ -99,7 +101,8 @@
                     @if ($openMessageId === $msg->id)
                         <tr wire:key="detail-{{ $msg->id }}" class="bg-gray-50">
                             <td colspan="6" class="px-6 py-4">
-                                <div class="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+                                <div
+                                    class="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
                                     <dl class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                         <div>
                                             <dt class="text-xs font-medium uppercase text-gray-500">
@@ -113,7 +116,8 @@
                                             <dt class="text-xs font-medium uppercase text-gray-500">
                                                 {{ __('contact.subject') }}
                                             </dt>
-                                            <dd class="mt-1 text-sm text-gray-900">{{ $msg->subject }}</dd>
+                                            <dd class="mt-1 text-sm text-gray-900">
+                                                {{ $msg->subject }}</dd>
                                         </div>
                                     </dl>
                                     <div class="mt-4">
@@ -141,10 +145,12 @@
 
     {{-- Delete confirmation modal --}}
     @if ($confirmingDeleteId)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" wire:click.self="cancelDelete"
-            role="dialog" aria-modal="true" aria-labelledby="delete-confirm-msg">
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+            wire:click.self="cancelDelete" role="dialog" aria-modal="true"
+            aria-labelledby="delete-confirm-msg">
             <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-                <p id="delete-confirm-msg" class="text-sm text-gray-700">{{ __('contact.admin.confirm_delete') }}</p>
+                <p id="delete-confirm-msg" class="text-sm text-gray-700">
+                    {{ __('contact.admin.confirm_delete') }}</p>
                 <div class="mt-4 flex justify-end gap-3">
                     <button wire:click="cancelDelete"
                         class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">

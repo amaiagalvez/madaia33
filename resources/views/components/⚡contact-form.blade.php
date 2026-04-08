@@ -160,7 +160,7 @@ new class extends Component {
     @if ($statusMessage)
         <div class="mb-6 rounded-lg px-4 py-3 text-sm font-medium
             {{ $statusType === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : '' }}
-            {{ $statusType === 'warning' ? 'bg-amber-50 text-amber-800 border border-amber-200' : '' }}
+            {{ $statusType === 'warning' ? 'bg-[#f1bd4d]/15 text-[#793d3d] border border-[#f1bd4d]/50' : '' }}
             {{ $statusType === 'error' ? 'bg-red-50 text-red-800 border border-red-200' : '' }}"
             role="alert">
             {{ $statusMessage }}
@@ -177,7 +177,7 @@ new class extends Component {
                 @class([
                     'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
                     'border-red-500' => $errors->has('name'),
-                    'border-gray-300' => ! $errors->has('name'),
+                    'border-gray-300' => !$errors->has('name'),
                 ])
                 aria-describedby="@error('name') contact-name-error @enderror" aria-required="true">
             @error('name')
@@ -195,7 +195,7 @@ new class extends Component {
                 @class([
                     'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
                     'border-red-500' => $errors->has('email'),
-                    'border-gray-300' => ! $errors->has('email'),
+                    'border-gray-300' => !$errors->has('email'),
                 ])
                 aria-describedby="@error('email') contact-email-error @enderror"
                 aria-required="true">
@@ -214,7 +214,7 @@ new class extends Component {
                 @class([
                     'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
                     'border-red-500' => $errors->has('subject'),
-                    'border-gray-300' => ! $errors->has('subject'),
+                    'border-gray-300' => !$errors->has('subject'),
                 ])
                 aria-describedby="@error('subject') contact-subject-error @enderror"
                 aria-required="true">
@@ -229,12 +229,11 @@ new class extends Component {
             <label for="contact-message" class="block text-sm font-medium text-gray-700 mb-1">
                 {{ __('contact.message') }} <span class="text-red-500" aria-hidden="true">*</span>
             </label>
-            <textarea id="contact-message" wire:model="message" rows="6"
-                @class([
-                    'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
-                    'border-red-500' => $errors->has('message'),
-                    'border-gray-300' => ! $errors->has('message'),
-                ])
+            <textarea id="contact-message" wire:model="message" rows="6" @class([
+                'block w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500',
+                'border-red-500' => $errors->has('message'),
+                'border-gray-300' => !$errors->has('message'),
+            ])
                 aria-describedby="@error('message') contact-message-error @enderror" aria-required="true"
                 maxlength="5000"></textarea>
             @error('message')
@@ -250,7 +249,7 @@ new class extends Component {
                     @class([
                         'mt-0.5 h-4 w-4 rounded text-gray-800 focus:ring-gray-500',
                         'border-red-500' => $errors->has('legalAccepted'),
-                        'border-gray-300' => ! $errors->has('legalAccepted'),
+                        'border-gray-300' => !$errors->has('legalAccepted'),
                     ])
                     aria-describedby="@error('legalAccepted') contact-legal-error @enderror"
                     aria-required="true">

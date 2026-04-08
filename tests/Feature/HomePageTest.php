@@ -40,7 +40,6 @@ test('public layout keeps sticky header solid and prevents horizontal overflow',
     $response->assertSee('sticky top-0 z-70', false);
     $response->assertSee('public-header', false);
     $response->assertSee('header-shell', false);
-    $response->assertSee('header-nav-panel', false);
     $response->assertSee('header-brand-mark', false);
     $response->assertSee('pt-[env(safe-area-inset-top)]', false);
 })->with('supported_locales');

@@ -38,7 +38,7 @@
             <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto"
                 aria-label="{{ __('admin.dashboard') }}">
                 <a href="{{ route('admin.dashboard') }}"
-                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-amber-100 text-amber-900' : 'text-stone-600 hover:bg-amber-50 hover:text-stone-900' }}">
+                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -48,7 +48,7 @@
                 </a>
 
                 <a href="{{ route('admin.notices') }}"
-                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.notices') ? 'bg-amber-100 text-amber-900' : 'text-stone-600 hover:bg-amber-50 hover:text-stone-900' }}">
+                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.notices') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -58,7 +58,7 @@
                 </a>
 
                 <a href="{{ route('admin.images') }}"
-                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.images') ? 'bg-amber-100 text-amber-900' : 'text-stone-600 hover:bg-amber-50 hover:text-stone-900' }}">
+                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.images') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -68,7 +68,7 @@
                 </a>
 
                 <a href="{{ route('admin.messages') }}"
-                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.messages') ? 'bg-amber-100 text-amber-900' : 'text-stone-600 hover:bg-amber-50 hover:text-stone-900' }}">
+                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.messages') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -78,7 +78,7 @@
                 </a>
 
                 <a href="{{ route('admin.settings') }}"
-                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.settings') ? 'bg-amber-100 text-amber-900' : 'text-stone-600 hover:bg-amber-50 hover:text-stone-900' }}">
+                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.settings') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -105,7 +105,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit"
-                        class="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:bg-amber-50 hover:text-stone-900 transition-colors">
+                        class="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">
                         <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -121,7 +121,7 @@
         <div class="lg:hidden fixed top-0 left-0 right-0 z-40 bg-stone-50 border-b border-stone-200 h-16 flex items-center px-4 gap-4"
             x-data="{ open: false }">
             <button type="button"
-                class="p-2 rounded-md text-stone-600 hover:text-stone-900 hover:bg-amber-50 transition-colors"
+                class="p-2 rounded-md text-stone-600 hover:text-[#793d3d] hover:bg-[#edd2c7]/45 transition-colors"
                 aria-label="Menua ireki / Abrir menú" @click="open = !open">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" aria-hidden="true">
@@ -163,21 +163,21 @@
                     </div>
                     <nav class="flex-1 px-4 py-6 space-y-1">
                         <a href="{{ route('admin.dashboard') }}"
-                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-amber-50 transition-colors">{{ __('admin.dashboard') }}</a>
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.dashboard') }}</a>
                         <a href="{{ route('admin.notices') }}"
-                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-amber-50 transition-colors">{{ __('admin.notices') }}</a>
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.notices') }}</a>
                         <a href="{{ route('admin.images') }}"
-                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-amber-50 transition-colors">{{ __('admin.gallery') }}</a>
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.gallery') }}</a>
                         <a href="{{ route('admin.messages') }}"
-                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-amber-50 transition-colors">{{ __('admin.messages') }}</a>
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.messages') }}</a>
                         <a href="{{ route('admin.settings') }}"
-                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-amber-50 transition-colors">{{ __('admin.settings') }}</a>
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.settings') }}</a>
                     </nav>
                     <div class="border-t border-stone-200 p-4">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"
-                                class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:bg-amber-50 transition-colors">
+                                class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">
                                 {{ __('admin.logout') }}
                             </button>
                         </form>

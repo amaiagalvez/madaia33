@@ -10,7 +10,6 @@
 [ ] test en ingles
 [ ] comments en ingles
 [ ] dentro de la carpeta madaia33 buscar todos los ficheros y carpetas que sean del usuario root y ponerles amaia:amaia
-[ ] color granate, marron
 [ ] añadir espacio de historia
 [ ] añadir espacio para comercios
 [ ] cookies
@@ -18,6 +17,7 @@
 [ ] pasar pain no en modo test, dejarle a él que lo corrija
 [ ] user hizkuntza, besdin du front-ekoa
 [ ] home historia toda la parte derecha, en el movil ajusta altura y el espacio de anuncios a dos columnas
+[ ] fotos, se abren muy abajo
 
 ## Txuletak
 /dusk-test pasar los dusk test

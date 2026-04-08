@@ -32,7 +32,7 @@ new class extends Component {
 <div class="flex items-center gap-2">
     @foreach (SupportedLocales::all() as $locale)
         <a href="{{ $this->localeUrls[$locale] }}" data-language-option="{{ $locale }}"
-            class="cursor-pointer rounded px-2 py-1 text-sm font-medium transition-colors {{ $currentLocale === $locale ? 'bg-gray-800 text-white' : 'text-gray-600 hover:text-gray-900' }}"
+            class="cursor-pointer rounded px-2 py-1 text-sm font-medium transition-colors {{ $currentLocale === $locale ? 'bg-[#793d3d] text-white' : 'text-gray-600 hover:text-[#793d3d]' }}"
             aria-label="{{ __('general.language.' . $locale) }}"
             @if ($currentLocale === $locale) aria-current="true" @endif>
             {{ SupportedLocales::switcherLabel($locale) }}

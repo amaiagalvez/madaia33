@@ -19,7 +19,7 @@
             @foreach ($images as $image)
                 <button type="button" data-gallery-open
                     wire:key="gallery-image-{{ $image->id }}"
-                    class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'col-span-2 min-h-[14rem] sm:row-span-2 sm:min-h-[18rem]' : 'aspect-square' }}"
+                    class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'col-span-2 min-h-[14rem] sm:row-span-2 sm:min-h-[18rem]' : 'aspect-square' }}"
                     @click="show('{{ $image->public_url }}', '{{ addslashes($image->alt_text) }}', $event)"
                     aria-label="{{ $image->alt_text }}">
                     <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"

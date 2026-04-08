@@ -220,20 +220,25 @@ new class extends Component {
 
             {{-- Location selector --}}
             <div>
-                <p class="block text-sm font-medium text-gray-700 mb-2">{{ __('notices.admin.locations') }}</p>
+                <p class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ __('notices.admin.locations') }}</p>
                 <div class="flex flex-wrap gap-2">
                     @foreach (\App\CommunityLocations::PORTALS as $portal)
                         <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" wire:model="selectedLocations" value="{{ $portal }}"
+                            <input type="checkbox" wire:model="selectedLocations"
+                                value="{{ $portal }}"
                                 class="rounded border-gray-300 text-gray-700 focus:ring-gray-500" />
-                            <span class="text-sm text-gray-700">{{ __('notices.portal') }} {{ $portal }}</span>
+                            <span class="text-sm text-gray-700">{{ __('notices.portal') }}
+                                {{ $portal }}</span>
                         </label>
                     @endforeach
                     @foreach (\App\CommunityLocations::GARAGES as $garage)
                         <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" wire:model="selectedLocations" value="{{ $garage }}"
+                            <input type="checkbox" wire:model="selectedLocations"
+                                value="{{ $garage }}"
                                 class="rounded border-gray-300 text-gray-700 focus:ring-gray-500" />
-                            <span class="text-sm text-gray-700">{{ __('notices.garage') }} {{ $garage }}</span>
+                            <span class="text-sm text-gray-700">{{ __('notices.garage') }}
+                                {{ $garage }}</span>
                         </label>
                     @endforeach
                 </div>
@@ -266,7 +271,8 @@ new class extends Component {
 
     {{-- ── Delete confirmation modal ───────────────────────────────────────── --}}
     @if ($confirmingDeleteId)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog"
+            aria-modal="true">
             <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
                 <p class="text-sm text-gray-700 mb-6">{{ __('notices.admin.confirm_delete') }}</p>
                 <div class="flex justify-end gap-3">
@@ -298,16 +304,21 @@ new class extends Component {
                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
-                                {{ __('notices.admin.title_eu') }} / {{ __('notices.admin.title_es') }}
+                            <th
+                                class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                {{ __('notices.admin.title_eu') }} /
+                                {{ __('notices.admin.title_es') }}
                             </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
+                            <th
+                                class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                                 {{ __('notices.admin.is_public') }}
                             </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
+                            <th
+                                class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                                 {{ __('notices.admin.locations') }}
                             </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
+                            <th
+                                class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                                 {{ __('notices.published_at') }}
                             </th>
                             <th class="px-6 py-3"></th>
@@ -337,7 +348,7 @@ new class extends Component {
                                         @forelse ($notice->locations as $loc)
                                             <span
                                                 class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
-                                                {{ $loc->location_type === 'portal' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                                {{ $loc->location_type === 'portal' ? 'bg-[#d9755b]/15 text-[#793d3d]' : 'bg-[#b9a7a5]/30 text-stone-700' }}">
                                                 {{ $loc->location_code }}
                                             </span>
                                         @empty
@@ -355,8 +366,9 @@ new class extends Component {
                                             {{ __('notices.admin.edit') }}
                                         </button>
                                         @if ($notice->is_public)
-                                            <button wire:click="unpublishNotice({{ $notice->id }})"
-                                                class="text-xs text-amber-600 hover:text-amber-800 underline">
+                                            <button
+                                                wire:click="unpublishNotice({{ $notice->id }})"
+                                                class="text-xs text-[#d9755b] hover:text-[#793d3d] underline">
                                                 {{ __('notices.admin.unpublish') }}
                                             </button>
                                         @else
