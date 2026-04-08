@@ -8,6 +8,8 @@ use Livewire\Livewire;
 use App\SupportedLocales;
 use Illuminate\Support\Facades\App;
 
+dataset('supported_locales', SupportedLocales::all());
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Propiedad 5: Round-trip de imagen (subir / eliminar)
 // Valida: Requisitos 3.2, 3.3
@@ -68,12 +70,12 @@ it('muestra mensaje de vacío cuando no hay imágenes', function () {
     $component->assertSee(__('gallery.empty'));
 });
 
-it('la galería pública es accesible', function () {
-    $response = test()->get(route('gallery'));
+it('la galería pública es accesible', function (string $locale) {
+    $response = test()->get(route(SupportedLocales::routeName('gallery', $locale)));
 
     $response->assertOk();
     $response->assertSee(__('gallery.editorial_summary'));
-});
+})->with('supported_locales');
 
 it('las imágenes se ordenan por created_at descendente', function () {
     Image::factory()->count(3)->create();
@@ -86,20 +88,20 @@ it('las imágenes se ordenan por created_at descendente', function () {
     }
 });
 
-it('renderiza la galería con grid responsive esperado', function () {
+it('renderiza la galería con grid responsive esperado', function (string $locale) {
     Image::factory()->count(2)->create();
 
-    $response = test()->get(route('gallery'));
+    $response = test()->get(route(SupportedLocales::routeName('gallery', $locale)));
 
     $response->assertOk();
     $response->assertSee('grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4', false);
     $response->assertSee('data-gallery-grid', false);
-});
+})->with('supported_locales');
 
-it('incluye controles avanzados del lightbox responsive', function () {
+it('incluye controles avanzados del lightbox responsive', function (string $locale) {
     Image::factory()->count(1)->create();
 
-    $response = test()->get(route('gallery'));
+    $response = test()->get(route(SupportedLocales::routeName('gallery', $locale)));
 
     $response->assertOk();
     $response->assertSee('window.innerHeight < window.innerWidth', false);
@@ -108,4 +110,4 @@ it('incluye controles avanzados del lightbox responsive', function () {
     $response->assertSee('data-lightbox-close', false);
     $response->assertSee('min-h-11 min-w-11', false);
     $response->assertSee('@touchmove="handleTouchMove($event)"', false);
-});
+})->with('supported_locales');

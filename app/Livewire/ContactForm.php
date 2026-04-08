@@ -235,7 +235,7 @@ class ContactForm extends Component
             }
         }
 
-        $legalUrl = (string) ($settings['legal_url'] ?? route('privacy-policy'));
+        $legalUrl = (string) ($settings['legal_url'] ?? route(SupportedLocales::routeName('privacy-policy')));
         $siteKey = (string) ($settings['recaptcha_site_key'] ?? '');
 
         return view('livewire.contact-form', [

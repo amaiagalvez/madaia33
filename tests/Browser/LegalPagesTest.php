@@ -10,11 +10,11 @@ use Laravel\Dusk\Browser;
 test('legal pages are accessible and rendered in Basque', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/politica-de-privacidad')
-            ->assertPathIs('/politica-de-privacidad')
+        $browser->visit('/eu/pribatutasun-politika')
+            ->assertPathIs('/eu/pribatutasun-politika')
             ->assertSee('Pribatutasun-politika')
-            ->visit('/aviso-legal')
-            ->assertPathIs('/aviso-legal')
+            ->visit('/eu/ohar-legala')
+            ->assertPathIs('/eu/ohar-legala')
             ->assertSee('Lege-oharra');
     });
 });
@@ -22,12 +22,12 @@ test('legal pages are accessible and rendered in Basque', function () {
 test('legal pages are rendered in Spanish after switching language', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/')
-            ->press('ES')
+        $browser->visit('/eu')
+            ->click('[data-language-option="es"]')
             ->waitForText('Avisos')
-            ->visit('/politica-de-privacidad')
+            ->visit('/es/politica-de-privacidad')
             ->assertSee('Política de privacidad')
-            ->visit('/aviso-legal')
+            ->visit('/es/aviso-legal')
             ->assertSee('Aviso legal');
     });
 });

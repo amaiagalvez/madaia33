@@ -23,7 +23,6 @@ class LegalPageController extends Controller
         $localizedKeys = SupportedLocales::localizedKeys("legal_page_{$pageKey}");
         $settings = Setting::query()
             ->whereIn('key', $localizedKeys)
-            ->get(['key', 'value'])
             ->pluck('value', 'key');
 
         $content = '';

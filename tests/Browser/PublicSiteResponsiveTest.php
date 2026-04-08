@@ -34,7 +34,7 @@ function mailhogDeliveredMessages(string $subject, array $recipients): bool
             $toHeader = implode(',', $headers['To'] ?? []);
 
             return in_array($subject, $subjects, true)
-              && str_contains($toHeader, $recipient);
+                && str_contains($toHeader, $recipient);
         });
     });
 }
@@ -60,7 +60,7 @@ test('home page smoke on mobile renders hero latest notices and working mobile m
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/')
+        $browser->visit('/eu')
             ->resize(375, 812)
             ->pause(500)
             ->assertScript("return document.querySelector('[data-hero-slider]') !== null;", true)
@@ -72,7 +72,7 @@ test('home page smoke on mobile renders hero latest notices and working mobile m
             ->assertScript("return getComputedStyle(document.querySelector('[data-mobile-menu]')).display !== 'none';", true)
             ->click('[data-first-menu-item]')
             ->pause(350)
-            ->assertPathIs('/avisos');
+            ->assertPathIs('/eu/iragarkiak');
     });
 });
 
@@ -105,7 +105,7 @@ test('notices page smoke checks responsive grid filter and pagination', function
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/avisos')
+        $browser->visit('/eu/iragarkiak')
             ->resize(375, 812)
             ->pause(500)
             ->assertScript(
@@ -133,7 +133,7 @@ test('gallery smoke opens lightbox closes with escape and works after rotating t
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/galeria')
+        $browser->visit('/eu/argazki-bilduma')
             ->resize(375, 812)
             ->pause(400)
             ->click('[data-gallery-open]')
@@ -167,7 +167,7 @@ test('contact form smoke submits successfully and sends both emails', function (
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($visitorEmail, $subject) {
-        $browser->visit('/contacto')
+        $browser->visit('/eu/harremana')
             ->resize(375, 812)
             ->pause(400)
             ->type('#contact-name', 'Smoke Test User')

@@ -13,14 +13,18 @@ dataset('public_seo_pages', [
 ]);
 
 test('public pages expose specific seo description in eu', function (string $routeName, string $descriptionKey) {
-    $response = test()->withSession(['locale' => SupportedLocales::BASQUE])->get(route($routeName));
+    $response = test()
+        ->withSession(['locale' => SupportedLocales::BASQUE])
+        ->get(route(SupportedLocales::routeName($routeName, SupportedLocales::BASQUE)));
 
     $response->assertOk();
     $response->assertSee('<meta name="description" content="'.e(__($descriptionKey)).'">', false);
 })->with('public_seo_pages');
 
 test('public pages expose specific seo description in es', function (string $routeName, string $descriptionKey) {
-    $response = test()->withSession(['locale' => SupportedLocales::SPANISH])->get(route($routeName));
+    $response = test()
+        ->withSession(['locale' => SupportedLocales::SPANISH])
+        ->get(route(SupportedLocales::routeName($routeName, SupportedLocales::SPANISH)));
 
     $response->assertOk();
     $response->assertSee('<meta name="description" content="'.e(__($descriptionKey)).'">', false);

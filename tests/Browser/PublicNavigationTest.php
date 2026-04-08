@@ -10,17 +10,17 @@ use Laravel\Dusk\Browser;
 test('public navigation reaches notices, gallery and contact pages', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/')
+        $browser->visit('/eu')
             ->clickLink('Iragarkiak')
-            ->assertPathIs('/avisos')
+            ->assertPathIs('/eu/iragarkiak')
             ->assertSee('Iragarkiak')
-            ->visit('/')
+            ->visit('/eu')
             ->clickLink('Argazki-bilduma')
-            ->assertPathIs('/galeria')
+            ->assertPathIs('/eu/argazki-bilduma')
             ->assertSee('Argazki-bilduma')
-            ->visit('/')
+            ->visit('/eu')
             ->clickLink('Kontaktua')
-            ->assertPathIs('/contacto')
+            ->assertPathIs('/eu/harremana')
             ->assertSee('Kontaktua');
     });
 });

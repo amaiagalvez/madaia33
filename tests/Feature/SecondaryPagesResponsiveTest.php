@@ -1,9 +1,12 @@
 <?php
 
+use App\SupportedLocales;
 use Illuminate\Support\Facades\Route;
 
-it('privacy and legal pages use readable responsive layout', function () {
-    $privacy = $this->get(route('privacy-policy'));
+dataset('supported_locales', SupportedLocales::all());
+
+it('privacy and legal pages use readable responsive layout', function (string $locale) {
+    $privacy = $this->get(route(SupportedLocales::routeName('privacy-policy', $locale)));
     $privacy->assertOk();
     $privacy->assertSee('max-w-prose mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14', false);
     $privacy->assertSee('data-page-hero="legal"', false);
@@ -11,24 +14,24 @@ it('privacy and legal pages use readable responsive layout', function () {
     $privacy->assertSee('text-2xl md:text-3xl font-bold text-gray-900 tracking-tight', false);
     $privacy->assertSee(__('general.footer.privacy_policy_description'));
 
-    $legal = $this->get(route('legal-notice'));
+    $legal = $this->get(route(SupportedLocales::routeName('legal-notice', $locale)));
     $legal->assertOk();
     $legal->assertSee('max-w-prose mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14', false);
     $legal->assertSee('data-page-hero="legal"', false);
     $legal->assertSee('text-base leading-relaxed', false);
     $legal->assertSee('text-2xl md:text-3xl font-bold text-gray-900 tracking-tight', false);
     $legal->assertSee(__('general.footer.legal_notice_description'));
-});
+})->with('supported_locales');
 
-it('private page shows centered responsive placeholder', function () {
-    $response = $this->get(route('private'));
+it('private page shows centered responsive placeholder', function (string $locale) {
+    $response = $this->get(route(SupportedLocales::routeName('private', $locale)));
 
     $response->assertOk();
     $response->assertSee('max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14', false);
     $response->assertSee('min-h-[60vh] flex items-center justify-center', false);
     $response->assertSee('data-private-placeholder', false);
     $response->assertSee(__('general.private.guest_message'));
-});
+})->with('supported_locales');
 
 it('404 page renders centered layout with touch friendly action', function () {
     $response = $this->get('/ruta-que-no-existe');
@@ -51,5 +54,5 @@ it('500 page renders centered layout with touch friendly actions', function () {
     $response->assertStatus(500);
     $response->assertSee('min-h-[70vh] flex items-center justify-center', false);
     $response->assertSee('inline-flex min-h-11 min-w-11 items-center justify-center', false);
-    $response->assertSee(route('contact'));
+    $response->assertSee(route(SupportedLocales::routeName('contact', SupportedLocales::BASQUE)));
 });

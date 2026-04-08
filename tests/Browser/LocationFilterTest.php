@@ -49,7 +49,7 @@ test('location filter on notices page filters results in real time', function ()
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($titleA, $titleB) {
-        $browser->visit('/avisos')
+        $browser->visit('/eu/iragarkiak')
             ->waitForText($titleA, 5)
             ->assertSee($titleA)
             ->assertSee($titleB);

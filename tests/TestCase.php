@@ -7,6 +7,13 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        app()->useStoragePath(sys_get_temp_dir().'/madaia33-storage-tests-'.getmypid());
+    }
+
     protected function skipUnlessFortifyFeature(string $feature, ?string $message = null): void
     {
         if (! Features::enabled($feature)) {

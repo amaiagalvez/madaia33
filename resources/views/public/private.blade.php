@@ -24,7 +24,7 @@
                 <p class="text-base leading-relaxed text-gray-600 mb-6">
                     {{ __('general.private.auth_message') }}
                 </p>
-                <a href="{{ route('home') }}" class="btn-brand inline-flex min-h-11">
+                <a href="{{ route(\App\SupportedLocales::routeName('home')) }}" class="btn-brand inline-flex min-h-11">
                     {{ __('general.buttons.back') }}
                 </a>
             @else

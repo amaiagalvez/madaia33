@@ -14,7 +14,7 @@ test('contact form complete flow with recaptcha disabled', function () {
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/contacto')
+        $browser->visit('/eu/harremana')
             ->assertSee('Kontaktua')
             ->type('#contact-name', 'Ane Etxebarria')
             ->type('#contact-email', 'ane@example.com')
@@ -36,7 +36,7 @@ test('contact form ignores a rapid double click on submit', function () {
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/contacto')
+        $browser->visit('/eu/harremana')
             ->assertSee('Kontaktua')
             ->type('#contact-name', 'Ane Etxebarria')
             ->type('#contact-email', 'ane@example.com')
@@ -60,7 +60,7 @@ test('contact form ignores a rapid double click on submit', function () {
 test('contact form shows validation errors when fields are empty', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/contacto')
+        $browser->visit('/eu/harremana')
             ->press('Bidali')
             ->waitForText('beharrezkoa', 5)
             ->assertSee('beharrezkoa');

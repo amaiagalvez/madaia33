@@ -6,37 +6,40 @@
 use App\Models\User;
 use Livewire\Livewire;
 use App\Models\Setting;
+use App\SupportedLocales;
+
+dataset('supported_locales', SupportedLocales::all());
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Acceso público a páginas legales
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('la página de política de privacidad es accesible públicamente', function () {
-    $this->get(route('privacy-policy'))->assertOk();
-});
+it('la página de política de privacidad es accesible públicamente', function (string $locale) {
+    $this->get(route(SupportedLocales::routeName('privacy-policy', $locale)))->assertOk();
+})->with('supported_locales');
 
-it('la página de aviso legal es accesible públicamente', function () {
-    $this->get(route('legal-notice'))->assertOk();
-});
+it('la página de aviso legal es accesible públicamente', function (string $locale) {
+    $this->get(route(SupportedLocales::routeName('legal-notice', $locale)))->assertOk();
+})->with('supported_locales');
 
-it('las páginas legales reutilizan la misma vista pública con contenido diferenciado', function () {
+it('las páginas legales reutilizan la misma vista pública con contenido diferenciado', function (string $locale) {
     createSetting('legal_page_privacy_policy_eu', 'Pribatutasun eduki partekatua');
     createSetting('legal_page_legal_notice_eu', 'Lege ohar eduki partekatua');
 
-    $privacy = $this->get(route('privacy-policy'));
+    $privacy = $this->get(route(SupportedLocales::routeName('privacy-policy', $locale)));
 
     $privacy->assertOk()
         ->assertViewIs('public.legal-page')
         ->assertSee('data-legal-page="privacy-policy"', false)
         ->assertSee('Pribatutasun eduki partekatua');
 
-    $legal = $this->get(route('legal-notice'));
+    $legal = $this->get(route(SupportedLocales::routeName('legal-notice', $locale)));
 
     $legal->assertOk()
         ->assertViewIs('public.legal-page')
         ->assertSee('data-legal-page="legal-notice"', false)
         ->assertSee('Lege ohar eduki partekatua');
-});
+})->with('supported_locales');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Admin puede editar el contenido de páginas legales

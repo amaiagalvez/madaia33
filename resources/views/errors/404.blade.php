@@ -8,7 +8,7 @@
             <p class="text-base leading-relaxed text-gray-600 mb-8">
                 {{ __('errors.404.message') ?? 'Bilatzen ari zaren orrialdea ez da existitzen. / La página que buscas no existe.' }}
             </p>
-            <a href="{{ route('home') }}"
+            <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
                 class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700">
                 {{ __('general.buttons.back') }}
             </a>

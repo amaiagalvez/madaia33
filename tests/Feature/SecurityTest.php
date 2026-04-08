@@ -4,18 +4,21 @@
 // Valida: Requisitos 16.4, 16.5, 17.3
 
 use App\Models\User;
+use App\SupportedLocales;
+
+dataset('supported_locales', SupportedLocales::all());
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Cabeceras de seguridad HTTP
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('las cabeceras de seguridad están presentes en rutas públicas', function () {
-    $response = $this->get(route('home'));
+it('las cabeceras de seguridad están presentes en rutas públicas', function (string $locale) {
+    $response = $this->get(route(SupportedLocales::routeName('home', $locale)));
 
     $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
     $response->assertHeader('X-Content-Type-Options', 'nosniff');
     $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-});
+})->with('supported_locales');
 
 it('las cabeceras de seguridad están presentes en rutas admin', function () {
     $user = User::factory()->create();
@@ -31,14 +34,14 @@ it('las cabeceras de seguridad están presentes en rutas admin', function () {
 // Sitemap y robots.txt
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('el sitemap.xml es accesible y contiene las URLs públicas', function () {
+it('el sitemap.xml es accesible y contiene las URLs públicas', function (string $locale) {
     $response = $this->get(route('sitemap'));
 
     $response->assertOk()
         ->assertHeader('Content-Type', 'application/xml')
         ->assertSee('<urlset', false)
-        ->assertSee(route('home'), false);
-});
+        ->assertSee(route(SupportedLocales::routeName('home', $locale)), false);
+})->with('supported_locales');
 
 it('el robots.txt es accesible y contiene las directivas correctas', function () {
     $response = $this->get(route('robots'));

@@ -11,6 +11,16 @@
 
     @stack('meta')
 
+    @if (request()->route()?->getName())
+        @php($__baseName = \App\SupportedLocales::baseRouteName(request()->route()->getName()))
+        @foreach (\App\SupportedLocales::all() as $altLocale)
+            <link rel="alternate" hreflang="{{ $altLocale }}"
+                href="{{ route(\App\SupportedLocales::routeName($__baseName, $altLocale)) }}" />
+        @endforeach
+        <link rel="alternate" hreflang="x-default"
+            href="{{ route(\App\SupportedLocales::routeName($__baseName, \App\SupportedLocales::default())) }}" />
+    @endif
+
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -41,7 +51,7 @@
                 class="header-shell flex items-center justify-between gap-2 min-h-16 transition-all duration-200">
 
                 {{-- Logo / Site name (left) --}}
-                <a href="{{ route('home') }}"
+                <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
                     class="flex min-w-0 items-center gap-2 sm:gap-3 rounded-sm transition-colors hover:text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2">
                     <img src="{{ asset('storage/madaia33/madaia33.png') }}"
                         alt="{{ config('app.name', 'Madaia') }} logo"
@@ -60,24 +70,24 @@
                     aria-label="{{ __('general.nav.main') ?? 'Nabigazio nagusia' }}">
                     <div
                         class="header-nav-panel glass-panel flex items-center gap-1 px-2 py-1.5 transition-all duration-200">
-                        <a href="{{ route('notices') }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('notices') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
-                            aria-current="{{ request()->routeIs('notices') ? 'page' : 'false' }}">
+                        <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('notices.*') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
+                            aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}">
                             {{ __('general.nav.notices') }}
                         </a>
-                        <a href="{{ route('gallery') }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('gallery') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
-                            aria-current="{{ request()->routeIs('gallery') ? 'page' : 'false' }}">
+                        <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('gallery.*') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
+                            aria-current="{{ request()->routeIs('gallery.*') ? 'page' : 'false' }}">
                             {{ __('general.nav.gallery') }}
                         </a>
-                        <a href="{{ route('contact') }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('contact') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
-                            aria-current="{{ request()->routeIs('contact') ? 'page' : 'false' }}">
+                        <a href="{{ route(\App\SupportedLocales::routeName('contact')) }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('contact.*') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
+                            aria-current="{{ request()->routeIs('contact.*') ? 'page' : 'false' }}">
                             {{ __('general.nav.contact') }}
                         </a>
-                        <a href="{{ route('private') }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('private') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
-                            aria-current="{{ request()->routeIs('private') ? 'page' : 'false' }}">
+                        <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 {{ request()->routeIs('private.*') ? 'bg-stone-700 text-white shadow-sm shadow-stone-900/20' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900' }}"
+                            aria-current="{{ request()->routeIs('private.*') ? 'page' : 'false' }}">
                             {{ __('general.nav.private') }}
                         </a>
                     </div>
@@ -111,25 +121,25 @@
             x-effect="if (open) { focusFirstMenuItem() }" x-show="open" x-transition>
             <nav class="px-4 py-3 flex flex-col gap-1" x-ref="mobileNav"
                 aria-label="{{ __('general.nav.main') ?? 'Nabigazio nagusia' }}">
-                <a href="{{ route('notices') }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('notices') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
-                    aria-current="{{ request()->routeIs('notices') ? 'page' : 'false' }}"
+                <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('notices.*') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
+                    aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}"
                     data-first-menu-item x-ref="firstMenuItem">
                     {{ __('general.nav.notices') }}
                 </a>
-                <a href="{{ route('gallery') }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('gallery') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
-                    aria-current="{{ request()->routeIs('gallery') ? 'page' : 'false' }}">
+                <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('gallery.*') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
+                    aria-current="{{ request()->routeIs('gallery.*') ? 'page' : 'false' }}">
                     {{ __('general.nav.gallery') }}
                 </a>
-                <a href="{{ route('contact') }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('contact') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
-                    aria-current="{{ request()->routeIs('contact') ? 'page' : 'false' }}">
+                <a href="{{ route(\App\SupportedLocales::routeName('contact')) }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('contact.*') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
+                    aria-current="{{ request()->routeIs('contact.*') ? 'page' : 'false' }}">
                     {{ __('general.nav.contact') }}
                 </a>
-                <a href="{{ route('private') }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('private') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
-                    aria-current="{{ request()->routeIs('private') ? 'page' : 'false' }}">
+                <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-stone-100 transition-colors min-h-11 {{ request()->routeIs('private.*') ? 'bg-stone-200 text-stone-900 font-semibold' : 'text-stone-700' }}"
+                    aria-current="{{ request()->routeIs('private.*') ? 'page' : 'false' }}">
                     {{ __('general.nav.private') }}
                 </a>
             </nav>
@@ -153,7 +163,8 @@
     </main>
 
     {{-- Footer --}}
-    <footer class="mt-auto border-t border-gray-200 bg-gray-50/90 pb-[env(safe-area-inset-bottom)]">
+    <footer
+        class="mt-auto border-t border-gray-200 bg-gray-50/90 pb-[env(safe-area-inset-bottom)]">
         <div class="h-0.5 bg-linear-to-r from-stone-600 via-amber-700 to-emerald-700"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div
@@ -171,14 +182,14 @@
                     </div>
                 </div>
                 <nav class="grid gap-3 sm:grid-cols-2" aria-label="Footer">
-                    <a href="{{ route('privacy-policy') }}"
+                    <a href="{{ route(\App\SupportedLocales::routeName('privacy-policy')) }}"
                         class="hero-frame px-4 py-3 transition-colors hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2">
                         <p class="text-sm font-semibold text-gray-800">
                             {{ __('general.footer.privacy_policy') }}</p>
                         <p class="mt-1 text-xs leading-relaxed text-gray-500">
                             {{ __('general.footer.privacy_policy_description') }}</p>
                     </a>
-                    <a href="{{ route('legal-notice') }}"
+                    <a href="{{ route(\App\SupportedLocales::routeName('legal-notice')) }}"
                         class="hero-frame px-4 py-3 transition-colors hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2">
                         <p class="text-sm font-semibold text-gray-800">
                             {{ __('general.footer.legal_notice') }}</p>

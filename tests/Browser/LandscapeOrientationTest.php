@@ -11,7 +11,7 @@ use Laravel\Dusk\Browser;
 test('small iphone landscape keeps header compact and mobile menu scrollable', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/')
+        $browser->visit('/eu')
             ->resize(667, 375)
             ->pause(350)
             ->script(<<<'JS'
@@ -47,7 +47,7 @@ test('gallery and lightbox adapt in landscape breakpoints', function () {
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/galeria')
+        $browser->visit('/eu/argazki-bilduma')
             ->resize(667, 375)
             ->pause(350);
 

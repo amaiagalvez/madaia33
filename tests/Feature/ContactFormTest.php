@@ -5,13 +5,15 @@
 
 use App\Models\User;
 use Livewire\Livewire;
+use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Route;
+
+dataset('supported_locales', SupportedLocales::all());
 
 beforeEach(function () {
     config(['app.recaptcha_skip' => true]);
@@ -254,14 +256,14 @@ it('si reCAPTCHA lanza excepción rechaza el envío y no guarda mensaje', functi
     expect(ContactMessage::count())->toBe(0);
 });
 
-it('render usa fallback de legal text y privacy policy cuando faltan settings', function () {
-    Route::get('/privacy-policy', fn () => 'ok')->name('privacy-policy');
+it('render usa fallback de legal text y privacy policy cuando faltan settings', function (string $locale) {
+    app()->setLocale($locale);
 
     Livewire::test('contact-form')
         ->assertViewHas('legalText', __('contact.legal_text'))
-        ->assertViewHas('legalUrl', route('privacy-policy'))
+        ->assertViewHas('legalUrl', route(SupportedLocales::routeName('privacy-policy', $locale)))
         ->assertViewHas('siteKey', '');
-});
+})->with('supported_locales');
 
 it('ignora recent submissions inválidas en sesión y permite el envío', function () {
     Mail::fake();

@@ -11,7 +11,7 @@ use Laravel\Dusk\Browser;
 test('mobile menu moves focus on open, restores on close and traps tab focus', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/')
+        $browser->visit('/eu')
             ->resize(375, 812);
 
         $browser->script("document.getElementById('livewire-error')?.close(); document.querySelector('#livewire-error')?.remove();");
@@ -34,7 +34,7 @@ test('lightbox moves focus on open, restores on close and keeps focus inside', f
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/galeria')
+        $browser->visit('/eu/argazki-bilduma')
             ->resize(390, 844)
             ->pause(300);
 

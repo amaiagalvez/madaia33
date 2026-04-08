@@ -105,6 +105,23 @@ final class SupportedLocales
         return self::metadata($locale)['property_suffix'];
     }
 
+    public static function routeName(string $baseName, ?string $locale = null): string
+    {
+        return $baseName.'.'.self::normalize($locale ?? self::current());
+    }
+
+    public static function baseRouteName(string $routeName): string
+    {
+        foreach (self::all() as $locale) {
+            $suffix = '.'.$locale;
+            if (str_ends_with($routeName, $suffix)) {
+                return substr($routeName, 0, -strlen($suffix));
+            }
+        }
+
+        return $routeName;
+    }
+
     /**
      * @return array{switcher_label: string, admin_tab_translation_key: string, property_suffix: string}
      */

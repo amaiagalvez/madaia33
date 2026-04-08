@@ -13,7 +13,7 @@ test('gallery grid responds to mobile tablet and desktop breakpoints', function 
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/galeria');
+        $browser->visit('/eu/argazki-bilduma');
 
         $browser->resize(375, 812)
             ->pause(300)
@@ -43,7 +43,7 @@ test('lightbox adapts orientation and closes with escape and outside click', fun
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/galeria')
+        $browser->visit('/eu/argazki-bilduma')
             ->resize(390, 844)
             ->pause(350);
 
@@ -103,7 +103,7 @@ test('lightbox closes with swipe down gesture', function () {
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/galeria')
+        $browser->visit('/eu/argazki-bilduma')
             ->resize(390, 844)
             ->pause(350);
 

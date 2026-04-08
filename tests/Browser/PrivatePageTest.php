@@ -11,8 +11,8 @@ use Laravel\Dusk\Browser;
 test('private page shows placeholder with login link for unauthenticated visitors', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/privado')
-            ->assertPathIs('/privado')
+        $browser->visit('/eu/pribatua')
+            ->assertPathIs('/eu/pribatua')
             ->assertPresent('a[href*="login"]');
     });
 });
@@ -23,8 +23,8 @@ test('private page shows development message for authenticated admin', function 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin) {
         $browser->loginAs($admin)
-            ->visit('/privado')
-            ->assertPathIs('/privado')
+            ->visit('/eu/pribatua')
+            ->assertPathIs('/eu/pribatua')
             ->assertSee('garatzen');
     });
 });

@@ -9,16 +9,27 @@ use App\SupportedLocales;
 use App\Models\NoticeLocation;
 use Illuminate\Support\Facades\App;
 
-it('no muestra avisos privados en la ruta pública de avisos', function () {
-    Notice::factory()->private()->create(['title_eu' => 'Aviso privado']);
-    Notice::factory()->public()->create(['title_eu' => 'Aviso público']);
+dataset('supported_locales', SupportedLocales::all());
 
-    $response = test()->get(route('notices'));
+it('no muestra avisos privados en la ruta pública de avisos', function (string $locale) {
+    $privateTitle = $locale === SupportedLocales::SPANISH ? 'Aviso privado ES' : 'Aviso privado EU';
+    $publicTitle = $locale === SupportedLocales::SPANISH ? 'Aviso público ES' : 'Aviso público EU';
+
+    Notice::factory()->private()->create([
+        'title_eu' => 'Aviso privado EU',
+        'title_es' => 'Aviso privado ES',
+    ]);
+    Notice::factory()->public()->create([
+        'title_eu' => 'Aviso público EU',
+        'title_es' => 'Aviso público ES',
+    ]);
+
+    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
 
     $response->assertOk();
-    $response->assertSee('Aviso público');
-    $response->assertDontSee('Aviso privado');
-});
+    $response->assertSee($publicTitle);
+    $response->assertDontSee($privateTitle);
+})->with('supported_locales');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Propiedad 18: Paginación de avisos

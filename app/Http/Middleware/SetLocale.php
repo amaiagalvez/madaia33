@@ -17,12 +17,23 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = SupportedLocales::normalize(
-            $request->session()->get('locale', SupportedLocales::default())
-        );
-
-        App::setLocale($locale);
+        App::setLocale($this->resolveLocale($request));
 
         return $next($request);
+    }
+
+    private function resolveLocale(Request $request): string
+    {
+        $firstSegment = (string) $request->segment(1);
+
+        if (SupportedLocales::isSupported($firstSegment)) {
+            return $firstSegment;
+        }
+
+        return SupportedLocales::normalize(
+            $request->route('locale')
+                ?? $request->session()->get('locale')
+                ?? SupportedLocales::default()
+        );
     }
 }

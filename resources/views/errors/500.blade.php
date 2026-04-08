@@ -9,11 +9,11 @@
                 {{ __('errors.500.message') ?? 'Zerbait gaizki joan da. Saiatu berriro geroago. / Algo salió mal. Inténtalo de nuevo más tarde.' }}
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="{{ route('home') }}"
+                <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
                     class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700">
                     {{ __('general.buttons.back') }}
                 </a>
-                <a href="{{ route('contact') }}"
+                <a href="{{ route(\App\SupportedLocales::routeName('contact')) }}"
                     class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                     {{ __('general.nav.contact') }}
                 </a>

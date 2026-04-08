@@ -18,8 +18,9 @@ test('sitemap.xml is publicly accessible and contains public URLs', function () 
             ->and($source)->toContain('<loc>');
 
         // Should contain public routes
-        expect($source)->toContain('/avisos')
-            ->and($source)->toContain('/galeria')
-            ->and($source)->toContain('/contacto');
+        expect($source)->toContain('/eu/iragarkiak')
+            ->and($source)->toContain('/es/avisos')
+            ->and($source)->toContain('/eu/argazki-bilduma')
+            ->and($source)->toContain('/eu/harremana');
     });
 });

@@ -20,29 +20,8 @@
         <div class="grid gap-6 lg:grid-cols-12 lg:items-start">
             <section class="section-shell mb-10 overflow-hidden p-6 sm:p-8 lg:col-span-8"
                 data-page-hero="home">
-                <div>
-                    <div class="mb-4 flex flex-wrap items-center gap-2">
-                        <span class="feature-chip border-indigo-100 bg-indigo-50 text-indigo-700">
-                            {{ __('home.section_kicker') }}
-                        </span>
-                        <span class="feature-chip">{{ __('general.nav.notices') }}</span>
-                        <span class="feature-chip">{{ __('general.nav.gallery') }}</span>
-                        <span class="feature-chip">{{ __('general.nav.contact') }}</span>
-                    </div>
-
-                    <div class="border-l-4 border-indigo-500 pl-4">
-                        <p
-                            class="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">
-                            {{ __('home.section_kicker') }}
-                        </p>
-                        <h2 class="text-3xl font-bold tracking-tight text-gray-900 md:text-5xl">
-                            {{ __('home.notices') }}
-                        </h2>
-                    </div>
-                </div>
-
-                <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4" data-home-quick-links>
-                    <a href="{{ route('notices') }}"
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" data-home-quick-links>
+                    <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
                         class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-amber-50/60 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <div class="page-icon-amber shrink-0 h-10 w-10 rounded-lg">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -65,7 +44,7 @@
                                 d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>
                     </a>
-                    <a href="{{ route('gallery') }}"
+                    <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
                         class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-emerald-50/60 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -88,7 +67,7 @@
                                 d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>
                     </a>
-                    <a href="{{ route('contact') }}"
+                    <a href="{{ route(\App\SupportedLocales::routeName('contact')) }}"
                         class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-indigo-50/60 p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <div class="page-icon-indigo shrink-0 h-10 w-10 rounded-lg">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -111,39 +90,6 @@
                                 d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>
                     </a>
-                </div>
-
-                <div class="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-                    <div class="hero-frame px-5 py-5 sm:px-6">
-                        <p
-                            class="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600">
-                            {{ __('home.discovery_badge') }}
-                        </p>
-                        <h3 class="mt-2 text-2xl font-bold tracking-tight text-gray-900">
-                            {{ __('home.discovery_title') }}
-                        </h3>
-                        <p
-                            class="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base">
-                            {{ __('home.discovery_summary') }}
-                        </p>
-                    </div>
-
-                    <div class="grid gap-3">
-                        <div class="stat-tile">
-                            <p
-                                class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
-                                {{ __('notices.title') }}</p>
-                            <p class="mt-2 text-sm leading-relaxed text-gray-600">
-                                {{ __('home.discovery_notice') }}</p>
-                        </div>
-                        <div class="stat-tile">
-                            <p
-                                class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
-                                {{ __('gallery.title') }}</p>
-                            <p class="mt-2 text-sm leading-relaxed text-gray-600">
-                                {{ __('home.discovery_gallery') }}</p>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -177,10 +123,11 @@
 
             @if (\App\Models\Notice::public()->count() > 6)
                 <div class="text-center">
-                    <a href="{{ route('notices') }}" class="btn-brand">
+                    <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
+                        class="btn-brand">
                         {{ __('home.view_all') }}
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>

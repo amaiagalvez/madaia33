@@ -37,7 +37,7 @@ test('admin can upload an image and it appears in the public gallery', function 
             ->assertPresent('img[alt="'.$altText.'"]');
 
         // Verify in public gallery
-        $browser->visit('/galeria')
+        $browser->visit('/eu/argazki-bilduma')
             ->waitFor('img[alt="'.$altText.'"]', 30)
             ->assertPresent('img[alt="'.$altText.'"]');
     });

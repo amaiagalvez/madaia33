@@ -46,7 +46,7 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
         $browser->waitForText('Argitalpena kendu', 5);
 
         // Verify visible in public
-        $browser->visit('/avisos')
+        $browser->visit('/eu/iragarkiak')
             ->assertSee($title);
 
         // Unpublish
@@ -68,7 +68,7 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
         $browser->pause(1000);
 
         // Verify not visible in public
-        $browser->visit('/avisos')
+        $browser->visit('/eu/iragarkiak')
             ->assertDontSee($title);
 
         // Delete — click delete button in the row, then confirm
