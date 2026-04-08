@@ -18,6 +18,9 @@
 [ ] pasar pain no en modo test, dejarle a él que lo corrija
 [ ] correction-workflow.md
 [ ] lighthouse.json en el navagador para corregir 
+[ ] user hizkuntza, besdin du front-ekoa
+[ ] componente para eel bloque superior de los blade publicos
+[ ] home historia toda la parte derecha, en el movil ajusta altura y el espacio de iragaki publikoak a dos columnas
 
 ## Txuletak
 /dusk-test pasar los dusk test
