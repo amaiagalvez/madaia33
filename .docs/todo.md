@@ -16,7 +16,6 @@
 [ ] cookies
 [ ] en los test todos los $this-> dan error en PROBLEMS
 [ ] pasar pain no en modo test, dejarle a él que lo corrija
-[ ] correction-workflow.md
 [ ] lighthouse.json en el navagador para corregir 
 [ ] user hizkuntza, besdin du front-ekoa
 [ ] componente para eel bloque superior de los blade publicos

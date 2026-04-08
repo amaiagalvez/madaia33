@@ -1,5 +1,5 @@
 {
-    "LaravelExtraIntellisense.phpCommand": "docker compose run --rm madaia33 php -r \"{code}\"",
+    "LaravelExtraIntellisense.phpCommand": "docker compose run --rm --no-deps madaia33 php -r \"{code}\"",
     "LaravelExtraIntellisense.basePathForCode": "/docker",
     "chat.tools.terminal.autoApprove": {
         "docker compose": true,

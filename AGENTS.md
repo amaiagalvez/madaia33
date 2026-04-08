@@ -73,6 +73,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 - **Spec completion quality gate**: At the end of each spec task set, before updating documentation and before running tests, execute quality checks inside Docker with a non-root user. Minimum required gate: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
 - **`->repeat()` in tests**: Only use `->repeat()` on property-based tests that randomise inputs with `rand()` or `fake()`. Never use on deterministic tests. Keep the count at 2 or below.
 - **Post-correction learning rule**: At the end of every correction response, include a short `Aprendizajes:` section with the concrete root cause and how to avoid repeating it, and persist that learning in memory so it can be consulted in the next correction.
+- **Correction memory mirroring rule**: Every time content is added or updated in `/memories/correction-workflow.md`, mirror the same content in `.docs/repo-corrections.md` in the repository.
 - **VS Code Problems rule**: Before finalizing any correction, always review the VS Code PROBLEMS panel and fix the warnings/errors found in the files touched by that correction. If there are unrelated pre-existing problems outside the scope, report them explicitly.
 
 ## Verification Scripts
