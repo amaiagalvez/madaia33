@@ -19,7 +19,7 @@
             @foreach ($images as $image)
                 <button type="button" data-gallery-open
                     wire:key="gallery-image-{{ $image->id }}"
-                    class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'col-span-2 min-h-[14rem] sm:row-span-2 sm:min-h-[18rem]' : 'aspect-square' }}"
+                    class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'col-span-2 min-h-56 sm:row-span-2 sm:min-h-72' : 'aspect-square' }}"
                     @click="show('{{ $image->public_url }}', '{{ addslashes($image->alt_text) }}', $event)"
                     aria-label="{{ $image->alt_text }}">
                     <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
@@ -27,7 +27,7 @@
                         class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
                     <span
                         class="absolute left-3 top-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm">
-                        {{ $loop->first ? __('gallery.title') : __('hero_slider.view_more_images') }}
+                        {{ $image->alt_text_eu }}
                     </span>
                     <span aria-hidden="true"
                         class="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent px-2 py-2 text-[11px] font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
@@ -39,26 +39,29 @@
     @endif
 
     {{-- Lightbox --}}
-    <div x-show="open" x-cloak style="display: none;" data-lightbox
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-        @click.self="close()" @touchstart="handleTouchStart($event)"
-        @touchmove="handleTouchMove($event)" role="dialog" aria-modal="true"
-        :aria-label="current.alt" data-gallery-lightbox>
-        <div class="relative max-h-full max-w-5xl w-full flex items-center justify-center"
-            x-ref="lightboxPanel">
-            <img :src="current.src" :alt="current.alt"
-                :class="isLandscape ? 'max-h-[85vh]' : 'max-h-[90vh]'"
-                class="max-w-full rounded-lg object-contain shadow-2xl">
-            <button type="button" @click="close()" x-ref="lightboxClose" data-lightbox-close
-                class="absolute -top-3 -right-3 flex min-h-11 min-w-11 items-center justify-center rounded-full bg-white text-gray-800 shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white"
-                aria-label="{{ __('general.close') }}">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-            </button>
+    <template x-teleport="body">
+        <div x-show="open" x-cloak style="display: none;" data-lightbox
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            @click.self="close()" @touchstart="handleTouchStart($event)"
+            @touchmove="handleTouchMove($event)" role="dialog" aria-modal="true"
+            :aria-label="current.alt" data-gallery-lightbox>
+            <div class="relative max-h-full max-w-5xl w-full flex items-center justify-center"
+                x-ref="lightboxPanel">
+                <img :src="current.src" :alt="current.alt"
+                    :class="isLandscape ? 'max-h-[85vh]' : 'max-h-[90vh]'"
+                    class="max-w-full rounded-lg object-contain shadow-2xl">
+                <button type="button" @click="close()" x-ref="lightboxClose" data-lightbox-close
+                    class="absolute right-3 top-3 flex min-h-11 min-w-11 items-center justify-center rounded-full bg-white text-gray-800 shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white"
+                    aria-label="{{ __('general.close') }}">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
         </div>
-    </div>
+    </template>
 </div>
 
 <script>

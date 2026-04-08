@@ -41,3 +41,5 @@
 - For asymmetric split layouts on home pages, make the parent grid `lg:items-stretch` and the side panel `lg:flex lg:h-full`; this keeps the right column truly full-height while preserving mobile stacking.
 - When adding new locale-aware Pest tests in this repo, always append `->with('supported_locales')` for closures with a `$locale` argument; otherwise tests fail with `DatasetMissing`.
 - In `routes/web.php`, avoid relying on outer variables inside `Route::prefix(...)->group(function () { ... })` unless explicitly imported with `use (...)`; prefer controller actions for non-trivial page data preparation.
+
+- If a Lightbox/overlay opens shifted (too low/high), teleport it to `body` (`x-teleport="body"`) so `fixed` positioning is viewport-based and not affected by ancestor layout/transform contexts.
