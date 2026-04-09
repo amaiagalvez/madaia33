@@ -63,9 +63,11 @@
                 </flux:field>
             </div>
             <div class="mt-4 flex gap-2">
-                <flux:button variant="primary" wire:click="saveOwner">{{ __('general.buttons.save') }}
+                <flux:button variant="primary" wire:click="saveOwner">
+                    {{ __('general.buttons.save') }}
                 </flux:button>
-                <flux:button variant="ghost" wire:click="cancelEdit">{{ __('general.buttons.cancel') }}
+                <flux:button variant="ghost" wire:click="cancelEdit">
+                    {{ __('general.buttons.cancel') }}
                 </flux:button>
             </div>
         </div>
@@ -102,7 +104,8 @@
                 </flux:field>
             </div>
             <div class="mt-4 flex gap-2">
-                <flux:button variant="primary" wire:click="assignProperty">{{ __('admin.owners.assign') }}
+                <flux:button variant="primary" wire:click="assignProperty">
+                    {{ __('admin.owners.assign') }}
                 </flux:button>
                 <flux:button variant="ghost" wire:click="$set('showAssignForm', false)">
                     {{ __('general.buttons.cancel') }}</flux:button>
@@ -138,10 +141,12 @@
                                     <flux:input type="date" wire:model="unassignEndDate"
                                         size="sm" />
                                     <flux:button variant="primary" size="sm"
-                                        wire:click="confirmUnassign">{{ __('general.buttons.confirm') }}
+                                        wire:click="confirmUnassign">
+                                        {{ __('general.buttons.confirm') }}
                                     </flux:button>
                                     <flux:button variant="ghost" size="sm"
-                                        wire:click="cancelUnassign">{{ __('general.buttons.cancel') }}
+                                        wire:click="cancelUnassign">
+                                        {{ __('general.buttons.cancel') }}
                                     </flux:button>
                                 </div>
                             @else

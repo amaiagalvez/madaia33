@@ -2,28 +2,33 @@
     {{-- Filters --}}
     <div class="mb-6 flex flex-wrap gap-3" data-section="filters">
         <flux:select wire:model.live="filterStatus" data-filter="status">
-            <flux:select.option value="active">{{ __('admin.owners.filters.active') }}</flux:select.option>
+            <flux:select.option value="active">{{ __('admin.owners.filters.active') }}
+            </flux:select.option>
             <flux:select.option value="inactive">{{ __('admin.owners.filters.inactive') }}
             </flux:select.option>
-            <flux:select.option value="all">{{ __('admin.owners.filters.all') }}</flux:select.option>
+            <flux:select.option value="all">{{ __('admin.owners.filters.all') }}
+            </flux:select.option>
         </flux:select>
 
         <flux:select wire:model.live="filterPortal" data-filter="portal">
-            <flux:select.option value="">{{ __('admin.owners.filters.all_portals') }}</flux:select.option>
+            <flux:select.option value="">{{ __('admin.owners.filters.all_portals') }}
+            </flux:select.option>
             @foreach ($portals as $portal)
                 <flux:select.option :value="$portal->id">{{ $portal->name }}</flux:select.option>
             @endforeach
         </flux:select>
 
         <flux:select wire:model.live="filterGarage" data-filter="garage">
-            <flux:select.option value="">{{ __('admin.owners.filters.all_garages') }}</flux:select.option>
+            <flux:select.option value="">{{ __('admin.owners.filters.all_garages') }}
+            </flux:select.option>
             @foreach ($garages as $garage)
                 <flux:select.option :value="$garage->id">{{ $garage->name }}</flux:select.option>
             @endforeach
         </flux:select>
 
         <flux:select wire:model.live="filterStorage" data-filter="storage">
-            <flux:select.option value="">{{ __('admin.owners.filters.all_storages') }}</flux:select.option>
+            <flux:select.option value="">{{ __('admin.owners.filters.all_storages') }}
+            </flux:select.option>
             @foreach ($storages as $storage)
                 <flux:select.option :value="$storage->id">{{ $storage->name }}</flux:select.option>
             @endforeach

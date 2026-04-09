@@ -9,15 +9,18 @@
     @if ($showAddForm)
         <div
             class="mb-6 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <flux:heading size="lg" class="mb-4">{{ __('admin.locations.new_property') }}</flux:heading>
+            <flux:heading size="lg" class="mb-4">{{ __('admin.locations.new_property') }}
+            </flux:heading>
             <div class="flex items-end gap-3">
                 <flux:field class="flex-1">
                     <flux:label>{{ __('admin.locations.property_name') }}</flux:label>
-                    <flux:input wire:model="newPropertyName" :placeholder="__('admin.locations.property_placeholder')"
+                    <flux:input wire:model="newPropertyName"
+                        :placeholder="__('admin.locations.property_placeholder')"
                         data-field="new-property-name" />
                     <flux:error name="newPropertyName" />
                 </flux:field>
-                <flux:button variant="primary" wire:click="addProperty">{{ __('general.buttons.save') }}
+                <flux:button variant="primary" wire:click="addProperty">
+                    {{ __('general.buttons.save') }}
                 </flux:button>
                 <flux:button variant="ghost" wire:click="$set('showAddForm', false)">
                     {{ __('general.buttons.cancel') }}</flux:button>
@@ -72,9 +75,11 @@
                                 colspan="{{ $location->type === 'storage' ? 4 : 3 }}">
                                 <div class="flex gap-2">
                                     <flux:button variant="primary" size="sm"
-                                        wire:click="saveProperty">{{ __('general.buttons.save') }}</flux:button>
+                                        wire:click="saveProperty">{{ __('general.buttons.save') }}
+                                    </flux:button>
                                     <flux:button variant="ghost" size="sm"
-                                        wire:click="cancelEditing">{{ __('general.buttons.cancel') }}
+                                        wire:click="cancelEditing">
+                                        {{ __('general.buttons.cancel') }}
                                     </flux:button>
                                 </div>
                             </td>
