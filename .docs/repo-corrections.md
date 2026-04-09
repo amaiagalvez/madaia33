@@ -71,3 +71,4 @@
 
 - For duplicated Blade components already referenced across views/tests, consolidate with a new shared base component and keep old component names as thin wrappers to preserve compatibility and stable `data-*` selectors.
 - Before switching row-by-row inserts to bulk insert, verify the table schema for timestamps (`created_at`/`updated_at`); include only real columns to avoid SQL errors in tests.
+- Before deleting a duplicate Livewire/Blade implementation, search actual usages first; keep only the mounted path and remove the orphan to avoid maintaining divergent logic.

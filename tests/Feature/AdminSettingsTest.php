@@ -7,10 +7,12 @@ use App\Models\User;
 use App\Models\Image;
 use App\Models\Notice;
 use Livewire\Livewire;
+use App\Mail\TestEmail;
 use App\Models\Setting;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
+use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 use App\Validations\AdminSettingsValidation;
 
@@ -258,7 +260,7 @@ it('el dashboard muestra estadísticas reales', function () {
 it('los settings creados con factory tienen sección válida', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -526,7 +528,7 @@ it('sendTestEmail envía un email de prueba con la configuración SMTP', functio
     createSetting('smtp_password', encrypt('password'));
     createSetting('smtp_encryption', 'tls');
 
-    \Illuminate\Support\Facades\Mail::fake();
+    Mail::fake();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -543,7 +545,7 @@ it('sendTestEmail envía un email de prueba con la configuración SMTP', functio
         ->call('sendTestEmail')
         ->assertSet('showTestEmailModal', false);
 
-    \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\TestEmail::class, function ($mail) {
+    Mail::assertSent(TestEmail::class, function ($mail) {
         return $mail->hasTo('recipient@example.com');
     });
 });

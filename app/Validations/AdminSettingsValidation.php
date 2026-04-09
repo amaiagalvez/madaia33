@@ -4,8 +4,8 @@ namespace App\Validations;
 
 use App\Models\Setting;
 use App\Rules\NoScriptTags;
-use App\Support\ConfiguredMailSettings;
 use Illuminate\Validation\Rule;
+use App\Support\ConfiguredMailSettings;
 
 class AdminSettingsValidation
 {

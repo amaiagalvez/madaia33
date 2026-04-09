@@ -6,6 +6,7 @@ use App\Models\Notice;
 use Livewire\Component;
 use App\CommunityLocations;
 use Illuminate\Support\Str;
+use Livewire\WithPagination;
 use App\Models\NoticeLocation;
 use Illuminate\Contracts\View\View;
 use App\Concerns\BuildsLocaleFieldConfigs;
@@ -13,6 +14,7 @@ use App\Concerns\BuildsLocaleFieldConfigs;
 class AdminNoticeManager extends Component
 {
     use BuildsLocaleFieldConfigs;
+    use WithPagination;
 
     // Form state
     public ?int $editingId = null;
@@ -250,7 +252,7 @@ class AdminNoticeManager extends Component
 
     public function render(): View
     {
-        $notices = Notice::with('locations')->latest()->get();
+        $notices = Notice::with('locations')->latest()->paginate(12);
 
         return view('livewire.admin.notice-manager', [
             'notices' => $notices,

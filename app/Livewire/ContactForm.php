@@ -19,6 +19,20 @@ class ContactForm extends Component
 {
     private const DUPLICATE_SUBMISSION_WINDOW_SECONDS = 15;
 
+    private const EMAIL_SETTING_KEYS = [
+        'admin_email',
+        'from_address',
+        'from_name',
+        'smtp_host',
+        'smtp_port',
+        'smtp_username',
+        'smtp_password',
+        'smtp_encryption',
+    ];
+
+    /** @var array<string, string>|null */
+    private ?array $cachedSettings = null;
+
     public string $name = '';
 
     public string $email = '';
@@ -41,7 +55,7 @@ class ContactForm extends Component
      */
     protected function rules(): array
     {
-        $siteKey = Setting::stringValue('recaptcha_site_key');
+        $siteKey = $this->settings()['recaptcha_site_key'] ?? '';
 
         return ContactFormValidation::rules($siteKey);
     }
@@ -173,10 +187,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn(mixed $timestamp): int => (int) $timestamp)
+            ->map(fn (mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 
@@ -209,7 +223,7 @@ class ContactForm extends Component
 
     private function recaptchaSecretKey(): string
     {
-        return Setting::stringValue('recaptcha_secret_key');
+        return $this->settings()['recaptcha_secret_key'] ?? '';
     }
 
     private function configuredMailSettings(): ConfiguredMailSettings
@@ -222,17 +236,29 @@ class ContactForm extends Component
      */
     private function emailSettings(): array
     {
-        return Setting::stringValues([
-            'admin_email',
-            'from_address',
-            'from_name',
-            'smtp_host',
-            'smtp_port',
-            'smtp_username',
-            'smtp_password',
-            'smtp_encryption',
+        return $this->settings();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function settings(): array
+    {
+        if ($this->cachedSettings !== null) {
+            return $this->cachedSettings;
+        }
+
+        $keys = [
+            ...self::EMAIL_SETTING_KEYS,
+            'recaptcha_site_key',
+            'recaptcha_secret_key',
             ...SupportedLocales::localizedKeys('legal_text'),
-        ]);
+            ...SupportedLocales::localizedKeys('legal_checkbox_text'),
+        ];
+
+        $this->cachedSettings = Setting::stringValues(array_values(array_unique($keys)));
+
+        return $this->cachedSettings;
     }
 
     private function verifyRecaptchaToken(string $secretKey): bool
@@ -255,10 +281,7 @@ class ContactForm extends Component
 
     public function render(): View
     {
-        $settings = Setting::stringValues([
-            ...SupportedLocales::localizedKeys('legal_checkbox_text'),
-            'recaptcha_site_key',
-        ]);
+        $settings = $this->settings();
 
         $legalText = Setting::localizedStringFrom($settings, 'legal_checkbox_text', __('contact.legal_text'));
 

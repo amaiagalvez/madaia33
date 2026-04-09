@@ -9,10 +9,10 @@ use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
-use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use App\Support\ConfiguredMailSettings;
 
 const CONTACT_FORM_VISITOR_NAME = 'Ane Etxebarria';
 const CONTACT_FORM_VISITOR_EMAIL = 'ane@example.com';

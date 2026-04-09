@@ -136,6 +136,12 @@
         </table>
     </div>
 
+    @if ($messages->hasPages())
+        <div class="mt-6">
+            {{ $messages->links() }}
+        </div>
+    @endif
+
     {{-- Delete confirmation modal --}}
     @if ($showDeleteModal && $confirmingDeleteId)
         <dialog open

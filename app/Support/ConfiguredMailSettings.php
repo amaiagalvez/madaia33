@@ -2,11 +2,11 @@
 
 namespace App\Support;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class ConfiguredMailSettings
 {

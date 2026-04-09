@@ -3,14 +3,15 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use App\Mail\Concerns\BuildsFromAddress;
 
 abstract class AbstractContactMail extends Mailable
 {
+    use BuildsFromAddress;
     use Queueable, SerializesModels;
 
     public function __construct(
@@ -26,7 +27,7 @@ abstract class AbstractContactMail extends Mailable
     {
         return new Envelope(
             subject: $this->messageSubject,
-            from: $this->fromAddress ? new Address($this->fromAddress, $this->fromName ?? '') : null,
+            from: $this->buildFromAddress($this->fromAddress, $this->fromName),
         );
     }
 

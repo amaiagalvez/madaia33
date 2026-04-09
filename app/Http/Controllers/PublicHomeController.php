@@ -16,7 +16,7 @@ class PublicHomeController extends Controller
             ->oldest()
             ->limit(3)
             ->get()
-            ->map(fn(Image $image): string => Storage::url($image->path))
+            ->map(fn (Image $image): string => Storage::url($image->path))
             ->values();
 
         if ($historyImageUrls->isEmpty()) {
@@ -30,12 +30,12 @@ class PublicHomeController extends Controller
             ->get();
 
         $generalNotices = $latestNotices
-            ->filter(fn(Notice $notice) => $notice->locations->isEmpty())
+            ->filter(fn (Notice $notice) => $notice->locations->isEmpty())
             ->take(6)
             ->values();
 
         $locationNotices = $latestNotices
-            ->filter(fn(Notice $notice) => $notice->locations->isNotEmpty())
+            ->filter(fn (Notice $notice) => $notice->locations->isNotEmpty())
             ->take(6)
             ->values();
 

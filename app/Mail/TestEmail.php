@@ -3,14 +3,15 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use App\Mail\Concerns\BuildsFromAddress;
 
 class TestEmail extends Mailable
 {
+    use BuildsFromAddress;
     use Queueable, SerializesModels;
 
     public function __construct(
@@ -22,7 +23,7 @@ class TestEmail extends Mailable
     {
         return new Envelope(
             subject: __('admin.test_email.subject'),
-            from: $this->fromAddress ? new Address($this->fromAddress, $this->fromName ?? '') : null,
+            from: $this->buildFromAddress($this->fromAddress, $this->fromName),
         );
     }
 

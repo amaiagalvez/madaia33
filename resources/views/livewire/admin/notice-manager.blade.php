@@ -227,6 +227,12 @@
         </table>
     </div>
 
+    @if ($notices->hasPages())
+        <div class="mt-6">
+            {{ $notices->links() }}
+        </div>
+    @endif
+
     {{-- Delete confirmation modal --}}
     @if ($showDeleteModal)
         <dialog open

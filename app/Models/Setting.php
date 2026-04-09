@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\SupportedLocales;
+use Database\Factories\SettingFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Setting extends Model
 {
-    /** @use HasFactory<\Database\Factories\SettingFactory> */
+    /** @use HasFactory<SettingFactory> */
     use HasFactory, SoftDeletes;
 
     public const SECTION_CONTACT_FORM = 'contact_form';
@@ -70,7 +71,7 @@ class Setting extends Model
         return self::query()
             ->whereIn('key', $keys)
             ->pluck('value', 'key')
-            ->map(static fn(mixed $value): string => (string) $value)
+            ->map(static fn (mixed $value): string => (string) $value)
             ->all();
     }
 
