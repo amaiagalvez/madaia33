@@ -65,3 +65,8 @@
 - En este proyecto, para nuevas claves de settings no hace falta crear migrations si la tabla `settings` ya es key/value; el cambio real está en sección/validación/UI/seeders. En correos Laravel, el remitente configurable debe declararse en `Envelope` con `Address` y conviene leer `admin_email`, `from_address` y textos legales en lote para evitar consultas repetidas.
 - Si tras crear una clase nueva con Artisan los tests siguen resolviendo una versión antigua o incompleta, ejecuta `composer dump-autoload` dentro de Docker antes de seguir depurando. En tests Pest, evita declarar clases auxiliares top-level dentro del archivo porque Composer avisará por PSR-4; usa una excepción anónima o una clase real en su ruta.
 - Mermaid parse hardening: avoid subgraph labels with mixed punctuation/diacritics when portability matters; prefer quoted ASCII-safe labels (`subgraph ID["Label"]`) and keep symbols like `/` or `⚡` inside node text, not structural headers.
+
+- If full-page Livewire routes fail with `View [app] not found` after layout refactors, verify `config/livewire.php` `component_layout` points to an existing namespaced view (in this repo `layouts::shared.app`).
+- For opaque Feature test 500s that hide stack traces, inspect dated Laravel logs in `storage/logs/laravel-YYYY-MM-DD.log`; the exception there is usually faster than rerunning tests blindly.
+
+- For duplicated Blade components already referenced across views/tests, consolidate with a new shared base component and keep old component names as thin wrappers to preserve compatibility and stable `data-*` selectors.

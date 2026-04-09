@@ -25,6 +25,9 @@
 [ ] configurar el sentry
 [ ] añadir debugbar y algo para ver los logs
 [ ] componente para inputs del formulario
+[ ] pasahitza aldatu funtzionalitatea
+[ ] registro sessions en bd
+[ ] listado users y sus sessions
 
 # Home
 [ ] Contact: subtitulua testua txukundu. 
