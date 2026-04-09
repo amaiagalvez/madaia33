@@ -10,24 +10,39 @@ final class CommunityLocations
     /** @var string[] */
     public const GARAGES = ['P-1', 'P-2', 'P-3'];
 
+    /** @var string[] */
+    public const STORAGES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
     public static function typeForCode(string $code): string
     {
-        return in_array($code, self::PORTALS, true) ? 'portal' : 'garage';
+        if (in_array($code, self::PORTALS, true)) {
+            return 'portal';
+        }
+
+        if (in_array($code, self::GARAGES, true)) {
+            return 'garage';
+        }
+
+        return 'storage';
     }
 
     /**
      * @return array<int, array{code: string, type: string, label: string}>
      */
-    public static function options(string $portalLabel, string $garageLabel): array
+    public static function options(string $portalLabel, string $garageLabel, string $storageLabel = 'Trastero'): array
     {
         return array_merge(
             array_map(
-                static fn (string $code): array => ['code' => $code, 'type' => 'portal', 'label' => $portalLabel.' '.$code],
+                static fn(string $code): array => ['code' => $code, 'type' => 'portal', 'label' => $portalLabel . ' ' . $code],
                 self::PORTALS,
             ),
             array_map(
-                static fn (string $code): array => ['code' => $code, 'type' => 'garage', 'label' => $garageLabel.' '.$code],
+                static fn(string $code): array => ['code' => $code, 'type' => 'garage', 'label' => $garageLabel . ' ' . $code],
                 self::GARAGES,
+            ),
+            array_map(
+                static fn(string $code): array => ['code' => $code, 'type' => 'storage', 'label' => $storageLabel . ' ' . $code],
+                self::STORAGES,
             ),
         );
     }

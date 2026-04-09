@@ -72,3 +72,5 @@
 - For duplicated Blade components already referenced across views/tests, consolidate with a new shared base component and keep old component names as thin wrappers to preserve compatibility and stable `data-*` selectors.
 - Before switching row-by-row inserts to bulk insert, verify the table schema for timestamps (`created_at`/`updated_at`); include only real columns to avoid SQL errors in tests.
 - Before deleting a duplicate Livewire/Blade implementation, search actual usages first; keep only the mounted path and remove the orphan to avoid maintaining divergent logic.
+- If a Pest test uses factories/DB tables, place it in tests/Feature (or add RefreshDatabase explicitly); tests in tests/Unit here run without DB migrations and can fail with "no such table".
+- In Dusk/Browser tests with seeded data, avoid hardcoded unique keys (e.g., location `code`); use factory-generated unique values or explicitly non-conflicting values to prevent intermittent `UNIQUE constraint failed` errors.

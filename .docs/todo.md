@@ -16,7 +16,15 @@
 # Copilot
 [ ] repasar agente lamia
 [ ] agente para crear manuales de usuario
+[ ] amalurra: comprobar que pasa ella sola los test cuando no hay error del git (ahora no se ha creado el branch)
+- donde añado cuando se creen nuevos ficheros el ident sea de 4 espacios?
+- dividir la carpeta Actions por features o modelos, lo que creas más conveniente
+- para las partes de las views  que sean sensibles, crear dusk-test
 
+- si la carpeta es Admin, no hace falta que se llame AdminLocations
+- Ordena Livewire en subcarpetas Admin y Front
+- crear un componente para que todas las tablas tengan la missma estructura
+- 
 # Code
 [ ] test en ingles
 [ ] comments en ingles

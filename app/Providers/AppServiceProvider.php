@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Owner;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Blade;
+use App\Observers\OwnerAuditObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->registerLegacyBladeComponentAliases();
+
+        Owner::observe(OwnerAuditObserver::class);
     }
 
     /**
@@ -40,13 +44,13 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Password::defaults(
-            fn (): ?Password => app()->isProduction()
+            fn(): ?Password => app()->isProduction()
                 ? Password::min(12)
-                    ->mixedCase()
-                    ->letters()
-                    ->numbers()
-                    ->symbols()
-                    ->uncompromised()
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised()
                 : null,
         );
     }

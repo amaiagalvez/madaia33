@@ -1,0 +1,125 @@
+<div>
+    <div class="mb-6 flex items-center justify-between">
+        <flux:heading size="xl">{{ $location->name }} ({{ $location->code }})</flux:heading>
+        <flux:button variant="primary" wire:click="$set('showAddForm', true)" icon="plus">
+            {{ __('Añadir propiedad') }}
+        </flux:button>
+    </div>
+
+    @if ($showAddForm)
+        <div
+            class="mb-6 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <flux:heading size="lg" class="mb-4">{{ __('Nueva propiedad') }}</flux:heading>
+            <div class="flex items-end gap-3">
+                <flux:field class="flex-1">
+                    <flux:label>{{ __('Nombre') }}</flux:label>
+                    <flux:input wire:model="newPropertyName" placeholder="Ej: 1A"
+                        data-field="new-property-name" />
+                    <flux:error name="newPropertyName" />
+                </flux:field>
+                <flux:button variant="primary" wire:click="addProperty">{{ __('Guardar') }}
+                </flux:button>
+                <flux:button variant="ghost" wire:click="$set('showAddForm', false)">
+                    {{ __('Cancelar') }}</flux:button>
+            </div>
+        </div>
+    @endif
+
+    <div
+        class="overflow-x-auto rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+        <table class="min-w-full text-sm">
+            <thead class="border-b border-zinc-200 dark:border-zinc-700">
+                <tr class="text-left text-zinc-600 dark:text-zinc-300">
+                    <th class="px-4 py-3">{{ __('Propiedad') }}</th>
+                    @if ($location->type !== 'storage')
+                        <th class="px-4 py-3">{{ __('% Comunidad') }}</th>
+                        <th class="px-4 py-3">{{ __('% Ubicación') }}</th>
+                    @endif
+                    <th class="px-4 py-3">{{ __('Asignada') }}</th>
+                    <th class="px-4 py-3">{{ __('Val. admin') }}</th>
+                    <th class="px-4 py-3">{{ __('Val. propietaria') }}</th>
+                    <th class="px-4 py-3"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($properties as $property)
+                    @php
+                        $activeAssignment = $property->activeAssignments->first();
+                        $isAssigned = $activeAssignment !== null;
+                    @endphp
+                    <tr wire:key="property-{{ $property->id }}"
+                        data-property-id="{{ $property->id }}"
+                        class="border-b border-zinc-100 dark:border-zinc-700">
+                        @if ($editingPropertyId === $property->id)
+                            <td class="px-4 py-3">
+                                <flux:input wire:model="editName" size="sm"
+                                    data-field="edit-name" />
+                                <flux:error name="editName" />
+                            </td>
+                            @if ($location->type !== 'storage')
+                                <td class="px-4 py-3">
+                                    <flux:input wire:model="editCommunityPct" type="number"
+                                        step="0.0001" size="sm" />
+                                    <flux:error name="editCommunityPct" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <flux:input wire:model="editLocationPct" type="number"
+                                        step="0.0001" size="sm" />
+                                    <flux:error name="editLocationPct" />
+                                </td>
+                            @endif
+                            <td class="px-4 py-3"
+                                colspan="{{ $location->type === 'storage' ? 4 : 3 }}">
+                                <div class="flex gap-2">
+                                    <flux:button variant="primary" size="sm"
+                                        wire:click="saveProperty">{{ __('Guardar') }}</flux:button>
+                                    <flux:button variant="ghost" size="sm"
+                                        wire:click="cancelEditing">{{ __('Cancelar') }}
+                                    </flux:button>
+                                </div>
+                            </td>
+                        @else
+                            <td class="px-4 py-3">{{ $property->name }}</td>
+                            @if ($location->type !== 'storage')
+                                <td class="px-4 py-3">{{ $property->community_pct ?? '—' }}</td>
+                                <td class="px-4 py-3">{{ $property->location_pct ?? '—' }}</td>
+                            @endif
+                            <td class="px-4 py-3">
+                                <flux:badge :color="$isAssigned ? 'green' : 'zinc'"
+                                    data-assigned="{{ $isAssigned ? 'yes' : 'no' }}">
+                                    {{ $isAssigned ? __('Sí') : __('No') }}
+                                </flux:badge>
+                            </td>
+                            <td class="px-4 py-3">
+                                <flux:badge
+                                    :color="$isAssigned && $activeAssignment->admin_validated ? 'green' : 'zinc'"
+                                    data-admin-validated="{{ $isAssigned && $activeAssignment?->admin_validated ? 'yes' : 'no' }}">
+                                    {{ $isAssigned && $activeAssignment?->admin_validated ? __('Sí') : __('No') }}
+                                </flux:badge>
+                            </td>
+                            <td class="px-4 py-3">
+                                <flux:badge
+                                    :color="$isAssigned && $activeAssignment->owner_validated ? 'green' : 'zinc'"
+                                    data-owner-validated="{{ $isAssigned && $activeAssignment?->owner_validated ? 'yes' : 'no' }}">
+                                    {{ $isAssigned && $activeAssignment?->owner_validated ? __('Sí') : __('No') }}
+                                </flux:badge>
+                            </td>
+                            <td class="px-4 py-3">
+                                <flux:button variant="ghost" size="sm"
+                                    wire:click="startEditing({{ $property->id }})" icon="pencil">
+                                    {{ __('Editar') }}
+                                </flux:button>
+                            </td>
+                        @endif
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-4 py-6 text-center text-zinc-400">
+                            {{ __('No hay propiedades.') }}
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
