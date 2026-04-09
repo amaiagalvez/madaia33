@@ -12,7 +12,7 @@ class SettingsSeeder extends Seeder
         $defaults = [
             [
                 'key' => 'admin_email',
-                'value' => 'admin@madaia33.eus',
+                'value' => 'info@madaia33.eus',
                 'section' => Setting::SECTION_CONTACT_FORM,
             ],
             [

@@ -33,8 +33,7 @@ class HeroSlider extends Component
 
     private function loadImages(): void
     {
-        $this->images = Image::query()
-            ->latest()
+        $this->images = Image::latest()
             ->limit(10)
             ->get()
             ->toArray();

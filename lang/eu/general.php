@@ -22,6 +22,8 @@ return [
         'back' => 'Itzuli',
         'send' => 'Bidali',
         'create' => 'Sortu',
+        'create_new' => 'Sortu berria',
+        'confirm' => 'Baieztatu',
     ],
     'messages' => [
         'saved' => 'Aldaketak gordeta.',

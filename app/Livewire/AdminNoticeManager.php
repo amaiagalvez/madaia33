@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Models\Notice;
 use Livewire\Component;
 use App\CommunityLocations;
@@ -11,6 +12,8 @@ use Illuminate\Contracts\View\View;
 
 class AdminNoticeManager extends Component
 {
+    use BuildsLocaleFieldConfigs;
+
     // Form state
     public ?int $editingId = null;
 
@@ -29,6 +32,14 @@ class AdminNoticeManager extends Component
 
     // Delete confirmation
     public ?int $confirmingDeleteId = null;
+
+    public bool $showDeleteModal = false;
+
+    public ?int $confirmingPublishId = null;
+
+    public string $publishAction = '';
+
+    public bool $showPublishModal = false;
 
     // UI state
     public bool $showForm = false;
@@ -67,6 +78,7 @@ class AdminNoticeManager extends Component
         $this->isPublic = $notice->is_public;
         $this->selectedLocations = $notice->locations->pluck('location_code')->toArray();
         $this->showForm = true;
+        $this->dispatch('admin-notice-form-focus');
     }
 
     public function saveNotice(): void
@@ -79,6 +91,8 @@ class AdminNoticeManager extends Component
 
         $this->resetForm();
         $this->showForm = false;
+        session()->flash('message', __('general.messages.saved'));
+        $this->dispatch('admin-notice-saved');
     }
 
     private function upsertNotice(): Notice
@@ -99,9 +113,14 @@ class AdminNoticeManager extends Component
     private function noticePayload(?Notice $existingNotice = null): array
     {
         $slug = Str::slug($this->titleEu);
+        $resolvedSlug = $slug;
+
+        if ($resolvedSlug === '') {
+            $resolvedSlug = $existingNotice !== null ? $existingNotice->slug : (string) Str::uuid();
+        }
 
         return [
-            'slug' => $slug ?: ($existingNotice !== null ? $existingNotice->slug : (string) Str::uuid()),
+            'slug' => $resolvedSlug,
             'title_eu' => $this->titleEu,
             'title_es' => $this->titleEs ?: null,
             'content_eu' => $this->contentEu,
@@ -139,14 +158,45 @@ class AdminNoticeManager extends Component
         $notice->update(['is_public' => false]);
     }
 
+    public function confirmPublish(int $id, bool $publish): void
+    {
+        $this->confirmingPublishId = $id;
+        $this->publishAction = $publish ? 'publish' : 'unpublish';
+        $this->showPublishModal = true;
+    }
+
+    public function doPublish(): void
+    {
+        if ($this->confirmingPublishId === null) {
+            return;
+        }
+
+        if ($this->publishAction === 'publish') {
+            $this->publishNotice($this->confirmingPublishId);
+        } else {
+            $this->unpublishNotice($this->confirmingPublishId);
+        }
+
+        $this->cancelPublish();
+    }
+
+    public function cancelPublish(): void
+    {
+        $this->confirmingPublishId = null;
+        $this->publishAction = '';
+        $this->showPublishModal = false;
+    }
+
     public function confirmDelete(int $id): void
     {
         $this->confirmingDeleteId = $id;
+        $this->showDeleteModal = true;
     }
 
     public function cancelDelete(): void
     {
         $this->confirmingDeleteId = null;
+        $this->showDeleteModal = false;
     }
 
     public function deleteNotice(): void
@@ -154,6 +204,7 @@ class AdminNoticeManager extends Component
         if ($this->confirmingDeleteId) {
             Notice::findOrFail($this->confirmingDeleteId)->delete();
             $this->confirmingDeleteId = null;
+            $this->showDeleteModal = false;
         }
     }
 

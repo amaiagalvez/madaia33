@@ -18,7 +18,7 @@ test('private page shows placeholder with login link for unauthenticated visitor
 });
 
 test('private page shows development message for authenticated admin', function () {
-    $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin) {

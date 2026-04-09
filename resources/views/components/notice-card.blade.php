@@ -58,8 +58,8 @@
 
             {{-- Excerpt --}}
             <p
-                class="leading-relaxed text-gray-600 {{ $featured ? 'text-sm md:text-base lg:text-lg line-clamp-4' : 'text-sm md:text-base line-clamp-3' }}">
-                {{ Str::limit($notice->content, 120, '...') }}
+                class="leading-relaxed text-gray-600 {{ $featured ? 'text-sm md:text-base lg:text-lg' : 'text-sm md:text-base' }}">
+                {{ $notice->content }}
             </p>
 
             {{-- Location Badges --}}

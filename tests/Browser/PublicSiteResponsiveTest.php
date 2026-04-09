@@ -89,7 +89,7 @@ test('notices page smoke checks responsive grid filter and pagination', function
     NoticeLocation::create([
         'notice_id' => $matchingNotice->id,
         'location_type' => 'portal',
-        'location_code' => 'A',
+        'location_code' => '33-A',
     ]);
 
     $nonMatchingNotice = Notice::factory()->public()->create([
@@ -100,7 +100,7 @@ test('notices page smoke checks responsive grid filter and pagination', function
     NoticeLocation::create([
         'notice_id' => $nonMatchingNotice->id,
         'location_type' => 'portal',
-        'location_code' => 'B',
+        'location_code' => '33-B',
     ]);
 
     /** @var DuskTestCase $this */
@@ -112,7 +112,7 @@ test('notices page smoke checks responsive grid filter and pagination', function
                 "return getComputedStyle(document.querySelector('[data-notices-grid]')).gridTemplateColumns.split(' ').length;",
                 1
             )
-            ->select('#location-filter', 'A')
+            ->click('[data-notices-filter-btn="33-A"]')
             ->pause(600)
             ->assertScript("return document.body.innerText.includes('Smoke Notice A');", true)
             ->resize(1200, 900)

@@ -57,17 +57,20 @@
                 <h2 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
                     {{ __('home.history_title') }}
                 </h2>
-                <div
-                    class="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-100 lg:flex-1 lg:min-h-0">
-                    <img src="{{ $historyImageUrl }}" alt="{{ __('home.history_image_alt') }}"
-                        class="h-36 w-full object-cover sm:h-48 lg:h-full" loading="lazy" />
+                <div class="mt-4 space-y-3" data-home-history-images>
+                    @foreach ($historyImageUrls as $historyImageUrl)
+                        <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                            <img src="{{ $historyImageUrl }}" alt="{{ __('home.history_title') }}"
+                                class="h-36 w-full object-cover sm:h-44" loading="lazy" />
+                        </div>
+                    @endforeach
                 </div>
                 <p class="mt-4 text-sm leading-relaxed text-gray-600">
                     {!! $historySummary !!}
                 </p>
 
                 <a href="mailto:admin@madaia.eus"
-                    class="elevated-card mt-4 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                    class="elevated-card mt-4 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 lg:mt-auto"
                     data-home-history-photos-callout>
                     <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"

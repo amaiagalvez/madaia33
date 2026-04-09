@@ -15,6 +15,20 @@ it('renders contact page with responsive max width container', function (string 
     $response->assertDontSee('data-contact-intro', false);
 })->with('supported_locales');
 
+it('renders contact title block above the form', function (string $locale) {
+    $response = $this->get(route(SupportedLocales::routeName('contact', $locale)));
+
+    $response->assertOk();
+    $response->assertSee('data-page-hero="contact"', false);
+    $response->assertSee(__('contact.subtitle'));
+    $response->assertSee('wire:submit="submit"', false);
+    $response->assertSeeInOrder([
+        'data-page-hero="contact"',
+        __('contact.subtitle'),
+        'wire:submit="submit"',
+    ], false);
+})->with('supported_locales');
+
 it('renders full width fields with 44px minimum touch height', function (string $locale) {
     $response = $this->get(route(SupportedLocales::routeName('contact', $locale)));
 

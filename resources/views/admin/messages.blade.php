@@ -1,6 +1,6 @@
 <x-layouts::admin :title="__('admin.messages')">
     <div class="max-w-7xl mx-auto">
-        <h1 class="text-2xl font-bold text-gray-900 mb-8">{{ __('admin.messages') }}</h1>
+        <x-admin.page-header :title="__('admin.messages')" />
 
         <livewire:admin-message-inbox />
     </div>

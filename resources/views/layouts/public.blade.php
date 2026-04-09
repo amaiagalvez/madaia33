@@ -51,19 +51,7 @@
                 class="header-shell flex items-center justify-between gap-2 min-h-16 transition-all duration-200">
 
                 {{-- Logo / Site name (left) --}}
-                <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
-                    class="flex min-w-0 items-center gap-2 sm:gap-3 rounded-sm transition-colors hover:text-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                    <img src="{{ asset('storage/madaia33/madaia33.png') }}"
-                        alt="{{ config('app.name', 'Madaia') }} logo"
-                        class="header-brand-mark h-10 w-10 sm:h-12 sm:w-12 rounded-2xl object-cover shadow-lg shadow-[#793d3d]/20 transition-all duration-200" />
-                    <span class="hidden sm:flex flex-col leading-none">
-                        <span
-                            class="text-lg font-semibold text-gray-900">{{ config('app.name', 'Madaia') }}</span>
-                        <span
-                            class="header-brand-subtitle text-[11px] uppercase tracking-[0.18em] text-stone-500 transition-all duration-200">Labeaga
-                            33, Urretxu</span>
-                    </span>
-                </a>
+                <x-public-brand-link />
 
                 {{-- Desktop navigation (center, hidden on mobile/tablet) --}}
                 <nav class="hidden flex-1 items-center justify-center gap-1 px-2 py-1.5 transition-all duration-200 md:flex"
@@ -171,23 +159,12 @@
     </main>
 
     {{-- Footer --}}
-    <footer
-        class="mt-auto border-t border-gray-200 bg-gray-50/90 pb-[env(safe-area-inset-bottom)]">
+    <footer class="mt-auto border-t border-gray-200 bg-gray-50/90 pb-[env(safe-area-inset-bottom)]">
         <div class="h-0.5 bg-linear-to-r from-[#793d3d] via-[#d9755b] to-[#f1bd4d]"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div
                 class="flex flex-col items-stretch gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
-                <div
-                    class="glass-panel flex w-full max-w-md items-center gap-4 px-4 py-3 sm:w-auto">
-                    <img src="{{ asset('storage/madaia33/madaia33.png') }}"
-                        alt="{{ config('app.name', 'Madaia') }} logo"
-                        class="h-12 w-12 rounded-2xl object-cover shadow-lg shadow-[#793d3d]/20" />
-                    <div class="flex flex-col gap-1 text-left">
-                        <span
-                            class="text-sm font-semibold text-gray-800">{{ config('app.name', 'Komunitatea') }}</span>
-                        <p class="text-xs text-gray-400">&copy; {{ date('Y') }} </p>
-                    </div>
-                </div>
+                <x-public-brand-link class="glass-panel w-full max-w-md px-4 py-3 sm:w-auto" />
                 <nav class="grid gap-3 sm:grid-cols-2" aria-label="Footer">
                     <a href="{{ route(\App\SupportedLocales::routeName('privacy-policy')) }}"
                         class="hero-frame px-4 py-3 transition-colors hover:border-[#d9755b]/60 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
@@ -200,6 +177,12 @@
                             {{ __('general.footer.legal_notice') }}</p>
                     </a>
                 </nav>
+                <a href="mailto:info@amaia.eus"
+                    class="inline-flex items-center self-end lg:self-center focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                    aria-label="Contact with Amaia">
+                    <img src="{{ asset('amaia.png') }}" alt="Amaia logo"
+                        class="h-10 w-auto object-contain sm:h-11" />
+                </a>
             </div>
         </div>
     </footer>

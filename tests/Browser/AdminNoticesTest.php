@@ -9,8 +9,8 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('admin can create, publish, verify public, unpublish and delete a notice', function () {
-    $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
-    $title = 'Dusk Test Iragarkia '.now()->timestamp;
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $title = 'Dusk Test Iragarkia ' . now()->timestamp;
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $title) {

@@ -1,30 +1,39 @@
 <div>
     <x-public-page-header hero="notices" :title="__('notices.title')" :subtitle="__('notices.subtitle')">
         <x-slot:actions>
-            <div class="w-full lg:w-auto" data-notices-filter>
-                <label for="location-filter" class="mb-1 block text-sm font-medium text-gray-700">
-                    {{ __('notices.filter.label') }}
-                </label>
-                <p class="mb-3 text-xs text-gray-500 sm:text-sm">{{ __('notices.filter_hint') }}</p>
-                <div class="glass-panel p-3 sm:p-4">
-                    <select id="location-filter" wire:model.live="locationFilter"
-                        aria-controls="notices-list"
-                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b] sm:w-64">
-                        <option value="">{{ __('notices.filter.all') }}</option>
-                        <optgroup label="{{ __('notices.portal') }}">
-                            @foreach (\App\CommunityLocations::PORTALS as $portal)
-                                <option value="{{ $portal }}">{{ __('notices.portal') }}
-                                    {{ $portal }}</option>
-                            @endforeach
-                        </optgroup>
-                        <optgroup label="{{ __('notices.garage') }}">
-                            @foreach (\App\CommunityLocations::GARAGES as $floor)
-                                <option value="{{ $floor }}">{{ __('notices.garage') }}
-                                    {{ $floor }}</option>
-                            @endforeach
-                        </optgroup>
-                    </select>
-                </div>
+            <div class="flex flex-wrap items-center justify-start gap-2 lg:justify-end"
+                data-notices-filter>
+                <button type="button" wire:click="setLocationFilter('')" data-notices-filter-btn="all"
+                    @class([
+                        'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                        'border-[#d9755b] bg-[#d9755b] text-white' => $locationFilter === '',
+                        'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                            $locationFilter !== '',
+                    ])>
+                    {{ __('notices.filter.all') }}
+                </button>
+                @foreach (\App\CommunityLocations::PORTALS as $portal)
+                    <button type="button" wire:click="setLocationFilter('{{ $portal }}')"
+                        data-notices-filter-btn="{{ $portal }}" @class([
+                            'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                            'border-[#d9755b] bg-[#d9755b] text-white' => $locationFilter === $portal,
+                            'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                                $locationFilter !== $portal,
+                        ])>
+                        {{ __('notices.portal') }} {{ $portal }}
+                    </button>
+                @endforeach
+                @foreach (\App\CommunityLocations::GARAGES as $floor)
+                    <button type="button" wire:click="setLocationFilter('{{ $floor }}')"
+                        data-notices-filter-btn="{{ $floor }}" @class([
+                            'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                            'border-[#d9755b] bg-[#d9755b] text-white' => $locationFilter === $floor,
+                            'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                                $locationFilter !== $floor,
+                        ])>
+                        {{ __('notices.garage') }} {{ $floor }}
+                    </button>
+                @endforeach
             </div>
         </x-slot:actions>
     </x-public-page-header>

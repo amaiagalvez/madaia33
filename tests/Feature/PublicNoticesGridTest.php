@@ -38,7 +38,7 @@ test('notices page renders notice cards with responsive classes', function (stri
     $response->assertSuccessful();
     // Should use notice-card component classes
     $response->assertSee('line-clamp-2');
-    $response->assertSee('line-clamp-4');
+    $response->assertDontSee('line-clamp-4');
 })->with('supported_locales');
 
 test('notices page renders a featured notice block layout', function (string $locale) {
@@ -59,8 +59,8 @@ test('notices page filter selector is visible and responsive', function (string 
     $response->assertSuccessful();
     $response->assertSee('data-page-hero="notices"', false);
     $response->assertSee('data-notices-filter', false);
-    $response->assertSee('sm:w-64');
-    $response->assertSee(__('notices.filter.label'));
+    $response->assertSee('data-notices-filter-btn="all"', false);
+    $response->assertDontSee(__('notices.filter.label'));
     $response->assertDontSee('lg:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)]');
 })->with('supported_locales');
 

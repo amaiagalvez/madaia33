@@ -21,8 +21,7 @@ class LegalPageController extends Controller
     private function renderLegalPage(string $pageKey, string $titleKey, string $pageSlug): View
     {
         $localizedKeys = SupportedLocales::localizedKeys("legal_page_{$pageKey}");
-        $settings = Setting::query()
-            ->whereIn('key', $localizedKeys)
+        $settings = Setting::whereIn('key', $localizedKeys)
             ->pluck('value', 'key');
 
         $content = '';

@@ -166,6 +166,16 @@ test('home page keeps mobile order general notices then location notices then hi
     expect($generalPos < $locationPos && $locationPos < $historyPos)->toBeTrue();
 })->with('supported_locales');
 
+test('home page footer uses shared menu brand on left and keeps amaia email logo on right', function (string $locale) {
+    test()->get(route(SupportedLocales::routeName('home', $locale)))
+        ->assertSuccessful()
+        ->assertSee(asset('storage/madaia33/madaia33.png'), false)
+        ->assertSee(config('app.name', 'Madaia'))
+        ->assertSee('mailto:info@amaia.eus', false)
+        ->assertSee(asset('amaia.png'), false)
+        ->assertDontSee('&copy;', false);
+})->with('supported_locales');
+
 test('home page uses configurable history summary from front settings', function (string $locale) {
     $historyByLocale = [
         SupportedLocales::BASQUE => '<p>Historia personalizada EU</p>',
@@ -189,10 +199,13 @@ test('home page uses configurable history summary from front settings', function
         ->assertSee($historyByLocale[$locale], false);
 })->with('supported_locales');
 
-test('home page history image uses only historia tag', function (string $locale) {
+test('home page history section shows first three historia images stacked and excludes non-historia', function (string $locale) {
     Storage::fake('public');
 
-    Storage::disk('public')->put('images/history-test.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
+    Storage::disk('public')->put('images/history-test-1.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
+    Storage::disk('public')->put('images/history-test-2.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
+    Storage::disk('public')->put('images/history-test-3.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
+    Storage::disk('public')->put('images/history-test-4.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
     Storage::disk('public')->put('images/madaia-test.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
 
     Image::factory()->create([
@@ -202,8 +215,26 @@ test('home page history image uses only historia tag', function (string $locale)
     ]);
 
     Image::factory()->create([
-        'filename' => 'history-test.svg',
-        'path' => 'images/history-test.svg',
+        'filename' => 'history-test-1.svg',
+        'path' => 'images/history-test-1.svg',
+        'tag' => Image::TAG_HISTORY,
+    ]);
+
+    Image::factory()->create([
+        'filename' => 'history-test-2.svg',
+        'path' => 'images/history-test-2.svg',
+        'tag' => Image::TAG_HISTORY,
+    ]);
+
+    Image::factory()->create([
+        'filename' => 'history-test-3.svg',
+        'path' => 'images/history-test-3.svg',
+        'tag' => Image::TAG_HISTORY,
+    ]);
+
+    Image::factory()->create([
+        'filename' => 'history-test-4.svg',
+        'path' => 'images/history-test-4.svg',
         'tag' => Image::TAG_HISTORY,
     ]);
 
@@ -215,9 +246,13 @@ test('home page history image uses only historia tag', function (string $locale)
 
     expect($historySectionStart)->not->toBeFalse();
 
-    $historySection = substr($content, $historySectionStart, 2000);
+    $historySection = substr($content, $historySectionStart, 5000);
 
     expect($historySection)
-        ->toContain('/storage/images/history-test.svg')
+        ->toContain('data-home-history-images')
+        ->toContain('/storage/images/history-test-1.svg')
+        ->toContain('/storage/images/history-test-2.svg')
+        ->toContain('/storage/images/history-test-3.svg')
+        ->not->toContain('/storage/images/history-test-4.svg')
         ->not->toContain('/storage/images/madaia-test.svg');
 })->with('supported_locales');

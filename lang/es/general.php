@@ -22,6 +22,8 @@ return [
         'back' => 'Volver',
         'send' => 'Enviar',
         'create' => 'Crear',
+        'create_new' => 'Crear nuevo',
+        'confirm' => 'Confirmar',
     ],
     'messages' => [
         'saved' => 'Cambios guardados.',

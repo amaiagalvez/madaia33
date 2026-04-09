@@ -13,15 +13,16 @@ class PublicHomeController extends Controller
 {
     public function index(): View
     {
-        $historyImage = Image::query()
-            ->where('tag', Image::TAG_HISTORY)
-            ->latest()
-            ->first();
+        $historyImageUrls = Image::where('tag', Image::TAG_HISTORY)
+            ->oldest()
+            ->limit(3)
+            ->get()
+            ->map(fn(Image $image): string => Storage::url($image->path))
+            ->values();
 
-        $historyImageUrl =
-            $historyImage && Storage::disk('public')->exists($historyImage->path)
-            ? Storage::url($historyImage->path)
-            : asset('apple-touch-icon.png');
+        if ($historyImageUrls->isEmpty()) {
+            $historyImageUrls = collect([asset('apple-touch-icon.png')]);
+        }
 
         $latestNotices = Notice::public()
             ->with('locations')
@@ -30,18 +31,17 @@ class PublicHomeController extends Controller
             ->get();
 
         $generalNotices = $latestNotices
-            ->filter(fn (Notice $notice) => $notice->locations->isEmpty())
+            ->filter(fn(Notice $notice) => $notice->locations->isEmpty())
             ->take(6)
             ->values();
 
         $locationNotices = $latestNotices
-            ->filter(fn (Notice $notice) => $notice->locations->isNotEmpty())
+            ->filter(fn(Notice $notice) => $notice->locations->isNotEmpty())
             ->take(6)
             ->values();
 
         $historyTextKeys = SupportedLocales::localizedKeys('home_history_text');
-        $historyTextSettings = Setting::query()
-            ->whereIn('key', $historyTextKeys)
+        $historyTextSettings = Setting::whereIn('key', $historyTextKeys)
             ->pluck('value', 'key');
 
         $historySummary = __('home.history_summary');
@@ -55,7 +55,7 @@ class PublicHomeController extends Controller
         }
 
         return view('public.home', [
-            'historyImageUrl' => $historyImageUrl,
+            'historyImageUrls' => $historyImageUrls,
             'historySummary' => $historySummary,
             'generalNotices' => $generalNotices,
             'locationNotices' => $locationNotices,

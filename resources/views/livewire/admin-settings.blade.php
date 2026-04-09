@@ -41,7 +41,6 @@
                 <button type="button" wire:click="setSection('{{ $section }}')"
                     data-settings-section="{{ $section }}"
                     class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors {{ $activeSection === $section ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
-                    aria-selected="{{ $activeSection === $section ? 'true' : 'false' }}"
                     aria-current="{{ $activeSection === $section ? 'page' : 'false' }}">
                     {{ __('admin.settings_sections.' . $section) }}
                 </button>

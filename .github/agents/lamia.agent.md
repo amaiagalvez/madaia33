@@ -39,6 +39,7 @@ Use Lamia for requests including or implying:
 1. Discover project conventions first
 
 - Identify active frontend stack and conventions before editing (Blade, Livewire, Inertia, Vue/React, Tailwind, custom CSS).
+- In this repo, verify which Livewire implementation is actually mounted before editing: a component name may resolve to a Volt SFC under `resources/views/components/⚡*.blade.php` even if a parallel file exists under `resources/views/livewire/`.
 - Detect existing spacing scale, typography approach, color tokens, and component patterns.
 - Match established style unless the user asks for a deliberate visual shift.
 
@@ -61,6 +62,7 @@ Use Lamia for requests including or implying:
 
 - Never introduce hardcoded user-facing text if translation keys are expected.
 - Respect multilingual structure already used in the project.
+- If admin validation messages appear in English while the locale is Basque, check first whether `lang/eu/validation.php` and other base Laravel translation files exist before changing component code or validation rules.
 
 6. Accessibility baseline is mandatory
 
@@ -82,6 +84,11 @@ Use Lamia for requests including or implying:
 
 - Make the smallest coherent change set that solves the request.
 - Do not refactor unrelated areas.
+
+10. Interactive states must be checked explicitly
+
+- When styling pills, chips, toggles, or icon-only actions, verify default, hover, focus, active, and selected states so text/icon contrast is preserved in every state.
+- If a UI issue is limited to state classes, prefer adjusting the Tailwind state utilities instead of rewriting the component structure.
 
 ## Design Quality Checklist
 

@@ -9,7 +9,7 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('admin can upload an image and it appears in the public gallery', function () {
-    $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
     $altText = 'Dusk test irudia ' . time();
 
     // Create a temporary test image inside the container's temp dir

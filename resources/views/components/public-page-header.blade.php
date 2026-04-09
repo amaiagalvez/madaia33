@@ -30,8 +30,7 @@
             </p>
         @endif
     @else
-        <div
-            class="{{ $hasActions ? 'flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between' : '' }}">
+        <div class="{{ $hasActions ? 'flex flex-col gap-4' : '' }}">
             <div class="{{ $hasIcon ? 'flex items-start gap-4' : '' }}">
                 @if ($hasIcon)
                     {{ $icon }}
