@@ -1,0 +1,21 @@
+flowchart LR
+  USER["Users and Browsers"] --> APP["Laravel App"]
+
+  subgraph APP["madaia33 Application"]
+    ROUTES["Routes and Middleware\nweb.php settings.php\nSetLocale SecurityHeaders Fortify"]
+    CORE["Application Core\nControllers Livewire Models\nValidation Rules Mail"]
+    UI["Presentation Layer\nBlade Layouts Pages Components\nLivewire Views I18N"]
+    QUALITY["Quality Layer\nPest PHPUnit Dusk\nPint PHPStan PHPMD"]
+
+    ROUTES --> CORE
+    CORE --> UI
+    QUALITY -. validates .-> CORE
+    QUALITY -. validates .-> UI
+  end
+
+  APP --> DB["MariaDB"]
+  APP --> ASSETS["Vite Assets\nTailwind Flux CSS\nJS entry"]
+
+  DEV["Developers"] --> DOCKER["Docker Compose Runtime"]
+  DOCKER --> APP
+  DOCKER --> DB

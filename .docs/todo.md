@@ -41,6 +41,7 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 [ ] settings imagen para el logo (sustituir donde se usa madaia33.png por este campo)
 [ ] en settings, el botón "enviar prueba" solo se debe activar cuando no haya cambios sin guardar, al modificar algo descativarlo
 [ ] en settings en la seccion email_configuration, ocultar todos los campos menos el nombre (ponerlos como si fueran tipo password) y al 
+[ ] text area, que se adapte al contenido automaticamente
 
 # Egiten ...
 [ ] oganiza las carpetas views/components, views/livewire, view/layouts en admin y front y mueve los ficheros cada uno a su sitio. mira la carpeta partials y reorganizala, lo mismo con el dashboard.
