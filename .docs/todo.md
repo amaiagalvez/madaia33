@@ -14,6 +14,7 @@
 [ ] user hizkuntza, besdin du front-ekoa
 
 # Copilot
+[ ] repasar agente lamia
 
 # Code
 [ ] test en ingles
@@ -32,6 +33,7 @@
 cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu aportación, consulta, duda... te responderemos lo antes posible o algo así, como a ti mejor te parezca
 [ ] Osatu pribatutasun-politika eta lege-oharrak testuak
 [ ] Cookies sartu
+[ ] Slider más pequeño, es importante que si hay anuncios se vean lo más rápido posible
 
 # Panela
 [ ] en le panel separa un poco el header del menú superior
