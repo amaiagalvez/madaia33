@@ -28,6 +28,7 @@ services:
 
     madaia33-composer:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
+        user: "${DC_UID:-1000}:${DC_GID:-1000}"
         profiles: ["composer"]
         volumes:
             - ./:/docker
@@ -35,17 +36,14 @@ services:
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
         command: bash -c "
-            rm -Rf vendor/iztkoop
-            && rm -f composer.lock
-            && composer install --no-progress
-            && chown -R ${DC_UID:-1000}:${DC_GID:-1000} vendor
-            && chown ${DC_UID:-1000}:${DC_GID:-1000} composer.lock
-            && composer show | grep izt"
+            rm -f composer.lock
+            && composer install --no-progress"
         networks:
             - frontend
 
     madaia33-reformat:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
+        user: "${DC_UID:-1000}:${DC_GID:-1000}"
         profiles: ["reformat"]
         volumes:
             - ./:/docker
@@ -59,6 +57,7 @@ services:
 
     madaia33-npm-all:
         image: node:${DC_NODE:-24-bullseye}
+        user: "${DC_UID:-1000}:${DC_GID:-1000}"
         profiles: ["npm-all"]
         volumes:
             - ./:/docker
@@ -71,15 +70,13 @@ services:
             rm -f package-lock.json
             && rm -Rf node_modules
             && npm install
-            && npm run build
-            && chown -R ${DC_UID:-1000}:${DC_GID:-1000} node_modules
-            && chown ${DC_UID:-1000}:${DC_GID:-1000} package-lock.json
-            && chown -R ${DC_UID:-1000}:${DC_GID:-1000} public"
+            && npm run build"
         networks:
             - frontend
 
     madaia33-npm:
         image: node:${DC_NODE:-24-bullseye}
+        user: "${DC_UID:-1000}:${DC_GID:-1000}"
         profiles: ["npm"]
         volumes:
             - ./:/docker
@@ -90,15 +87,13 @@ services:
             WEB_DOCUMENT_ROOT: /docker/public
         command: bash -c "
             npm install
-            && npm run build
-            && chown -R ${DC_UID:-1000}:${DC_GID:-1000} node_modules
-            && chown ${DC_UID:-1000}:${DC_GID:-1000} package-lock.json
-            && chown -R ${DC_UID:-1000}:${DC_GID:-1000} public"
+            && npm run build"
         networks:
             - frontend
 
     madaia33-migrate-all:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
+        user: "${DC_UID:-1000}:${DC_GID:-1000}"
         profiles: ["migrate-all"]
         volumes:
             - ./:/docker
@@ -108,8 +103,7 @@ services:
         command: bash -c "
             composer install --no-progress
             && php artisan migrate:fresh
-            && php artisan izt:basics-migrations-seeds
-            && chown -R ${DC_UID:-1000}:${DC_GID:-1000} vendor"
+            && php artisan db:seed"
         depends_on:
             - db
         networks:
@@ -117,6 +111,7 @@ services:
 
     madaia33-migrate:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
+        user: "${DC_UID:-1000}:${DC_GID:-1000}"
         profiles: ["migrate"]
         volumes:
             - ./:/docker
@@ -124,9 +119,8 @@ services:
         environment:
             WEB_DOCUMENT_ROOT: /docker/public
         command: bash -c "
-            composer install --no-progress
-            && php artisan izt:basics-migrations-seeds
-            && chown -R ${DC_UID:-1000}:${DC_GID:-1000} vendor"
+            php artisan migrate
+            && php artisan db:seed"
         depends_on:
             - db
         networks:
@@ -134,6 +128,7 @@ services:
 
     madaia33-phpunit:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
+        user: "${DC_UID:-1000}:${DC_GID:-1000}"
         profiles: ["phpunit"]
         volumes:
             - ./:/docker
