@@ -164,10 +164,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn(mixed $timestamp): int => (int) $timestamp)
+            ->map(fn (mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 

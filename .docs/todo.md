@@ -15,6 +15,11 @@
 [ ] pasar pain no en modo test, dejarle a él que lo corrija
 [ ] user hizkuntza, besdin du front-ekoa
 
+# Home
+[ ] historian argazki gehiago sartu, lehengo hirurak bata bestearen azpian
+[ ] Footerrean, kendu copyright eta iskin baatean jarri nire logoa, public karpetan dagoean estaka emailera info@amaia.eus
+
+
 ## Txuletak
 /dusk-test pasar los dusk test
 pasar los test con coverage

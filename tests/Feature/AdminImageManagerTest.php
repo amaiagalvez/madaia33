@@ -85,7 +85,7 @@ it('muestra alt texts en ambos idiomas y etiqueta en la lista admin de imágenes
         ->assertSee('Atari nagusia')
         ->assertSee('Portal principal')
         ->assertSee(__('gallery.filter.history'))
-        ->assertSee('data-image-alt-eu="' . $image->id . '"', false)
-        ->assertSee('data-image-alt-es="' . $image->id . '"', false)
-        ->assertSee('data-image-tag="' . $image->id . '"', false);
+        ->assertSee('data-image-alt-eu="'.$image->id.'"', false)
+        ->assertSee('data-image-alt-es="'.$image->id.'"', false)
+        ->assertSee('data-image-tag="'.$image->id.'"', false);
 });

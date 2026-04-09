@@ -133,3 +133,15 @@ it('filtra la galería por etiqueta madaia', function () {
     expect($component->images)->toHaveCount(1)
         ->and($component->images->first()->id)->toBe($madaiaImage->id);
 });
+
+it('resetea el filtro cuando la etiqueta es inválida', function () {
+    Image::factory()->history()->create();
+    Image::factory()->madaia()->create();
+
+    $component = Livewire::test('image-gallery')
+        ->call('setTagFilter', 'historia')
+        ->call('setTagFilter', 'etiqueta-invalida');
+
+    expect($component->activeTag)->toBe('')
+        ->and($component->images)->toHaveCount(2);
+});

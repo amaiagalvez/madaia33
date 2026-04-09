@@ -49,3 +49,5 @@
 - In docker-compose.yml, if repeated service blocks make partial patches unstable, rewrite the whole file and validate with docker compose config --quiet to catch misplaced lines early.
 
 - In admin image grids, show EU/ES alt texts and tag as always-visible card metadata (not hover-only), and add stable `data-*` selectors so Feature tests can assert content without relying on Tailwind classes.
+
+- Cuando un test de Livewire cubre filtros por valor válido, añade también un caso de valor inválido que verifique el reset de estado (por ejemplo `activeTag=''`) para cubrir ramas de guard clause y evitar bajadas de cobertura.

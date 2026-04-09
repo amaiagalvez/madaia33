@@ -18,8 +18,8 @@ class ImageFactory extends Factory
     public function definition(): array
     {
         return [
-            'filename' => fake()->uuid() . '.jpg',
-            'path' => 'images/' . fake()->uuid() . '.jpg',
+            'filename' => fake()->uuid().'.jpg',
+            'path' => 'images/'.fake()->uuid().'.jpg',
             'alt_text_eu' => fake()->sentence(4),
             'alt_text_es' => fake()->sentence(4),
             'tag' => null,

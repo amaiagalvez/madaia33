@@ -30,12 +30,12 @@ class PublicHomeController extends Controller
             ->get();
 
         $generalNotices = $latestNotices
-            ->filter(fn(Notice $notice) => $notice->locations->isEmpty())
+            ->filter(fn (Notice $notice) => $notice->locations->isEmpty())
             ->take(6)
             ->values();
 
         $locationNotices = $latestNotices
-            ->filter(fn(Notice $notice) => $notice->locations->isNotEmpty())
+            ->filter(fn (Notice $notice) => $notice->locations->isNotEmpty())
             ->take(6)
             ->values();
 

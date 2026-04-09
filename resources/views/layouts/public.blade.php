@@ -131,7 +131,8 @@
                 </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
                     class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('notices.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
-                    aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}">
+                    aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}"
+                    data-mobile-notices-link>
                     {{ __('general.nav.notices') }}
                 </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"

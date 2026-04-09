@@ -28,7 +28,7 @@ class ImageGallery extends Component
     public function getImagesProperty(): Collection
     {
         return Image::query()
-            ->when($this->activeTag !== '', fn($query) => $query->where('tag', $this->activeTag))
+            ->when($this->activeTag !== '', fn ($query) => $query->where('tag', $this->activeTag))
             ->orderByDesc('created_at')
             ->get();
     }

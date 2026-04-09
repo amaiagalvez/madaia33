@@ -64,13 +64,13 @@ test('home page smoke on mobile renders hero latest notices and working mobile m
             ->resize(375, 812)
             ->pause(500)
             ->assertScript("return document.querySelector('[data-hero-slider]') !== null;", true)
-            ->assertScript("return document.querySelector('[data-latest-notices]') !== null;", true)
+            ->assertScript("return document.querySelector('[data-latest-notices-general]') !== null;", true)
             ->assertScript("return getComputedStyle(document.querySelector('header')).position;", 'sticky')
             ->assertScript("return document.getElementById('livewire-error') === null;", true)
             ->click('[data-hamburger-button]')
             ->pause(350)
             ->assertScript("return getComputedStyle(document.querySelector('[data-mobile-menu]')).display !== 'none';", true)
-            ->click('[data-first-menu-item]')
+            ->click('[data-mobile-notices-link]')
             ->pause(350)
             ->assertPathIs('/eu/iragarkiak');
     });
