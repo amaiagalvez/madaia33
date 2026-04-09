@@ -3,16 +3,17 @@
 namespace App\Livewire;
 
 use App\Models\Setting;
-use Livewire\Component;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
+use App\Support\ConfiguredMailSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Validations\ContactFormValidation;
+use Livewire\Component;
 
 class ContactForm extends Component
 {
@@ -109,15 +110,23 @@ class ContactForm extends Component
     private function sendContactEmails(ContactMessage $contactMessage): bool
     {
         try {
-            $adminEmail = Setting::where('key', 'admin_email')->value('value') ?? config('mail.from.address');
+            $emailSettings = $this->emailSettings();
+            $this->configuredMailSettings()->apply($emailSettings);
+            $adminEmail = $emailSettings['admin_email'] ?: (string) config('mail.from.address');
+            $fromAddress = $emailSettings['from_address'] ?: (string) config('mail.from.address');
+            $fromName = ($emailSettings['from_name'] ?? '') !== '' ? $emailSettings['from_name'] : (string) config('mail.from.name');
+            $legalText = $this->resolveLocalizedSetting($emailSettings, 'legal_text');
 
             Mail::to($this->email)->send(new ContactConfirmation(
                 visitorName: $this->name,
                 messageSubject: $this->subject,
                 messageBody: $this->message,
+                legalText: $legalText,
+                fromAddress: $fromAddress,
+                fromName: $fromName,
             ));
 
-            Mail::to($adminEmail)->send(new ContactNotification($contactMessage));
+            Mail::to($adminEmail)->send(new ContactNotification($contactMessage, $legalText, $fromAddress, $fromName));
 
             return false;
         } catch (\Throwable $e) {
@@ -164,10 +173,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn (mixed $timestamp): int => (int) $timestamp)
+            ->map(fn(mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 
@@ -203,6 +212,48 @@ class ContactForm extends Component
         return (string) (Setting::where('key', 'recaptcha_secret_key')->value('value') ?? '');
     }
 
+    private function configuredMailSettings(): ConfiguredMailSettings
+    {
+        return app(ConfiguredMailSettings::class);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function emailSettings(): array
+    {
+        return Setting::whereIn('key', [
+            'admin_email',
+            'from_address',
+            'from_name',
+            'smtp_host',
+            'smtp_port',
+            'smtp_username',
+            'smtp_password',
+            'smtp_encryption',
+            ...SupportedLocales::localizedKeys('legal_text'),
+        ])
+            ->pluck('value', 'key')
+            ->map(fn(mixed $value): string => (string) $value)
+            ->all();
+    }
+
+    /**
+     * @param  array<string, string>  $settings
+     */
+    private function resolveLocalizedSetting(array $settings, string $prefix, ?string $fallback = null): ?string
+    {
+        foreach (SupportedLocales::localizedKeys($prefix) as $key) {
+            $value = trim((string) ($settings[$key] ?? ''));
+
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return $fallback;
+    }
+
     private function verifyRecaptchaToken(string $secretKey): bool
     {
         try {
@@ -223,19 +274,17 @@ class ContactForm extends Component
 
     public function render(): View
     {
-        $legalTextKeys = SupportedLocales::localizedKeys('legal_checkbox_text');
-        $settings = Setting::whereIn('key', [...$legalTextKeys, 'recaptcha_site_key'])->pluck('value', 'key');
-        $legalText = __('contact.legal_text');
+        $settings = Setting::whereIn('key', [
+            ...SupportedLocales::localizedKeys('legal_checkbox_text'),
+            'recaptcha_site_key',
+        ])
+            ->pluck('value', 'key')
+            ->map(fn(mixed $value): string => (string) $value)
+            ->all();
 
-        foreach ($legalTextKeys as $legalTextKey) {
-            if ($settings->has($legalTextKey)) {
-                $legalText = (string) $settings[$legalTextKey];
+        $legalText = $this->resolveLocalizedSetting($settings, 'legal_checkbox_text', __('contact.legal_text'));
 
-                break;
-            }
-        }
-
-        $siteKey = (string) ($settings['recaptcha_site_key'] ?? '');
+        $siteKey = $settings['recaptcha_site_key'] ?? '';
 
         return view('livewire.contact-form', [
             'legalText' => $legalText,

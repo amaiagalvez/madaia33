@@ -48,6 +48,10 @@
 
 - In docker-compose.yml, if repeated service blocks make partial patches unstable, rewrite the whole file and validate with docker compose config --quiet to catch misplaced lines early.
 
+- Traducción de claves en tests: Usar notación con punto para las claves de traducción (`admin.test_email.button` no `admin.test_email_button`). Flux UI y otros componentes aceptan directamente `__('key.with.dots')`.
+
+- Modales en Livewire: No usar `flux:modal wire:model="property"` porque Flux UI no maneja bien el binding con propiedades Livewire. En su lugar, usar `<dialog open>` HTML nativo con condición `@if ($propertyBoolean)` y botones `wire:click`, patrón validado en admin-notice-manager, admin-message-inbox.
+
 - In admin image grids, show EU/ES alt texts and tag as always-visible card metadata (not hover-only), and add stable `data-*` selectors so Feature tests can assert content without relying on Tailwind classes.
 
 - Cuando un test de Livewire cubre filtros por valor válido, añade también un caso de valor inválido que verifique el reset de estado (por ejemplo `activeTag=''`) para cubrir ramas de guard clause y evitar bajadas de cobertura.
@@ -58,3 +62,5 @@
 - En este proyecto, antes de editar un componente Livewire, verifica cuál es la implementación realmente montada: el nombre puede resolver a un SFC Volt en `resources/views/components/⚡*.blade.php` aunque exista una vista/clase paralela en `resources/views/livewire/`; editar el archivo equivocado hace perder tiempo y deja la UI sin cambios.
 - Si `APP_LOCALE=eu` y faltan `lang/eu/validation.php` u otras traducciones base de Laravel, las validaciones caerán en inglés por `fallback_locale`; cuando aparezcan mensajes de error en inglés en formularios del panel, comprueba primero la existencia del archivo de idioma antes de tocar reglas o componentes.
 - En la bandeja de mensajes tipo tabla, mover una columna en <thead> sin mover su celda equivalente en <tbody> rompe la percepción visual aunque el código parezca correcto; siempre validar cabecera-celdas por orden real y revisar con captura/UI antes de cerrar.
+- En este proyecto, para nuevas claves de settings no hace falta crear migrations si la tabla `settings` ya es key/value; el cambio real está en sección/validación/UI/seeders. En correos Laravel, el remitente configurable debe declararse en `Envelope` con `Address` y conviene leer `admin_email`, `from_address` y textos legales en lote para evitar consultas repetidas.
+- Si tras crear una clase nueva con Artisan los tests siguen resolviendo una versión antigua o incompleta, ejecuta `composer dump-autoload` dentro de Docker antes de seguir depurando. En tests Pest, evita declarar clases auxiliares top-level dentro del archivo porque Composer avisará por PSR-4; usa una excepción anónima o una clase real en su ruta.

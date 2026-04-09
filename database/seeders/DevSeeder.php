@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Image;
 use App\Models\Notice;
+use App\Models\Setting;
 use App\CommunityLocations;
 use Illuminate\Support\Str;
 use App\Models\ContactMessage;
@@ -15,6 +16,7 @@ class DevSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->seedMailhogSettings();
         $this->seedNotices();
         $this->seedImages();
         $this->seedContactMessages();
@@ -22,10 +24,26 @@ class DevSeeder extends Seeder
 
     // -------------------------------------------------------------------------
 
+    private function seedMailhogSettings(): void
+    {
+        // Configure for mailhog in local development
+        Setting::upsert([
+            ['key' => 'from_address', 'value' => 'madaia33@mailhog.local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+            ['key' => 'from_name', 'value' => 'Madaia 33 Local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+            ['key' => 'smtp_host', 'value' => 'mailhog', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+            ['key' => 'smtp_port', 'value' => '1025', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+            ['key' => 'smtp_username', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+            ['key' => 'smtp_password', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+            ['key' => 'smtp_encryption', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+        ], ['key'], ['value', 'section']);
+    }
+
+    // -------------------------------------------------------------------------
+
     private function seedNotices(): void
     {
         // Aviso general (sin ubicación) — público
-        $general = Notice::factory()->public()->create([
+        Notice::factory()->public()->create([
             'title_eu' => 'Ongi etorri komunitate-webera',
             'title_es' => 'Bienvenidos a la web de la comunidad',
             'content_eu' => 'Hemen aurkituko dituzu komunitateari buruzko azken berriak eta iragarkiak.',
@@ -34,7 +52,7 @@ class DevSeeder extends Seeder
         ]);
 
         // Aviso solo en euskera (sin traducción al castellano) — público
-        $euOnly = Notice::factory()->public()->euOnly()->create([
+        Notice::factory()->public()->euOnly()->create([
             'title_eu' => 'Iragarkia euskaraz soilik',
             'content_eu' => 'Iragarki hau euskaraz bakarrik dago. Gaztelaniazko itzulpenik ez dago.',
             'published_at' => now()->subDays(2),
@@ -133,8 +151,8 @@ class DevSeeder extends Seeder
         Storage::disk('public')->makeDirectory('images');
 
         foreach ($items as $index => $item) {
-            $filename = Str::uuid().'.svg';
-            $path = 'images/'.$filename;
+            $filename = Str::uuid() . '.svg';
+            $path = 'images/' . $filename;
             $imageText = $item['alt_es'];
 
             Storage::disk('public')->put(
@@ -142,7 +160,7 @@ class DevSeeder extends Seeder
                 $this->buildSeededImageSvg($imageText, $item['colors'][0], $item['colors'][1], $index + 1)
             );
 
-            $image = Image::create([
+            Image::create([
                 'filename' => $filename,
                 'path' => $path,
                 'alt_text_eu' => $item['alt_eu'],

@@ -9,15 +9,11 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-abstract class AbstractContactMail extends Mailable
+class TestEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
-        public readonly string $visitorName,
-        public readonly string $messageSubject,
-        public readonly string $messageBody,
-        public readonly ?string $legalText = null,
         public readonly ?string $fromAddress = null,
         public readonly ?string $fromName = null,
     ) {}
@@ -25,7 +21,7 @@ abstract class AbstractContactMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->messageSubject,
+            subject: __('admin.test_email.subject'),
             from: $this->fromAddress ? new Address($this->fromAddress, $this->fromName ?? '') : null,
         );
     }
@@ -33,9 +29,7 @@ abstract class AbstractContactMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: $this->viewName(),
+            view: 'mail.test-email',
         );
     }
-
-    abstract protected function viewName(): string;
 }

@@ -3,10 +3,13 @@
 namespace App\Livewire;
 
 use App\Concerns\BuildsLocaleFieldConfigs;
+use App\Mail\TestEmail;
 use App\Models\Setting;
-use Livewire\Component;
+use App\Support\ConfiguredMailSettings;
 use Illuminate\Contracts\View\View;
 use App\Validations\AdminSettingsValidation;
+use Illuminate\Support\Facades\Mail;
+use Livewire\Component;
 
 class AdminSettings extends Component
 {
@@ -39,7 +42,33 @@ class AdminSettings extends Component
 
     public string $legalNoticeContentEs = '';
 
+    public string $emailFromAddress = '';
+
+    public string $emailFromName = '';
+
+    public string $smtpHost = '';
+
+    public string $smtpPort = '';
+
+    public string $smtpUsername = '';
+
+    public string $smtpPassword = '';
+
+    public string $smtpEncryption = '';
+
+    public string $emailLegalTextEu = '';
+
+    public string $emailLegalTextEs = '';
+
     public bool $saved = false;
+
+    public bool $showTestEmailModal = false;
+
+    public string $testEmailAddress = '';
+
+    public string $testEmailStatus = '';
+
+    public string $testEmailError = '';
 
     /**
      * Maps section identifier → [Livewire property name => DB key].
@@ -53,6 +82,17 @@ class AdminSettings extends Component
                 'adminEmail' => 'admin_email',
                 'legalCheckboxTextEu' => 'legal_checkbox_text_eu',
                 'legalCheckboxTextEs' => 'legal_checkbox_text_es',
+            ],
+            Setting::SECTION_EMAIL_CONFIGURATION => [
+                'emailFromAddress' => 'from_address',
+                'emailFromName' => 'from_name',
+                'smtpHost' => 'smtp_host',
+                'smtpPort' => 'smtp_port',
+                'smtpUsername' => 'smtp_username',
+                'smtpPassword' => 'smtp_password',
+                'smtpEncryption' => 'smtp_encryption',
+                'emailLegalTextEu' => 'legal_text_eu',
+                'emailLegalTextEs' => 'legal_text_es',
             ],
             Setting::SECTION_FRONT => [
                 'historyTextEu' => 'home_history_text_eu',
@@ -95,6 +135,15 @@ class AdminSettings extends Component
         $this->recaptchaSecretKey = $settings['recaptcha_secret_key'] ?? '';
         $this->legalCheckboxTextEu = $settings['legal_checkbox_text_eu'] ?? '';
         $this->legalCheckboxTextEs = $settings['legal_checkbox_text_es'] ?? '';
+        $this->emailFromAddress = $settings['from_address'] ?? '';
+        $this->emailFromName = $settings['from_name'] ?? '';
+        $this->smtpHost = $settings['smtp_host'] ?? '';
+        $this->smtpPort = $settings['smtp_port'] ?? '';
+        $this->smtpUsername = $settings['smtp_username'] ?? '';
+        $this->smtpPassword = $this->configuredMailSettings()->displayValue('smtp_password', $settings['smtp_password'] ?? '');
+        $this->smtpEncryption = $settings['smtp_encryption'] ?? '';
+        $this->emailLegalTextEu = $settings['legal_text_eu'] ?? '';
+        $this->emailLegalTextEs = $settings['legal_text_es'] ?? '';
         $this->historyTextEu = $settings['home_history_text_eu'] ?? '';
         $this->historyTextEs = $settings['home_history_text_es'] ?? '';
         $this->privacyContentEu = $settings['legal_page_privacy_policy_eu'] ?? '';
@@ -135,7 +184,7 @@ class AdminSettings extends Component
         foreach ($map as $property => $key) {
             $rows[] = [
                 'key' => $key,
-                'value' => $this->{$property},
+                'value' => $this->configuredMailSettings()->storeValue($key, (string) $this->{$property}),
                 'section' => $this->activeSection,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
@@ -143,6 +192,11 @@ class AdminSettings extends Component
         }
 
         return $rows;
+    }
+
+    private function configuredMailSettings(): ConfiguredMailSettings
+    {
+        return app(ConfiguredMailSettings::class);
     }
 
     public function mount(): void
@@ -183,6 +237,64 @@ class AdminSettings extends Component
         Setting::upsert($this->buildUpsertRows($map), ['key'], ['value', 'updated_at']);
 
         $this->saved = true;
+    }
+
+    public function openTestEmailModal(): void
+    {
+        $this->testEmailStatus = '';
+        $this->testEmailAddress = '';
+        $this->showTestEmailModal = true;
+    }
+
+    public function closeTestEmailModal(): void
+    {
+        $this->showTestEmailModal = false;
+        $this->testEmailStatus = '';
+        $this->testEmailAddress = '';
+        $this->testEmailError = '';
+    }
+
+    public function sendTestEmail(): void
+    {
+        $this->validate([
+            'testEmailAddress' => 'required|email',
+        ]);
+
+        if (empty($this->smtpHost)) {
+            $this->testEmailStatus = 'error';
+            $this->dispatch('notify', message: __('admin.test_email.smtp_not_configured'), type: 'error');
+
+            return;
+        }
+
+        try {
+            $emailSettings = Setting::whereIn('key', [
+                'from_address',
+                'from_name',
+                'smtp_host',
+                'smtp_port',
+                'smtp_username',
+                'smtp_password',
+                'smtp_encryption',
+            ])->pluck('value', 'key');
+
+            $this->configuredMailSettings()->apply($emailSettings->all());
+
+            Mail::to($this->testEmailAddress)->send(
+                new TestEmail(
+                    $this->emailFromAddress,
+                    $this->emailFromName,
+                )
+            );
+
+            $this->testEmailStatus = 'success';
+            $this->dispatch('notify', message: __('admin.test_email.sent'), type: 'success');
+            $this->closeTestEmailModal();
+        } catch (\Exception $e) {
+            $this->testEmailStatus = 'error';
+            $this->testEmailError = $e->getMessage();
+            $this->dispatch('notify', message: __('admin.test_email.failed', ['error' => $e->getMessage()]), type: 'error');
+        }
     }
 
     public function render(): View

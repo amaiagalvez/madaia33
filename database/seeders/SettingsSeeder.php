@@ -41,6 +41,51 @@ class SettingsSeeder extends Seeder
                 'section' => Setting::SECTION_CONTACT_FORM,
             ],
             [
+                'key' => 'from_address',
+                'value' => 'noreply@madaia33.eus',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
+                'key' => 'from_name',
+                'value' => 'Madaia 33',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
+                'key' => 'smtp_host',
+                'value' => '',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
+                'key' => 'smtp_port',
+                'value' => '587',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
+                'key' => 'smtp_username',
+                'value' => '',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
+                'key' => 'smtp_password',
+                'value' => '',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
+                'key' => 'smtp_encryption',
+                'value' => 'tls',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
+                'key' => 'legal_text_eu',
+                'value' => 'Mezua pribatua da eta babestu dago legez.',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
+                'key' => 'legal_text_es',
+                'value' => 'Este mensaje es privado y está protegido por ley.',
+                'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+            ],
+            [
                 'key' => 'legal_page_privacy_policy_eu',
                 'value' => '<p>Pribatutasun politikaren edukia hemen agertuko da.</p>',
                 'section' => Setting::SECTION_FRONT,

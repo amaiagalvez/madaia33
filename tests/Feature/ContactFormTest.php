@@ -9,15 +9,31 @@ use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
+use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+
+const CONTACT_FORM_VISITOR_NAME = 'Ane Etxebarria';
+const CONTACT_FORM_VISITOR_EMAIL = 'ane@example.com';
+const CONTACT_FORM_SHORT_MESSAGE = 'Kaixo!';
+const CONTACT_FORM_FROM_ADDRESS = 'mailhog@example.test';
+const CONTACT_FORM_FROM_NAME = 'Madaia 33';
+const CONTACT_FORM_LEGAL_TEXT_EU = '<p>Ohar legalaren testua</p>';
 
 dataset('supported_locales', SupportedLocales::all());
 
 beforeEach(function () {
     config(['app.recaptcha_skip' => true]);
     createSetting('admin_email', 'admin@example.com');
+    createSetting('from_address', CONTACT_FORM_FROM_ADDRESS);
+    createSetting('from_name', CONTACT_FORM_FROM_NAME);
+    createSetting('smtp_host', 'smtp.example.test');
+    createSetting('smtp_port', '2525');
+    createSetting('smtp_username', 'smtp-user');
+    createSetting('smtp_password', app(ConfiguredMailSettings::class)->storeValue('smtp_password', 'smtp-secret'));
+    createSetting('smtp_encryption', 'tls');
+    createSetting('legal_text_eu', CONTACT_FORM_LEGAL_TEXT_EU);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,10 +45,10 @@ it('limpia todos los campos tras un envío exitoso', function () {
     Mail::fake();
 
     Livewire::test('contact-form')
-        ->set('name', 'Ane Etxebarria')
-        ->set('email', 'ane@example.com')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Proba')
-        ->set('message', 'Kaixo!')
+        ->set('message', CONTACT_FORM_SHORT_MESSAGE)
         ->set('legalAccepted', true)
         ->set('recaptchaToken', 'skip')
         ->call('submit')
@@ -53,16 +69,47 @@ it('despacha ContactConfirmation y ContactNotification', function () {
     Mail::fake();
 
     Livewire::test('contact-form')
-        ->set('name', 'Ane Etxebarria')
-        ->set('email', 'ane@example.com')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Proba gaia')
         ->set('message', 'Kaixo, mezu bat bidaltzen dut.')
         ->set('legalAccepted', true)
         ->set('recaptchaToken', 'skip')
         ->call('submit');
 
-    Mail::assertSent(ContactConfirmation::class);
-    Mail::assertSent(ContactNotification::class);
+    Mail::assertSent(ContactConfirmation::class, function (ContactConfirmation $mail): bool {
+        return $mail->fromAddress === CONTACT_FORM_FROM_ADDRESS
+            && $mail->fromName === CONTACT_FORM_FROM_NAME
+            && $mail->legalText === CONTACT_FORM_LEGAL_TEXT_EU;
+    });
+
+    Mail::assertSent(ContactNotification::class, function (ContactNotification $mail): bool {
+        return $mail->fromAddress === CONTACT_FORM_FROM_ADDRESS
+            && $mail->fromName === CONTACT_FORM_FROM_NAME
+            && $mail->legalText === CONTACT_FORM_LEGAL_TEXT_EU;
+    });
+});
+
+it('aplica la configuración smtp guardada en settings antes de enviar', function () {
+    Mail::fake();
+
+    Livewire::test('contact-form')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
+        ->set('subject', 'SMTP test')
+        ->set('message', CONTACT_FORM_SHORT_MESSAGE)
+        ->set('legalAccepted', true)
+        ->set('recaptchaToken', 'skip')
+        ->call('submit');
+
+    expect(config('mail.default'))->toBe('smtp')
+        ->and(config('mail.from.address'))->toBe(CONTACT_FORM_FROM_ADDRESS)
+        ->and(config('mail.from.name'))->toBe(CONTACT_FORM_FROM_NAME)
+        ->and(config('mail.mailers.smtp.host'))->toBe('smtp.example.test')
+        ->and(config('mail.mailers.smtp.port'))->toBe(2525)
+        ->and(config('mail.mailers.smtp.username'))->toBe('smtp-user')
+        ->and(config('mail.mailers.smtp.password'))->toBe('smtp-secret')
+        ->and(config('mail.mailers.smtp.scheme'))->toBe('tls');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -83,7 +130,7 @@ it('rechaza el envío cuando el score de reCAPTCHA es inferior al umbral', funct
 
     $component = Livewire::test('contact-form')
         ->set('name', 'Ane')
-        ->set('email', 'ane@example.com')
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Gaia')
         ->set('message', 'Mezua')
         ->set('legalAccepted', true)
@@ -103,10 +150,10 @@ it('happy path: guarda ContactMessage y despacha ambos emails', function () {
     Mail::fake();
 
     $component = Livewire::test('contact-form')
-        ->set('name', 'Ane Etxebarria')
-        ->set('email', 'ane@example.com')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Proba')
-        ->set('message', 'Kaixo!')
+        ->set('message', CONTACT_FORM_SHORT_MESSAGE)
         ->set('legalAccepted', true)
         ->set('recaptchaToken', 'skip')
         ->call('submit');
@@ -121,10 +168,10 @@ it('evita envíos duplicados cuando se repite rápidamente el mismo payload', fu
     Mail::fake();
 
     $payload = [
-        'name' => 'Ane Etxebarria',
-        'email' => 'ane@example.com',
+        'name' => CONTACT_FORM_VISITOR_NAME,
+        'email' => CONTACT_FORM_VISITOR_EMAIL,
         'subject' => 'Proba',
-        'message' => 'Kaixo!',
+        'message' => CONTACT_FORM_SHORT_MESSAGE,
         'legalAccepted' => true,
         'recaptchaToken' => 'skip',
     ];
@@ -161,7 +208,7 @@ it('fallo de email: guarda el mensaje y muestra advertencia', function () {
 
     $component = Livewire::test('contact-form')
         ->set('name', 'Ane')
-        ->set('email', 'ane@example.com')
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Gaia')
         ->set('message', 'Mezua')
         ->set('legalAccepted', true)
@@ -182,7 +229,7 @@ it('fallo de reCAPTCHA por error externo: rechaza el envío', function () {
 
     $component = Livewire::test('contact-form')
         ->set('name', 'Ane')
-        ->set('email', 'ane@example.com')
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Gaia')
         ->set('message', 'Mezua')
         ->set('legalAccepted', true)
@@ -199,8 +246,8 @@ it('rechaza payload xss con script tags y no guarda el mensaje', function () {
     $payload = '<script>alert("xss")</script>';
 
     Livewire::test('contact-form')
-        ->set('name', 'Ane Etxebarria')
-        ->set('email', 'ane@example.com')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Consulta')
         ->set('message', $payload)
         ->set('legalAccepted', true)
@@ -217,8 +264,8 @@ it('trata payload sql-like como texto plano en la bandeja admin', function () {
     $payload = "' OR 1=1 --";
 
     Livewire::test('contact-form')
-        ->set('name', 'Ane Etxebarria')
-        ->set('email', 'ane@example.com')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Consulta SQL')
         ->set('message', $payload)
         ->set('legalAccepted', true)
@@ -240,7 +287,7 @@ it('si reCAPTCHA lanza excepción rechaza el envío y no guarda mensaje', functi
     createSetting('recaptcha_secret_key', 'test-secret');
 
     Http::fake(function () {
-        throw new RuntimeException('Recaptcha service unavailable');
+        throw new class('Recaptcha service unavailable') extends RuntimeException {};
     });
 
     Livewire::test('contact-form')
@@ -270,10 +317,10 @@ it('ignora recent submissions inválidas en sesión y permite el envío', functi
     session(['contact_form_recent_submissions' => 'invalid']);
 
     Livewire::test('contact-form')
-        ->set('name', 'Ane Etxebarria')
-        ->set('email', 'ane@example.com')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Proba')
-        ->set('message', 'Kaixo!')
+        ->set('message', CONTACT_FORM_SHORT_MESSAGE)
         ->set('legalAccepted', true)
         ->set('recaptchaToken', 'skip')
         ->call('submit')
@@ -287,10 +334,10 @@ it('si no hay recaptcha secret key acepta el envío aunque recaptcha_skip sea fa
     config(['app.recaptcha_skip' => false]);
 
     Livewire::test('contact-form')
-        ->set('name', 'Ane Etxebarria')
-        ->set('email', 'ane@example.com')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
         ->set('subject', 'Sin secret')
-        ->set('message', 'Kaixo!')
+        ->set('message', CONTACT_FORM_SHORT_MESSAGE)
         ->set('legalAccepted', true)
         ->set('recaptchaToken', 'token-cualquiera')
         ->call('submit')

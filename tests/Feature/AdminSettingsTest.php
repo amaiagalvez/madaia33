@@ -11,7 +11,10 @@ use App\Models\Setting;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
+use App\Support\ConfiguredMailSettings;
 use App\Validations\AdminSettingsValidation;
+
+const ADMIN_SETTINGS_EMAIL = 'admin@example.com';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AdminSettings — guardar configuración
@@ -23,10 +26,10 @@ it('guarda el email de admin en la tabla settings', function () {
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_CONTACT_FORM)
-        ->set('adminEmail', 'admin@example.com')
+        ->set('adminEmail', ADMIN_SETTINGS_EMAIL)
         ->call('save');
 
-    expect(settingValue('admin_email'))->toBe('admin@example.com');
+    expect(settingValue('admin_email'))->toBe(ADMIN_SETTINGS_EMAIL);
 });
 
 it('guarda las claves reCAPTCHA en la tabla settings', function () {
@@ -77,13 +80,44 @@ it('guarda el texto legal en la tabla settings', function () {
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_CONTACT_FORM)
-        ->set('adminEmail', 'admin@example.com')
+        ->set('adminEmail', ADMIN_SETTINGS_EMAIL)
         ->set('legalCheckboxTextEu', 'Pribatutasun-politika onartzen dut')
         ->set('legalCheckboxTextEs', 'Acepto la política de privacidad')
         ->call('save');
 
     expect(settingValue('legal_checkbox_text_eu'))->toBe('Pribatutasun-politika onartzen dut');
     expect(settingValue('legal_checkbox_text_es'))->toBe('Acepto la política de privacidad');
+});
+
+it('guarda la configuración de correo en la tabla settings', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_EMAIL_CONFIGURATION)
+        ->set('emailFromAddress', 'noreply@example.com')
+        ->set('emailFromName', 'Madaia 33')
+        ->set('smtpHost', 'smtp.example.com')
+        ->set('smtpPort', '587')
+        ->set('smtpUsername', 'smtp-user')
+        ->set('smtpPassword', 'smtp-secret')
+        ->set('smtpEncryption', 'tls')
+        ->set('emailLegalTextEu', '<p>Ohar legala</p>')
+        ->set('emailLegalTextEs', '<p>Aviso legal</p>')
+        ->call('save');
+
+    $configuredMailSettings = app(ConfiguredMailSettings::class);
+
+    expect(settingValue('from_address'))->toBe('noreply@example.com')
+        ->and(settingValue('from_name'))->toBe('Madaia 33')
+        ->and(settingValue('smtp_host'))->toBe('smtp.example.com')
+        ->and(settingValue('smtp_port'))->toBe('587')
+        ->and(settingValue('smtp_username'))->toBe('smtp-user')
+        ->and(settingValue('smtp_password'))->not->toBe('smtp-secret')
+        ->and($configuredMailSettings->displayValue('smtp_password', (string) settingValue('smtp_password')))->toBe('smtp-secret')
+        ->and(settingValue('smtp_encryption'))->toBe('tls')
+        ->and(settingValue('legal_text_eu'))->toBe('<p>Ohar legala</p>')
+        ->and(settingValue('legal_text_es'))->toBe('<p>Aviso legal</p>');
 });
 
 it('el campo recaptcha_secret_key se renderiza como type=password', function () {
@@ -158,6 +192,22 @@ it('renderiza los campos recaptcha dentro de su propia sección', function () {
         ->assertSeeHtml('id="recaptchaSecretKey"');
 });
 
+it('renderiza los campos de configuración de correo dentro de su sección', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_EMAIL_CONFIGURATION)
+        ->assertSeeHtml('id="emailFromAddress"')
+        ->assertSeeHtml('id="emailFromName"')
+        ->assertSeeHtml('id="smtpHost"')
+        ->assertSeeHtml('id="smtpPort"')
+        ->assertSeeHtml('id="smtpUsername"')
+        ->assertSeeHtml('id="smtpPassword"')
+        ->assertSeeHtml('id="smtpEncryption"')
+        ->assertSeeHtml('data-bilingual-field="emailLegalTextEu"');
+});
+
 it('mantiene visible el botón guardar en la sección front', function () {
     $user = User::factory()->create();
 
@@ -174,7 +224,7 @@ it('rechaza scripts en los textos legales de settings', function () {
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_CONTACT_FORM)
-        ->set('adminEmail', 'admin@example.com')
+        ->set('adminEmail', ADMIN_SETTINGS_EMAIL)
         ->set('legalCheckboxTextEu', '<script>alert(1)</script>')
         ->call('save')
         ->assertHasErrors(['legalCheckboxTextEu']);
@@ -208,7 +258,7 @@ it('el dashboard muestra estadísticas reales', function () {
 it('los settings creados con factory tienen sección válida', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -225,6 +275,7 @@ it('los tabs de secciones se muestran en orden alfabético', function () {
 
     expect($sections)
         ->toContain(Setting::SECTION_CONTACT_FORM)
+        ->toContain(Setting::SECTION_EMAIL_CONFIGURATION)
         ->toContain(Setting::SECTION_FRONT)
         ->toContain(Setting::SECTION_RECAPTCHA)
         ->and($sections)->toBe(collect($sections)->sort()->values()->all());
@@ -412,4 +463,87 @@ it('añadir datos en una nueva sección renderiza su tab sin cambios estructural
         ->and($component->get('activeSection'))->toBe($sections[0]);
 
     $component->assertSeeHtml(Setting::SECTION_GALLERY);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Test Email Features
+// ─────────────────────────────────────────────────────────────────────────────
+
+it('openTestEmailModal abre el modal y resetea el formulario', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('openTestEmailModal')
+        ->assertSet('showTestEmailModal', true)
+        ->assertSet('testEmailAddress', '')
+        ->assertSet('testEmailStatus', '');
+});
+
+it('closeTestEmailModal cierra el modal y resetea el estado', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('openTestEmailModal')
+        ->call('closeTestEmailModal')
+        ->assertSet('showTestEmailModal', false)
+        ->assertSet('testEmailAddress', '')
+        ->assertSet('testEmailStatus', '');
+});
+
+it('sendTestEmail valida que testEmailAddress sea un email válido', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('openTestEmailModal')
+        ->set('testEmailAddress', 'not-an-email')
+        ->call('sendTestEmail')
+        ->assertHasErrors(['testEmailAddress']);
+});
+
+it('sendTestEmail requiere SMTP configurado (smtp_host no vacío)', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('openTestEmailModal')
+        ->set('testEmailAddress', 'test@example.com')
+        ->set('smtpHost', '')
+        ->call('sendTestEmail')
+        ->assertSet('testEmailStatus', 'error');
+});
+
+it('sendTestEmail envía un email de prueba con la configuración SMTP', function () {
+    $user = User::factory()->create();
+
+    createSetting('from_address', 'sender@example.com');
+    createSetting('from_name', 'Test Sender');
+    createSetting('smtp_host', 'smtp.mailtrap.io');
+    createSetting('smtp_port', '587');
+    createSetting('smtp_username', 'user');
+    createSetting('smtp_password', encrypt('password'));
+    createSetting('smtp_encryption', 'tls');
+
+    \Illuminate\Support\Facades\Mail::fake();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_EMAIL_CONFIGURATION)
+        ->set('emailFromAddress', 'sender@example.com')
+        ->set('emailFromName', 'Test Sender')
+        ->set('smtpHost', 'smtp.mailtrap.io')
+        ->set('smtpPort', '587')
+        ->set('smtpUsername', 'user')
+        ->set('smtpPassword', 'password')
+        ->set('smtpEncryption', 'tls')
+        ->call('openTestEmailModal')
+        ->set('testEmailAddress', 'recipient@example.com')
+        ->call('sendTestEmail')
+        ->assertSet('showTestEmailModal', false);
+
+    \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\TestEmail::class, function ($mail) {
+        return $mail->hasTo('recipient@example.com');
+    });
 });

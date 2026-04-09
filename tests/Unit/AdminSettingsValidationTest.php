@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\Facades\Validator;
 use App\Validations\AdminSettingsValidation;
 
@@ -130,6 +131,58 @@ it('accepts valid recaptcha section payload', function () {
     );
 
     expect($validator->fails())->toBeFalse();
+});
+
+it('requires a valid sender address in email configuration section rules', function () {
+    $validator = Validator::make(
+        [
+            'emailFromAddress' => 'not-an-email',
+            'smtpHost' => 'smtp.example.com',
+            'smtpPort' => '587',
+            'smtpEncryption' => 'tls',
+            'emailLegalTextEu' => '<p>Testu legala</p>',
+            'emailLegalTextEs' => '<p>Texto legal</p>',
+        ],
+        AdminSettingsValidation::rulesBySection(Setting::SECTION_EMAIL_CONFIGURATION),
+    );
+
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->keys())->toContain('emailFromAddress');
+});
+
+it('accepts valid email configuration section payload', function () {
+    $validator = Validator::make(
+        [
+            'emailFromAddress' => 'noreply@example.com',
+            'emailFromName' => 'Madaia 33',
+            'smtpHost' => 'smtp.example.com',
+            'smtpPort' => '587',
+            'smtpUsername' => 'smtp-user',
+            'smtpPassword' => 'smtp-secret',
+            'smtpEncryption' => 'tls',
+            'emailLegalTextEu' => '<p>Testu legala</p>',
+            'emailLegalTextEs' => '<p>Texto legal</p>',
+        ],
+        AdminSettingsValidation::rulesBySection(Setting::SECTION_EMAIL_CONFIGURATION),
+    );
+
+    expect($validator->fails())->toBeFalse();
+});
+
+it('rejects invalid smtp encryption option in email configuration section rules', function () {
+    $validator = Validator::make(
+        [
+            'emailFromAddress' => 'noreply@example.com',
+            'smtpHost' => 'smtp.example.com',
+            'smtpPort' => '587',
+            'smtpEncryption' => 'starttls',
+        ],
+        AdminSettingsValidation::rulesBySection(Setting::SECTION_EMAIL_CONFIGURATION),
+    );
+
+    expect($validator->fails())->toBeTrue()
+        ->and($validator->errors()->keys())->toContain('smtpEncryption')
+        ->and(ConfiguredMailSettings::encryptionOptions())->toBe(['tls', 'ssl']);
 });
 
 it('accepts valid front section payload including home history text', function () {

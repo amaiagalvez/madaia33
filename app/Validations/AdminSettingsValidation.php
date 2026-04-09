@@ -4,6 +4,7 @@ namespace App\Validations;
 
 use App\Models\Setting;
 use App\Rules\NoScriptTags;
+use App\Support\ConfiguredMailSettings;
 use Illuminate\Validation\Rule;
 
 class AdminSettingsValidation
@@ -58,6 +59,17 @@ class AdminSettingsValidation
                 'adminEmail' => 'required|email|max:255',
                 'legalCheckboxTextEu' => ['nullable', 'string', 'max:1000', new NoScriptTags],
                 'legalCheckboxTextEs' => ['nullable', 'string', 'max:1000', new NoScriptTags],
+            ],
+            Setting::SECTION_EMAIL_CONFIGURATION => [
+                'emailFromAddress' => 'required|email|max:255',
+                'emailFromName' => 'nullable|string|max:255',
+                'smtpHost' => 'required|string|max:255',
+                'smtpPort' => 'required|integer|min:1|max:65535',
+                'smtpUsername' => 'nullable|string|max:255|required_with:smtpPassword',
+                'smtpPassword' => 'nullable|string|max:255|required_with:smtpUsername',
+                'smtpEncryption' => ['nullable', 'string', Rule::in(ConfiguredMailSettings::encryptionOptions())],
+                'emailLegalTextEu' => ['nullable', 'string', 'max:5000', new NoScriptTags],
+                'emailLegalTextEs' => ['nullable', 'string', 'max:5000', new NoScriptTags],
             ],
             Setting::SECTION_RECAPTCHA => [
                 'recaptchaSiteKey' => 'nullable|string|max:255',

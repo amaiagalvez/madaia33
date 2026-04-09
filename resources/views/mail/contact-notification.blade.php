@@ -6,3 +6,8 @@
 
 <p><strong>{{ __('contact.message') }}:</strong></p>
 <p>{{ $messageBody }}</p>
+
+@if ($legalText)
+    <hr>
+    <div>{!! $legalText !!}</div>
+@endif

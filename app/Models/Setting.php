@@ -14,6 +14,8 @@ class Setting extends Model
 
     public const SECTION_CONTACT_FORM = 'contact_form';
 
+    public const SECTION_EMAIL_CONFIGURATION = 'email_configuration';
+
     public const SECTION_FRONT = 'front';
 
     public const SECTION_GALLERY = 'gallery';
@@ -35,6 +37,7 @@ class Setting extends Model
     {
         return [
             self::SECTION_CONTACT_FORM,
+            self::SECTION_EMAIL_CONFIGURATION,
             self::SECTION_FRONT,
             self::SECTION_GALLERY,
             self::SECTION_GENERAL,
