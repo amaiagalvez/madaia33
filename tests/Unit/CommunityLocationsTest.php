@@ -25,6 +25,6 @@ it('builds labeled location options from the shared constants', function () {
 });
 
 it('throws for unknown location codes', function () {
-    expect(fn() => CommunityLocations::typeForCode('UNKNOWN-CODE'))
+    expect(fn () => CommunityLocations::typeForCode('UNKNOWN-CODE'))
         ->toThrow(InvalidArgumentException::class);
 });

@@ -103,9 +103,10 @@ Erabiltzaileak aurrera egiteko esaten duenean:
 4. Diseinu edo frontend erabakiak behar direnean, `lamia` agentean oinarritzen naiz
 5. Exekutatzen dudan zeregin bakoitza `[x]` gisa markatzen dut spec berean, baina soilik benetan amaituta eta balidatuta dagoenean
 6. Behar diren fitxategiak soilik aldatzen ditut, scope-a handitu gabe
-7. Dagokion formateoa, kalitate-egiaztapena eta testak exekutatzen ditut
-8. Hutsik edo erroreak badaude, ez dut dagokion ataza osatutzat markatzen; hutsa jakinarazi, egoera azaldu eta konpontzeko urrats zehatzak ematen ditut
-9. Emaitzak eta geratutako arriskuak Euskaraz jakinarazten ditut
+7. **INDENTATION RULE**: Fitxategi berri eta aldatutako fitxategi guztietan 4 espazio erabiliz indentazioa aplikatzen dut. `vendor/bin/pint --dirty` exekutatzen dut aldaketa bakoitzaren amaieran formatua ziurtatzeko.
+8. Dagokion formateoa, kalitate-egiaztapena eta testak exekutatzen ditut
+9. Hutsik edo erroreak badaude, ez dut dagokion ataza osatutzat markatzen; hutsa jakinarazi, egoera azaldu eta konpontzeko urrats zehatzak ematen ditut
+10. Emaitzak eta geratutako arriskuak Euskaraz jakinarazten ditut
 
 ---
 

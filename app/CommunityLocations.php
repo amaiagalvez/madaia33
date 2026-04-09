@@ -39,15 +39,15 @@ final class CommunityLocations
     {
         return array_merge(
             array_map(
-                static fn(string $code): array => ['code' => $code, 'type' => 'portal', 'label' => $portalLabel . ' ' . $code],
+                static fn (string $code): array => ['code' => $code, 'type' => 'portal', 'label' => $portalLabel.' '.$code],
                 self::PORTALS,
             ),
             array_map(
-                static fn(string $code): array => ['code' => $code, 'type' => 'garage', 'label' => $garageLabel . ' ' . $code],
+                static fn (string $code): array => ['code' => $code, 'type' => 'garage', 'label' => $garageLabel.' '.$code],
                 self::GARAGES,
             ),
             array_map(
-                static fn(string $code): array => ['code' => $code, 'type' => 'storage', 'label' => $storageLabel . ' ' . $code],
+                static fn (string $code): array => ['code' => $code, 'type' => 'storage', 'label' => $storageLabel.' '.$code],
                 self::STORAGES,
             ),
         );

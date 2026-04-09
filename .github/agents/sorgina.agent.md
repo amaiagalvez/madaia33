@@ -63,17 +63,18 @@ Erabiltzaileak "bai", "aurrera", "ados" edo antzeko zerbait esaten duenean:
 1. **Spec zenbakia kalkulatu**: `.github/specs/` karpetan dagoen azken `XXX-*.md` fitxategia bilatu eta hurrengo zenbakia hartu
 2. **Spec sortu**: `.github/specs/XXX-code-review.md` fitxategia sortu beheko egiturarekin
 3. **Exekutatu** aldaketa bakoitza spec-eko ordenan, bakoitza bukatu ondoren `[x]` markatuz
-4. **Quality check** exekutatu Docker barruan egitasmo amaieran:
+4. **INDENTATION RULE**: Fitxategi berri eta aldatutako fitxategi guztietan 4 espazio erabiliz indentazioa aplikatzen dut. `vendor/bin/pint --dirty` exekutatzen dut aldaketa bakoitzaren amaieran formatua ziurtatzeko.
+5. **Quality check** exekutatu Docker barruan egitasmo amaieran:
    ```
    docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality
    ```
-5. **Testak exekutatu**:
+6. **Testak exekutatu**:
    ```
    docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact
    ```
-6. **Dusk testak exekutatu**: Browser testak pasa daitezen egiaztatu. Jarraitu `dusk-testing` skill-eko instrukzioak (`.github/skills/dusk-testing/SKILL.md`) — Chrome/ChromeDriver instalazioa, datu-base prestaketa eta app-server Docker barruan.
-7. Emaitzak Euskaraz jakinarazi
-8. **Informe eta agenteen eguneratzea**: Egitasmo amaieran:
+7. **Dusk testak exekutatu**: Browser testak pasa daitezen egiaztatu. Jarraitu `dusk-testing` skill-eko instrukzioak (`.github/skills/dusk-testing/SKILL.md`) — Chrome/ChromeDriver instalazioa, datu-base prestaketa eta app-server Docker barruan.
+8. Emaitzak Euskaraz jakinarazi
+9. **Informe eta agenteen eguneratzea**: Egitasmo amaieran:
    - Sortu edo eguneratu `.github/agents/code-reviews/correction-report-[YYYY-MM-DD].md` aurrera datorrekin:
      - Arazo-motak aurkituta (zenbakia eta maiztasuna)
      - Arriskua murriztua (zergatik duten inportantzia)

@@ -2,8 +2,8 @@
 
 namespace App\Actions;
 
-use App\Models\PropertyAssignment;
 use Carbon\CarbonImmutable;
+use App\Models\PropertyAssignment;
 use Illuminate\Validation\ValidationException;
 
 class UnassignPropertyAction

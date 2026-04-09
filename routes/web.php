@@ -1,37 +1,37 @@
 <?php
 
-use App\Http\Controllers\LegalPageController;
-use App\Http\Controllers\SitemapController;
-use App\Http\Controllers\PublicHomeController;
 use App\Models\Image;
 use App\Models\Owner;
 use App\Models\Notice;
 use App\Models\Location;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\LegalPageController;
+use App\Http\Controllers\PublicHomeController;
 
 // ─── Root redirect ────────────────────────────────────────────────────────────
 
-Route::get('/', fn() => redirect()->route('home.eu'))->name('root');
+Route::get('/', fn () => redirect()->route('home.eu'))->name('root');
 
 // ─── Public routes ────────────────────────────────────────────────────────────
 
 Route::prefix('eu')->group(function () {
     Route::get('/', [PublicHomeController::class, 'index'])->name('home.eu');
-    Route::get('/iragarkiak', fn() => view('public.notices'))->name('notices.eu');
-    Route::get('/argazki-bilduma', fn() => view('public.gallery'))->name('gallery.eu');
-    Route::get('/harremana', fn() => view('public.contact'))->name('contact.eu');
-    Route::get('/pribatua', fn() => view('public.private'))->name('private.eu');
+    Route::get('/iragarkiak', fn () => view('public.notices'))->name('notices.eu');
+    Route::get('/argazki-bilduma', fn () => view('public.gallery'))->name('gallery.eu');
+    Route::get('/harremana', fn () => view('public.contact'))->name('contact.eu');
+    Route::get('/pribatua', fn () => view('public.private'))->name('private.eu');
     Route::get('/pribatutasun-politika', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy.eu');
     Route::get('/ohar-legala', [LegalPageController::class, 'legalNotice'])->name('legal-notice.eu');
 });
 
 Route::prefix('es')->group(function () {
     Route::get('/', [PublicHomeController::class, 'index'])->name('home.es');
-    Route::get('/avisos', fn() => view('public.notices'))->name('notices.es');
-    Route::get('/galeria', fn() => view('public.gallery'))->name('gallery.es');
-    Route::get('/contacto', fn() => view('public.contact'))->name('contact.es');
-    Route::get('/privado', fn() => view('public.private'))->name('private.es');
+    Route::get('/avisos', fn () => view('public.notices'))->name('notices.es');
+    Route::get('/galeria', fn () => view('public.gallery'))->name('gallery.es');
+    Route::get('/contacto', fn () => view('public.contact'))->name('contact.es');
+    Route::get('/privado', fn () => view('public.private'))->name('private.es');
     Route::get('/politica-de-privacidad', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy.es');
     Route::get('/aviso-legal', [LegalPageController::class, 'legalNotice'])->name('legal-notice.es');
 });
@@ -43,7 +43,7 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin\n";
     $content .= "\n";
-    $content .= 'Sitemap: ' . route('sitemap') . "\n";
+    $content .= 'Sitemap: '.route('sitemap')."\n";
 
     return response($content, 200, ['Content-Type' => 'text/plain']);
 })->name('robots');
@@ -59,16 +59,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             'unreadMessagesCount' => ContactMessage::where('is_read', false)->count(),
         ]);
     })->name('dashboard');
-    Route::get('/avisos', fn() => view('admin.notices'))->name('notices');
-    Route::get('/imagenes', fn() => view('admin.images'))->name('images');
-    Route::get('/mensajes', fn() => view('admin.messages'))->name('messages');
-    Route::get('/configuracion', fn() => view('admin.settings'))->name('settings');
-    Route::get('/portales', fn() => view('admin.locations.index', ['type' => 'portal']))->name('locations.portals');
-    Route::get('/garajes', fn() => view('admin.locations.index', ['type' => 'garage']))->name('locations.garages');
-    Route::get('/trasteros', fn() => view('admin.locations.index', ['type' => 'storage']))->name('locations.storages');
-    Route::get('/ubicaciones/{location}', fn(Location $location) => view('admin.locations.show', ['location' => $location]))->name('locations.show');
-    Route::get('/propietarias', fn() => view('admin.owners.index'))->name('owners.index');
-    Route::get('/propietarias/{owner}', fn(Owner $owner) => view('admin.owners.show', ['owner' => $owner]))->name('owners.show');
+    Route::get('/avisos', fn () => view('admin.notices'))->name('notices');
+    Route::get('/imagenes', fn () => view('admin.images'))->name('images');
+    Route::get('/mensajes', fn () => view('admin.messages'))->name('messages');
+    Route::get('/configuracion', fn () => view('admin.settings'))->name('settings');
+    Route::get('/portales', fn () => view('admin.locations.index', ['type' => 'portal']))->name('locations.portals');
+    Route::get('/garajes', fn () => view('admin.locations.index', ['type' => 'garage']))->name('locations.garages');
+    Route::get('/trasteros', fn () => view('admin.locations.index', ['type' => 'storage']))->name('locations.storages');
+    Route::get('/ubicaciones/{location}', fn (Location $location) => view('admin.locations.show', ['location' => $location]))->name('locations.show');
+    Route::get('/propietarias', fn () => view('admin.owners.index'))->name('owners.index');
+    Route::get('/propietarias/{owner}', fn (Owner $owner) => view('admin.owners.show', ['owner' => $owner]))->name('owners.show');
 });
 
 // ─── Auth (Fortify / Breeze) ───────────────────────────────────────────────────
@@ -77,4 +77,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'pages.dashboard.index')->name('dashboard');
 });
 
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

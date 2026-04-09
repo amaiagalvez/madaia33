@@ -1,9 +1,9 @@
 <?php
 
-use App\Actions\AssignPropertyAction;
 use App\Models\Owner;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
+use App\Actions\AssignPropertyAction;
 use App\Actions\UnassignPropertyAction;
 use Illuminate\Validation\ValidationException;
 
@@ -36,7 +36,7 @@ describe('AssignPropertyAction', function () {
 
         $action = new AssignPropertyAction;
 
-        expect(fn() => $action->execute($property, $owner2, '2026-06-01'))
+        expect(fn () => $action->execute($property, $owner2, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -73,7 +73,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn() => $action->execute($assignment, '2026-06-01'))
+        expect(fn () => $action->execute($assignment, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -82,7 +82,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn() => $action->execute($assignment, '2026-03-09'))
+        expect(fn () => $action->execute($assignment, '2026-03-09'))
             ->toThrow(ValidationException::class);
     });
 });

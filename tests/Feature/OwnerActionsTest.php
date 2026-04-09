@@ -1,11 +1,11 @@
 <?php
 
-use App\Actions\CreateOwnerAction;
-use App\Models\Owner;
 use App\Models\User;
+use App\Models\Owner;
+use App\Actions\CreateOwnerAction;
 use App\Actions\DeactivateOwnerAction;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Auth\Notifications\ResetPassword;
 
 describe('CreateOwnerAction', function () {
     it('creates an owner with the required data', function () {
