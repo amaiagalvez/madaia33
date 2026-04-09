@@ -13,6 +13,8 @@ class AdminMessageInbox extends Component
 
     public ?int $confirmingDeleteId = null;
 
+    public bool $showDeleteModal = false;
+
     public string $sortBy = 'created_at';
 
     public string $sortDir = 'desc';
@@ -56,11 +58,13 @@ class AdminMessageInbox extends Component
     public function confirmDelete(int $id): void
     {
         $this->confirmingDeleteId = $id;
+        $this->showDeleteModal = true;
     }
 
     public function cancelDelete(): void
     {
         $this->confirmingDeleteId = null;
+        $this->showDeleteModal = false;
     }
 
     public function deleteMessage(): void
@@ -73,6 +77,7 @@ class AdminMessageInbox extends Component
             }
 
             $this->confirmingDeleteId = null;
+            $this->showDeleteModal = false;
         }
     }
 

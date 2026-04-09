@@ -37,11 +37,12 @@
 
 
 # Panela
-[?] En el panel, en mensajes, quita el testu "Mezu-sarrera"
-En la lista de mesajes haz estos cambios:
-- Mueve la columna irakurrita al principio y en vez de texto utiliza iconos. En los iconos añade la funcionalidad que hay en el texto justo antes de Ezabatu "Irakurrita markatu/Irakurri gabe markatu" y quita esta columna.
-- En Ezabatu en texto, pon un icono.
-- Al borrar pedir confirmación mediante un modal "bonito", reutiliza lo que hemos hecho en iragarkiak
+[ ] en le panel separa un poco el header del menú superior
+[ ] Mezuak. Al abrir el mensaje, un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
+[ ] Filtro mensajes con botoncitos, como en el front de Iragarkiak. Leidos y no Leidos. Por defecto, al entrar mostrar solo los leidos
+
+# Egiten ...
+
 
 
 ## Txuletak
