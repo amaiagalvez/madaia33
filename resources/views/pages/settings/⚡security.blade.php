@@ -86,7 +86,7 @@ new #[Title('Security settings')] class extends Component {
 }; ?>
 
 <section class="w-full">
-    @include('partials.settings.settings-heading')
+    @include('partials.admin.settings-heading')
 
     <flux:heading class="sr-only">{{ __('Security settings') }}</flux:heading>
 
@@ -124,7 +124,7 @@ new #[Title('Security settings')] class extends Component {
                     </flux:button>
                 </div>
 
-                <x-action-message class="me-3" on="password-updated">
+                <x-shared.action-message class="me-3" on="password-updated">
                     {{ __('Saved.') }}
                 </x-action-message>
             </div>

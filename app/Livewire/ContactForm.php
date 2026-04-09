@@ -286,7 +286,7 @@ class ContactForm extends Component
 
         $siteKey = $settings['recaptcha_site_key'] ?? '';
 
-        return view('livewire.contact-form', [
+        return view('livewire.front.contact-form', [
             'legalText' => $legalText,
             'siteKey' => $siteKey,
         ]);

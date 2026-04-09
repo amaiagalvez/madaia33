@@ -246,7 +246,7 @@ class AdminNoticeManager extends Component
     {
         $notices = Notice::with('locations')->latest()->get();
 
-        return view('livewire.admin-notice-manager', [
+        return view('livewire.admin.notice-manager', [
             'notices' => $notices,
             'allLocations' => CommunityLocations::options(__('notices.portal'), __('notices.garage')),
         ]);

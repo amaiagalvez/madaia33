@@ -299,6 +299,6 @@ class AdminSettings extends Component
 
     public function render(): View
     {
-        return view('livewire.admin-settings');
+        return view('livewire.admin.settings');
     }
 }

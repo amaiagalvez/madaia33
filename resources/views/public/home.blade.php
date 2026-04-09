@@ -1,4 +1,4 @@
-<x-layouts::public :title="__('home.title')">
+<x-layouts::front.main :title="__('home.title')">
     @push('meta')
         <meta name="description" content="{{ __('home.seo_description') }}">
     @endpush
@@ -192,4 +192,4 @@
             </div>
         </section>
     </div>
-</x-layouts::public>
+</x-layouts::front.main>

@@ -1,4 +1,4 @@
-<x-layouts::public :title="__('errors.500.title') ?? '500'">
+<x-layouts::front.main :title="__('errors.500.title') ?? '500'">
     <div class="min-h-[70vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <div class="max-w-prose w-full text-center">
             <p class="text-6xl font-bold text-gray-300 mb-4" aria-hidden="true">500</p>
@@ -20,4 +20,4 @@
             </div>
         </div>
     </div>
-</x-layouts::public>
+</x-layouts::front.main>

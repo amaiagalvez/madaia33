@@ -34,7 +34,7 @@ class ImageGallery extends Component
 
     public function render(): View
     {
-        return view('livewire.image-gallery', [
+        return view('livewire.front.image-gallery', [
             'images' => $this->getImagesProperty(),
         ]);
     }

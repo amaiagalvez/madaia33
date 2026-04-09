@@ -1,4 +1,4 @@
-<x-layouts::public :title="__($titleKey)">
+<x-layouts::front.main :title="__($titleKey)">
     @push('meta')
         <meta name="description" content="{{ __($titleKey) }}">
     @endpush
@@ -17,4 +17,4 @@
             </div>
         </div>
     </div>
-</x-layouts::public>
+</x-layouts::front.main>

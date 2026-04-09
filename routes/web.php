@@ -50,7 +50,7 @@ Route::get('/robots.txt', function () {
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
-        return view('admin.dashboard', [
+        return view('admin.dashboard.index', [
             'publishedNoticesCount' => Notice::where('is_public', true)->count(),
             'totalNoticesCount' => Notice::count(),
             'imagesCount' => Image::count(),
@@ -66,7 +66,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // ─── Auth (Fortify / Breeze) ───────────────────────────────────────────────────
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'pages.dashboard')->name('dashboard');
+    Route::view('dashboard', 'pages.dashboard.index')->name('dashboard');
 });
 
 require __DIR__.'/settings.php';

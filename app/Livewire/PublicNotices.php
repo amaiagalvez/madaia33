@@ -62,7 +62,7 @@ class PublicNotices extends Component
 
     public function render(): View
     {
-        return view('livewire.public-notices', [
+        return view('livewire.front.public-notices', [
             'notices' => $this->getNoticesProperty(),
         ]);
     }

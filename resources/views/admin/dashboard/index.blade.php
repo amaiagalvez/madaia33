@@ -1,4 +1,4 @@
-<x-layouts::admin :title="__('admin.dashboard')">
+<x-layouts::admin.main :title="__('admin.dashboard')">
     <div class="max-w-7xl mx-auto">
         <x-admin.page-header :title="__('admin.dashboard')" />
 
@@ -25,4 +25,4 @@
             </div>
         </div>
     </div>
-</x-layouts::admin>
+</x-layouts::admin.main>

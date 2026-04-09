@@ -1,4 +1,4 @@
-<x-layouts::auth :title="__('admin.login.title')">
+<x-layouts::shared.auth :title="__('admin.login.title')">
     <div class="flex flex-col gap-6">
         <x-auth.auth-header :title="__('admin.login.title')" />
 
@@ -25,4 +25,4 @@
             </div>
         </form>
     </div>
-</x-layouts::auth>
+</x-layouts::shared.auth>

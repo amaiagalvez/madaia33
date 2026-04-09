@@ -44,7 +44,7 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 [ ] text area, que se adapte al contenido automaticamente
 
 # Egiten ...
-[ ] oganiza las carpetas views/components, views/livewire, view/layouts en admin y front y mueve los ficheros cada uno a su sitio. mira la carpeta partials y reorganizala, lo mismo con el dashboard.
+[ ] oganiza las carpetas views/components, views/livewire, view/layouts y dentro de cada una de ellass crea las subcarpetas admin y front y mueve los ficheros cada uno a su sitio. mira la carpeta partials y reorganizala, lo mismo con el dashboard.
 
 ## Comprobar
 
