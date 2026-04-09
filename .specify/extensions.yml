@@ -1,0 +1,22 @@
+hooks:
+  after_specify:
+    - extension: translate-es
+      command: speckit.translate-es
+      description: Automatically translate spec to Spanish and keep spec_es.md in sync
+      prompt: Translate the feature spec I just created to Spanish, or update spec_es.md if it already exists
+      optional: false
+      enabled: true
+  after_clarify:
+    - extension: translate-es
+      command: speckit.translate-es
+      description: Automatically update Spanish translation after clarifications
+      prompt: Update spec_es.md to reflect the clarifications made to the English spec
+      optional: false
+      enabled: true
+  after_plan:
+    - extension: translate-es
+      command: speckit.translate-es
+      description: Automatically update Spanish translation in the plan
+      prompt: Update any Spanish translation files in the feature directory after the plan was created
+      optional: false
+      enabled: true

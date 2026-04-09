@@ -2,9 +2,10 @@
 
 use App\Models\User;
 use Laravel\Fortify\Features;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 test('login screen can be rendered', function () {
-    $response = $this->get(route('login'));
+    $response = test()->get(route('login'));
 
     $response->assertOk();
 });
@@ -12,33 +13,35 @@ test('login screen can be rendered', function () {
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
+    $response = test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+        ->assertRedirect('/admin');
 
-    $this->assertAuthenticated();
+    test()->assertAuthenticated();
 });
 
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
-        'password' => 'wrong-password',
-    ]);
+    $response = test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
 
     $response->assertSessionHasErrorsIn('email');
 
-    $this->assertGuest();
+    test()->assertGuest();
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
-    $this->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
+    test()->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
 
     Features::twoFactorAuthentication([
         'confirm' => true,
@@ -47,21 +50,24 @@ test('users with two factor enabled are redirected to two factor challenge', fun
 
     $user = User::factory()->withTwoFactor()->create();
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
+    $response = test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
 
     $response->assertRedirect(route('two-factor.login'));
-    $this->assertGuest();
+    test()->assertGuest();
 });
 
 test('users can logout', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post(route('logout'));
+    $response = test()->actingAs($user)
+        ->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('logout'));
 
-    $response->assertRedirect(route('home'));
+    $response->assertRedirect(route('root'));
 
-    $this->assertGuest();
+    test()->assertGuest();
 });

@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Laravel\Fortify\Features;
 use Livewire\Livewire;
+use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
     $this->skipUnlessFortifyFeature(Features::twoFactorAuthentication());

@@ -1,6 +1,13 @@
 <?php
 
 use Tests\TestCase;
+use App\Models\Setting;
+use Tests\DuskTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+pest()->extend(DuskTestCase::class)
+    //  ->use(Illuminate\Foundation\Testing\DatabaseMigrations::class)
+    ->in('Browser');
 
 /*
 |--------------------------------------------------------------------------
@@ -14,23 +21,11 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+pest()->extend(TestCase::class)
+    ->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +38,18 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function settingValue(string $key, mixed $default = null): mixed
 {
-    // ..
+    return Setting::where('key', $key)->value('value') ?? $default;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Global Setup
+|--------------------------------------------------------------------------
+*/
+
+function createSetting(string $key, mixed $value): Setting
+{
+    return Setting::factory()->forKey($key, (string) $value)->create();
 }

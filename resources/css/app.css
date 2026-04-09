@@ -26,6 +26,19 @@
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+
+    /* Brand palette */
+    --color-brand-100: #edd2c7;
+    --color-brand-300: #b9a7a5;
+    --color-brand-500: #f1bd4d;
+    --color-brand-600: #d9755b;
+    --color-brand-900: #793d3d;
+
+    --color-brand: var(--color-brand-600);
+    --color-brand-hover: var(--color-brand-900);
+    --color-brand-light: var(--color-brand-100);
+    --color-brand-border: var(--color-brand-500);
+    --color-brand-text: var(--color-brand-900);
 }
 
 @layer theme {
@@ -38,6 +51,11 @@
 
 @layer base {
 
+    html,
+    body {
+        max-width: 100%;
+    }
+
     *,
     ::after,
     ::before,
@@ -47,18 +65,191 @@
     }
 }
 
+@layer components {
+    .public-surface {
+        background-image:
+            radial-gradient(70rem 70rem at 90% -15%, rgb(241 189 77 / 28%), transparent 55%),
+            radial-gradient(50rem 50rem at -10% 30%, rgb(237 210 199 / 45%), transparent 50%),
+            linear-gradient(180deg, rgb(255 255 255 / 96%), rgb(250 245 243 / 96%));
+    }
+
+    .section-shell {
+        @apply rounded-2xl border border-gray-200 bg-linear-to-br from-white via-gray-50 to-gray-100 shadow-sm;
+    }
+
+    .elevated-card {
+        @apply rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+        border-color: color-mix(in srgb, var(--color-brand-300) 45%, white);
+    }
+
+    .elevated-card:hover {
+        border-color: var(--color-brand-600);
+    }
+
+    .btn-brand {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+        background-color: var(--color-brand);
+        --tw-ring-color: var(--color-brand-600);
+    }
+
+    .btn-brand:hover {
+        background-color: var(--color-brand-hover);
+    }
+
+    .glass-panel {
+        @apply rounded-3xl border border-white/60 bg-white/70 shadow-xl shadow-gray-900/5 backdrop-blur-md;
+    }
+
+    .stat-tile {
+        @apply rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm backdrop-blur;
+    }
+
+    .feature-chip {
+        @apply inline-flex items-center gap-2 rounded-full border bg-white/90 px-3 py-1.5 text-xs font-medium shadow-sm;
+        border-color: color-mix(in srgb, var(--color-brand-300) 50%, white);
+        color: var(--color-brand-900);
+    }
+
+    .hero-frame {
+        @apply relative overflow-hidden rounded-[1.75rem] border border-white/50 bg-white/70 shadow-xl shadow-gray-900/5 backdrop-blur;
+    }
+
+    .page-icon-amber {
+        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl;
+        background-color: color-mix(in srgb, var(--color-brand-100) 70%, white);
+        color: var(--color-brand-900);
+    }
+
+    .page-icon-emerald {
+        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl;
+        background-color: color-mix(in srgb, var(--color-brand-300) 35%, white);
+        color: var(--color-brand-900);
+    }
+
+    .page-icon-indigo {
+        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl;
+        background-color: color-mix(in srgb, var(--color-brand-500) 35%, white);
+        color: var(--color-brand-900);
+    }
+
+    .page-icon-rose {
+        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl;
+        background-color: color-mix(in srgb, var(--color-brand-600) 24%, white);
+        color: var(--color-brand-900);
+    }
+}
+
+@layer utilities {
+    @keyframes soft-rise {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-soft-rise {
+        animation: soft-rise .45s ease-out both;
+    }
+
+    .animate-soft-rise-delayed {
+        animation: soft-rise .65s ease-out both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .animate-soft-rise {
+            animation: none;
+        }
+
+        .animate-soft-rise-delayed {
+            animation: none;
+        }
+    }
+}
+
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;
 }
 
 [data-flux-label] {
-    @apply  !mb-0 !leading-tight;
+    @apply mb-0! leading-tight!;
 }
 
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* ========================================
+   Safe Area Insets (iOS notch support)
+   ======================================== */
+
+.public-header {
+    padding-top: max(env(safe-area-inset-top), 0.25rem);
+}
+
+footer {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.25rem);
+}
+
+/* ========================================
+   Alpine.js: hide before init
+   ======================================== */
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* ========================================
+   Modal / Lightbox Responsive
+   ======================================== */
+
+/* Block body scroll when modal is open */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Lightbox image max-height responsive */
+@media (max-height: 500px) and (orientation: landscape) {
+    .public-header {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .lightbox-image {
+        max-height: 85vh;
+    }
+}
+
+@media (orientation: portrait) {
+    .lightbox-image {
+        max-height: 90vh;
+    }
+}
+
+/* ========================================
+   Typography Responsive
+   ======================================== */
+
+/* Mobile: text-sm (14px) */
+@media (max-width: 767px) {
+    body {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+}
+
+/* Tablet and up: text-base (16px) */
+@media (min-width: 768px) {
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+    }
 }
 
 /* \[:where(&)\]:size-4 {
