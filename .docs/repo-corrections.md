@@ -47,3 +47,5 @@
 - In bilingual rich-text tabs, avoid `x-if` for language panes because it destroys/recreates editors and can drop unsynced content on tab switch; prefer `x-show` (or explicit buffer syncing) to preserve in-progress text.
 
 - In docker-compose.yml, if repeated service blocks make partial patches unstable, rewrite the whole file and validate with docker compose config --quiet to catch misplaced lines early.
+
+- In admin image grids, show EU/ES alt texts and tag as always-visible card metadata (not hover-only), and add stable `data-*` selectors so Feature tests can assert content without relying on Tailwind classes.

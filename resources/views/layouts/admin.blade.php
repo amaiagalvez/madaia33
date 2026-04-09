@@ -99,9 +99,6 @@
                         <p class="text-xs text-gray-500 truncate">{{ auth()->user()?->email }}</p>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <livewire:language-switcher />
-                </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit"

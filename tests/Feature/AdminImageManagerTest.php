@@ -71,3 +71,21 @@ it('eliminar imagen la quita de la galería pública', function () {
     $gallery = Livewire::test('image-gallery');
     expect($gallery->images->pluck('id'))->not->toContain($image->id);
 });
+
+it('muestra alt texts en ambos idiomas y etiqueta en la lista admin de imágenes', function () {
+    $user = User::factory()->create();
+    $image = Image::factory()->create([
+        'alt_text_eu' => 'Atari nagusia',
+        'alt_text_es' => 'Portal principal',
+        'tag' => Image::TAG_HISTORY,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-image-manager')
+        ->assertSee('Atari nagusia')
+        ->assertSee('Portal principal')
+        ->assertSee(__('gallery.filter.history'))
+        ->assertSee('data-image-alt-eu="' . $image->id . '"', false)
+        ->assertSee('data-image-alt-es="' . $image->id . '"', false)
+        ->assertSee('data-image-tag="' . $image->id . '"', false);
+});
