@@ -15,7 +15,7 @@ use App\Models\PropertyAssignment;
  */
 
 test('admin can access owner detail sensitive view and sees assignment controls', function () {
-  $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+  $admin = User::factory()->create();
 
   $owner = Owner::factory()->create([
     'coprop1_name' => 'Dusk Owner',
@@ -45,7 +45,7 @@ test('admin can access owner detail sensitive view and sees assignment controls'
 });
 
 test('admin can access location detail sensitive view and sees editable property rows', function () {
-  $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+  $admin = User::factory()->create();
 
   $location = Location::factory()->portal()->create();
 

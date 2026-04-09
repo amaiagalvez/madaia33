@@ -2,28 +2,28 @@
     {{-- Filters --}}
     <div class="mb-6 flex flex-wrap gap-3" data-section="filters">
         <flux:select wire:model.live="filterStatus" data-filter="status">
-            <flux:select.option value="active">{{ __('Propietarias activas') }}</flux:select.option>
-            <flux:select.option value="inactive">{{ __('Sin asignación activa') }}
+            <flux:select.option value="active">{{ __('admin.owners.filters.active') }}</flux:select.option>
+            <flux:select.option value="inactive">{{ __('admin.owners.filters.inactive') }}
             </flux:select.option>
-            <flux:select.option value="all">{{ __('Todas') }}</flux:select.option>
+            <flux:select.option value="all">{{ __('admin.owners.filters.all') }}</flux:select.option>
         </flux:select>
 
         <flux:select wire:model.live="filterPortal" data-filter="portal">
-            <flux:select.option value="">{{ __('Todos los portales') }}</flux:select.option>
+            <flux:select.option value="">{{ __('admin.owners.filters.all_portals') }}</flux:select.option>
             @foreach ($portals as $portal)
                 <flux:select.option :value="$portal->id">{{ $portal->name }}</flux:select.option>
             @endforeach
         </flux:select>
 
         <flux:select wire:model.live="filterGarage" data-filter="garage">
-            <flux:select.option value="">{{ __('Todos los garajes') }}</flux:select.option>
+            <flux:select.option value="">{{ __('admin.owners.filters.all_garages') }}</flux:select.option>
             @foreach ($garages as $garage)
                 <flux:select.option :value="$garage->id">{{ $garage->name }}</flux:select.option>
             @endforeach
         </flux:select>
 
         <flux:select wire:model.live="filterStorage" data-filter="storage">
-            <flux:select.option value="">{{ __('Todos los trasteros') }}</flux:select.option>
+            <flux:select.option value="">{{ __('admin.owners.filters.all_storages') }}</flux:select.option>
             @foreach ($storages as $storage)
                 <flux:select.option :value="$storage->id">{{ $storage->name }}</flux:select.option>
             @endforeach
@@ -35,11 +35,11 @@
         <table class="min-w-full text-sm">
             <thead class="border-b border-zinc-200 dark:border-zinc-700">
                 <tr class="text-left text-zinc-600 dark:text-zinc-300">
-                    <th class="px-4 py-3">{{ __('Copropietaria 1') }}</th>
-                    <th class="px-4 py-3">{{ __('Copropietaria 2') }}</th>
-                    <th class="px-4 py-3">{{ __('Portales') }}</th>
-                    <th class="px-4 py-3">{{ __('Garajes') }}</th>
-                    <th class="px-4 py-3">{{ __('Trasteros') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.columns.coprop1') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.columns.coprop2') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.columns.portals') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.columns.garages') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.columns.storages') }}</th>
                     <th class="px-4 py-3"></th>
                 </tr>
             </thead>
@@ -91,14 +91,14 @@
                         <td class="px-4 py-3">
                             <flux:button variant="ghost" size="sm"
                                 :href="route('admin.owners.show', $owner)">
-                                {{ __('Ver') }}
+                                {{ __('admin.owners.view') }}
                             </flux:button>
                         </td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="6" class="px-4 py-6 text-center text-zinc-400">
-                            {{ __('No hay propietarias.') }}
+                            {{ __('admin.owners.no_records') }}
                         </td>
                     </tr>
                 @endforelse

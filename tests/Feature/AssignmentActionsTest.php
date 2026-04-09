@@ -76,4 +76,13 @@ describe('UnassignPropertyAction', function () {
         expect(fn() => $action->execute($assignment, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
+
+    it('throws a validation exception when end date is before start date', function () {
+        $assignment = PropertyAssignment::factory()->create(['start_date' => '2026-03-10', 'end_date' => null]);
+
+        $action = new UnassignPropertyAction;
+
+        expect(fn() => $action->execute($assignment, '2026-03-09'))
+            ->toThrow(ValidationException::class);
+    });
 });

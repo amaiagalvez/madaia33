@@ -212,6 +212,26 @@ Spec-ak ukitzen duen esparruaren arabera, dagokion skill-a irakurri behar dut ko
 
 ---
 
+## Anti-regresio gidalerro orokorrak (beti aplikatu)
+
+Spec bat exekutatu aurretik eta amaieran, irakurri eta aplikatu gida hau:
+
+- `.github/agents/code-reviews/reusable-correction-playbook.md`
+
+Gutxieneko kontrol-zerrenda orokorra:
+
+- Autentikazioan sarbide-egoera arauak benetan aplikatzen direla egiaztatu (ez soilik datu-ereduan).
+- Esclusibitate arauak bi mailatan ezarri: aplikazio-maila + DB murriztapenak.
+- Idazketa lotuak transakzioan bildu eta race-condition arriskuak blokeatu.
+- Denbora/egoera balidazioak (adib. data-koherentzia) esplizituki inplementatu.
+- Sarrera ezezagunak ez inferitu isilean: errore edo balidazio argia erabili.
+- UI testu berrietan i18n giltzak derrigorrez aplikatu eta hizkuntza guztietan osatu.
+- Testetan seed menpekotasun zurrunak saihestu; factory/egoera kontrolatuak lehenetsi.
+- Komponenteetan dependentzien injekzioa lehenetsi, instantziazio zuzena saihestuz.
+- Amaieran, ukitutako fitxategietako IDE/Problems egoera garbi dagoela baieztatu.
+
+---
+
 ## Noiz erabili Amalurra
 
 - "Irakurri spec hau eta presta plan bat"

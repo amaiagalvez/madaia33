@@ -1,10 +1,10 @@
 <div>
     {{-- Type tabs --}}
     <div class="mb-6 flex gap-2">
-        @foreach ($typeLabels as $key => $label)
-            <flux:button :variant="$type === $key ? 'primary' : 'ghost'"
-                wire:click="setType('{{ $key }}')" data-type="{{ $key }}">
-                {{ $label }}
+        @foreach ($types as $typeKey)
+            <flux:button :variant="$type === $typeKey ? 'primary' : 'ghost'"
+                wire:click="setType('{{ $typeKey }}')" data-type="{{ $typeKey }}">
+                {{ __('admin.locations.types.' . $typeKey) }}
             </flux:button>
         @endforeach
     </div>
@@ -14,9 +14,9 @@
         <table class="min-w-full text-sm">
             <thead class="border-b border-zinc-200 dark:border-zinc-700">
                 <tr class="text-left text-zinc-600 dark:text-zinc-300">
-                    <th class="px-4 py-3">{{ __('Código') }}</th>
-                    <th class="px-4 py-3">{{ __('Nombre') }}</th>
-                    <th class="px-4 py-3">{{ __('Propiedades') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.locations.code') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.locations.name') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.locations.properties_count') }}</th>
                     <th class="px-4 py-3"></th>
                 </tr>
             </thead>
@@ -31,14 +31,14 @@
                         <td class="px-4 py-3">
                             <flux:button variant="ghost" size="sm"
                                 :href="route('admin.locations.show', $location)">
-                                {{ __('Ver') }}
+                                {{ __('admin.locations.view') }}
                             </flux:button>
                         </td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="4" class="px-4 py-6 text-center text-zinc-400">
-                            {{ __('No hay registros.') }}
+                            {{ __('admin.locations.no_records') }}
                         </td>
                     </tr>
                 @endforelse

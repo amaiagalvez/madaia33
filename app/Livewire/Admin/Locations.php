@@ -13,12 +13,8 @@ class Locations extends Component
 
   public string $type = 'portal';
 
-  /** @var array<string, string> */
-  public array $typeLabels = [
-    'portal' => 'Portales',
-    'garage' => 'Garajes',
-    'storage' => 'Trasteros',
-  ];
+  /** @var string[] */
+  public array $types = ['portal', 'garage', 'storage'];
 
   public function setType(string $type): void
   {

@@ -64,7 +64,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M8.25 21v-4.5m0 0a2.25 2.25 0 0 1 4.5 0m-4.5 0h4.5M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5v-9Z" />
                     </svg>
-                    {{ __('Ubicaciones') }}
+                    {{ __('admin.locations.menu') }}
                 </a>
 
                 <a href="{{ route('admin.owners.index') }}"
@@ -74,7 +74,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M18 18.72a8.964 8.964 0 0 0 3-6.72A9 9 0 1 0 3 12a8.964 8.964 0 0 0 3 6.72m12 0a8.966 8.966 0 0 1-12 0m12 0A10.953 10.953 0 0 1 12 21c-2.331 0-4.496-.727-6-1.968m12 0a5.95 5.95 0 0 0-12 0m12 0a5.952 5.952 0 0 1-12 0m6-10.5a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                     </svg>
-                    {{ __('Propietarias') }}
+                    {{ __('admin.owners.menu') }}
                 </a>
 
                 <a href="{{ route('admin.images') }}"
@@ -163,9 +163,9 @@
                         <a href="{{ route('admin.notices') }}"
                             class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.notices') }}</a>
                         <a href="{{ route('admin.locations.portals') }}"
-                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('Ubicaciones') }}</a>
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.locations.menu') }}</a>
                         <a href="{{ route('admin.owners.index') }}"
-                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('Propietarias') }}</a>
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.owners.menu') }}</a>
                         <a href="{{ route('admin.images') }}"
                             class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.gallery') }}</a>
                         <a href="{{ route('admin.messages') }}"

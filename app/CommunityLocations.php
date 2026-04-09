@@ -2,6 +2,8 @@
 
 namespace App;
 
+use InvalidArgumentException;
+
 final class CommunityLocations
 {
     /** @var string[] */
@@ -23,7 +25,11 @@ final class CommunityLocations
             return 'garage';
         }
 
-        return 'storage';
+        if (in_array($code, self::STORAGES, true)) {
+            return 'storage';
+        }
+
+        throw new InvalidArgumentException("Unknown location code: {$code}");
     }
 
     /**

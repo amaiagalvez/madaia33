@@ -10,9 +10,9 @@
         <flux:heading size="xl">{{ $owner->coprop1_name }}</flux:heading>
         <div class="flex gap-2">
             <flux:button variant="ghost" wire:click="$set('showEditForm', true)">
-                {{ __('Editar datos') }}</flux:button>
+                {{ __('admin.owners.edit_data') }}</flux:button>
             <flux:button variant="danger" wire:click="deactivateOwner" data-action="deactivate-owner">
-                {{ __('Dar de baja') }}
+                {{ __('admin.owners.deactivate') }}
             </flux:button>
         </div>
     </div>
@@ -22,59 +22,59 @@
             data-section="owner-edit-form">
             <div class="grid gap-4 md:grid-cols-2">
                 <flux:field>
-                    <flux:label>{{ __('Nombre copropietaria 1') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop1_name') }}</flux:label>
                     <flux:input wire:model="coprop1Name" />
                     <flux:error name="coprop1Name" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('DNI copropietaria 1') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop1_dni') }}</flux:label>
                     <flux:input wire:model="coprop1Dni" />
                     <flux:error name="coprop1Dni" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('Teléfono copropietaria 1') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop1_phone') }}</flux:label>
                     <flux:input wire:model="coprop1Phone" />
                     <flux:error name="coprop1Phone" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('Email copropietaria 1') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop1_email') }}</flux:label>
                     <flux:input wire:model="coprop1Email" type="email" />
                     <flux:error name="coprop1Email" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('Nombre copropietaria 2') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop2_name') }}</flux:label>
                     <flux:input wire:model="coprop2Name" />
                     <flux:error name="coprop2Name" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('DNI copropietaria 2') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop2_dni') }}</flux:label>
                     <flux:input wire:model="coprop2Dni" />
                     <flux:error name="coprop2Dni" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('Teléfono copropietaria 2') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop2_phone') }}</flux:label>
                     <flux:input wire:model="coprop2Phone" />
                     <flux:error name="coprop2Phone" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('Email copropietaria 2') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop2_email') }}</flux:label>
                     <flux:input wire:model="coprop2Email" type="email" />
                     <flux:error name="coprop2Email" />
                 </flux:field>
             </div>
             <div class="mt-4 flex gap-2">
-                <flux:button variant="primary" wire:click="saveOwner">{{ __('Guardar') }}
+                <flux:button variant="primary" wire:click="saveOwner">{{ __('general.buttons.save') }}
                 </flux:button>
-                <flux:button variant="ghost" wire:click="cancelEdit">{{ __('Cancelar') }}
+                <flux:button variant="ghost" wire:click="cancelEdit">{{ __('general.buttons.cancel') }}
                 </flux:button>
             </div>
         </div>
     @endif
 
     <div class="mb-4 flex items-center justify-between">
-        <flux:heading size="lg">{{ __('Asignaciones') }}</flux:heading>
+        <flux:heading size="lg">{{ __('admin.owners.assignments') }}</flux:heading>
         <flux:button variant="primary" wire:click="$set('showAssignForm', true)">
-            {{ __('Añadir propiedad') }}</flux:button>
+            {{ __('admin.owners.add_property') }}</flux:button>
     </div>
 
     @if ($showAssignForm)
@@ -82,9 +82,9 @@
             data-section="assign-form">
             <div class="grid gap-4 md:grid-cols-2">
                 <flux:field>
-                    <flux:label>{{ __('Propiedad') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.property') }}</flux:label>
                     <flux:select wire:model="assignPropertyId">
-                        <flux:select.option value="">{{ __('Selecciona una propiedad') }}
+                        <flux:select.option value="">{{ __('admin.owners.select_property') }}
                         </flux:select.option>
                         @foreach ($availableProperties as $property)
                             <flux:select.option :value="$property->id">
@@ -96,16 +96,16 @@
                 </flux:field>
 
                 <flux:field>
-                    <flux:label>{{ __('Fecha de inicio') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.start_date') }}</flux:label>
                     <flux:input type="date" wire:model="assignStartDate" />
                     <flux:error name="assignStartDate" />
                 </flux:field>
             </div>
             <div class="mt-4 flex gap-2">
-                <flux:button variant="primary" wire:click="assignProperty">{{ __('Asignar') }}
+                <flux:button variant="primary" wire:click="assignProperty">{{ __('admin.owners.assign') }}
                 </flux:button>
                 <flux:button variant="ghost" wire:click="$set('showAssignForm', false)">
-                    {{ __('Cancelar') }}</flux:button>
+                    {{ __('general.buttons.cancel') }}</flux:button>
             </div>
         </div>
     @endif
@@ -115,11 +115,11 @@
         <table class="min-w-full text-sm">
             <thead class="border-b border-zinc-200 dark:border-zinc-700">
                 <tr class="text-left text-zinc-600 dark:text-zinc-300">
-                    <th class="px-4 py-3">{{ __('Ubicación') }}</th>
-                    <th class="px-4 py-3">{{ __('Propiedad') }}</th>
-                    <th class="px-4 py-3">{{ __('Fecha inicio') }}</th>
-                    <th class="px-4 py-3">{{ __('Fecha fin') }}</th>
-                    <th class="px-4 py-3">{{ __('Estado') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.location') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.property') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.start_date') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.end_date') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.owners.status') }}</th>
                     <th class="px-4 py-3"></th>
                 </tr>
             </thead>
@@ -138,10 +138,10 @@
                                     <flux:input type="date" wire:model="unassignEndDate"
                                         size="sm" />
                                     <flux:button variant="primary" size="sm"
-                                        wire:click="confirmUnassign">{{ __('Aceptar') }}
+                                        wire:click="confirmUnassign">{{ __('general.buttons.confirm') }}
                                     </flux:button>
                                     <flux:button variant="ghost" size="sm"
-                                        wire:click="cancelUnassign">{{ __('Cancelar') }}
+                                        wire:click="cancelUnassign">{{ __('general.buttons.cancel') }}
                                     </flux:button>
                                 </div>
                             @else
@@ -150,14 +150,14 @@
                         </td>
                         <td class="px-4 py-3">
                             <flux:badge :color="$assignment->isActive() ? 'green' : 'zinc'">
-                                {{ $assignment->isActive() ? __('Activa') : __('Cerrada') }}
+                                {{ $assignment->isActive() ? __('admin.owners.active') : __('admin.owners.closed') }}
                             </flux:badge>
                         </td>
                         <td class="px-4 py-3">
                             @if ($assignment->isActive() && $unassigningId !== $assignment->id)
                                 <flux:button variant="ghost" size="sm"
                                     wire:click="startUnassign({{ $assignment->id }})">
-                                    {{ __('Desasignar') }}
+                                    {{ __('admin.owners.unassign') }}
                                 </flux:button>
                             @endif
                         </td>
@@ -165,7 +165,7 @@
                 @empty
                     <tr>
                         <td colspan="6" class="px-4 py-6 text-center text-zinc-400">
-                            {{ __('No hay asignaciones para esta propietaria.') }}
+                            {{ __('admin.owners.no_assignments') }}
                         </td>
                     </tr>
                 @endforelse

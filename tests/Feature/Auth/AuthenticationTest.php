@@ -26,6 +26,36 @@ test('users can authenticate using the login screen', function () {
     test()->assertAuthenticated();
 });
 
+test('users can authenticate with dni as login identifier', function () {
+    $user = User::factory()->create(['name' => '12345678Z']);
+
+    $response = test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => '12345678Z',
+            'password' => 'password',
+        ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/admin');
+
+    test()->assertAuthenticated();
+});
+
+test('inactive users can not authenticate', function () {
+    $user = User::factory()->create(['is_active' => false]);
+
+    $response = test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+    $response->assertSessionHasErrorsIn('email');
+
+    test()->assertGuest();
+});
+
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 

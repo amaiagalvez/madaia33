@@ -74,3 +74,5 @@
 - Before deleting a duplicate Livewire/Blade implementation, search actual usages first; keep only the mounted path and remove the orphan to avoid maintaining divergent logic.
 - If a Pest test uses factories/DB tables, place it in tests/Feature (or add RefreshDatabase explicitly); tests in tests/Unit here run without DB migrations and can fail with "no such table".
 - In Dusk/Browser tests with seeded data, avoid hardcoded unique keys (e.g., location `code`); use factory-generated unique values or explicitly non-conflicting values to prevent intermittent `UNIQUE constraint failed` errors.
+- If `is_active` is added to users for deactivation, enforce it in Fortify authentication (`authenticateUsing`) and add a Feature test; toggling the flag alone does not block login.
+- To prevent duplicate active ownership assignments, combine transactional `lockForUpdate()` checks with a DB-level uniqueness strategy for active rows.

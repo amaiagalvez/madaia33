@@ -2,25 +2,25 @@
     <div class="mb-6 flex items-center justify-between">
         <flux:heading size="xl">{{ $location->name }} ({{ $location->code }})</flux:heading>
         <flux:button variant="primary" wire:click="$set('showAddForm', true)" icon="plus">
-            {{ __('Añadir propiedad') }}
+            {{ __('admin.locations.add_property') }}
         </flux:button>
     </div>
 
     @if ($showAddForm)
         <div
             class="mb-6 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <flux:heading size="lg" class="mb-4">{{ __('Nueva propiedad') }}</flux:heading>
+            <flux:heading size="lg" class="mb-4">{{ __('admin.locations.new_property') }}</flux:heading>
             <div class="flex items-end gap-3">
                 <flux:field class="flex-1">
-                    <flux:label>{{ __('Nombre') }}</flux:label>
-                    <flux:input wire:model="newPropertyName" placeholder="Ej: 1A"
+                    <flux:label>{{ __('admin.locations.property_name') }}</flux:label>
+                    <flux:input wire:model="newPropertyName" :placeholder="__('admin.locations.property_placeholder')"
                         data-field="new-property-name" />
                     <flux:error name="newPropertyName" />
                 </flux:field>
-                <flux:button variant="primary" wire:click="addProperty">{{ __('Guardar') }}
+                <flux:button variant="primary" wire:click="addProperty">{{ __('general.buttons.save') }}
                 </flux:button>
                 <flux:button variant="ghost" wire:click="$set('showAddForm', false)">
-                    {{ __('Cancelar') }}</flux:button>
+                    {{ __('general.buttons.cancel') }}</flux:button>
             </div>
         </div>
     @endif
@@ -30,14 +30,14 @@
         <table class="min-w-full text-sm">
             <thead class="border-b border-zinc-200 dark:border-zinc-700">
                 <tr class="text-left text-zinc-600 dark:text-zinc-300">
-                    <th class="px-4 py-3">{{ __('Propiedad') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.locations.property') }}</th>
                     @if ($location->type !== 'storage')
-                        <th class="px-4 py-3">{{ __('% Comunidad') }}</th>
-                        <th class="px-4 py-3">{{ __('% Ubicación') }}</th>
+                        <th class="px-4 py-3">{{ __('admin.locations.community_pct') }}</th>
+                        <th class="px-4 py-3">{{ __('admin.locations.location_pct') }}</th>
                     @endif
-                    <th class="px-4 py-3">{{ __('Asignada') }}</th>
-                    <th class="px-4 py-3">{{ __('Val. admin') }}</th>
-                    <th class="px-4 py-3">{{ __('Val. propietaria') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.locations.assigned') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.locations.admin_validated') }}</th>
+                    <th class="px-4 py-3">{{ __('admin.locations.owner_validated') }}</th>
                     <th class="px-4 py-3"></th>
                 </tr>
             </thead>
@@ -72,9 +72,9 @@
                                 colspan="{{ $location->type === 'storage' ? 4 : 3 }}">
                                 <div class="flex gap-2">
                                     <flux:button variant="primary" size="sm"
-                                        wire:click="saveProperty">{{ __('Guardar') }}</flux:button>
+                                        wire:click="saveProperty">{{ __('general.buttons.save') }}</flux:button>
                                     <flux:button variant="ghost" size="sm"
-                                        wire:click="cancelEditing">{{ __('Cancelar') }}
+                                        wire:click="cancelEditing">{{ __('general.buttons.cancel') }}
                                     </flux:button>
                                 </div>
                             </td>
@@ -87,27 +87,27 @@
                             <td class="px-4 py-3">
                                 <flux:badge :color="$isAssigned ? 'green' : 'zinc'"
                                     data-assigned="{{ $isAssigned ? 'yes' : 'no' }}">
-                                    {{ $isAssigned ? __('Sí') : __('No') }}
+                                    {{ $isAssigned ? __('admin.common.yes') : __('admin.common.no') }}
                                 </flux:badge>
                             </td>
                             <td class="px-4 py-3">
                                 <flux:badge
                                     :color="$isAssigned && $activeAssignment->admin_validated ? 'green' : 'zinc'"
                                     data-admin-validated="{{ $isAssigned && $activeAssignment?->admin_validated ? 'yes' : 'no' }}">
-                                    {{ $isAssigned && $activeAssignment?->admin_validated ? __('Sí') : __('No') }}
+                                    {{ $isAssigned && $activeAssignment?->admin_validated ? __('admin.common.yes') : __('admin.common.no') }}
                                 </flux:badge>
                             </td>
                             <td class="px-4 py-3">
                                 <flux:badge
                                     :color="$isAssigned && $activeAssignment->owner_validated ? 'green' : 'zinc'"
                                     data-owner-validated="{{ $isAssigned && $activeAssignment?->owner_validated ? 'yes' : 'no' }}">
-                                    {{ $isAssigned && $activeAssignment?->owner_validated ? __('Sí') : __('No') }}
+                                    {{ $isAssigned && $activeAssignment?->owner_validated ? __('admin.common.yes') : __('admin.common.no') }}
                                 </flux:badge>
                             </td>
                             <td class="px-4 py-3">
                                 <flux:button variant="ghost" size="sm"
                                     wire:click="startEditing({{ $property->id }})" icon="pencil">
-                                    {{ __('Editar') }}
+                                    {{ __('general.buttons.edit') }}
                                 </flux:button>
                             </td>
                         @endif
@@ -115,7 +115,7 @@
                 @empty
                     <tr>
                         <td colspan="7" class="px-4 py-6 text-center text-zinc-400">
-                            {{ __('No hay propiedades.') }}
+                            {{ __('admin.locations.no_properties') }}
                         </td>
                     </tr>
                 @endforelse
