@@ -161,7 +161,9 @@ Implementación incremental de la web de la comunidad de vecinos sobre Laravel 1
 - [ ] 10. Implementar el panel de administración — Gestión de imágenes
   - Crear el componente Livewire `AdminImageManager` con grid de miniaturas, subida y eliminación
   - Implementar subida con `TemporaryUploadedFile` de Livewire y campos de alt text bilingüe
+  - Añadir etiquetado de imágenes (`historia`, `madaia`) en la subida administrativa y persistencia en base de datos
   - Integrar la vista `/admin/imagenes` con la gestión administrativa real de imágenes
+  - Implementar filtros públicos por etiqueta en `/galeria` y restringir la imagen del bloque historia de la home a la etiqueta `historia`
   - _Requisitos: 6.2_
 
   - [ ]\* 10.1 Escribir tests de ejemplo para gestión de imágenes

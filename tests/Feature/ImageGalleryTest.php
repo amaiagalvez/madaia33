@@ -111,3 +111,25 @@ it('incluye controles avanzados del lightbox responsive', function (string $loca
     $response->assertSee('min-h-11 min-w-11', false);
     $response->assertSee('@touchmove="handleTouchMove($event)"', false);
 })->with('supported_locales');
+
+it('filtra la galería por etiqueta historia', function () {
+    $historyImage = Image::factory()->history()->create();
+    Image::factory()->madaia()->create();
+
+    $component = Livewire::test('image-gallery')
+        ->call('setTagFilter', 'historia');
+
+    expect($component->images)->toHaveCount(1)
+        ->and($component->images->first()->id)->toBe($historyImage->id);
+});
+
+it('filtra la galería por etiqueta madaia', function () {
+    Image::factory()->history()->create();
+    $madaiaImage = Image::factory()->madaia()->create();
+
+    $component = Livewire::test('image-gallery')
+        ->call('setTagFilter', 'madaia');
+
+    expect($component->images)->toHaveCount(1)
+        ->and($component->images->first()->id)->toBe($madaiaImage->id);
+});

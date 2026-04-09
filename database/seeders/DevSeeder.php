@@ -102,34 +102,39 @@ class DevSeeder extends Seeder
                 'alt_eu' => 'Komunitate-etxea',
                 'alt_es' => 'Casa de la comunidad',
                 'colors' => ['#0f172a', '#155e75'],
+                'tag' => Image::TAG_MADAIA,
             ],
             [
                 'alt_eu' => '33-A atariko sarrera',
                 'alt_es' => 'Entrada portal 33-A',
                 'colors' => ['#1e293b', '#1d4ed8'],
+                'tag' => Image::TAG_HISTORY,
             ],
             [
                 'alt_eu' => '33-B atariko sarrera',
                 'alt_es' => 'Entrada portal 33-B',
                 'colors' => ['#312e81', '#7c3aed'],
+                'tag' => Image::TAG_HISTORY,
             ],
             [
                 'alt_eu' => 'P-1 aparkalekua',
                 'alt_es' => 'Garaje P-1',
                 'colors' => ['#78350f', '#ea580c'],
+                'tag' => Image::TAG_HISTORY,
             ],
             [
                 'alt_eu' => 'Lorategia',
                 'alt_es' => 'Jardín comunitario',
                 'colors' => ['#14532d', '#16a34a'],
+                'tag' => Image::TAG_MADAIA,
             ],
         ];
 
         Storage::disk('public')->makeDirectory('images');
 
         foreach ($items as $index => $item) {
-            $filename = Str::uuid().'.svg';
-            $path = 'images/'.$filename;
+            $filename = Str::uuid() . '.svg';
+            $path = 'images/' . $filename;
             $imageText = $item['alt_es'];
 
             Storage::disk('public')->put(
@@ -142,6 +147,7 @@ class DevSeeder extends Seeder
                 'path' => $path,
                 'alt_text_eu' => $item['alt_eu'],
                 'alt_text_es' => $item['alt_es'],
+                'tag' => $item['tag'] ?? null,
             ]);
         }
     }

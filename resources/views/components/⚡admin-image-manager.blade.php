@@ -16,6 +16,8 @@ new class extends Component {
 
     public string $altEs = '';
 
+    public string $tag = '';
+
     // ── Delete confirmation ──────────────────────────────────────────────────
     public ?int $confirmingDeleteId = null;
 
@@ -35,6 +37,7 @@ new class extends Component {
             'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
             'altEu' => 'nullable|string|max:255',
             'altEs' => 'nullable|string|max:255',
+            'tag' => 'required|string|in:historia,madaia',
         ]);
 
         $filename = $this->photo->hashName();
@@ -45,6 +48,7 @@ new class extends Component {
             'path' => $path,
             'alt_text_eu' => filled($this->altEu) ? $this->altEu : null,
             'alt_text_es' => filled($this->altEs) ? $this->altEs : null,
+            'tag' => $this->tag,
         ]);
 
         $this->resetUploadForm();
@@ -84,6 +88,7 @@ new class extends Component {
         $this->photo = null;
         $this->altEu = '';
         $this->altEs = '';
+        $this->tag = '';
         $this->resetValidation();
     }
 };
@@ -138,6 +143,21 @@ new class extends Component {
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+            </div>
+
+            <div>
+                <label for="tag" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ __('gallery.admin.tag') }}
+                </label>
+                <select id="tag" wire:model="tag"
+                    class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500">
+                    <option value="">{{ __('gallery.admin.tag_placeholder') }}</option>
+                    <option value="historia">{{ __('gallery.filter.history') }}</option>
+                    <option value="madaia">{{ __('gallery.filter.madaia') }}</option>
+                </select>
+                @error('tag')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="pt-2">
@@ -200,6 +220,11 @@ new class extends Component {
                                 </svg>
                             </button>
                         </div>
+
+                        <span
+                            class="absolute left-2 top-2 rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-semibold text-gray-700 shadow-sm">
+                            {{ $image->tag === \App\Models\Image::TAG_HISTORY ? __('gallery.filter.history') : ($image->tag === \App\Models\Image::TAG_MADAIA ? __('gallery.filter.madaia') : '-') }}
+                        </span>
                     </div>
                 @endforeach
             </div>

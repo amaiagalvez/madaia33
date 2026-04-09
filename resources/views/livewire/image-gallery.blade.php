@@ -1,13 +1,48 @@
 <div x-data="imageGallery()" @keydown.escape.window="close()" @keydown.tab="trapLightboxFocus($event)"
     x-effect="if (open) { focusCloseButton() }">
+    <x-public-page-header hero="gallery" :title="__('gallery.title')" :subtitle="__('gallery.subtitle')">
+        <x-slot:actions>
+            <div class="flex flex-wrap items-center justify-start gap-2 lg:justify-end"
+                data-gallery-filters>
+                <button type="button" wire:click="setTagFilter('')" data-gallery-filter="all"
+                    @class([
+                        'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === '',
+                        'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                            $activeTag !== '',
+                    ])>
+                    {{ __('gallery.filter.all') }}
+                </button>
+                <button type="button" wire:click="setTagFilter('historia')"
+                    data-gallery-filter="historia" @class([
+                        'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === 'historia',
+                        'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                            $activeTag !== 'historia',
+                    ])>
+                    {{ __('gallery.filter.history') }}
+                </button>
+                <button type="button" wire:click="setTagFilter('madaia')"
+                    data-gallery-filter="madaia" @class([
+                        'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === 'madaia',
+                        'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                            $activeTag !== 'madaia',
+                    ])>
+                    {{ __('gallery.filter.madaia') }}
+                </button>
+            </div>
+        </x-slot:actions>
+    </x-public-page-header>
+
     {{-- Image grid --}}
     @if ($images->isEmpty())
         <div
             class="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
             <div
                 class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" aria-hidden="true">
+                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
                 </svg>

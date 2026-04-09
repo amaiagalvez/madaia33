@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Image;
 use App\Models\Notice;
 use App\Models\Setting;
 use App\SupportedLocales;
 use App\Models\NoticeLocation;
+use Illuminate\Support\Facades\Storage;
 
 dataset('supported_locales', SupportedLocales::all());
 
@@ -185,4 +187,37 @@ test('home page uses configurable history summary from front settings', function
     test()->get(route(SupportedLocales::routeName('home', $locale)))
         ->assertSuccessful()
         ->assertSee($historyByLocale[$locale], false);
+})->with('supported_locales');
+
+test('home page history image uses only historia tag', function (string $locale) {
+    Storage::fake('public');
+
+    Storage::disk('public')->put('images/history-test.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
+    Storage::disk('public')->put('images/madaia-test.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
+
+    Image::factory()->create([
+        'filename' => 'madaia-test.svg',
+        'path' => 'images/madaia-test.svg',
+        'tag' => Image::TAG_MADAIA,
+    ]);
+
+    Image::factory()->create([
+        'filename' => 'history-test.svg',
+        'path' => 'images/history-test.svg',
+        'tag' => Image::TAG_HISTORY,
+    ]);
+
+    $response = test()->get(route(SupportedLocales::routeName('home', $locale)))
+        ->assertSuccessful();
+
+    $content = $response->getContent();
+    $historySectionStart = strpos($content, 'data-home-history');
+
+    expect($historySectionStart)->not->toBeFalse();
+
+    $historySection = substr($content, $historySectionStart, 2000);
+
+    expect($historySection)
+        ->toContain('/storage/images/history-test.svg')
+        ->not->toContain('/storage/images/madaia-test.svg');
 })->with('supported_locales');

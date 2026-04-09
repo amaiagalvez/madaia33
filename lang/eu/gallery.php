@@ -13,12 +13,16 @@ return [
     'filter' => [
         'label' => 'Iragazi kokapenaren arabera',
         'all' => 'Guztiak',
+        'history' => 'Historia',
+        'madaia' => 'Madaia',
     ],
     'admin' => [
         'list' => 'Argazkien zerrenda',
         'upload' => 'Argazkia igo',
         'alt_eu' => 'Testu alternatiboa (EU)',
         'alt_es' => 'Testu alternatiboa (ES)',
+        'tag' => 'Etiketa',
+        'tag_placeholder' => 'Aukeratu etiketa bat',
         'locations' => 'Kokapena(k)',
         'confirm_delete' => 'Ziur zaude argazki hau ezabatu nahi duzula?',
         'formats' => 'Onartutako formatuak: JPG, PNG, WebP. Gehieneko tamaina: 5 MB.',

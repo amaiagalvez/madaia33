@@ -13,11 +13,15 @@ class PublicHomeController extends Controller
 {
     public function index(): View
     {
-        $historyImage = Image::latest()->first();
+        $historyImage = Image::query()
+            ->where('tag', Image::TAG_HISTORY)
+            ->latest()
+            ->first();
+
         $historyImageUrl =
-          $historyImage && Storage::disk('public')->exists($historyImage->path)
-          ? Storage::url($historyImage->path)
-          : asset('apple-touch-icon.png');
+            $historyImage && Storage::disk('public')->exists($historyImage->path)
+            ? Storage::url($historyImage->path)
+            : asset('apple-touch-icon.png');
 
         $latestNotices = Notice::public()
             ->with('locations')
@@ -26,12 +30,12 @@ class PublicHomeController extends Controller
             ->get();
 
         $generalNotices = $latestNotices
-            ->filter(fn (Notice $notice) => $notice->locations->isEmpty())
+            ->filter(fn(Notice $notice) => $notice->locations->isEmpty())
             ->take(6)
             ->values();
 
         $locationNotices = $latestNotices
-            ->filter(fn (Notice $notice) => $notice->locations->isNotEmpty())
+            ->filter(fn(Notice $notice) => $notice->locations->isNotEmpty())
             ->take(6)
             ->values();
 

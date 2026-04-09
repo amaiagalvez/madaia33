@@ -27,13 +27,15 @@ it('subir imagen la hace aparecer en la galería pública', function () {
         ->set('photo', $file)
         ->set('altEu', 'Argazkia')
         ->set('altEs', 'Imagen')
+        ->set('tag', Image::TAG_MADAIA)
         ->call('uploadImage');
 
     $image = Image::first();
     expect($image)->not->toBeNull();
     expect($image->alt_text_eu)->toBe('Argazkia');
+    expect($image->tag)->toBe(Image::TAG_MADAIA);
 
-    Storage::disk('public')->assertExists($image->path);
+    expect(Storage::disk('public')->exists($image->path))->toBeTrue();
 
     $gallery = Livewire::test('image-gallery');
     expect($gallery->images->pluck('id'))->toContain($image->id);
@@ -52,6 +54,7 @@ it('eliminar imagen la quita de la galería pública', function () {
     Livewire::actingAs($user)
         ->test('admin-image-manager')
         ->set('photo', $file)
+        ->set('tag', Image::TAG_HISTORY)
         ->call('uploadImage');
 
     $image = Image::first();

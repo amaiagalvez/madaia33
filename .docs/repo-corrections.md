@@ -45,3 +45,5 @@
 - If a Lightbox/overlay opens shifted (too low/high), teleport it to `body` (`x-teleport="body"`) so `fixed` positioning is viewport-based and not affected by ancestor layout/transform contexts.
 
 - In bilingual rich-text tabs, avoid `x-if` for language panes because it destroys/recreates editors and can drop unsynced content on tab switch; prefer `x-show` (or explicit buffer syncing) to preserve in-progress text.
+
+- In docker-compose.yml, if repeated service blocks make partial patches unstable, rewrite the whole file and validate with docker compose config --quiet to catch misplaced lines early.

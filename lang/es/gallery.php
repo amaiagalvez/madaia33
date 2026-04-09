@@ -13,12 +13,16 @@ return [
     'filter' => [
         'label' => 'Filtrar por ubicación',
         'all' => 'Todos',
+        'history' => 'Historia',
+        'madaia' => 'Madaya',
     ],
     'admin' => [
         'list' => 'Lista de imágenes',
         'upload' => 'Subir imagen',
         'alt_eu' => 'Texto alternativo (EU)',
         'alt_es' => 'Texto alternativo (ES)',
+        'tag' => 'Etiqueta',
+        'tag_placeholder' => 'Selecciona una etiqueta',
         'locations' => 'Ubicación(es)',
         'confirm_delete' => '¿Estás seguro de que quieres eliminar esta imagen?',
         'formats' => 'Formatos aceptados: JPG, PNG, WebP. Tamaño máximo: 5 MB.',
