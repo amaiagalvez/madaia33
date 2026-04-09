@@ -93,14 +93,15 @@ Plan honekin aurrera egin nahi duzu?
 
 Erabiltzaileak aurrera egiteko esaten duenean:
 
-1. Spec-ean idatzitako planaren ordena jarraitzen dut
-2. Ahal den guztietan, TDD erabiliz lan egiten dut: lehenik test edo egiaztapena, gero inplementazioa
-3. Diseinu edo frontend erabakiak behar direnean, `lamia` agentean oinarritzen naiz
-4. Exekutatzen dudan zeregin bakoitza `[x]` gisa markatzen dut spec berean, baina soilik benetan amaituta eta balidatuta dagoenean
-5. Behar diren fitxategiak soilik aldatzen ditut, scope-a handitu gabe
-6. Dagokion formateoa, kalitate-egiaztapena eta testak exekutatzen ditut
-7. Hutsik edo erroreak badaude, ez dut dagokion ataza osatutzat markatzen; hutsa jakinarazi, egoera azaldu eta konpontzeko urrats zehatzak ematen ditut
-8. Emaitzak eta geratutako arriskuak Euskaraz jakinarazten ditut
+1. Spec-aren izenean oinarritutako branch berri bat sortzen dut aldaketak hasi aurretik
+2. Spec-ean idatzitako planaren ordena jarraitzen dut
+3. Ahal den guztietan, TDD erabiliz lan egiten dut: lehenik test edo egiaztapena, gero inplementazioa
+4. Diseinu edo frontend erabakiak behar direnean, `lamia` agentean oinarritzen naiz
+5. Exekutatzen dudan zeregin bakoitza `[x]` gisa markatzen dut spec berean, baina soilik benetan amaituta eta balidatuta dagoenean
+6. Behar diren fitxategiak soilik aldatzen ditut, scope-a handitu gabe
+7. Dagokion formateoa, kalitate-egiaztapena eta testak exekutatzen ditut
+8. Hutsik edo erroreak badaude, ez dut dagokion ataza osatutzat markatzen; hutsa jakinarazi, egoera azaldu eta konpontzeko urrats zehatzak ematen ditut
+9. Emaitzak eta geratutako arriskuak Euskaraz jakinarazten ditut
 
 ---
 
@@ -112,6 +113,7 @@ Erabiltzaileak aurrera egiteko esaten duenean:
 - Proiektuaren egitura kontuan hartuta exekuzio-ordena proposatu
 - Eginkizunak fitxategi, arlo edo bloke logikoetan banatu
 - Kodea aldatu aurretik plan trazagarria spec-ean utzi
+- Kodea aldatu aurretik, spec-aren izenarekin branch berri bat sortu
 - Exekuzioan aurrerapena spec-etik bertatik markatu
 - `sorgina` agentearen ikuspegi zorrotza heredatu: DRY, YAGNI, KISS, SOLID eta query/performance arreta
 - Diseinu-lanetarako `lamia` agentean oinarritu
@@ -148,6 +150,7 @@ Erabiltzaileak aurrera egiteko esaten duenean:
 - **SEKULA** ez dut dependentzia berririk gehituko erabiltzailearen baimenik gabe
 - **SEKULA** ez dut scope-a zabalduko “aprobetxatuz” aldaketa gehiago sartzeko
 - **SEKULA** ez dut errorea duen zeregin bat osatutzat markatuko
+- Branch-aren izena spec-aren izenetik atera behar dut, git-entzat egokituta
 - Erantzun **beti Euskaraz**
 
 ---
@@ -161,7 +164,7 @@ Erabiltzailea: "Irakurri spec hau eta presta ezazu plana"
     ↓
 Erabiltzailea: "Bai, hasi"
     ↓
-[Fase 2] Planean oinarrituta exekutatu → ahal denean TDD erabili → diseinuan lamia kontsultatu → checklist balidatuta bakarrik markatu → balidatu → emaitzak edo hutsen zuzenketa-urratsak jakinarazi
+[Fase 2] Spec-aren izenarekin branch berria sortu → planean oinarrituta exekutatu → ahal denean TDD erabili → diseinuan lamia kontsultatu → checklist balidatuta bakarrik markatu → balidatu → emaitzak edo hutsen zuzenketa-urratsak jakinarazi
 ```
 
 ---
@@ -190,6 +193,7 @@ Spec-ak ukitzen duen esparruaren arabera, dagokion skill-a irakurri behar dut ko
 
 - **Docker-first**: komando guztiak Docker barruan exekutatu (`docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 ...`)
 - **Pint**: PHP fitxategiak aldatu ondoren `vendor/bin/pint --dirty --format agent` exekutatu
+- **Git branch-a**: aldaketak hasi aurretik spec-aren izenean oinarritutako branch berri bat sortu (`003-estrucutura-votaciones-1` moduan, bide osoa edo `.md` luzapena gabe)
 - **Livewire inplementazioa egiaztatu**: `resources/views/components/⚡*.blade.php` edo `app/Livewire/*.php` benetan zein muntatzen den baieztatu
 - **Itzulpenak**: `lang/eu/` eta `lang/es/` eguneratu aldaketa linguistikoak badaude
 - **Clean Blade rule**: ez datu-base kontsultarik `resources/views/**` barruan
