@@ -15,6 +15,7 @@
 
 # Copilot
 [ ] repasar agente lamia
+[ ] agente para crear manuales de usuario
 
 # Code
 [ ] test en ingles
