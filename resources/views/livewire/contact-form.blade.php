@@ -1,6 +1,7 @@
 <div x-data="{
     subjectCount: 0,
     messageCount: 0,
+    showLegalModal: false,
     focusFirstField() {
         this.$refs.firstField?.focus();
     },
@@ -104,8 +105,10 @@
                     aria-describedby="{{ $errors->has('legalAccepted') ? 'contact-legal-error' : '' }}"
                     aria-invalid="{{ $errors->has('legalAccepted') ? 'true' : 'false' }}">
                 <label for="contact-legal" class="text-sm text-gray-700">
-                    <a href="{{ $legalUrl }}" target="_blank" rel="noopener noreferrer"
-                        class="underline decoration-[#d9755b]/40 underline-offset-4 hover:text-[#793d3d]">{{ $legalText }}</a>
+                    <button type="button" @click="showLegalModal = true"
+                        class="underline decoration-[#d9755b]/40 underline-offset-4 hover:text-[#793d3d]">
+                        He leído y acepto la política de privacidad
+                    </button>
                     <span aria-hidden="true" class="text-red-500">*</span>
                 </label>
             </div>
@@ -134,6 +137,36 @@
             </span>
         </button>
     </form>
+
+    <template x-teleport="body">
+        <div x-cloak x-show="showLegalModal" x-on:keydown.escape.window="showLegalModal = false"
+            x-transition.opacity
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+            aria-modal="true" role="dialog" aria-label="Política de privacidad">
+            <div class="absolute inset-0 bg-black/50" @click="showLegalModal = false"></div>
+
+            <div class="relative z-10 w-full max-w-3xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl"
+                @click.stop>
+                <div class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Política de privacidad</h2>
+                    <button type="button" @click="showLegalModal = false"
+                        class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                        aria-label="Cerrar modal">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div
+                    class="max-h-[80vh] overflow-y-auto px-5 py-4 text-sm leading-6 text-gray-700">
+                    {!! $legalText !!}
+                </div>
+            </div>
+        </div>
+    </template>
 
     @if ($siteKey)
         <script src="https://www.google.com/recaptcha/api.js?render={{ $siteKey }}" defer></script>

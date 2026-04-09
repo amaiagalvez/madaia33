@@ -164,10 +164,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn (mixed $timestamp): int => (int) $timestamp)
+            ->map(fn(mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 
@@ -224,7 +224,7 @@ class ContactForm extends Component
     public function render(): View
     {
         $legalTextKeys = SupportedLocales::localizedKeys('legal_checkbox_text');
-        $settings = Setting::whereIn('key', [...$legalTextKeys, 'legal_url', 'recaptcha_site_key'])->pluck('value', 'key');
+        $settings = Setting::whereIn('key', [...$legalTextKeys, 'recaptcha_site_key'])->pluck('value', 'key');
         $legalText = __('contact.legal_text');
 
         foreach ($legalTextKeys as $legalTextKey) {
@@ -235,12 +235,10 @@ class ContactForm extends Component
             }
         }
 
-        $legalUrl = (string) ($settings['legal_url'] ?? route(SupportedLocales::routeName('privacy-policy')));
         $siteKey = (string) ($settings['recaptcha_site_key'] ?? '');
 
         return view('livewire.contact-form', [
             'legalText' => $legalText,
-            'legalUrl' => $legalUrl,
             'siteKey' => $siteKey,
         ]);
     }

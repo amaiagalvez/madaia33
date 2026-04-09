@@ -63,7 +63,7 @@
                         class="h-36 w-full object-cover sm:h-48 lg:h-full" loading="lazy" />
                 </div>
                 <p class="mt-4 text-sm leading-relaxed text-gray-600">
-                    {{ __('home.history_summary') }}
+                    {!! $historySummary !!}
                 </p>
 
                 <a href="mailto:admin@madaia.eus"

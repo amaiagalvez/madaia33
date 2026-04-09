@@ -67,35 +67,35 @@
     </div>
 
     @foreach ($tabs as $tabConfig)
-        <template x-if="tab === '{{ $tabConfig['key'] }}'">
-            <div x-cloak data-bilingual-pane="{{ $tabConfig['key'] }}"
-                class="grid h-64 grid-rows-[1fr_auto] gap-1 overflow-hidden">
-                <p id="{{ $tabConfig['field'] }}Label" class="sr-only">
-                    {{ $tabConfig['fieldLabel'] }}</p>
-                <div class="rounded-md border border-gray-300 bg-white shadow-sm">
-                    <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 px-2 py-2"
-                        role="toolbar" aria-label="{{ __('admin.settings_form.editor_toolbar') }}">
-                        @foreach ($toolbarActions as $toolbarAction)
-                            <button type="button"
-                                @click="{{ $toolbarAction['type'] === 'link' ? "link('{$tabConfig['field']}')" : "format('{$tabConfig['field']}', '{$toolbarAction['value']}')" }}"
-                                class="rounded border border-gray-300 px-2 py-1 text-xs font-semibold text-stone-700 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">{{ $toolbarAction['label'] }}</button>
-                        @endforeach
-                    </div>
-                    <div id="{{ $tabConfig['field'] }}" x-ref="{{ $tabConfig['field'] }}"
-                        contenteditable="true" role="textbox"
-                        aria-labelledby="{{ $tabConfig['field'] }}Label" aria-multiline="true"
-                        @input="sync('{{ $tabConfig['field'] }}')"
-                        class="h-52 w-full overflow-y-auto bg-white px-3 py-2 text-sm text-stone-900 focus:outline-none">
-                        {!! $tabConfig['value'] !!}</div>
+        <div x-cloak x-show="tab === '{{ $tabConfig['key'] }}'"
+            x-bind:hidden="tab !== '{{ $tabConfig['key'] }}'"
+            data-bilingual-pane="{{ $tabConfig['key'] }}"
+            class="grid h-64 grid-rows-[1fr_auto] gap-1 overflow-hidden">
+            <p id="{{ $tabConfig['field'] }}Label" class="sr-only">
+                {{ $tabConfig['fieldLabel'] }}</p>
+            <div class="rounded-md border border-gray-300 bg-white shadow-sm">
+                <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 px-2 py-2"
+                    role="toolbar" aria-label="{{ __('admin.settings_form.editor_toolbar') }}">
+                    @foreach ($toolbarActions as $toolbarAction)
+                        <button type="button"
+                            @click="{{ $toolbarAction['type'] === 'link' ? "link('{$tabConfig['field']}')" : "format('{$tabConfig['field']}', '{$toolbarAction['value']}')" }}"
+                            class="rounded border border-gray-300 px-2 py-1 text-xs font-semibold text-stone-700 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">{{ $toolbarAction['label'] }}</button>
+                    @endforeach
                 </div>
-                <div class="min-h-5">
-                    @isset($errors)
-                        @error($tabConfig['field'])
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    @endisset
-                </div>
+                <div id="{{ $tabConfig['field'] }}" x-ref="{{ $tabConfig['field'] }}"
+                    contenteditable="true" role="textbox"
+                    aria-labelledby="{{ $tabConfig['field'] }}Label" aria-multiline="true"
+                    @input="sync('{{ $tabConfig['field'] }}')"
+                    class="h-52 w-full overflow-y-auto bg-white px-3 py-2 text-sm text-stone-900 focus:outline-none">
+                    {!! $tabConfig['value'] !!}</div>
             </div>
-        </template>
+            <div class="min-h-5">
+                @isset($errors)
+                    @error($tabConfig['field'])
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                @endisset
+            </div>
+        </div>
     @endforeach
 </div>

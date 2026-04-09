@@ -60,6 +60,16 @@ class SettingsSeeder extends Seeder
                 'value' => '<p>El contenido del aviso legal aparecerá aquí.</p>',
                 'section' => Setting::SECTION_FRONT,
             ],
+            [
+                'key' => 'home_history_text_eu',
+                'value' => '<p>Komunitatearen hastapenetara begirada laburra: espazio partekatuak, lehen topaketak eta gaur arte ekarri gaituen bilakaera.</p>',
+                'section' => Setting::SECTION_FRONT,
+            ],
+            [
+                'key' => 'home_history_text_es',
+                'value' => '<p>Un recorrido breve por los inicios de la comunidad: espacios compartidos, primeros encuentros y la evolución que nos ha traído hasta hoy.</p>',
+                'section' => Setting::SECTION_FRONT,
+            ],
         ];
 
         foreach ($defaults as $data) {

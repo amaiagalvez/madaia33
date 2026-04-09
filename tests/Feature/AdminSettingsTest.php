@@ -55,19 +55,23 @@ it('guarda el contenido de las páginas legales dentro de la sección front', fu
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_FRONT)
+        ->set('historyTextEu', '<p>Historia EU</p>')
+        ->set('historyTextEs', '<p>Historia ES</p>')
         ->set('privacyContentEu', '<p>Privacidad EU</p>')
         ->set('privacyContentEs', '<p>Privacidad ES</p>')
         ->set('legalNoticeContentEu', '<p>Aviso EU</p>')
         ->set('legalNoticeContentEs', '<p>Aviso ES</p>')
         ->call('save');
 
-    expect(settingValue('legal_page_privacy_policy_eu'))->toBe('<p>Privacidad EU</p>')
+    expect(settingValue('home_history_text_eu'))->toBe('<p>Historia EU</p>')
+        ->and(settingValue('home_history_text_es'))->toBe('<p>Historia ES</p>')
+        ->and(settingValue('legal_page_privacy_policy_eu'))->toBe('<p>Privacidad EU</p>')
         ->and(settingValue('legal_page_privacy_policy_es'))->toBe('<p>Privacidad ES</p>')
         ->and(settingValue('legal_page_legal_notice_eu'))->toBe('<p>Aviso EU</p>')
         ->and(settingValue('legal_page_legal_notice_es'))->toBe('<p>Aviso ES</p>');
 });
 
-it('guarda el texto legal y la URL en la tabla settings', function () {
+it('guarda el texto legal en la tabla settings', function () {
     $user = User::factory()->create();
 
     Livewire::actingAs($user)
@@ -76,12 +80,10 @@ it('guarda el texto legal y la URL en la tabla settings', function () {
         ->set('adminEmail', 'admin@example.com')
         ->set('legalCheckboxTextEu', 'Pribatutasun-politika onartzen dut')
         ->set('legalCheckboxTextEs', 'Acepto la política de privacidad')
-        ->set('legalUrl', 'https://example.com/privacidad')
         ->call('save');
 
     expect(settingValue('legal_checkbox_text_eu'))->toBe('Pribatutasun-politika onartzen dut');
     expect(settingValue('legal_checkbox_text_es'))->toBe('Acepto la política de privacidad');
-    expect(settingValue('legal_url'))->toBe('https://example.com/privacidad');
 });
 
 it('el campo recaptcha_secret_key se renderiza como type=password', function () {
@@ -118,6 +120,8 @@ it('renderiza también los editores ricos de política de privacidad y aviso leg
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_FRONT)
+        ->assertSeeHtml('historyTextEu')
+        ->assertSeeHtml('historyTextEs')
         ->assertSeeHtml('privacyContentEu')
         ->assertSeeHtml('privacyContentEs')
         ->assertSeeHtml('legalNoticeContentEu')
@@ -132,6 +136,7 @@ it('renderiza tabs de idioma EUS/CAS en los bloques bilingües de settings', fun
         ->call('setSection', Setting::SECTION_FRONT)
         ->assertSee(SupportedLocales::BASQUE)
         ->assertSee(SupportedLocales::SPANISH)
+        ->assertSeeHtml('data-bilingual-field="historyTextEu"')
         ->assertSeeHtml('data-bilingual-field="privacyContentEu"')
         ->assertSeeHtml('data-bilingual-field="legalNoticeContentEu"');
 
@@ -203,7 +208,7 @@ it('el dashboard muestra estadísticas reales', function () {
 it('los settings creados con factory tienen sección válida', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -320,7 +325,6 @@ it('los keys del seeder se pueden asignar a contact_form sin conflicto', functio
     $knownKeys = [
         'legal_checkbox_text_eu',
         'legal_checkbox_text_es',
-        'legal_url',
         'admin_email',
     ];
 
@@ -335,6 +339,8 @@ it('los keys del seeder se pueden asignar a contact_form sin conflicto', functio
 
 it('los keys de páginas legales se pueden asignar a la sección front sin conflicto', function () {
     $knownKeys = [
+        'home_history_text_eu',
+        'home_history_text_es',
         'legal_page_privacy_policy_eu',
         'legal_page_privacy_policy_es',
         'legal_page_legal_notice_eu',

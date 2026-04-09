@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\Notice;
-use App\Models\NoticeLocation;
+use App\Models\Setting;
 use App\SupportedLocales;
+use App\Models\NoticeLocation;
 
 dataset('supported_locales', SupportedLocales::all());
 
@@ -161,4 +162,27 @@ test('home page keeps mobile order general notices then location notices then hi
     expect($locationPos)->not->toBeFalse();
     expect($historyPos)->not->toBeFalse();
     expect($generalPos < $locationPos && $locationPos < $historyPos)->toBeTrue();
+})->with('supported_locales');
+
+test('home page uses configurable history summary from front settings', function (string $locale) {
+    $historyByLocale = [
+        SupportedLocales::BASQUE => '<p>Historia personalizada EU</p>',
+        SupportedLocales::SPANISH => '<p>Historia personalizada ES</p>',
+    ];
+
+    Setting::factory()->create([
+        'key' => 'home_history_text_eu',
+        'value' => $historyByLocale[SupportedLocales::BASQUE],
+        'section' => Setting::SECTION_FRONT,
+    ]);
+
+    Setting::factory()->create([
+        'key' => 'home_history_text_es',
+        'value' => $historyByLocale[SupportedLocales::SPANISH],
+        'section' => Setting::SECTION_FRONT,
+    ]);
+
+    test()->get(route(SupportedLocales::routeName('home', $locale)))
+        ->assertSuccessful()
+        ->assertSee($historyByLocale[$locale], false);
 })->with('supported_locales');

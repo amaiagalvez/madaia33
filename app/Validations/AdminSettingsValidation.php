@@ -19,7 +19,6 @@ class AdminSettingsValidation
             'recaptchaSecretKey' => 'nullable|string|max:255',
             'legalCheckboxTextEu' => ['nullable', 'string', 'max:1000', new NoScriptTags],
             'legalCheckboxTextEs' => ['nullable', 'string', 'max:1000', new NoScriptTags],
-            'legalUrl' => 'nullable|url|max:255',
         ];
     }
 
@@ -48,6 +47,8 @@ class AdminSettingsValidation
     {
         return match ($section) {
             Setting::SECTION_FRONT => [
+                'historyTextEu' => ['nullable', 'string', new NoScriptTags],
+                'historyTextEs' => ['nullable', 'string', new NoScriptTags],
                 'privacyContentEu' => ['nullable', 'string', new NoScriptTags],
                 'privacyContentEs' => ['nullable', 'string', new NoScriptTags],
                 'legalNoticeContentEu' => ['nullable', 'string', new NoScriptTags],
@@ -57,7 +58,6 @@ class AdminSettingsValidation
                 'adminEmail' => 'required|email|max:255',
                 'legalCheckboxTextEu' => ['nullable', 'string', 'max:1000', new NoScriptTags],
                 'legalCheckboxTextEs' => ['nullable', 'string', 'max:1000', new NoScriptTags],
-                'legalUrl' => 'nullable|url|max:255',
             ],
             Setting::SECTION_RECAPTCHA => [
                 'recaptchaSiteKey' => 'nullable|string|max:255',

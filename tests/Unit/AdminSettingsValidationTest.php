@@ -12,7 +12,6 @@ it('rejects empty admin email', function () {
             'recaptchaSecretKey' => null,
             'legalCheckboxTextEu' => null,
             'legalCheckboxTextEs' => null,
-            'legalUrl' => null,
         ],
         AdminSettingsValidation::rules(),
         AdminSettingsValidation::messages(),
@@ -30,7 +29,6 @@ it('rejects invalid admin email format', function () {
             'recaptchaSecretKey' => null,
             'legalCheckboxTextEu' => null,
             'legalCheckboxTextEs' => null,
-            'legalUrl' => null,
         ],
         AdminSettingsValidation::rules(),
         AdminSettingsValidation::messages(),
@@ -38,24 +36,6 @@ it('rejects invalid admin email format', function () {
 
     expect($validator->fails())->toBeTrue()
         ->and($validator->errors()->keys())->toContain('adminEmail');
-});
-
-it('rejects invalid legal url format', function () {
-    $validator = Validator::make(
-        [
-            'adminEmail' => 'admin@example.com',
-            'recaptchaSiteKey' => null,
-            'recaptchaSecretKey' => null,
-            'legalCheckboxTextEu' => null,
-            'legalCheckboxTextEs' => null,
-            'legalUrl' => 'invalid-url',
-        ],
-        AdminSettingsValidation::rules(),
-        AdminSettingsValidation::messages(),
-    );
-
-    expect($validator->fails())->toBeTrue()
-        ->and($validator->errors()->keys())->toContain('legalUrl');
 });
 
 it('rejects script tags in legal texts', function () {
@@ -66,7 +46,6 @@ it('rejects script tags in legal texts', function () {
             'recaptchaSecretKey' => null,
             'legalCheckboxTextEu' => '<script>alert(1)</script>',
             'legalCheckboxTextEs' => null,
-            'legalUrl' => null,
         ],
         AdminSettingsValidation::rules(),
         AdminSettingsValidation::messages(),
@@ -84,7 +63,6 @@ it('accepts valid admin settings payload', function () {
             'recaptchaSecretKey' => 'secret-key-456',
             'legalCheckboxTextEu' => 'Pribatutasun-politika onartzen dut',
             'legalCheckboxTextEs' => 'Acepto la politica de privacidad',
-            'legalUrl' => 'https://example.com/privacidad',
         ],
         AdminSettingsValidation::rules(),
         AdminSettingsValidation::messages(),
@@ -134,7 +112,6 @@ it('requires admin email in contact form section rules', function () {
             'adminEmail' => '',
             'legalCheckboxTextEu' => null,
             'legalCheckboxTextEs' => null,
-            'legalUrl' => null,
         ],
         AdminSettingsValidation::rulesBySection(Setting::SECTION_CONTACT_FORM),
     );
@@ -150,6 +127,22 @@ it('accepts valid recaptcha section payload', function () {
             'recaptchaSecretKey' => 'secret-key-456',
         ],
         AdminSettingsValidation::rulesBySection(Setting::SECTION_RECAPTCHA),
+    );
+
+    expect($validator->fails())->toBeFalse();
+});
+
+it('accepts valid front section payload including home history text', function () {
+    $validator = Validator::make(
+        [
+            'historyTextEu' => '<p>Historia EU</p>',
+            'historyTextEs' => '<p>Historia ES</p>',
+            'privacyContentEu' => '<p>Privacidad EU</p>',
+            'privacyContentEs' => '<p>Privacidad ES</p>',
+            'legalNoticeContentEu' => '<p>Aviso EU</p>',
+            'legalNoticeContentEs' => '<p>Aviso ES</p>',
+        ],
+        AdminSettingsValidation::rulesBySection(Setting::SECTION_FRONT),
     );
 
     expect($validator->fails())->toBeFalse();

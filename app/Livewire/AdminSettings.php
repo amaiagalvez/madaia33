@@ -25,11 +25,13 @@ class AdminSettings extends Component
 
     public string $legalCheckboxTextEs = '';
 
-    public string $legalUrl = '';
-
     public string $privacyContentEu = '';
 
     public string $privacyContentEs = '';
+
+    public string $historyTextEu = '';
+
+    public string $historyTextEs = '';
 
     public string $legalNoticeContentEu = '';
 
@@ -49,9 +51,10 @@ class AdminSettings extends Component
                 'adminEmail' => 'admin_email',
                 'legalCheckboxTextEu' => 'legal_checkbox_text_eu',
                 'legalCheckboxTextEs' => 'legal_checkbox_text_es',
-                'legalUrl' => 'legal_url',
             ],
             Setting::SECTION_FRONT => [
+                'historyTextEu' => 'home_history_text_eu',
+                'historyTextEs' => 'home_history_text_es',
                 'privacyContentEu' => 'legal_page_privacy_policy_eu',
                 'privacyContentEs' => 'legal_page_privacy_policy_es',
                 'legalNoticeContentEu' => 'legal_page_legal_notice_eu',
@@ -90,7 +93,8 @@ class AdminSettings extends Component
         $this->recaptchaSecretKey = $settings['recaptcha_secret_key'] ?? '';
         $this->legalCheckboxTextEu = $settings['legal_checkbox_text_eu'] ?? '';
         $this->legalCheckboxTextEs = $settings['legal_checkbox_text_es'] ?? '';
-        $this->legalUrl = $settings['legal_url'] ?? '';
+        $this->historyTextEu = $settings['home_history_text_eu'] ?? '';
+        $this->historyTextEs = $settings['home_history_text_es'] ?? '';
         $this->privacyContentEu = $settings['legal_page_privacy_policy_eu'] ?? '';
         $this->privacyContentEs = $settings['legal_page_privacy_policy_es'] ?? '';
         $this->legalNoticeContentEu = $settings['legal_page_legal_notice_eu'] ?? '';

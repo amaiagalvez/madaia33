@@ -203,6 +203,7 @@ Implementación incremental de la web de la comunidad de vecinos sobre Laravel 1
 - [x] 12. Implementar el panel de administración — Configuración
   - Crear el componente Livewire `AdminSettings` con formulario de configuración
   - Implementar lectura y escritura de la tabla `settings` para: email admin, claves reCAPTCHA, texto legal (EU+ES) y URL legal
+  - Implementar lectura y escritura de la tabla `settings` para el texto de historia de la home (EU+ES) dentro de la sección front
   - Asegurar que el campo de clave privada reCAPTCHA se renderiza como `type="password"`
   - Crear el dashboard admin con resumen de avisos, imágenes y mensajes no leídos
   - _Requisitos: 11.6, 12.4, 13.4_

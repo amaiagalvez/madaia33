@@ -113,6 +113,7 @@ Web pública para la comunidad de vecinos. La web contará con una parte públic
 6. IF el Administrador introduce credenciales incorrectas, THEN THE Web SHALL mostrar un mensaje de error y no conceder acceso al panel de administración.
 7. WHEN el Administrador intenta eliminar un aviso o imagen, THE Panel_Administración SHALL solicitar confirmación antes de proceder con la eliminación.
 8. THE Web SHALL permitir la creación de cuentas de Administrador únicamente mediante herramientas de línea de comandos (Artisan) o seeders, sin ofrecer registro público de administradores.
+9. THE Administrador SHALL poder configurar desde el Panel_Administración el texto bilingüe (EU/ES) del bloque de historia mostrado en la página principal.
 
 ---
 

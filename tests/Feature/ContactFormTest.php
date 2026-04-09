@@ -261,7 +261,6 @@ it('render usa fallback de legal text y privacy policy cuando faltan settings', 
 
     Livewire::test('contact-form')
         ->assertViewHas('legalText', __('contact.legal_text'))
-        ->assertViewHas('legalUrl', route(SupportedLocales::routeName('privacy-policy', $locale)))
         ->assertViewHas('siteKey', '');
 })->with('supported_locales');
 
