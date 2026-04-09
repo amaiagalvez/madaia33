@@ -233,12 +233,18 @@ class AdminNoticeManager extends Component
     {
         $notice->locations()->delete();
 
-        foreach ($this->selectedLocations as $code) {
-            NoticeLocation::create([
+        $rows = [];
+
+        foreach (array_values(array_unique($this->selectedLocations)) as $code) {
+            $rows[] = [
                 'notice_id' => $notice->id,
                 'location_type' => CommunityLocations::typeForCode($code),
                 'location_code' => $code,
-            ]);
+            ];
+        }
+
+        if ($rows !== []) {
+            NoticeLocation::insert($rows);
         }
     }
 

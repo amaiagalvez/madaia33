@@ -70,3 +70,4 @@
 - For opaque Feature test 500s that hide stack traces, inspect dated Laravel logs in `storage/logs/laravel-YYYY-MM-DD.log`; the exception there is usually faster than rerunning tests blindly.
 
 - For duplicated Blade components already referenced across views/tests, consolidate with a new shared base component and keep old component names as thin wrappers to preserve compatibility and stable `data-*` selectors.
+- Before switching row-by-row inserts to bulk insert, verify the table schema for timestamps (`created_at`/`updated_at`); include only real columns to avoid SQL errors in tests.

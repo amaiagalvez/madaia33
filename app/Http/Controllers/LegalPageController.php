@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
-use App\SupportedLocales;
 use Illuminate\Contracts\View\View;
 
 class LegalPageController extends Controller
@@ -20,19 +19,7 @@ class LegalPageController extends Controller
 
     private function renderLegalPage(string $pageKey, string $titleKey, string $pageSlug): View
     {
-        $localizedKeys = SupportedLocales::localizedKeys("legal_page_{$pageKey}");
-        $settings = Setting::whereIn('key', $localizedKeys)
-            ->pluck('value', 'key');
-
-        $content = '';
-
-        foreach ($localizedKeys as $localizedKey) {
-            if ($settings->has($localizedKey)) {
-                $content = (string) $settings[$localizedKey];
-
-                break;
-            }
-        }
+        $content = Setting::localizedString("legal_page_{$pageKey}", '') ?? '';
 
         return view('public.legal-page', [
             'content' => $content,

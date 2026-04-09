@@ -202,9 +202,9 @@ class AdminSettings extends Component
     public function mount(): void
     {
         $allKeys = collect($this->sectionFieldMap())->flatten()->values()->all();
-        $settings = Setting::whereIn('key', $allKeys)->pluck('value', 'key');
+        $settings = Setting::stringValues($allKeys);
 
-        $this->assignSettingValues($settings->all());
+        $this->assignSettingValues($settings);
 
         $sections = $this->resolveAvailableSections();
 
@@ -268,7 +268,7 @@ class AdminSettings extends Component
         }
 
         try {
-            $emailSettings = Setting::whereIn('key', [
+            $emailSettings = Setting::stringValues([
                 'from_address',
                 'from_name',
                 'smtp_host',
@@ -276,9 +276,9 @@ class AdminSettings extends Component
                 'smtp_username',
                 'smtp_password',
                 'smtp_encryption',
-            ])->pluck('value', 'key');
+            ]);
 
-            $this->configuredMailSettings()->apply($emailSettings->all());
+            $this->configuredMailSettings()->apply($emailSettings);
 
             Mail::to($this->testEmailAddress)->send(
                 new TestEmail(
