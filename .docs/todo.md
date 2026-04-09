@@ -14,8 +14,6 @@
 [ ] user hizkuntza, besdin du front-ekoa
 
 # Copilot
-[ ] Crear un nuevo agente, nombre sorgina con el icono de una brujita. Es una experta en PHP, LARAVEL y MYSQL, clean code, buenas prácticas, patrones de diseño DRY, YAGNI, KISS, SOLID... Su labor será revisar el código y buscar incongruencias, detectar código repetido, número de consultas repetidas, consultas lentas, ... y proponer soluciones con lo que encuentre. Funciona en modo "Plan" y luego pide confirmación para realizar los cambios. 
-[ ] Crear una regla que guade en specs numeradas lo que le voy pidiendo y el plan de acción. Si hay errores, que añada los errores detectados y las correcciones.
 
 # Code
 [ ] test en ingles
