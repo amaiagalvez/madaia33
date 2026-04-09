@@ -3,17 +3,17 @@
 namespace App\Livewire;
 
 use App\Models\Setting;
+use Livewire\Component;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
-use App\Support\ConfiguredMailSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use App\Support\ConfiguredMailSettings;
 use App\Validations\ContactFormValidation;
-use Livewire\Component;
 
 class ContactForm extends Component
 {
@@ -173,10 +173,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn(mixed $timestamp): int => (int) $timestamp)
+            ->map(fn (mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 
@@ -234,7 +234,7 @@ class ContactForm extends Component
             ...SupportedLocales::localizedKeys('legal_text'),
         ])
             ->pluck('value', 'key')
-            ->map(fn(mixed $value): string => (string) $value)
+            ->map(fn (mixed $value): string => (string) $value)
             ->all();
     }
 
@@ -279,7 +279,7 @@ class ContactForm extends Component
             'recaptcha_site_key',
         ])
             ->pluck('value', 'key')
-            ->map(fn(mixed $value): string => (string) $value)
+            ->map(fn (mixed $value): string => (string) $value)
             ->all();
 
         $legalText = $this->resolveLocalizedSetting($settings, 'legal_checkbox_text', __('contact.legal_text'));

@@ -2,13 +2,13 @@
 
 namespace App\Livewire;
 
-use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Models\Notice;
 use Livewire\Component;
 use App\CommunityLocations;
 use Illuminate\Support\Str;
 use App\Models\NoticeLocation;
 use Illuminate\Contracts\View\View;
+use App\Concerns\BuildsLocaleFieldConfigs;
 
 class AdminNoticeManager extends Component
 {

@@ -66,7 +66,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // ─── Auth (Fortify / Breeze) ───────────────────────────────────────────────────
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::view('dashboard', 'pages.dashboard')->name('dashboard');
 });
 
 require __DIR__.'/settings.php';

@@ -2,14 +2,14 @@
 
 namespace App\Livewire;
 
-use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Mail\TestEmail;
 use App\Models\Setting;
-use App\Support\ConfiguredMailSettings;
-use Illuminate\Contracts\View\View;
-use App\Validations\AdminSettingsValidation;
-use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Mail;
+use App\Support\ConfiguredMailSettings;
+use App\Concerns\BuildsLocaleFieldConfigs;
+use App\Validations\AdminSettingsValidation;
 
 class AdminSettings extends Component
 {

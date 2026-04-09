@@ -21,7 +21,7 @@
                         <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6"
                             data-latest-notices-general>
                             @foreach ($generalNotices as $notice)
-                                <x-notice-card :notice="$notice" />
+                                <x-front.notice-card :notice="$notice" />
                             @endforeach
                         </div>
                     @else
@@ -39,7 +39,7 @@
                         <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6"
                             data-latest-notices>
                             @foreach ($locationNotices as $notice)
-                                <x-notice-card :notice="$notice" />
+                                <x-front.notice-card :notice="$notice" />
                             @endforeach
                         </div>
                     @else

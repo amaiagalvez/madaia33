@@ -5,6 +5,7 @@ namespace App\Providers;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->registerLegacyBladeComponentAliases();
     }
 
     /**
@@ -37,14 +39,27 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
+        Password::defaults(
+            fn(): ?Password => app()->isProduction()
+                ? Password::min(12)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
                 ->symbols()
                 ->uncompromised()
-            : null,
+                : null,
         );
+    }
+
+    /**
+     * Keep backward-compatible component names while templates are organized in folders.
+     */
+    protected function registerLegacyBladeComponentAliases(): void
+    {
+        Blade::component('auth.auth-header', 'auth-header');
+        Blade::component('auth.auth-session-status', 'auth-session-status');
+        Blade::component('front.notice-card', 'notice-card');
+        Blade::component('front.public-brand-link', 'public-brand-link');
+        Blade::component('front.public-page-header', 'public-page-header');
     }
 }

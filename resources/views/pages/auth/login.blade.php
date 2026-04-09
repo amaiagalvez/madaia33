@@ -1,9 +1,9 @@
 <x-layouts::auth :title="__('admin.login.title')">
     <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('admin.login.title')" />
+        <x-auth.auth-header :title="__('admin.login.title')" />
 
         <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+        <x-auth.auth-session-status class="text-center" :status="session('status')" />
 
         <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
             @csrf
