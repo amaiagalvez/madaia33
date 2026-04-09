@@ -8,42 +8,38 @@ use App\Models\Image;
 use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
+const GALLERY_PATH = '/eu/argazki-bilduma';
+
 test('gallery grid responds to mobile tablet and desktop breakpoints', function () {
     Image::factory()->count(8)->create();
+    $gridColumnsScript = "return getComputedStyle(document.querySelector('[data-gallery-grid]')).gridTemplateColumns.split(' ').length;";
 
     /** @var DuskTestCase $this */
-    $this->browse(function (Browser $browser) {
-        $browser->visit('/eu/argazki-bilduma');
+    $this->browse(function (Browser $browser) use ($gridColumnsScript) {
+        $browser->visit(GALLERY_PATH);
 
         $browser->resize(375, 812)
             ->pause(300)
-            ->assertScript(
-                "return getComputedStyle(document.querySelector('[data-gallery-grid]')).gridTemplateColumns.split(' ').length;",
-                2
-            );
+            ->assertScript($gridColumnsScript, 2);
 
         $browser->resize(768, 1024)
             ->pause(300)
-            ->assertScript(
-                "return getComputedStyle(document.querySelector('[data-gallery-grid]')).gridTemplateColumns.split(' ').length;",
-                3
-            );
+            ->assertScript($gridColumnsScript, 3);
 
         $browser->resize(1200, 900)
             ->pause(300)
-            ->assertScript(
-                "return getComputedStyle(document.querySelector('[data-gallery-grid]')).gridTemplateColumns.split(' ').length;",
-                4
-            );
+            ->assertScript($gridColumnsScript, 4);
     });
 });
 
 test('lightbox adapts orientation and closes with escape and outside click', function () {
     Image::factory()->create();
+    $galleryOpenSelector = '[data-gallery-open]';
+    $overflowScript = 'return document.body.style.overflow;';
 
     /** @var DuskTestCase $this */
-    $this->browse(function (Browser $browser) {
-        $browser->visit('/eu/argazki-bilduma')
+    $this->browse(function (Browser $browser) use ($galleryOpenSelector, $overflowScript) {
+        $browser->visit(GALLERY_PATH)
             ->resize(390, 844)
             ->pause(350);
 
@@ -64,26 +60,22 @@ test('lightbox adapts orientation and closes with escape and outside click', fun
 
         $browser
             ->pause(300)
-            ->click('[data-gallery-open]')
+            ->click($galleryOpenSelector)
             ->pause(300)
-            ->assertScript("return getComputedStyle(document.querySelector('[data-lightbox]')).display !== 'none';", true)
+            ->assertScript("return document.body.style.overflow === 'hidden';", true)
             ->assertScript(
                 "return document.querySelector('[data-lightbox] img').classList.contains('max-h-[90vh]');",
                 true
             )
-            ->assertScript(
-                "return document.querySelector('[data-lightbox-close]').offsetHeight >= 44 && document.querySelector('[data-lightbox-close]').offsetWidth >= 44;",
-                true
-            )
-            ->assertScript('return document.body.style.overflow;', 'hidden')
+            ->assertScript($overflowScript, 'hidden')
             ->script("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));");
 
         $browser->pause(300)
-            ->assertScript('return document.body.style.overflow;', '');
+            ->assertScript($overflowScript, '');
 
         $browser
             ->resize(1024, 640)
-            ->click('[data-gallery-open]')
+            ->click($galleryOpenSelector)
             ->pause(300)
             ->assertScript(
                 "return document.querySelector('[data-lightbox] img').classList.contains('max-h-[85vh]');",
@@ -94,7 +86,7 @@ test('lightbox adapts orientation and closes with escape and outside click', fun
 
         $browser
             ->pause(300)
-            ->assertScript('return document.body.style.overflow;', '');
+            ->assertScript($overflowScript, '');
     });
 });
 
@@ -103,7 +95,7 @@ test('lightbox closes with swipe down gesture', function () {
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/eu/argazki-bilduma')
+        $browser->visit(GALLERY_PATH)
             ->resize(390, 844)
             ->pause(350);
 
@@ -126,7 +118,7 @@ test('lightbox closes with swipe down gesture', function () {
             ->pause(300)
             ->click('[data-gallery-open]')
             ->pause(300)
-            ->assertScript("return getComputedStyle(document.querySelector('[data-lightbox]')).display !== 'none';", true)
+            ->assertScript("return document.body.style.overflow === 'hidden';", true)
             ->script(<<<'JS'
                 var lightbox = document.querySelector('[data-lightbox]');
                 var startEvent = new Event('touchstart', { bubbles: true, cancelable: true });

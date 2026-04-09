@@ -8,6 +8,8 @@
 ])
 
 @php
+    $validationErrors = $errors ?? new \Illuminate\Support\ViewErrorBag();
+
     $tabs = collect(\App\SupportedLocales::all())
         ->map(function (string $locale) use ($localeConfigs): ?array {
             $localeConfig = $localeConfigs[$locale] ?? null;
@@ -110,23 +112,23 @@
                     <textarea id="{{ $tabConfig['field'] }}" wire:model="{{ $tabConfig['field'] }}"
                         rows="{{ $rows }}" @class([
                             'mt-1 block w-full rounded-md border bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]',
-                            'border-red-500' => $errors->has($tabConfig['field']),
-                            'border-gray-300' => !$errors->has($tabConfig['field']),
+                            'border-red-500' => $validationErrors->has($tabConfig['field']),
+                            'border-gray-300' => !$validationErrors->has($tabConfig['field']),
                         ])></textarea>
                 @else
                     <input id="{{ $tabConfig['field'] }}" type="{{ $type }}"
                         wire:model="{{ $tabConfig['field'] }}" @class([
                             'mt-1 block w-full rounded-md border bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]',
-                            'border-red-500' => $errors->has($tabConfig['field']),
-                            'border-gray-300' => !$errors->has($tabConfig['field']),
+                            'border-red-500' => $validationErrors->has($tabConfig['field']),
+                            'border-gray-300' => !$validationErrors->has($tabConfig['field']),
                         ]) />
                 @endif
             @endif
 
             <div class="{{ $mode === 'rich-text' ? 'min-h-5' : '' }}">
-                @error($tabConfig['field'])
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+                @if ($validationErrors->has($tabConfig['field']))
+                    <p class="mt-1 text-sm text-red-600">{{ $validationErrors->first($tabConfig['field']) }}</p>
+                @endif
             </div>
         </div>
     @endforeach

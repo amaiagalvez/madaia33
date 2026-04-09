@@ -11,17 +11,18 @@ use App\Models\ContactMessage;
 
 test('admin can read a message and it gets marked as read', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $messageBody = 'Dusk test message body.';
 
     $message = ContactMessage::create([
         'name' => 'Dusk Sender',
         'email' => 'dusk@example.com',
         'subject' => 'Dusk Test Subject',
-        'message' => 'Dusk test message body.',
+        'message' => $messageBody,
         'is_read' => false,
     ]);
 
     /** @var DuskTestCase $this */
-    $this->browse(function (Browser $browser) use ($admin, $message) {
+    $this->browse(function (Browser $browser) use ($admin, $message, $messageBody) {
         $browser->loginAs($admin)
             ->visit('/admin/mensajes')
             ->assertSee('Dusk Sender')
@@ -38,8 +39,8 @@ test('admin can read a message and it gets marked as read', function () {
             }
         ");
 
-        $browser->waitForText('Dusk test message body.', 5)
-            ->assertSee('Dusk test message body.');
+        $browser->waitForText($messageBody, 5)
+            ->assertSee($messageBody);
 
         // Verify marked as read in DB
         expect($message->fresh()->is_read)->toBeTrue();
@@ -50,27 +51,28 @@ test('admin can read a message and it gets marked as read', function () {
 
 test('admin can delete a message with confirmation', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $deleteSubject = 'Delete Test Subject';
 
     $message = ContactMessage::create([
         'name' => 'Delete Me',
         'email' => 'delete@example.com',
-        'subject' => 'Delete Test Subject',
+        'subject' => $deleteSubject,
         'message' => 'This message should be deleted.',
         'is_read' => false,
     ]);
 
     /** @var DuskTestCase $this */
-    $this->browse(function (Browser $browser) use ($admin) {
+    $this->browse(function (Browser $browser) use ($admin, $deleteSubject) {
         $browser->loginAs($admin)
             ->visit('/admin/mensajes')
-            ->assertSee('Delete Test Subject');
+            ->assertSee($deleteSubject);
 
         // Click delete button for this message (stop propagation prevents row click)
         $browser->script("
             const rows = document.querySelectorAll('tbody tr');
             for (const row of rows) {
-                if (row.textContent.includes('Delete Test Subject')) {
-                    const btn = row.querySelector('button.text-red-600');
+                if (row.textContent.includes('{$deleteSubject}')) {
+                    const btn = row.querySelector('button[title=\"Ezabatu\"]');
                     if (btn) btn.click();
                     break;
                 }
@@ -81,17 +83,11 @@ test('admin can delete a message with confirmation', function () {
         $browser->waitForText('Ziur zaude', 5)
             ->assertSee('Ziur zaude');
 
-        // Confirm deletion in modal — click the red delete button in the modal
-        $browser->script("
-            const modal = document.querySelector('[role=\"dialog\"]');
-            if (modal) {
-                const btn = modal.querySelector('button.bg-red-600');
-                if (btn) btn.click();
-            }
-        ");
+        // Confirm deletion in modal
+        $browser->press('Ezabatu');
 
-        $browser->pause(1500)
-            ->assertDontSee('Delete Test Subject');
+        $browser->pause(2000)
+            ->assertDontSee($deleteSubject);
     });
 
     // Verify deleted from DB

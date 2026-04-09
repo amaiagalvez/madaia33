@@ -52,12 +52,22 @@
     @else
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" data-gallery-grid>
             @foreach ($images as $image)
+                @php
+                    $cleanAltText = trim(
+                        (string) preg_replace(
+                            '/\b(image|imagen|irudia)\b/iu',
+                            '',
+                            $image->alt_text,
+                        ),
+                    );
+                    $accessibleAltText = $cleanAltText !== '' ? $cleanAltText : $image->alt_text;
+                @endphp
                 <button type="button" data-gallery-open
                     wire:key="gallery-image-{{ $image->id }}"
                     class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'col-span-2 min-h-56 sm:row-span-2 sm:min-h-72' : 'aspect-square' }}"
-                    @click="show('{{ $image->public_url }}', '{{ addslashes($image->alt_text) }}', $event)"
-                    aria-label="{{ $image->alt_text }}">
-                    <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
+                    @click="show('{{ $image->public_url }}', '{{ addslashes($accessibleAltText) }}', $event)"
+                    aria-label="{{ $accessibleAltText }}">
+                    <img src="{{ $image->public_url }}" alt="{{ $accessibleAltText }}"
                         loading="{{ $loop->first ? 'eager' : 'lazy' }}"
                         class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
                     <span
@@ -73,13 +83,40 @@
         </div>
     @endif
 
+    <a href="mailto:admin@madaia.eus"
+        class="elevated-card mt-6 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+        data-gallery-photos-callout>
+        <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+            </svg>
+        </div>
+        <div>
+            <p
+                class="text-sm font-semibold text-gray-900 transition-colors group-hover:text-[#793d3d]">
+                {{ __('home.history_photos_title') }}
+            </p>
+            <p class="mt-0.5 text-xs leading-relaxed text-gray-500">
+                {{ __('home.history_photos_summary', ['email' => 'admin@madaia.eus']) }}
+            </p>
+        </div>
+        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
+            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+            aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+    </a>
+
     {{-- Lightbox --}}
     <template x-teleport="body">
-        <div x-show="open" x-cloak style="display: none;" data-lightbox
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+        <dialog x-show="open" x-cloak style="display: none;" data-lightbox
+            class="fixed inset-0 z-50 m-0 h-full w-full max-h-none max-w-none border-0 bg-black/80 p-4"
             @click.self="close()" @touchstart="handleTouchStart($event)"
-            @touchmove="handleTouchMove($event)" role="dialog" aria-modal="true"
-            :aria-label="current.alt" data-gallery-lightbox>
+            @touchmove="handleTouchMove($event)" aria-modal="true" :aria-label="current.alt"
+            data-gallery-lightbox>
             <div class="relative max-h-full max-w-5xl w-full flex items-center justify-center"
                 x-ref="lightboxPanel">
                 <img :src="current.src" :alt="current.alt"
@@ -95,7 +132,7 @@
                     </svg>
                 </button>
             </div>
-        </div>
+        </dialog>
     </template>
 </div>
 

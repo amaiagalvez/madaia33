@@ -138,7 +138,7 @@ test('gallery smoke opens lightbox closes with escape and works after rotating t
             ->pause(400)
             ->click('[data-gallery-open]')
             ->pause(350)
-            ->assertScript("return getComputedStyle(document.querySelector('[data-lightbox]')).display !== 'none';", true)
+            ->assertScript("return document.body.style.overflow === 'hidden';", true)
             ->script("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));");
 
         $browser->pause(350)

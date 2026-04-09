@@ -18,7 +18,7 @@
                     </h2>
 
                     @if ($generalNotices->isNotEmpty())
-                        <div class="mt-4 grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6"
+                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6"
                             data-latest-notices-general>
                             @foreach ($generalNotices as $notice)
                                 <x-notice-card :notice="$notice" />
@@ -36,7 +36,7 @@
                     data-home-notices-by-location>
 
                     @if ($locationNotices->isNotEmpty())
-                        <div class="mt-4 grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6"
+                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6"
                             data-latest-notices>
                             @foreach ($locationNotices as $notice)
                                 <x-notice-card :notice="$notice" />

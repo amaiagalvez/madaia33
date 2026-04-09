@@ -37,6 +37,7 @@ return [
     'pagination' => [
         'previous' => 'Anterior',
         'next' => 'Siguiente',
+        'go_to_page' => 'Ir a la página :page',
     ],
     'font_sizes' => [
         'mobile' => 'text-sm',
@@ -50,5 +51,13 @@ return [
         'auth_message' => 'La zona privada está en desarrollo.',
         'login_cta' => 'Iniciar sesión',
         'seo_description' => 'Accede a la zona privada de la comunidad para iniciar sesion y gestionar tu area personal.',
+        'form_title' => 'Acceso a la zona privada',
+        'username' => 'Usuario',
+        'username_placeholder' => 'Por ejemplo: vecino01',
+        'password' => 'Contraseña',
+        'change_password_option' => 'Cambiar contraseña',
+        'show_password' => 'Mostrar contraseña',
+        'hide_password' => 'Ocultar contraseña',
+        'form_note' => 'Este formulario muestra únicamente el diseño por ahora; las funcionalidades se activarán en una fase posterior.',
     ],
 ];

@@ -22,11 +22,51 @@
             {{-- Status message --}}
             @if ($statusType)
                 <div role="alert" aria-live="polite"
-                    class="mb-6 rounded-lg px-4 py-3 text-sm font-medium
-            {{ $statusType === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : '' }}
-            {{ $statusType === 'warning' ? 'bg-[#f1bd4d]/15 text-[#793d3d] border border-[#f1bd4d]/50' : '' }}
-            {{ $statusType === 'error' ? 'bg-red-50 text-red-800 border border-red-200' : '' }}">
-                    {{ $statusMessage }}
+                    class="mb-6 rounded-2xl border px-4 py-4 sm:px-5" @class([
+                        'border-green-300 bg-linear-to-r from-green-50 to-white text-green-900' =>
+                            $statusType === 'success',
+                        'border-[#f1bd4d]/70 bg-linear-to-r from-[#f1bd4d]/20 to-white text-[#793d3d]' =>
+                            $statusType === 'warning',
+                        'border-red-300 bg-linear-to-r from-red-50 to-white text-red-900' =>
+                            $statusType === 'error',
+                    ])>
+                    <div class="flex items-start gap-3">
+                        <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+                            @class([
+                                'bg-green-100 text-green-700' => $statusType === 'success',
+                                'bg-[#f1bd4d]/40 text-[#793d3d]' => $statusType === 'warning',
+                                'bg-red-100 text-red-700' => $statusType === 'error',
+                            ])>
+                            @if ($statusType === 'success')
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                            @elseif($statusType === 'warning')
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 9v3.75m9.303 3.376c.866 1.5-.217 3.374-1.948 3.374H4.645c-1.73 0-2.813-1.874-1.948-3.374L10.051 3.378c.866-1.5 3.032-1.5 3.898 0l7.354 12.748ZM12 15.75h.007v.008H12v-.008Z" />
+                                </svg>
+                            @else
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 9v3.75m9.303 3.376c.866 1.5-.217 3.374-1.948 3.374H4.645c-1.73 0-2.813-1.874-1.948-3.374L10.051 3.378c.866-1.5 3.032-1.5 3.898 0l7.354 12.748ZM12 15.75h.007v.008H12v-.008Z" />
+                                </svg>
+                            @endif
+                        </div>
+
+                        <div>
+                            <p class="text-sm font-semibold">{{ $statusMessage }}</p>
+                            @if ($statusType === 'success')
+                                <p class="mt-1 text-xs text-green-800/80">
+                                    {{ __('contact.success_hint') }}
+                                </p>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             @endif
 
@@ -106,7 +146,8 @@
                         aria-invalid="{{ $errors->has('message') ? 'true' : 'false' }}"></textarea>
                     <p id="contact-message-counter" class="mt-1 text-xs text-gray-500"
                         aria-live="polite">
-                        {{ __('contact.message_count') }} <span x-text="messageCount">0</span>/5000
+                        {{ __('contact.message_count') }} <span
+                            x-text="messageCount">0</span>/5000
                     </p>
                     @error('message')
                         <p id="contact-message-error" class="text-red-600 text-sm mt-1">
@@ -157,10 +198,10 @@
             </form>
 
             <template x-teleport="body">
-                <div x-cloak x-show="showLegalModal"
+                <dialog x-cloak x-show="showLegalModal"
                     x-on:keydown.escape.window="showLegalModal = false" x-transition.opacity
-                    class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-                    aria-modal="true" role="dialog" aria-label="Política de privacidad">
+                    class="fixed inset-0 z-50 m-0 h-full w-full max-h-none max-w-none border-0 bg-transparent p-4 sm:p-6"
+                    aria-modal="true" aria-label="Política de privacidad">
                     <div class="absolute inset-0 bg-black/50" @click="showLegalModal = false">
                     </div>
 
@@ -186,7 +227,7 @@
                             {!! $legalText !!}
                         </div>
                     </div>
-                </div>
+                </dialog>
             </template>
 
             @if ($siteKey)

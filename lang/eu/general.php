@@ -37,6 +37,7 @@ return [
     'pagination' => [
         'previous' => 'Aurrekoa',
         'next' => 'Hurrengoa',
+        'go_to_page' => 'Joan :page. orrira',
     ],
     'font_sizes' => [
         'mobile' => 'text-sm',
@@ -50,5 +51,13 @@ return [
         'auth_message' => 'Eremu pribatua oraindik garatzen ari da.',
         'login_cta' => 'Saioa hasi',
         'seo_description' => 'Komunitateko eremu pribatura sartzeko, saioa hasi eta zure kudeaketa pertsonalak kontsultatu.',
+        'form_title' => 'Eremu pribatuan sartu',
+        'username' => 'Erabiltzailea',
+        'username_placeholder' => 'Adibidez: bizilaguna01',
+        'password' => 'Pasahitza',
+        'change_password_option' => 'Pasahitza aldatu',
+        'show_password' => 'Pasahitza erakutsi',
+        'hide_password' => 'Pasahitza ezkutatu',
+        'form_note' => 'Formulario honek oraingoz diseinua bakarrik erakusten du; funtzioak hurrengo fasean aktibatuko dira.',
     ],
 ];

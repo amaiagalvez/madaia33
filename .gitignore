@@ -30,3 +30,4 @@ Homestead.json
 auth.json
 
 /dc-data
+.tmp/

@@ -4,6 +4,8 @@ use App\Models\Notice;
 use Illuminate\Support\Str;
 use App\Models\NoticeLocation;
 
+const DEFAULT_NOTICE_CARD_TEMPLATE = '<x-notice-card :notice="$notice" />';
+
 it('renders notice card component with all content', function () {
     $notice = Notice::factory()->public()->create([
         'title_eu' => 'Preba iragarkia',
@@ -12,7 +14,7 @@ it('renders notice card component with all content', function () {
         'content_es' => 'Este es el contenido de una prueba.',
     ]);
 
-    $view = $this->blade('<x-notice-card :notice="$notice" />', ['notice' => $notice]);
+    $view = $this->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => $notice]);
 
     $view->assertSee('Preba iragarkia');
     $view->assertSee(Str::limit($notice->content, 120, '...'));
@@ -45,7 +47,7 @@ it('renders location badges when locations exist', function () {
     ]);
 
     $notice->refresh();
-    $view = $this->blade('<x-notice-card :notice="$notice" />', ['notice' => $notice]);
+    $view = $this->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => $notice]);
 
     $view->assertSee('33-A');
 });
@@ -64,11 +66,11 @@ it('renders with image when provided', function () {
     ]);
 
     $view->assertSee('images/test.jpg');
-    $view->assertSee('Test image');
+    $view->assertSee('Test');
 });
 
 it('renders nothing when notice is null', function () {
-    $view = $this->blade('<x-notice-card :notice="$notice" />', ['notice' => null]);
+    $view = $this->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => null]);
 
     // When null is passed, the component should render nothing (empty div)
     $view->assertDontSee('bg-white');

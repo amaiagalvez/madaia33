@@ -15,11 +15,19 @@
                     $imageUrl =
                         data_get($image, 'public_url') ??
                         (data_get($image, 'path') ?? asset('favicon.svg'));
-                    $imageAlt = data_get($image, 'alt_text') ?: $notice->title;
+                    $rawImageAlt = data_get($image, 'alt_text') ?: $notice->title;
+                    $altText = trim(
+                        (string) preg_replace(
+                            '/\b(image|imagen|irudia)\b/iu',
+                            '',
+                            (string) $rawImageAlt,
+                        ),
+                    );
+                    $altText = $altText !== '' ? $altText : $notice->title;
                 @endphp
                 <div
-                    class="relative overflow-hidden bg-gray-100 aspect-video {{ $featured ? 'lg:aspect-auto lg:min-h-[20rem]' : '' }}">
-                    <img src="{{ $imageUrl }}" alt="{{ $imageAlt }}"
+                    class="relative overflow-hidden bg-gray-100 aspect-video {{ $featured ? 'lg:aspect-auto lg:min-h-80' : '' }}">
+                    <img src="{{ $imageUrl }}" alt="{{ $altText }}"
                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         loading="lazy" decoding="async" />
                     <div
@@ -28,7 +36,7 @@
                 </div>
             @else
                 <div
-                    class="relative flex aspect-video items-center justify-center overflow-hidden bg-linear-to-br from-[#edd2c7]/20 via-gray-100 to-gray-200 {{ $featured ? 'lg:aspect-auto lg:min-h-[20rem]' : '' }}">
+                    class="relative flex aspect-video items-center justify-center overflow-hidden bg-linear-to-br from-[#edd2c7]/20 via-gray-100 to-gray-200 {{ $featured ? 'lg:aspect-auto lg:min-h-80' : '' }}">
                     <svg class="h-10 w-10 text-[#d9755b]/30" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"

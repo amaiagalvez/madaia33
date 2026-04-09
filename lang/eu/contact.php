@@ -3,7 +3,7 @@
 return [
     'title' => 'Kontaktua',
     'seo_description' => 'Jarri komunitatearekin harremanetan formulario seguru baten bidez, zure kontsulta edo iradokizunetarako.',
-    'subtitle' => 'Bidali zure mezua modu seguruan, argian eta komunitatearen tonu zaindu berarekin.',
+    'subtitle' => 'Bidali zure mezua argi, erraz eta segurtasunez komunitatearekin harremanetan jartzeko.',
     'required_hint' => '* Ikurra duten eremuak derrigorrezkoak dira.',
     'support_badge' => 'Laguntza zuzena',
     'support_title' => 'Komunitatearekin hitz egiteko bide argia',
@@ -23,6 +23,7 @@ return [
     'send' => 'Bidali',
     'legal_text' => 'Pribatutasun-politika irakurri eta onartzen dut.',
     'success' => 'Zure mezua bidali da. Eskerrik asko!',
+    'success_hint' => 'Laster erantzungo dizugu emandako helbide elektronikora.',
     'error' => 'Errore bat gertatu da. Saiatu berriro.',
     'email_error' => 'Mezua jaso da, baina baliteke posta elektronikoa bidaltzean arazo bat egotea.',
     'spam_error' => 'Zure eskaera ezin izan da prozesatu. Saiatu berriro.',

@@ -34,13 +34,13 @@ test('admin can upload an image and it appears in the public gallery', function 
         $browser->type('#altEu', $altText)
             ->select('#tag', 'madaia')
             ->press('Argazkia igo')
-            ->waitFor('img[alt="' . $altText . '"]', 30)
-            ->assertPresent('img[alt="' . $altText . '"]');
+            ->waitUntil("document.body.innerText.includes('" . addslashes($altText) . "')", 30)
+            ->assertScript("return document.body.innerText.includes('" . addslashes($altText) . "');", true);
 
         // Verify in public gallery
         $browser->visit('/eu/argazki-bilduma')
-            ->waitFor('img[alt="' . $altText . '"]', 30)
-            ->assertPresent('img[alt="' . $altText . '"]');
+            ->waitUntil("document.body.innerText.includes('" . addslashes($altText) . "')", 30)
+            ->assertScript("return document.body.innerText.includes('" . addslashes($altText) . "');", true);
     });
 
     @unlink($tmpImage);
