@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Owner;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Voting;
 use Livewire\Component;
 use App\Models\Location;
@@ -78,7 +80,7 @@ class Votings extends Component
 
   public function mount(): void
   {
-    abort_unless($this->canUseDelegatedVoting(), 403);
+    abort_unless($this->canManageAdminVotings(), 403);
 
     $this->options = [$this->emptyOptionRow()];
   }
@@ -239,7 +241,7 @@ class Votings extends Component
 
   public function openDelegatedVoteModal(): void
   {
-    abort_unless($this->canUseDelegatedVoting(), 403);
+    abort_unless($this->canManageAdminVotings(), 403);
 
     $this->delegatedRows = $this->eligibilityService
       ->ownersWithPendingDelegations()
@@ -264,7 +266,7 @@ class Votings extends Component
 
   public function startDelegatedVote(int $ownerId): RedirectResponse
   {
-    abort_unless($this->canUseDelegatedVoting(), 403);
+    abort_unless($this->canManageAdminVotings(), 403);
 
     $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
       ->map(static fn(array $row): int => $row['owner']->id)
@@ -388,8 +390,11 @@ class Votings extends Component
     $this->options = [$this->emptyOptionRow()];
   }
 
-  private function canUseDelegatedVoting(): bool
+  private function canManageAdminVotings(): bool
   {
-    return Auth::user()?->owner === null && Auth::user()?->canUseDelegatedVoting();
+    /** @var User|null $user */
+    $user = Auth::user();
+
+    return $user?->hasAnyRole([Role::SUPER_ADMIN]) ?? false;
   }
 }
