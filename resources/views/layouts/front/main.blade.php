@@ -164,7 +164,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div
                 class="flex flex-col items-stretch gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
-                <x-front.public-brand-link class="glass-panel w-full max-w-md px-4 py-3 sm:w-auto" />
+                <x-front.public-brand-link
+                    class="glass-panel w-full max-w-md px-4 py-3 sm:w-auto" />
                 <nav class="grid gap-3 sm:grid-cols-2" aria-label="Footer">
                     <a href="{{ route(\App\SupportedLocales::routeName('privacy-policy')) }}"
                         class="hero-frame px-4 py-3 transition-colors hover:border-[#d9755b]/60 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
@@ -180,7 +181,7 @@
                 <a href="mailto:info@amaia.eus"
                     class="inline-flex items-center self-end lg:self-center focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
                     aria-label="Contact with Amaia">
-                    <img src="{{ asset('amaia.png') }}" alt="Amaia logo"
+                    <img src="{{ asset('amaia-footer.png') }}" alt="Amaia logo"
                         class="h-10 w-auto object-contain sm:h-11" />
                 </a>
             </div>

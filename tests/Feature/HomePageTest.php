@@ -167,7 +167,7 @@ test('home page footer uses shared menu brand on left and keeps amaia email logo
         ->assertSee(asset('storage/madaia33/madaia33.png'), false)
         ->assertSee(config('app.name', 'Madaia'))
         ->assertSee('mailto:info@amaia.eus', false)
-        ->assertSee(asset('amaia.png'), false)
+        ->assertSee(asset('amaia-footer.png'), false)
         ->assertDontSee('&copy;', false);
 })->with('supported_locales');
 
