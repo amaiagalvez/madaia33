@@ -2,9 +2,9 @@
 
 namespace App\Livewire;
 
+use App\Models\Location;
 use App\Models\Notice;
 use Livewire\Component;
-use App\CommunityLocations;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use App\Models\NoticeLocation;
@@ -70,7 +70,7 @@ class AdminNoticeManager extends Component
 
     public function editNotice(int $id): void
     {
-        $notice = Notice::with('locations')->findOrFail($id);
+        $notice = Notice::with(['locations.location', 'locations.property.location'])->findOrFail($id);
 
         $this->editingId = $notice->id;
         $this->titleEu = $notice->title_eu ?? '';
@@ -78,7 +78,17 @@ class AdminNoticeManager extends Component
         $this->contentEu = $notice->content_eu ?? '';
         $this->contentEs = $notice->content_es ?? '';
         $this->isPublic = $notice->is_public;
-        $this->selectedLocations = $notice->locations->pluck('location_code')->toArray();
+        $this->selectedLocations = $notice->locations
+            ->map(function (NoticeLocation $location): ?string {
+                if ($location->property_id !== null) {
+                    return $location->location_code;
+                }
+
+                return $location->location_code;
+            })
+            ->filter()
+            ->values()
+            ->all();
         $this->showForm = true;
         $this->dispatch('admin-notice-form-focus');
     }
@@ -237,11 +247,17 @@ class AdminNoticeManager extends Component
 
         $rows = [];
 
-        foreach (array_values(array_unique($this->selectedLocations)) as $code) {
+        foreach (array_values(array_unique($this->selectedLocations)) as $selected) {
+            [$locationId, $propertyId] = $this->resolveSelectionToForeignKeys((string) $selected);
+
+            if ($locationId === null && $propertyId === null) {
+                continue;
+            }
+
             $rows[] = [
                 'notice_id' => $notice->id,
-                'location_type' => CommunityLocations::typeForCode($code),
-                'location_code' => $code,
+                'location_id' => $locationId,
+                'property_id' => $propertyId,
             ];
         }
 
@@ -250,13 +266,55 @@ class AdminNoticeManager extends Component
         }
     }
 
+    /**
+     * @return array{0: int|null, 1: int|null}
+     */
+    private function resolveSelectionToForeignKeys(string $selected): array
+    {
+        $locationId = Location::query()
+            ->where('code', $selected)
+            ->value('id');
+
+        return [$locationId, null];
+    }
+
+    /**
+     * @return array<int, array{code: string, type: string, label: string}>
+     */
+    private function allLocationOptions(): array
+    {
+        $locations = Location::query()
+            ->whereIn('type', ['portal', 'garage'])
+            ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
+            ->orderBy('code')
+            ->get();
+
+        return $locations
+            ->map(fn(Location $location): array => [
+                'code' => $location->code,
+                'type' => $location->type,
+                'label' => $this->locationLabel($location) . $location->code,
+            ])
+            ->all();
+    }
+
+    private function locationLabel(Location $location): string
+    {
+        return match ($location->type) {
+            'portal' => __('admin.locations.types.portal') . ' ',
+            'garage' => __('admin.locations.types.garage') . ' ',
+            'storage' => __('admin.locations.types.storage') . ' ',
+            default => '',
+        };
+    }
+
     public function render(): View
     {
-        $notices = Notice::with('locations')->latest()->paginate(12);
+        $notices = Notice::with(['locations.location', 'locations.property.location'])->latest()->paginate(12);
 
         return view('livewire.admin.notice-manager', [
             'notices' => $notices,
-            'allLocations' => CommunityLocations::options(__('notices.portal'), __('notices.garage')),
+            'allLocations' => $this->allLocationOptions(),
         ]);
     }
 }

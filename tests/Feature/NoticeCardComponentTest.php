@@ -2,7 +2,6 @@
 
 use App\Models\Notice;
 use Illuminate\Support\Str;
-use App\Models\NoticeLocation;
 
 const DEFAULT_NOTICE_CARD_TEMPLATE = '<x-notice-card :notice="$notice" />';
 
@@ -14,7 +13,7 @@ it('renders notice card component with all content', function () {
         'content_es' => 'Este es el contenido de una prueba.',
     ]);
 
-    $view = $this->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => $notice]);
+    $view = test()->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => $notice]);
 
     $view->assertSee('Preba iragarkia');
     $view->assertSee(Str::limit($notice->content, 120, '...'));
@@ -23,7 +22,7 @@ it('renders notice card component with all content', function () {
 it('renders placeholder image when showImage is true but no image provided', function () {
     $notice = Notice::factory()->public()->create();
 
-    $view = $this->blade('<x-notice-card :notice="$notice" show-image />', ['notice' => $notice]);
+    $view = test()->blade('<x-notice-card :notice="$notice" show-image />', ['notice' => $notice]);
 
     // Check for brand-tinted placeholder with aspect-video
     $view->assertSee('from-[#edd2c7]/20');
@@ -33,21 +32,17 @@ it('renders placeholder image when showImage is true but no image provided', fun
 it('hides image when showImage is false', function () {
     $notice = Notice::factory()->public()->create();
 
-    $view = $this->blade('<x-notice-card :notice="$notice" :show-image="false" />', ['notice' => $notice]);
+    $view = test()->blade('<x-notice-card :notice="$notice" :show-image="false" />', ['notice' => $notice]);
 
     $view->assertDontSee('aspect-video');
 });
 
 it('renders location badges when locations exist', function () {
     $notice = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice->id,
-        'location_type' => 'portal',
-        'location_code' => '33-A',
-    ]);
+    attachNoticeToLocationCode($notice, '33-A');
 
     $notice->refresh();
-    $view = $this->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => $notice]);
+    $view = test()->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => $notice]);
 
     $view->assertSee('33-A');
 });
@@ -60,7 +55,7 @@ it('renders with image when provided', function () {
         'alt_text' => 'Test image',
     ];
 
-    $view = $this->blade('<x-notice-card :notice="$notice" :image="$image" />', [
+    $view = test()->blade('<x-notice-card :notice="$notice" :image="$image" />', [
         'notice' => $notice,
         'image' => $mockImage,
     ]);
@@ -70,7 +65,7 @@ it('renders with image when provided', function () {
 });
 
 it('renders nothing when notice is null', function () {
-    $view = $this->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => null]);
+    $view = test()->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => null]);
 
     // When null is passed, the component should render nothing (empty div)
     $view->assertDontSee('bg-white');

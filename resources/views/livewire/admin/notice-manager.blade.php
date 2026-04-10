@@ -175,7 +175,12 @@
                                 @foreach ($notice->locations as $loc)
                                     <span
                                         class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-                                        {{ $loc->location_code }}
+                                        @if ($loc->property)
+                                            {{ __('admin.locations.property') }}
+                                            {{ $loc->property->name }} · {{ $loc->location_code }}
+                                        @else
+                                            {{ $loc->location_code }}
+                                        @endif
                                     </span>
                                 @endforeach
                             </div>

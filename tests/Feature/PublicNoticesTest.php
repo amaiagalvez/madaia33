@@ -6,7 +6,6 @@
 use App\Models\Notice;
 use Livewire\Livewire;
 use App\SupportedLocales;
-use App\Models\NoticeLocation;
 use Illuminate\Support\Facades\App;
 
 dataset('supported_locales', SupportedLocales::all());
@@ -56,11 +55,11 @@ it('pagina los avisos a 10 por página ordenados por published_at desc', functio
 it('filtra avisos por portal mostrando también los de ámbito general', function () {
     // Notice for portal 33-A only
     $portalA = Notice::factory()->public()->create();
-    NoticeLocation::create(['notice_id' => $portalA->id, 'location_type' => 'portal', 'location_code' => '33-A']);
+    attachNoticeToLocationCode($portalA, '33-A');
 
     // Notice for portal 33-B only
     $portalB = Notice::factory()->public()->create();
-    NoticeLocation::create(['notice_id' => $portalB->id, 'location_type' => 'portal', 'location_code' => '33-B']);
+    attachNoticeToLocationCode($portalB, '33-B');
 
     // General notice (no locations)
     $general = Notice::factory()->public()->create();
@@ -126,7 +125,7 @@ it('no muestra el indicador de sin traducción cuando el aviso tiene traducción
 
 it('muestra las etiquetas de ubicación junto al aviso', function () {
     $notice = Notice::factory()->public()->create(['title_eu' => 'Aviso con portal']);
-    NoticeLocation::create(['notice_id' => $notice->id, 'location_type' => 'portal', 'location_code' => '33-C']);
+    attachNoticeToLocationCode($notice, '33-C');
 
     $component = Livewire::test('public-notices');
 

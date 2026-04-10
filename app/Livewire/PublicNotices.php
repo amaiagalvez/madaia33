@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Location;
 use App\Models\Notice;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -47,11 +48,15 @@ class PublicNotices extends Component
     public function getNoticesProperty(): LengthAwarePaginator
     {
         return Notice::public()
-            ->with('locations')
+            ->with(['locations.location', 'locations.property.location'])
             ->when($this->locationFilter !== '', function ($query) {
                 $query->where(function ($q) {
                     // Include notices with the selected location
-                    $q->whereHas('locations', fn ($l) => $l->where('location_code', $this->locationFilter));
+                    $q->whereHas('locations', function ($locationQuery): void {
+                        $locationQuery
+                            ->whereHas('location', fn($query) => $query->where('code', $this->locationFilter))
+                            ->orWhereHas('property.location', fn($query) => $query->where('code', $this->locationFilter));
+                    });
                     // Also include general notices (no locations)
                     $q->orWhereDoesntHave('locations');
                 });
@@ -60,10 +65,28 @@ class PublicNotices extends Component
             ->paginate(9);
     }
 
+    /**
+     * @return array<int, array{code: string, label: string}>
+     */
+    private function availableFilterLocations(): array
+    {
+        return Location::query()
+            ->whereIn('type', ['portal', 'garage'])
+            ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
+            ->orderBy('code')
+            ->get(['type', 'code'])
+            ->map(fn(Location $location): array => [
+                'code' => $location->code,
+                'label' => ($location->type === 'portal' ? __('notices.portal') : __('notices.garage')) . ' ' . $location->code,
+            ])
+            ->all();
+    }
+
     public function render(): View
     {
         return view('livewire.front.public-notices', [
             'notices' => $this->getNoticesProperty(),
+            'filterLocations' => $this->availableFilterLocations(),
         ]);
     }
 }

@@ -76,7 +76,13 @@
                     @foreach ($notice->locations as $location)
                         <span
                             class="inline-flex items-center rounded-full border border-[#d9755b]/20 bg-[#edd2c7]/30 px-2.5 py-0.5 text-xs font-medium text-[#793d3d]">
-                            @if ($location->location_type === 'portal')
+                            @if ($location->property !== null)
+                                {{ __('admin.locations.property') }}
+                                {{ $location->property->name }}
+                                @if ($location->location_code)
+                                    · {{ $location->location_code }}
+                                @endif
+                            @elseif ($location->location_type === 'portal')
                                 {{ __('notices.portal') }} {{ $location->location_code }}
                             @elseif ($location->location_type === 'garage')
                                 {{ __('notices.garage') }} {{ $location->location_code }}

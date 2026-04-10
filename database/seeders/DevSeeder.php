@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Image;
+use App\Models\Location;
 use App\Models\Notice;
 use App\Models\Setting;
-use App\CommunityLocations;
 use Illuminate\Support\Str;
 use App\Models\ContactMessage;
 use App\Models\NoticeLocation;
@@ -66,7 +66,7 @@ class DevSeeder extends Seeder
             'content_es' => 'Aviso dirigido a los vecinos del portal 33-A.',
             'published_at' => now()->subDays(3),
         ]);
-        NoticeLocation::create(['notice_id' => $portalA->id, 'location_type' => 'portal', 'location_code' => '33-A']);
+        $this->attachNoticeToLocationCode($portalA, '33-A');
 
         // Aviso para portal 33-B — público
         $portalB = Notice::factory()->public()->create([
@@ -76,7 +76,7 @@ class DevSeeder extends Seeder
             'content_es' => 'Aviso dirigido a los vecinos del portal 33-B.',
             'published_at' => now()->subDays(4),
         ]);
-        NoticeLocation::create(['notice_id' => $portalB->id, 'location_type' => 'portal', 'location_code' => '33-B']);
+        $this->attachNoticeToLocationCode($portalB, '33-B');
 
         // Aviso para garaje P-1 — público
         $garage = Notice::factory()->public()->create([
@@ -86,7 +86,7 @@ class DevSeeder extends Seeder
             'content_es' => 'Aviso dirigido a los vecinos del garaje P-1.',
             'published_at' => now()->subDays(5),
         ]);
-        NoticeLocation::create(['notice_id' => $garage->id, 'location_type' => 'garage', 'location_code' => 'P-1']);
+        $this->attachNoticeToLocationCode($garage, 'P-1');
 
         // Aviso privado (no visible en parte pública)
         Notice::factory()->private()->create([
@@ -101,14 +101,30 @@ class DevSeeder extends Seeder
         Notice::factory()->public()->count(8)->create()->each(function (Notice $notice) {
             // Asignar aleatoriamente a un portal o sin ubicación
             if (fake()->boolean(60)) {
-                $portal = fake()->randomElement(CommunityLocations::PORTALS);
-                NoticeLocation::create([
-                    'notice_id' => $notice->id,
-                    'location_type' => 'portal',
-                    'location_code' => $portal,
-                ]);
+                $portalCode = Location::query()
+                    ->where('type', 'portal')
+                    ->inRandomOrder()
+                    ->value('code');
+
+                if ($portalCode !== null) {
+                    $this->attachNoticeToLocationCode($notice, $portalCode);
+                }
             }
         });
+    }
+
+    private function attachNoticeToLocationCode(Notice $notice, string $code): void
+    {
+        $locationId = Location::query()->where('code', $code)->value('id');
+
+        if ($locationId === null) {
+            return;
+        }
+
+        NoticeLocation::create([
+            'notice_id' => $notice->id,
+            'location_id' => $locationId,
+        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -151,8 +167,8 @@ class DevSeeder extends Seeder
         Storage::disk('public')->makeDirectory('images');
 
         foreach ($items as $index => $item) {
-            $filename = Str::uuid().'.svg';
-            $path = 'images/'.$filename;
+            $filename = Str::uuid() . '.svg';
+            $path = 'images/' . $filename;
             $imageText = $item['alt_es'];
 
             Storage::disk('public')->put(

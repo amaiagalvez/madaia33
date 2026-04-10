@@ -16,7 +16,8 @@
 # Copilot
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario
-- [ ] amalurra: comprobar que pasa ella sola los test cuando no hay error del git (ahora no se ha creado el branch)
+- [ ] añadir en los agentes amalurra y sorgina una nueva regla para que usen siempre que se pueda test unitarios sin usar la base de datos para que los test sean lo más rápidos posibles
+- [ ] 
 - donde añado cuando se creen nuevos ficheros el ident sea de 4 espacios?
 - dividir la carpeta Actions por features o modelos, lo que creas más conveniente
 - para las partes de las views  que sean sensibles, crear dusk-test
@@ -63,7 +64,7 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] en settings, en la sección "contac_form" añadir dos nuevos para el asunto del email (eu y es). Al enviar el mensaje cuando se rellena el formulario, tiene que usar lo que hay en estos campos. El idioma que se usará para enviarr el email será el idioma actual
 - [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente?
 - [ ] en el aginte-panela añade estadísticas de las nuevas tablas
-- [ ] reorganizar notice-locations para que use las tablas locations y properties y modifica todos los sitios en los que se utiliza CommunityLocations. Cuando termines elimina CommunityLocations
+
 
 # Egiten ...
 

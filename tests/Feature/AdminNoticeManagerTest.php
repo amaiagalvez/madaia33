@@ -5,8 +5,9 @@
 
 use App\Models\User;
 use App\Models\Notice;
+use App\Models\Location;
+use App\Models\Property;
 use Livewire\Livewire;
-use App\Models\NoticeLocation;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Propiedad 8: Toggle de publicación de avisos es reversible
@@ -133,6 +134,8 @@ it('editar aviso dispara evento de foco al formulario', function () {
 
 it('la asociación de ubicaciones persiste correctamente', function () {
     $user = User::factory()->create();
+    Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
 
     Livewire::actingAs($user)
         ->test('admin-notice-manager')
@@ -194,8 +197,39 @@ it('renderiza los campos multiidioma de avisos con pestañas por idioma', functi
         ->assertSeeHtml('id="contentEs"');
 });
 
+it('muestra solo locations en el selector de ubicaciones del formulario', function () {
+    $user = User::factory()->create();
+
+    $location = Location::factory()->create([
+        'type' => 'portal',
+        'code' => '33-A',
+        'name' => 'Portal 33-A',
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1A',
+    ]);
+
+    Location::factory()->create([
+        'type' => 'storage',
+        'code' => 'TR-99',
+        'name' => 'Trastero TR-99',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('createNotice')
+        ->assertSee('33-A')
+        ->assertDontSee('1A')
+        ->assertDontSee('TR-99');
+});
+
 it('edita un aviso existente y reemplaza sus ubicaciones al guardar', function () {
     $user = User::factory()->create();
+    Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
+
     $notice = Notice::factory()->public()->create([
         'title_eu' => 'Original EU',
         'title_es' => 'Original ES',
@@ -204,11 +238,7 @@ it('edita un aviso existente y reemplaza sus ubicaciones al guardar', function (
         'published_at' => now()->subDay(),
     ]);
 
-    NoticeLocation::create([
-        'notice_id' => $notice->id,
-        'location_type' => 'portal',
-        'location_code' => '33-A',
-    ]);
+    attachNoticeToLocationCode($notice, '33-A');
 
     $originalPublishedAt = $notice->published_at;
 
