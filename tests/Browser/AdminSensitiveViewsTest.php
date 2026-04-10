@@ -14,7 +14,7 @@ use App\Models\PropertyAssignment;
  * - Location detail (editable property/validation state)
  */
 test('admin can access owner detail sensitive view and sees assignment controls', function () {
-    $admin = User::factory()->create();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
     $owner = Owner::factory()->create([
         'coprop1_name' => 'Dusk Owner',
@@ -36,7 +36,7 @@ test('admin can access owner detail sensitive view and sees assignment controls'
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $owner) {
         $browser->loginAs($admin)
-            ->visit('/admin/propietarias/'.$owner->id)
+            ->visit('/admin/propietarias/' . $owner->id)
             ->waitFor('[data-assignment-id]', 5)
             ->assertPresent('[data-assignment-id]')
             ->assertPresent('[data-assignment-admin-validated-toggle]')
@@ -46,7 +46,7 @@ test('admin can access owner detail sensitive view and sees assignment controls'
 });
 
 test('admin can access location detail sensitive view and sees editable property rows', function () {
-    $admin = User::factory()->create();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
     $location = Location::factory()->portal()->create();
 
@@ -58,9 +58,9 @@ test('admin can access location detail sensitive view and sees editable property
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $location, $property) {
         $browser->loginAs($admin)
-            ->visit('/admin/ubicaciones/'.$location->id)
-            ->waitFor('[data-property-id="'.$property->id.'"]', 5)
-            ->assertPresent('[data-property-id="'.$property->id.'"]')
+            ->visit('/admin/ubicaciones/' . $location->id)
+            ->waitFor('[data-property-id="' . $property->id . '"]', 5)
+            ->assertPresent('[data-property-id="' . $property->id . '"]')
             ->assertPresent('[data-assigned]')
             ->assertMissing('[data-admin-validated]')
             ->assertMissing('[data-owner-validated]');
@@ -74,10 +74,10 @@ test('guest cannot access sensitive owner and location admin views', function ()
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($owner, $location) {
         $browser->visit('/_dusk/logout')
-            ->visit('/admin/propietarias/'.$owner->id)
+            ->visit('/admin/propietarias/' . $owner->id)
             ->waitForLocation('/eu/pribatua')
             ->assertPathIs('/eu/pribatua')
-            ->visit('/admin/ubicaciones/'.$location->id)
+            ->visit('/admin/ubicaciones/' . $location->id)
             ->waitForLocation('/eu/pribatua')
             ->assertPathIs('/eu/pribatua');
     });

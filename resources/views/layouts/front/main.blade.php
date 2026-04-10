@@ -34,6 +34,8 @@
 
 <body class="min-h-screen bg-white text-gray-900 antialiased flex flex-col public-surface">
 
+    @php($showVotingsLink = $showVotingsLink ?? false)
+
     <a href="#main-content"
         class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-gray-900 focus:shadow-md focus:ring-2 focus:ring-gray-500 focus:outline-none">
         {{ __('general.nav.main') }}

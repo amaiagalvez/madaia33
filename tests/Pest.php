@@ -1,6 +1,8 @@
 <?php
 
 use Tests\TestCase;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Notice;
 use App\Models\Setting;
 use Tests\DuskTestCase;
@@ -73,4 +75,17 @@ function attachNoticeToLocationCode(Notice $notice, string $code): NoticeLocatio
         'notice_id' => $notice->id,
         'location_id' => $locationId,
     ]);
+}
+
+function adminUser(array $attributes = []): User
+{
+    $user = User::factory()->create($attributes);
+
+    Role::query()->firstOrCreate([
+        'name' => Role::SUPER_ADMIN,
+    ]);
+
+    $user->assignRole(Role::SUPER_ADMIN);
+
+    return $user;
 }

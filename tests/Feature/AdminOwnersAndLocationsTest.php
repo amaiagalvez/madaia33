@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Livewire\Admin\LocationDetail;
 
 it('renders admin locations list for selected type', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
     Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
@@ -29,7 +29,7 @@ it('renders admin locations list for selected type', function () {
 });
 
 it('renders location detail with assignment badges', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
     $property = Property::factory()->create([
@@ -60,7 +60,7 @@ it('renders location detail with assignment badges', function () {
 });
 
 it('toggles assignment validations one by one and blocks closed assignments', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $owner = Owner::factory()->create();
     $location = Location::factory()->portal()->create(['code' => '33-A']);
@@ -103,7 +103,7 @@ it('toggles assignment validations one by one and blocks closed assignments', fu
 });
 
 it('accepts comma decimals for location percentages and stores them normalized with dot', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
 
@@ -138,7 +138,7 @@ it('accepts comma decimals for location percentages and stores them normalized w
 });
 
 it('filters owners by active portal assignment', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $portalA = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
     $portalB = Location::factory()->create(['type' => 'portal', 'code' => '33-B', 'name' => 'Portal 33-B']);
@@ -169,7 +169,7 @@ it('filters owners by active portal assignment', function () {
 });
 
 it('renders new admin pages for locations and owners', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
     $owner = Owner::factory()->create();
@@ -192,7 +192,7 @@ it('renders new admin pages for locations and owners', function () {
 });
 
 it('renders a type-aware breadcrumb link on location detail page', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $garage = Location::factory()->garage()->create(['code' => 'P-2', 'name' => 'Garaje P-2']);
 
@@ -205,7 +205,7 @@ it('renders a type-aware breadcrumb link on location detail page', function () {
 it('creates a new owner from the admin owners list', function () {
     Mail::fake();
 
-    $adminUser = User::factory()->create();
+    $adminUser = adminUser();
     $portal = Location::factory()->portal()->create(['code' => '33-A', 'name' => 'Portal 33-A']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1A']);
 
@@ -237,7 +237,7 @@ it('creates a new owner from the admin owners list', function () {
 });
 
 it('shows owners without active properties when using without-properties filter', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $portal = Location::factory()->portal()->create(['code' => '33-A', 'name' => 'Portal 33-A']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1A']);
@@ -270,7 +270,7 @@ it('shows owners without active properties when using without-properties filter'
 });
 
 it('renders owners list with inline expansion action instead of detail bars link', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $owner = Owner::factory()->create(['coprop1_name' => 'Inline Jabea']);
     $portal = Location::factory()->portal()->create(['code' => '33-D']);
     $property = Property::factory()->create([
@@ -291,7 +291,7 @@ it('renders owners list with inline expansion action instead of detail bars link
 });
 
 it('allows creating and editing owner assignments inline from owners list', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $owner = Owner::factory()->create(['coprop1_name' => 'Jabe Inline']);
     $portal = Location::factory()->portal()->create(['code' => '33-C']);
