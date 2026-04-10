@@ -4,6 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\Location;
 use App\Models\Voting;
+use App\Models\VotingBallot;
+use App\Models\VotingLocation;
+use App\Models\VotingOption;
+use App\Models\VotingOptionTotal;
+use App\Models\VotingSelection;
 use Illuminate\Database\Seeder;
 
 class VotingSeeder extends Seeder
@@ -99,7 +104,11 @@ class VotingSeeder extends Seeder
       $attributes,
     );
 
-    $voting->options()->delete();
+    VotingSelection::query()->where('voting_id', $voting->id)->forceDelete();
+    VotingBallot::query()->where('voting_id', $voting->id)->forceDelete();
+    VotingOptionTotal::query()->where('voting_id', $voting->id)->forceDelete();
+    VotingLocation::query()->where('voting_id', $voting->id)->forceDelete();
+    VotingOption::query()->where('voting_id', $voting->id)->forceDelete();
 
     foreach (array_values($options) as $index => $option) {
       $voting->options()->create([
@@ -112,8 +121,6 @@ class VotingSeeder extends Seeder
     $locationIds = Location::query()
       ->whereIn('code', $locationCodes)
       ->pluck('id');
-
-    $voting->locations()->delete();
 
     foreach ($locationIds as $locationId) {
       $voting->locations()->create([

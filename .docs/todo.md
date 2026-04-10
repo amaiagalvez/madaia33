@@ -10,30 +10,19 @@
 - [ ] dentro de la carpeta madaia33 buscar todos los ficheros y carpetas que sean del usuario root y ponerles amaia:amaia
 - [ ] añadir espacio para comercios
 - [ ] en los test todos los $this-> dan error en PROBLEMS
-- [ ] pasar pain no en modo test, dejarle a él que lo corrija
 - [ ] user hizkuntza, besdin du front-ekoa
 
 # Copilot
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario
-- [ ] añadir en los agentes amalurra y sorgina una nueva regla para que usen siempre que se pueda test unitarios sin usar la base de datos para que los test sean lo más rápidos posibles
-
-- donde añado cuando se creen nuevos ficheros el ident sea de 4 espacios?
-- dividir la carpeta Actions por features o modelos, lo que creas más conveniente
-- para las partes de las views  que sean sensibles, crear dusk-test
-
-- si la carpeta es Admin, no hace falta que se llame AdminLocations
-- Ordena Livewire en subcarpetas Admin y Front
-- crear un componente para que todas las tablas tengan la missma estructura
-  
-
-- Nola konpondu hau? Aldiro eskatzen dit:
-dpkg: abisua: 'libpaper1:amd64' paketearen fitxategi-zerrendaren fitxategiak falta dira, paketeak ez duela fitxategirik instalatuta ondorioztatuko da
-
 
 # Code
 - [ ] test en ingles
 - [ ] comments en ingles
+- [ ] dividir la carpeta Actions por features o modelos, lo que creas más conveniente
+- [ ] para las partes de las views  que sean sensibles, crear dusk-test
+- [ ] Ordena Livewire en subcarpetas Admin y Front
+- [ ] crear un componente para que todas las tablas tengan la missma estructura
 - [ ] cachear los settings para que reducir el número de consultas a la base de datos, cuando se modifica algun setting, borrar la cache y volver a crearla
 - [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
 - [ ] configurar el sentry
@@ -51,7 +40,6 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] Slider más pequeño, es importante que si hay anuncios se vean lo más rápido posible
 
 # Panela
-- [ ] en le panel separa un poco el header del menú superior
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 - [ ] En el panel MezuakFiltro mensajes con botoncitos, como en el front de Iragarkiak. Leidos y no Leidos. Por defecto, al entrar mostrar solo los leidos
 - [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak (aldatu dezakezu migrazioa, ez dago indarrean)
@@ -71,8 +59,14 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
 - [ ] añadir al menu un enlace debajo del menu aginte-panela para ir a la web publica
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
-- [ ] añadir hizkuntza a la ficha de propietaria y al user, mantener sincronizados tanto el idioma como el email con el email del koop1. Al loguearse por defecto se cargará el idioma del user logeado
+- [ ] añadir hizkuntza a la ficha de propietaria y al user, mantener sincronizados tanto el idioma como el nombre y el email con el nombre y el email del koop1. Al loguearse por defecto se cargará el idioma del user logeado
 - [ ] en el skill db-schema separar las tablas de las votoaciones en otro bloque
+- [ ] traducciones en la tabla Erabiltzaileak
+- [ ] moverlo al apartado configución del menu
+- [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla con el user_id, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje
+- [ ] Trackea los mensajes para que se pueda saber quien lo ha habierto y quien ha pinchado en los enlaces del mensaje si los hubiera
+- [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
+- [ ] usa el mismo componente para mostrar en el menu del front y del aginte-panela el nombre de usuario y el logout, usa como referencia el del aginte panela que está mejor
 
 # profila
 un usuario tiene que tener un perfil desde el que pueda ver:
@@ -81,19 +75,11 @@ organizar la información en diferentes pestañas
 - las votaciones en las que ha tomado parte y cuando
 - las sesiones que ha abierto, su inicio y su fin y el tiempo de conexión
 - un enlace a cambiar contraseña que vaya al de cambiar la contraseña
-- la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
 - su ficha de propietaria y sus propiedades para poder validarlas (asegurate de que no puede la ficha de ningua otra propietaria)
-- la primera vez que un usuario se loguee, pidele que validee sus propiedades, si no las tiene validadas ya (oweer validation)
+- la primera vez que un usuario se loguee, pidele que acepte las condiciones de uso (texto que se almacenará en settings en el section owners en dos idiomas) y luego muestrale una pantalla con sus propiedades asignadas para que las valide, si no las tiene validadas ya (oweer validation)
 
-añadir el icono para accedeer al perfil junto al nombre del usuario, tanto en el menú del front como en el menu del aginte-panaela
+- añadir el icono para accedeer al perfil junto al nombre del usuario, tanto en el menú del front como en el menu del aginte-panaela
 
-
-# konponketak bozka delegatua
-
-- [ ] bozka delegatua error 
-- [ ] bozka delegatua zerrenda, handitu modala. bilatzailea behar du, portal, garaje, jabearen edozein datu (koop1 edo koop 2)
-- [ ] al guardar el voto delegado, junto con el id del usuario también guardar la IP y si se han podido detectar, las coordenadas
- 
 ## Comprobar
 
 https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696

@@ -2,29 +2,49 @@
 
 namespace Database\Seeders;
 
+use App\Actions\CastVotingBallotAction;
 use App\Models\Image;
 use App\Models\Location;
 use App\Models\Notice;
 use App\Models\Owner;
 use App\Models\Property;
+use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\Voting;
+use App\Support\VotingEligibilityService;
 use Illuminate\Support\Str;
 use App\Models\PropertyAssignment;
 use App\Models\ContactMessage;
 use App\Models\NoticeLocation;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class DevSeeder extends Seeder
 {
+    private const GENERAL_ADMIN_EMAIL = 'admin.general@madaia33.eus';
+
+    private const COMMUNITY_ADMIN_EMAIL = 'admin.comunidad@madaia33.eus';
+
+    private const PROPERTY_OWNER_EMAIL = 'propietaria@madaia33.eus';
+
+    private const DELEGATED_VOTE_EMAIL = 'voto.delegado@madaia33.eus';
+
     public function run(): void
     {
+        $this->call([
+            RoleSeeder::class,
+            LocationSeeder::class,
+        ]);
+
         $this->seedMailhogSettings();
         $this->seedNotices();
         $this->seedImages();
         $this->seedOwnersAndProperties();
+        $this->seedRoleUsers();
         $this->call(\Database\Seeders\VotingSeeder::class);
+        $this->seedVotingBallots();
         $this->seedContactMessages();
     }
 
@@ -157,6 +177,8 @@ class DevSeeder extends Seeder
             ->create();
 
         $owners = $ownerUsers->map(function (User $user): Owner {
+            $user->assignRole(Role::PROPERTY_OWNER);
+
             return Owner::factory()->create([
                 'user_id' => $user->id,
                 'coprop1_name' => $user->name,
@@ -182,6 +204,199 @@ class DevSeeder extends Seeder
                     'end_date' => null,
                 ]);
             });
+    }
+
+    private function seedRoleUsers(): void
+    {
+        $this->seedGeneralAdminUser();
+        $this->seedCommunityAdminUser();
+        $this->seedPropertyOwnerUser();
+        $this->seedDelegatedVoteUser();
+    }
+
+    private function seedGeneralAdminUser(): void
+    {
+        $this->upsertRoleUser(
+            email: self::GENERAL_ADMIN_EMAIL,
+            name: 'Admin General Demo',
+            roles: [Role::GENERAL_ADMIN],
+        );
+    }
+
+    private function seedCommunityAdminUser(): void
+    {
+        $user = $this->upsertRoleUser(
+            email: self::COMMUNITY_ADMIN_EMAIL,
+            name: 'Admin Comunidad Demo',
+            roles: [Role::COMMUNITY_ADMIN],
+        );
+
+        $managedLocationId = Location::query()
+            ->portals()
+            ->orderBy('id')
+            ->value('id');
+
+        $user->managedLocations()->sync($managedLocationId === null ? [] : [$managedLocationId]);
+    }
+
+    private function seedPropertyOwnerUser(): void
+    {
+        $user = $this->upsertRoleUser(
+            email: self::PROPERTY_OWNER_EMAIL,
+            name: 'Propietaria Demo',
+            roles: [Role::PROPERTY_OWNER],
+        );
+
+        $owner = Owner::query()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'coprop1_name' => $user->name,
+                'coprop1_dni' => '00000000A',
+                'coprop1_email' => $user->email,
+                'coprop1_phone' => '600000001',
+            ],
+        );
+
+        $existingPropertyId = $owner->activeAssignments()
+            ->orderBy('id')
+            ->value('property_id');
+
+        $preferredPropertyId = Property::query()
+            ->doesntHave('activeAssignments')
+            ->whereHas('location', function ($query): void {
+                $query->whereIn('code', ['33-A', '33-B', '33-C']);
+            })
+            ->orderBy('id')
+            ->value('id');
+
+        if ($preferredPropertyId === null) {
+            $preferredLocationId = Location::query()
+                ->whereIn('code', ['33-A', '33-B', '33-C'])
+                ->orderBy('id')
+                ->value('id');
+
+            if ($preferredLocationId !== null) {
+                $preferredPropertyId = Property::query()->firstOrCreate(
+                    [
+                        'location_id' => $preferredLocationId,
+                        'name' => 'DEMO-OWNER',
+                    ],
+                    [
+                        'community_pct' => null,
+                        'location_pct' => null,
+                    ],
+                )->id;
+            }
+        }
+
+        $propertyId = $existingPropertyId
+            ?? $preferredPropertyId
+            ?? Property::query()->doesntHave('activeAssignments')->orderBy('id')->value('id');
+
+        if ($propertyId === null) {
+            return;
+        }
+
+        PropertyAssignment::query()->updateOrCreate(
+            [
+                'owner_id' => $owner->id,
+                'property_id' => $propertyId,
+                'end_date' => null,
+            ],
+            [
+                'start_date' => now()->subMonths(6)->format('Y-m-d'),
+            ],
+        );
+    }
+
+    private function seedDelegatedVoteUser(): void
+    {
+        $this->upsertRoleUser(
+            email: self::DELEGATED_VOTE_EMAIL,
+            name: 'Voto Delegado Demo',
+            roles: [Role::DELEGATED_VOTE],
+        );
+    }
+
+    private function seedVotingBallots(): void
+    {
+        /** @var CastVotingBallotAction $castVotingBallotAction */
+        $castVotingBallotAction = app(CastVotingBallotAction::class);
+
+        /** @var VotingEligibilityService $eligibilityService */
+        $eligibilityService = app(VotingEligibilityService::class);
+
+        $delegatedUser = User::query()->where('email', self::DELEGATED_VOTE_EMAIL)->first();
+
+        $propertyOwner = Owner::query()
+            ->with('user')
+            ->whereHas('user', function ($query): void {
+                $query->where('email', self::PROPERTY_OWNER_EMAIL);
+            })
+            ->first();
+
+        Voting::query()
+            ->with(['options', 'locations.location'])
+            ->publishedOpen()
+            ->orderBy('id')
+            ->get()
+            ->each(function (Voting $voting) use ($castVotingBallotAction, $eligibilityService, $delegatedUser, $propertyOwner): void {
+                $eligibleOwners = $eligibilityService->eligibleOwners($voting)->values();
+
+                if ($eligibleOwners->isEmpty() || $voting->options->isEmpty()) {
+                    return;
+                }
+
+                $selfVotingOwner = $propertyOwner !== null && $eligibleOwners->contains('id', $propertyOwner->id)
+                    ? $eligibleOwners->firstWhere('id', $propertyOwner->id)
+                    : $eligibleOwners->first();
+
+                if ($selfVotingOwner instanceof Owner && $selfVotingOwner->user !== null) {
+                    $castVotingBallotAction->execute(
+                        $voting,
+                        $selfVotingOwner,
+                        $voting->options->first()->id,
+                        $selfVotingOwner->user,
+                    );
+                }
+
+                $delegatedOwner = $eligibleOwners->first(
+                    fn(Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
+                );
+
+                if (! $delegatedOwner instanceof Owner || ! $delegatedUser instanceof User) {
+                    return;
+                }
+
+                $delegatedOption = $voting->options->skip(1)->first() ?? $voting->options->first();
+
+                $castVotingBallotAction->execute(
+                    $voting,
+                    $delegatedOwner,
+                    $delegatedOption->id,
+                    $delegatedUser,
+                );
+            });
+    }
+
+    /**
+     * @param  array<int, string>  $roles
+     */
+    private function upsertRoleUser(string $email, string $name, array $roles): User
+    {
+        $user = User::query()->updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => $name,
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ],
+        );
+
+        $user->syncRoleNames($roles);
+
+        return $user;
     }
 
     // -------------------------------------------------------------------------

@@ -119,6 +119,18 @@ Erabiltzaileak "bai", "aurrera", "ados" edo antzeko zerbait esaten duenean:
 
 ---
 
+## Testing Preferentziak (Unitak Lehenetsi)
+
+**Arau nagusia**: Ahal den guztietan, **Unit testak** (`tests/Unit/`) lehenetsi, datu-base-orik gabe, garbitasun logikarako:
+
+- **Logika puruarentzat** (balidazio-arauak, formatatzaileak, enumerazioak, transformadoreak, kalkuluak): `tests/Unit/`
+- **Integrazio-fluxuak** (HTTP, Livewire erreaktibitate, datu-basea, denbora-efektuak): `tests/Feature/`
+- **Ratioea**: Unit testak milisegundoetan abian dira; Feature testak segundoak edo gehiago dituen. Ahal den guztietan bizkorrek lehenetsi.
+- **TDD erritmoa**: Lehenik testa, gero inplementazioa — baina Unit tesa egiten bada, exekuzioa bat-batean gertatzen da.
+- **Sorgina-klausula**: Aldaketa proposatzean, balidazio-logika, transformador-metodoak, enum-ak edo kalkuluak isolatzen badira Unit testen arabera, beti proposatzen dut testik Unit moduan, ez soilik Feature-ko kontrol-fluxuan.
+
+---
+
 ## Detektatzeko areak (analisi osoan)
 
 ### 🔴 Arazo Kritikoak

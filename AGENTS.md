@@ -218,6 +218,15 @@ This project has domain-specific skills available. You MUST activate the relevan
 - Run tests: `php artisan test --compact` or filter: `php artisan test --compact --filter=testName`.
 - Do NOT delete tests without approval.
 
+=== unit testing preferences (amalurra, sorgina) ===
+
+## Unit Tests Without Database (Preferred)
+
+- **amalurra** and **sorgina** agents: Always prefer **Unit tests** (`tests/Unit/`) over Feature tests when validating logic that does not require database access (pure functions, value objects, transformers, formatters, helpers, service methods without persistence).
+- Split test scenarios: keep pure logic unit tests fast (`tests/Unit/`), and use Feature tests only for database interaction, HTTP flows, or Livewire reactivity.
+- Rationale: Unit tests without database run in milliseconds and provide instant feedback, enabling faster iteration and reducing CI/CD overhead. Reserve Feature tests for integration scenarios only.
+- Examples of Unit test candidates: validation rules, formatters, enums, casting logic, computed properties, string transformations, mathematical operations, data mappers.
+
 </laravel-boost-guidelines>
 
 ```

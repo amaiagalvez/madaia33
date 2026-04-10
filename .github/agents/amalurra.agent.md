@@ -110,6 +110,28 @@ Erabiltzaileak aurrera egiteko esaten duenean:
 
 ---
 
+## Testing Preferentziak (Unitak Lehenetsi)
+
+**Arau nagusia**: Ahal den guztietan, **Unit testak** (`tests/Unit/`) lehenetsi, datu-base-orik gabe, garbitasun logikarako:
+
+- **Logika puruarentzat** (balidazio-arauak, formatatzaileak, enumerazioak, transformadoreak, kalkuluak): `tests/Unit/`
+- **Integrazio-fluxuak** (HTTP, Livewire erreaktibitate, datu-basea, denbora-efektuak): `tests/Feature/`
+- **Ratioea**: Unit testak milisegundoetan abian dira; Feature testak segundoak edo gehiago dituen. Ahal den guztietan bizkorrek lehenetsi.
+- **TDD erritmoa**: Lehenik testa, gero inplementazioa — baina Unit tesa egiten bada, exekuzioa bat-batean gertatzen da.
+- **TDD erritmoa**: Lehenik testa, gero inplementazioa — baina Unit tesa egiten bada, exekuzioa bat-batean gertatzen da.
+
+---
+
+## Inplementazio Arauak
+
+- **Datu-base taulak eta seeders**: Taula berria sortzen dugunetik, beti gehitu seeder berria `database/seeders/DevSeeder.php` fitxategian, hala nola dev-eko datuekin proiektu lokala erabilia izatea.
+- **Indentazioa**: Fitxategi berri eta aldatutako fitxategi guztietan **4 espazio** erabiliz indentazioa aplikatu (ez tab, ez 2 espazio). `vendor/bin/pint --dirty` exekutatu aldaketa bakoitzaren amaieran ziurtatzeko.
+- **Klase izena eta karpeta**: Klase bat `app/Admin/Locations.php` karpetan gordetzen bada, `Locations` deituriko klasea sortu (ez `AdminLocations`). Karpeta-izena ez dute errepikatu klasearen izenean.
+
+---
+
+---
+
 ## Amalurraren zeregina
 
 ### Zer egiten dut

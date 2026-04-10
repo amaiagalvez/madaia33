@@ -94,3 +94,9 @@ en la lista de personas que han votado a la que se accede desde el listado de vo
 
 - [x] Boto delegatuaren segurtasuna gogortu da: owner erabiltzaileek ezin dute delegated session bidez beste jabe baten identitatea hartu.
 - [x] Segurtasun-regresio test berriak gehitu dira eta berde daude (Feature + Dusk front).
+
+# konponketak bozka delegatua
+
+- [ ] bozka delegatua error 
+- [ ] bozka delegatua zerrenda, handitu modala. bilatzailea behar du, portal, garaje, jabearen edozein datu (koop1 edo koop 2)
+- [ ] al guardar el voto delegado, junto con el id del usuario también guardar la IP y si se han podido detectar, las coordenadas
