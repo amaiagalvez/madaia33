@@ -1,10 +1,12 @@
 <?php
 
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
 use App\SupportedLocales;
 use Laravel\Fortify\Features;
-use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\Lang;
+use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -13,6 +15,12 @@ dataset('supported_locales', SupportedLocales::all());
 
 beforeEach(function () {
     test()->skipUnlessFortifyFeature(Features::resetPasswords());
+
+    foreach (Role::names() as $roleName) {
+        Role::query()->firstOrCreate([
+            'name' => $roleName,
+        ]);
+    }
 });
 
 test('reset password link screen can be rendered', function () {
@@ -39,6 +47,38 @@ test('reset password link can be requested', function () {
 
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('reset password link can be requested with coproprietary email 1', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+    $user->assignRole(Role::PROPERTY_OWNER);
+
+    Owner::factory()->for($user)->create([
+        'coprop1_email' => 'owner1@example.com',
+    ]);
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => 'owner1@example.com']);
+
+    Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('reset password link can be requested with coproprietary email 2', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+    $user->assignRole(Role::PROPERTY_OWNER);
+
+    Owner::factory()->for($user)->create([
+        'coprop2_email' => 'owner2@example.com',
+    ]);
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => 'owner2@example.com']);
 
     Notification::assertSentTo($user, ResetPassword::class);
 });

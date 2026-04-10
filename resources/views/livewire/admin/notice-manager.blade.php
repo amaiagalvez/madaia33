@@ -77,25 +77,34 @@
                             :required-primary="true" />
 
                         {{-- Locations --}}
-                        <div>
-                            <fieldset>
-                                <legend class="block text-sm font-medium text-gray-700">
-                                    {{ __('notices.admin.locations') }}
-                                </legend>
-                                <div class="mt-2 flex flex-wrap gap-2">
-                                    @foreach ($allLocations as $loc)
-                                        <label class="cursor-pointer select-none">
-                                            <input type="checkbox" wire:model="selectedLocations"
-                                                value="{{ $loc['code'] }}" class="sr-only peer" />
-                                            <span
-                                                class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
-                                                {{ $loc['label'] }}
-                                            </span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </fieldset>
-                        </div>
+                        @if ($allLocations !== [])
+                            <div>
+                                <fieldset>
+                                    <legend class="block text-sm font-medium text-gray-700">
+                                        {{ __('notices.admin.locations') }}
+                                    </legend>
+                                    <div class="mt-2 flex flex-wrap gap-2">
+                                        @foreach ($allLocations as $loc)
+                                            <label class="cursor-pointer select-none">
+                                                <input type="checkbox"
+                                                    wire:model="selectedLocations"
+                                                    value="{{ $loc['code'] }}"
+                                                    class="sr-only peer" />
+                                                <span
+                                                    class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
+                                                    {{ $loc['label'] }}
+                                                </span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </fieldset>
+                            </div>
+                        @else
+                            <p
+                                class="rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-600">
+                                {{ __('notices.admin.global_only') }}
+                            </p>
+                        @endif
 
                         {{-- Is public toggle --}}
                         <div>

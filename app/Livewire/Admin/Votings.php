@@ -2,23 +2,25 @@
 
 namespace App\Livewire\Admin;
 
-use App\Concerns\BuildsLocaleFieldConfigs;
-use App\Http\Controllers\PublicVotingController;
-use App\Models\Location;
 use App\Models\Owner;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Voting;
-use App\Models\VotingBallot;
-use App\Models\VotingLocation;
-use App\Models\VotingOption;
-use App\Support\VotingEligibilityService;
-use App\SupportedLocales;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\View\View;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use App\Models\Location;
+use App\SupportedLocales;
+use App\Models\VotingBallot;
+use App\Models\VotingOption;
 use Livewire\WithPagination;
+use App\Models\VotingLocation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use App\Support\VotingEligibilityService;
+use App\Concerns\BuildsLocaleFieldConfigs;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Controllers\PublicVotingController;
 
 class Votings extends Component
 {
@@ -78,7 +80,7 @@ class Votings extends Component
 
   public function mount(): void
   {
-    abort_unless($this->canUseDelegatedVoting(), 403);
+    abort_unless($this->canManageAdminVotings(), 403);
 
     $this->options = [$this->emptyOptionRow()];
   }
@@ -239,7 +241,7 @@ class Votings extends Component
 
   public function openDelegatedVoteModal(): void
   {
-    abort_unless($this->canUseDelegatedVoting(), 403);
+    abort_unless($this->canManageAdminVotings(), 403);
 
     $this->delegatedRows = $this->eligibilityService
       ->ownersWithPendingDelegations()
@@ -264,7 +266,7 @@ class Votings extends Component
 
   public function startDelegatedVote(int $ownerId): RedirectResponse
   {
-    abort_unless($this->canUseDelegatedVoting(), 403);
+    abort_unless($this->canManageAdminVotings(), 403);
 
     $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
       ->map(static fn(array $row): int => $row['owner']->id)
@@ -388,8 +390,11 @@ class Votings extends Component
     $this->options = [$this->emptyOptionRow()];
   }
 
-  private function canUseDelegatedVoting(): bool
+  private function canManageAdminVotings(): bool
   {
-    return Auth::user()?->owner === null;
+    /** @var User|null $user */
+    $user = Auth::user();
+
+    return $user?->hasAnyRole([Role::SUPER_ADMIN]) ?? false;
   }
 }

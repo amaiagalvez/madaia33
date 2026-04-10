@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Role;
 use App\Models\User;
 use App\SupportedLocales;
 use Illuminate\Support\Str;
@@ -62,10 +63,18 @@ class FortifyServiceProvider extends ServiceProvider
             $user = User::query()
                 ->where(function ($query) use ($emailLogin, $dniLogin): void {
                     $query->where('email', $emailLogin)
-                        ->orWhereHas('owner', function ($ownerQuery) use ($dniLogin): void {
-                            $ownerQuery
-                                ->where('coprop1_dni', $dniLogin)
-                                ->orWhere('coprop2_dni', $dniLogin);
+                        ->orWhere(function ($ownerLoginQuery) use ($emailLogin, $dniLogin): void {
+                            $ownerLoginQuery
+                                ->whereHas('roles', function ($roleQuery): void {
+                                    $roleQuery->where('name', Role::PROPERTY_OWNER);
+                                })
+                                ->whereHas('owner', function ($ownerQuery) use ($emailLogin, $dniLogin): void {
+                                    $ownerQuery
+                                        ->where('coprop1_dni', $dniLogin)
+                                        ->orWhere('coprop2_dni', $dniLogin)
+                                        ->orWhereRaw('LOWER(coprop1_email) = ?', [$emailLogin])
+                                        ->orWhereRaw('LOWER(coprop2_email) = ?', [$emailLogin]);
+                                });
                         });
                 })
                 ->where('is_active', true)

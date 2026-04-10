@@ -34,6 +34,7 @@ return [
         'confirm_publish' => 'Ziur al zaude iragaki hau argitaratu nahi duzula?',
         'confirm_unpublish' => 'Ziur al zaude iragaki hau argitalpenetik kendu nahi duzula?',
         'locations' => 'Kokapena(k)',
+        'global_only' => 'Rol honek komunitate osorako iragarkiak soilik sor ditzake.',
         'delete_title' => 'Iragarkia ezabatu',
         'confirm_delete' => 'Ziur zaude iragarki hau ezabatu nahi duzula?',
     ],

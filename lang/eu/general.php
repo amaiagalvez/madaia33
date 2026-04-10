@@ -6,6 +6,7 @@ return [
         'notices' => 'Iragarkiak',
         'gallery' => 'Argazki-bilduma',
         'contact' => 'Kontaktua',
+        'votings' => 'Bozketak',
         'private' => 'Eremu pribatua',
         'admin' => 'Administrazioa',
     ],

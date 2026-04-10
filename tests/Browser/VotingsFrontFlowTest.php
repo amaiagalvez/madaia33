@@ -1,14 +1,16 @@
 <?php
 
-use App\Models\Location;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Owner;
-use App\Models\Property;
-use App\Models\PropertyAssignment;
 use App\Models\Voting;
+use Tests\DuskTestCase;
+use App\Models\Location;
+use App\Models\Property;
+use Laravel\Dusk\Browser;
 use App\Models\VotingBallot;
 use App\Models\VotingOption;
-use Laravel\Dusk\Browser;
-use Tests\DuskTestCase;
+use App\Models\PropertyAssignment;
 
 test('open voting callout redirects guest to private login and then to votings page', function () {
   $owner = Owner::factory()->create();
@@ -90,4 +92,38 @@ test('eligible owner can vote from front and ballot is stored as auditable recor
 
   expect($ballot)->not->toBeNull()
     ->and($ballot->cast_by_user_id)->toBeNull();
+});
+
+test('superadmin can open votings front in read only mode', function () {
+  $superadmin = User::query()->find(1) ?? User::factory()->create([
+    'id' => 1,
+    'email' => 'superadmin@example.com',
+  ]);
+
+  Role::query()->firstOrCreate([
+    'name' => Role::SUPER_ADMIN,
+  ]);
+
+  $superadmin->assignRole(Role::SUPER_ADMIN);
+
+  $voting = Voting::factory()->current()->create([
+    'is_published' => true,
+    'is_anonymous' => false,
+  ]);
+
+  VotingOption::factory()->create([
+    'voting_id' => $voting->id,
+    'position' => 1,
+    'label_eu' => 'Bai',
+  ]);
+
+  /** @var DuskTestCase $this */
+  $this->browse(function (Browser $browser) use ($superadmin, $voting) {
+    $browser->loginAs($superadmin)
+      ->visit('/eu/bozketak')
+      ->waitFor('[data-page="votings"]')
+      ->assertPresent("[data-voting-card='{$voting->id}']")
+      ->assertSee('Superadmin gisa bozketak ikus ditzakezu, baina ezin duzu bozkatu.')
+      ->assertMissing("[data-vote-submit='{$voting->id}']");
+  });
 });

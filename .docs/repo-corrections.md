@@ -103,3 +103,6 @@
 - In development seeders, do not rely only on nested factory side effects for critical auth entities; create Users explicitly and then create Owners linked by `user_id`, and test `User::whereHas('owner')` to prevent missing login accounts for seeded owners.
 
 - In this repo, if static analysis flags `Seeder::call(...)` class resolution inside `database/seeders`, use a fully-qualified seeder class string (e.g., `\\Database\\Seeders\\VotingSeeder::class`) to clear IDE warnings.
+- In this repo, `php artisan make:livewire ... --mfc` can scaffold into `resources/views/components/...` unexpectedly; verify the generated path against `config/livewire.php` before continuing and delete stray scaffold files immediately if they land in the wrong namespace.
+- If `docker-compose` rejects boolean environment values in this repo, use `docker compose` (v2) for maintenance commands; for root-owned leftovers, run `docker compose run --rm --user root madaia33 chown ...` and then re-verify ownership with `ls -l`.
+- If an admin route allows access but the page still returns 403, verify the mounted Livewire component `mount()`/action guards match route middleware; route-level role checks and component-level checks can drift and block valid superadmin sessions.

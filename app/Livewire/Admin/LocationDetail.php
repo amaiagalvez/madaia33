@@ -49,6 +49,8 @@ class LocationDetail extends Component
 
     public function addProperty(): void
     {
+        abort_unless(auth()->user()?->canManageLocation($this->location), 403);
+
         $isStorage = $this->location->type === 'storage';
 
         if (! $isStorage) {
@@ -81,6 +83,8 @@ class LocationDetail extends Component
 
     public function startEditing(int $propertyId): void
     {
+        abort_unless(auth()->user()?->canManageLocation($this->location), 403);
+
         $property = Property::findOrFail($propertyId);
 
         $this->editingPropertyId = $propertyId;
@@ -91,6 +95,8 @@ class LocationDetail extends Component
 
     public function saveProperty(): void
     {
+        abort_unless(auth()->user()?->canManageLocation($this->location), 403);
+
         if ($this->location->type !== 'storage') {
             $this->editCommunityPct = $this->normalizeDecimalInput($this->editCommunityPct);
             $this->editLocationPct = $this->normalizeDecimalInput($this->editLocationPct);
@@ -119,6 +125,8 @@ class LocationDetail extends Component
 
     public function render(): View
     {
+        abort_unless(auth()->user()?->canManageLocation($this->location), 403);
+
         $properties = $this->location->properties()
             ->with(['activeAssignments'])
             ->withCount(['activeAssignments'])

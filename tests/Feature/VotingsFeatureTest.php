@@ -1,19 +1,28 @@
 <?php
 
-use App\Http\Controllers\PublicVotingController;
-use App\Livewire\PublicVotings;
-use App\Models\Location;
-use App\Models\Owner;
-use App\Models\Property;
-use App\Models\PropertyAssignment;
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
 use App\Models\Voting;
+use Livewire\Livewire;
+use App\Models\Location;
+use App\Models\Property;
 use App\Models\VotingBallot;
 use App\Models\VotingOption;
-use App\Models\VotingOptionTotal;
+use App\Livewire\PublicVotings;
 use App\Models\VotingSelection;
+use App\Models\VotingOptionTotal;
+use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Mail;
-use Livewire\Livewire;
+use App\Http\Controllers\PublicVotingController;
+
+beforeEach(function () {
+  foreach (Role::names() as $roleName) {
+    Role::query()->firstOrCreate([
+      'name' => $roleName,
+    ]);
+  }
+});
 
 it('requires authentication to access public votings page', function () {
   test()->get(route('votings.eu'))
@@ -131,6 +140,7 @@ it('stores delegated voter user id when voting on behalf of another owner', func
 
   $delegatedOwner = Owner::factory()->create();
   $adminUser = User::factory()->create();
+  $adminUser->assignRole(Role::DELEGATED_VOTE);
 
   $portal = Location::factory()->portal()->create(['code' => '33-C']);
   $property = Property::factory()->create(['location_id' => $portal->id]);
@@ -168,4 +178,38 @@ it('stores delegated voter user id when voting on behalf of another owner', func
 
   expect($ballot)->not->toBeNull()
     ->and($ballot->cast_by_user_id)->toBe($adminUser->id);
+});
+
+it('allows superadmin to open public votings in read only mode', function () {
+  $superadmin = User::factory()->create([
+    'id' => 1,
+  ]);
+  $superadmin->assignRole(Role::SUPER_ADMIN);
+
+  $voting = Voting::factory()->current()->create([
+    'is_published' => true,
+  ]);
+
+  $option = VotingOption::factory()->create([
+    'voting_id' => $voting->id,
+    'position' => 1,
+  ]);
+
+  Livewire::actingAs($superadmin)
+    ->test(PublicVotings::class)
+    ->assertSet('canCastVotes', false)
+    ->set("selectedOptions.{$voting->id}", $option->id)
+    ->call('vote', $voting->id)
+    ->assertHasErrors(["selectedOptions.{$voting->id}"]);
+});
+
+it('forbids delegated voting flow for users without delegated role', function () {
+  $adminUser = User::factory()->create();
+
+  test()->actingAs($adminUser)
+    ->withSession([PublicVotingController::DELEGATED_OWNER_SESSION_KEY => 999]);
+
+  Livewire::actingAs($adminUser)
+    ->test(PublicVotings::class)
+    ->assertForbidden();
 });

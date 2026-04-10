@@ -36,6 +36,10 @@ flowchart LR
     USERS --> OWNERS
     USERS --> SESSIONS
     USERS --> OWNER_AUDIT_LOGS
+    USERS --> ROLE_USER
+    ROLES --> ROLE_USER
+    USERS --> LOCATION_USER
+    LOCATIONS --> LOCATION_USER
     OWNERS --> PROPERTY_ASSIGNMENTS
     OWNERS --> OWNER_AUDIT_LOGS
     LOCATIONS --> PROPERTIES
@@ -67,6 +71,17 @@ erDiagram
         datetime deleted_at
     }
 
+    ROLES {
+        bigint id
+        string name
+        datetime deleted_at
+    }
+
+    ROLE_USER {
+        bigint role_id
+        bigint user_id
+    }
+
     SESSIONS {
         string id
         bigint user_id
@@ -78,6 +93,11 @@ erDiagram
         string code
         string name
         datetime deleted_at
+    }
+
+    LOCATION_USER {
+        bigint location_id
+        bigint user_id
     }
 
     PROPERTIES {
@@ -176,10 +196,14 @@ erDiagram
     USERS ||--o{ OWNERS : has_many
     USERS ||--o{ SESSIONS : has_many
     USERS ||--o{ OWNER_AUDIT_LOGS : changed_by
+    USERS ||--o{ ROLE_USER : has_many
+    ROLES ||--o{ ROLE_USER : has_many
+    USERS ||--o{ LOCATION_USER : manages
     OWNERS ||--o{ PROPERTY_ASSIGNMENTS : has_many
     OWNERS ||--o{ OWNER_AUDIT_LOGS : has_many
     OWNERS ||--o{ VOTING_BALLOTS : has_many
     LOCATIONS ||--o{ PROPERTIES : has_many
+    LOCATIONS ||--o{ LOCATION_USER : has_many
     PROPERTIES ||--o{ PROPERTY_ASSIGNMENTS : has_many
     USERS ||--o{ VOTING_BALLOTS : delegated_by
     VOTINGS ||--o{ VOTING_OPTIONS : has_many

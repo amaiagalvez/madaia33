@@ -6,6 +6,7 @@ return [
         'notices' => 'Avisos',
         'gallery' => 'Galería',
         'contact' => 'Contacto',
+        'votings' => 'Votaciones',
         'private' => 'Zona privada',
         'admin' => 'Administración',
     ],

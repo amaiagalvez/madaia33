@@ -1,9 +1,18 @@
 <?php
 
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
 use Laravel\Fortify\Features;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+
+beforeEach(function () {
+    foreach (Role::names() as $roleName) {
+        Role::query()->firstOrCreate([
+            'name' => $roleName,
+        ]);
+    }
+});
 
 test('login screen can be rendered', function () {
     $response = test()->get(route('login'));
@@ -37,6 +46,7 @@ test('users can authenticate using the login screen', function () {
 
 test('users can authenticate with dni as login identifier', function () {
     $user = User::factory()->create();
+    $user->assignRole(Role::PROPERTY_OWNER);
 
     Owner::factory()->for($user)->create([
         'coprop1_dni' => '12345678Z',
@@ -53,6 +63,63 @@ test('users can authenticate with dni as login identifier', function () {
         ->assertRedirect('/admin');
 
     test()->assertAuthenticated();
+});
+
+test('property owner users can authenticate with coproprietary emails', function () {
+    $user = User::factory()->create();
+    $user->assignRole(Role::PROPERTY_OWNER);
+
+    Owner::factory()->for($user)->create([
+        'coprop1_email' => 'owner1@example.com',
+        'coprop2_email' => 'owner2@example.com',
+    ]);
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => 'owner1@example.com',
+            'password' => 'password',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/admin');
+
+    test()->assertAuthenticated();
+
+    test()->post(route('logout'));
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => 'owner2@example.com',
+            'password' => 'password',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/admin');
+
+    test()->assertAuthenticatedAs($user);
+});
+
+test('users without propietaria role can not authenticate with dni or coproprietary emails', function () {
+    $user = User::factory()->create();
+
+    Owner::factory()->for($user)->create([
+        'coprop1_dni' => '12345678Z',
+        'coprop1_email' => 'owner1@example.com',
+    ]);
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => '12345678Z',
+            'password' => 'password',
+        ])
+        ->assertSessionHasErrorsIn('email');
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => 'owner1@example.com',
+            'password' => 'password',
+        ])
+        ->assertSessionHasErrorsIn('email');
+
+    test()->assertGuest();
 });
 
 test('users without owner can not authenticate with dni as login identifier', function () {
@@ -145,4 +212,16 @@ test('users can logout', function () {
     $response->assertRedirect(route('root'));
 
     test()->assertGuest();
+});
+
+test('front header shows authenticated user name and logout button', function () {
+    $user = User::factory()->create([
+        'name' => 'Frontend User',
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('home.eu'))
+        ->assertOk()
+        ->assertSee('Frontend User')
+        ->assertSee(__('admin.logout'));
 });

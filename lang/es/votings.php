@@ -45,6 +45,7 @@ return [
     'vote_button' => 'Votar',
     'vote_saved' => 'Tu voto se ha guardado correctamente.',
     'already_voted' => 'Ya has votado',
+    'read_only_superadmin' => 'Como superadmin puedes ver las votaciones, pero no puedes votar.',
     'delegated_mode' => 'Modo delegado activo: estás votando como :owner.',
     'leave_delegated_mode' => 'Salir del voto delegado',
   ],

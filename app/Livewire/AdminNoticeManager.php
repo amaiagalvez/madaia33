@@ -2,13 +2,17 @@
 
 namespace App\Livewire;
 
-use App\Models\Location;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Notice;
 use Livewire\Component;
+use App\Models\Location;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use App\Models\NoticeLocation;
+use Illuminate\Validation\Rule;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use App\Concerns\BuildsLocaleFieldConfigs;
 
 class AdminNoticeManager extends Component
@@ -51,25 +55,45 @@ class AdminNoticeManager extends Component
      */
     protected function rules(): array
     {
+        $user = $this->currentUser();
+
+        abort_unless($user?->canManageNotices(), 403);
+
+        $selectedLocationRules = ['string'];
+
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
+            $selectedLocationRules[] = Rule::in($this->allowedLocationCodes());
+        }
+
+        $selectedLocationsRule = ['array'];
+
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
+            $selectedLocationsRule = ['required', 'array', 'min:1'];
+        }
+
         return [
             'titleEu' => 'required|string|max:255',
             'titleEs' => 'nullable|string|max:255',
             'contentEu' => 'required|string',
             'contentEs' => 'nullable|string',
             'isPublic' => 'boolean',
-            'selectedLocations' => 'array',
-            'selectedLocations.*' => 'string',
+            'selectedLocations' => $selectedLocationsRule,
+            'selectedLocations.*' => $selectedLocationRules,
         ];
     }
 
     public function createNotice(): void
     {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
         $this->resetForm();
         $this->showForm = true;
     }
 
     public function editNotice(int $id): void
     {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
         $notice = Notice::with(['locations.location'])->findOrFail($id);
 
         $this->editingId = $notice->id;
@@ -83,12 +107,45 @@ class AdminNoticeManager extends Component
             ->filter()
             ->values()
             ->all();
+
+        $user = $this->currentUser();
+
+        if ($user?->hasRole(Role::GENERAL_ADMIN)) {
+            $this->selectedLocations = [];
+        }
+
+        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+            $allowedLocationCodes = $this->allowedLocationCodes();
+
+            $this->selectedLocations = collect($this->selectedLocations)
+                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->values()
+                ->all();
+        }
+
         $this->showForm = true;
         $this->dispatch('admin-notice-form-focus');
     }
 
     public function saveNotice(): void
     {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
+        $user = $this->currentUser();
+
+        if ($user?->hasRole(Role::GENERAL_ADMIN)) {
+            $this->selectedLocations = [];
+        }
+
+        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+            $allowedLocationCodes = $this->allowedLocationCodes();
+
+            $this->selectedLocations = collect($this->selectedLocations)
+                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->values()
+                ->all();
+        }
+
         $this->validate();
 
         $notice = $this->upsertNotice();
@@ -151,6 +208,8 @@ class AdminNoticeManager extends Component
 
     public function publishNotice(int $id): void
     {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
         $notice = Notice::findOrFail($id);
         $notice->update([
             'is_public' => true,
@@ -160,6 +219,8 @@ class AdminNoticeManager extends Component
 
     public function unpublishNotice(int $id): void
     {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
         $notice = Notice::findOrFail($id);
         $notice->update(['is_public' => false]);
     }
@@ -195,6 +256,8 @@ class AdminNoticeManager extends Component
 
     public function confirmDelete(int $id): void
     {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
         $this->confirmingDeleteId = $id;
         $this->showDeleteModal = true;
     }
@@ -207,6 +270,8 @@ class AdminNoticeManager extends Component
 
     public function deleteNotice(): void
     {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
         if ($this->confirmingDeleteId) {
             Notice::findOrFail($this->confirmingDeleteId)->delete();
             $this->confirmingDeleteId = null;
@@ -271,8 +336,19 @@ class AdminNoticeManager extends Component
      */
     private function allLocationOptions(): array
     {
-        $locations = Location::query()
-            ->whereIn('type', ['portal', 'garage'])
+        $user = $this->currentUser();
+
+        $query = Location::query()->whereIn('type', ['portal', 'garage']);
+
+        if ($user?->hasRole(Role::GENERAL_ADMIN)) {
+            return [];
+        }
+
+        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+            $query->whereIn('id', $user->managedLocations()->pluck('locations.id'));
+        }
+
+        $locations = $query
             ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
             ->orderBy('code')
             ->get();
@@ -298,11 +374,32 @@ class AdminNoticeManager extends Component
 
     public function render(): View
     {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
         $notices = Notice::with(['locations.location'])->latest()->paginate(12);
 
         return view('livewire.admin.notice-manager', [
             'notices' => $notices,
             'allLocations' => $this->allLocationOptions(),
         ]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function allowedLocationCodes(): array
+    {
+        return collect($this->allLocationOptions())
+            ->map(static fn(array $location): string => $location['code'])
+            ->values()
+            ->all();
+    }
+
+    private function currentUser(): ?User
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        return $user;
     }
 }

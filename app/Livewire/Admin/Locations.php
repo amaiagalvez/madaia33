@@ -24,7 +24,15 @@ class Locations extends Component
 
     public function render(): View
     {
-        $locations = Location::where('type', $this->type)
+        abort_unless(auth()->user()?->canAccessAdminPanel(), 403);
+
+        $query = Location::where('type', $this->type);
+
+        if (! auth()->user()?->canManageAllLocations()) {
+            $query->whereIn('id', auth()->user()?->managedLocations()->pluck('locations.id'));
+        }
+
+        $locations = $query
             ->withCount(['properties'])
             ->orderBy('code')
             ->paginate(20);

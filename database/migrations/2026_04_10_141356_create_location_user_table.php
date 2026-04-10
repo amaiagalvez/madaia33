@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('location_user', function (Blueprint $table) {
+            $table->foreignId('location_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->timestamps();
+
+            $table->primary(['location_id', 'user_id']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('location_user');
+    }
+};
