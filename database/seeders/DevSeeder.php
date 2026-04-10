@@ -5,8 +5,12 @@ namespace Database\Seeders;
 use App\Models\Image;
 use App\Models\Location;
 use App\Models\Notice;
+use App\Models\Owner;
+use App\Models\Property;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Support\Str;
+use App\Models\PropertyAssignment;
 use App\Models\ContactMessage;
 use App\Models\NoticeLocation;
 use Illuminate\Database\Seeder;
@@ -19,6 +23,8 @@ class DevSeeder extends Seeder
         $this->seedMailhogSettings();
         $this->seedNotices();
         $this->seedImages();
+        $this->seedOwnersAndProperties();
+        $this->call(\Database\Seeders\VotingSeeder::class);
         $this->seedContactMessages();
     }
 
@@ -125,6 +131,57 @@ class DevSeeder extends Seeder
             'notice_id' => $notice->id,
             'location_id' => $locationId,
         ]);
+    }
+
+    // -------------------------------------------------------------------------
+
+    private function seedOwnersAndProperties(): void
+    {
+        $locationIds = Location::query()
+            ->whereIn('type', ['portal', 'garage'])
+            ->pluck('id');
+
+        if ($locationIds->isEmpty()) {
+            $locationIds = Location::factory()->portal()->count(2)->create(['name' => 'Portal demo'])->pluck('id')
+                ->merge(Location::factory()->garage()->count(1)->create(['name' => 'Garaje demo'])->pluck('id'));
+        }
+
+        foreach (range(1, 12) as $_) {
+            Property::factory()->create([
+                'location_id' => $locationIds->random(),
+            ]);
+        }
+
+        $ownerUsers = User::factory()
+            ->count(10)
+            ->create();
+
+        $owners = $ownerUsers->map(function (User $user): Owner {
+            return Owner::factory()->create([
+                'user_id' => $user->id,
+                'coprop1_name' => $user->name,
+                'coprop1_email' => $user->email,
+            ]);
+        });
+
+        $propertyIds = Property::query()
+            ->doesntHave('activeAssignments')
+            ->inRandomOrder()
+            ->limit($owners->count())
+            ->pluck('id')
+            ->values();
+
+        $owners
+            ->take($propertyIds->count())
+            ->values()
+            ->each(function (Owner $owner, int $index) use ($propertyIds): void {
+                PropertyAssignment::factory()->validated()->create([
+                    'property_id' => $propertyIds[$index],
+                    'owner_id' => $owner->id,
+                    'start_date' => now()->subMonths(fake()->numberBetween(1, 24))->format('Y-m-d'),
+                    'end_date' => null,
+                ]);
+            });
     }
 
     // -------------------------------------------------------------------------

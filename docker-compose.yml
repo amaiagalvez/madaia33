@@ -17,7 +17,7 @@ services:
             XDEBUG_CLIENT_HOST: host.docker.internal
             XDEBUG_CLIENT_PORT: 9003
             XDEBUG_DISCOVER_CLIENT_HOST: "0"
-            XDEBUG_START_WITH_REQUEST: "yes"
+            XDEBUG_START_WITH_REQUEST: "trigger"
             XDEBUG_MODE: "debug,develop"
             PHP_MEMORY_LIMIT: 9064M
         depends_on:

@@ -72,6 +72,7 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] erabiltzaileen zerrenda loginAs botoiarekin
 - [ ] añadir al menu un enlace debajo del menu aginte-panela para ir a la web publica
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
+- [ ] en el menu del front, si se está logueado que enseñe el nombre y el botón de saioa itxi, como en el aginte-panela
 
 # Egiten ...
 

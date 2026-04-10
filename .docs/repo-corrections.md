@@ -97,3 +97,9 @@
 
 - In voting flows, enforce one-choice-per-ballot invariants at DB level (unique key on ballot identifier) in addition to service-level validation.
 - In Livewire admin listings, avoid per-row census/count queries; pre-aggregate with one query or a single in-memory map to prevent N+1 regressions.
+
+- If Docker logs show `Xdebug: [Step Debug] Could not connect to debugging client` while requests return 200, treat it as debug-noise (not app failure); set `XDEBUG_START_WITH_REQUEST=trigger` to avoid log spam and keep on-demand debugging.
+
+- In development seeders, do not rely only on nested factory side effects for critical auth entities; create Users explicitly and then create Owners linked by `user_id`, and test `User::whereHas('owner')` to prevent missing login accounts for seeded owners.
+
+- In this repo, if static analysis flags `Seeder::call(...)` class resolution inside `database/seeders`, use a fully-qualified seeder class string (e.g., `\\Database\\Seeders\\VotingSeeder::class`) to clear IDE warnings.
