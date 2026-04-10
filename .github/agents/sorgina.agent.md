@@ -211,3 +211,4 @@ Aldaketa bat proposatu edo inplementatu aurretik, dagokion skill-a irakurri irte
 - **Itzulpenak**: `lang/eu/` eta `lang/es/` — biak eguneratu aldaketa linguistikoak badaude
 - **Settings batch access**: `whereIn` eta `upsert` erabiltzea hobetsi individual query-en ordez
 - **Clean Blade rule**: ez datu-base kontsultarik `resources/views/**` barruan
+- **Admin taula ekintzen koherentzia**: edit/delete botoietan notice taulako icon-button eredua mantendu (`rounded-full` + hover semantika bera), admin zerrendetan estilo-banaketa saihesteko

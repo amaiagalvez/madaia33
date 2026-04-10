@@ -209,6 +209,7 @@ Spec-ak ukitzen duen esparruaren arabera, dagokion skill-a irakurri behar dut ko
 - **Livewire inplementazioa egiaztatu**: `resources/views/components/⚡*.blade.php` edo `app/Livewire/*.php` benetan zein muntatzen den baieztatu
 - **Itzulpenak**: `lang/eu/` eta `lang/es/` eguneratu aldaketa linguistikoak badaude
 - **Clean Blade rule**: ez datu-base kontsultarik `resources/views/**` barruan
+- **Admin taula ekintzen koherentzia**: edit/delete ekintzetan notice taulako icon-button eredua lehenetsi (`rounded-full`, hover-egoera koherenteak), zerrenda desberdinen artean UI drift-a saihesteko
 - **Spec-a da egia iturri**: exekuzioaren egoera spec berean islatu behar da, ez aparteko zerrenda pribatuetan soilik
 
 ---

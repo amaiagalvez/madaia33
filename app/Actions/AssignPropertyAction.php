@@ -28,7 +28,7 @@ class AssignPropertyAction
                 ]);
             }
 
-            return PropertyAssignment::create([
+            $assignment = PropertyAssignment::create([
                 'property_id' => $property->id,
                 'owner_id' => $owner->id,
                 'start_date' => $startDate,
@@ -36,6 +36,10 @@ class AssignPropertyAction
                 'admin_validated' => false,
                 'owner_validated' => false,
             ]);
+
+            $owner->user()->update(['is_active' => true]);
+
+            return $assignment;
         });
     }
 }

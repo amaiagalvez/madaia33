@@ -55,177 +55,177 @@
     {{-- Header --}}
     <div class="mb-6 flex items-center justify-end">
         @unless ($showForm)
-            <button wire:click="createNotice"
-                class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                {{ __('general.buttons.create') }}
-            </button>
+            <x-admin.create-record-button wire:click="createNotice" />
         @endunless
     </div>
 
-    {{-- Inline form --}}
+    {{-- Right panel form --}}
     @if ($showForm)
-        <div id="admin-notice-form-card"
-            class="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <form wire:submit="saveNotice" novalidate>
-                <div class="grid grid-cols-1 gap-4">
-                    <x-admin.bilingual-rich-text-tabs :title="__('notices.admin.title')" :locale-configs="$this->localeConfigsFor('title', 'notices.admin.title')"
-                        mode="plain" :required-primary="true" />
+        <div class="fixed inset-0 z-40" data-section="notice-create-form">
+            <button type="button" wire:click="cancelForm"
+                class="admin-slideover-backdrop absolute inset-0 bg-black/30"
+                aria-label="{{ __('general.buttons.cancel') }}"></button>
 
-                    <x-admin.bilingual-rich-text-tabs :title="__('notices.admin.content')" :locale-configs="$this->localeConfigsFor('content', 'notices.admin.content')"
-                        :required-primary="true" />
+            <div id="admin-notice-form-card"
+                class="admin-slideover-panel absolute inset-y-0 right-0 z-50 h-full w-full max-w-4xl overflow-y-auto bg-white p-6 shadow-2xl">
+                <form wire:submit="saveNotice" novalidate>
+                    <div class="grid grid-cols-1 gap-4">
+                        <x-admin.bilingual-rich-text-tabs :title="__('notices.admin.title')" :locale-configs="$this->localeConfigsFor('title', 'notices.admin.title')"
+                            mode="plain" :required-primary="true" />
 
-                    {{-- Locations --}}
-                    <div>
-                        <fieldset>
-                            <legend class="block text-sm font-medium text-gray-700">
-                                {{ __('notices.admin.locations') }}
-                            </legend>
-                            <div class="mt-2 flex flex-wrap gap-2">
-                                @foreach ($allLocations as $loc)
-                                    <label class="cursor-pointer select-none">
-                                        <input type="checkbox" wire:model="selectedLocations"
-                                            value="{{ $loc['code'] }}" class="sr-only peer" />
-                                        <span
-                                            class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
-                                            {{ $loc['label'] }}
-                                        </span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </fieldset>
-                    </div>
+                        <x-admin.bilingual-rich-text-tabs :title="__('notices.admin.content')" :locale-configs="$this->localeConfigsFor('content', 'notices.admin.content')"
+                            :required-primary="true" />
 
-                    {{-- Is public toggle --}}
-                    <div>
-                        <label for="isPublic"
-                            class="mb-2 block text-sm font-semibold text-stone-800">
-                            {{ __('notices.admin.is_public') }}
-                        </label>
-                        <label for="isPublic"
-                            class="flex cursor-pointer items-center justify-between rounded-2xl border border-brand-300/50 bg-brand-100/30 px-4 py-3 transition-colors hover:border-brand-600/50 hover:bg-brand-100/50">
-                            <div>
-                                <p class="text-sm font-semibold text-brand-900">
-                                    {{ __('notices.admin.is_public') }}</p>
-                                <p class="text-xs text-stone-600">
-                                    {{ $isPublic ? __('notices.admin.publish') : __('notices.admin.unpublish') }}
-                                </p>
-                            </div>
-                            <span
-                                class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors {{ $isPublic ? 'bg-brand-600' : 'bg-stone-300' }}">
+                        {{-- Locations --}}
+                        <div>
+                            <fieldset>
+                                <legend class="block text-sm font-medium text-gray-700">
+                                    {{ __('notices.admin.locations') }}
+                                </legend>
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach ($allLocations as $loc)
+                                        <label class="cursor-pointer select-none">
+                                            <input type="checkbox" wire:model="selectedLocations"
+                                                value="{{ $loc['code'] }}" class="sr-only peer" />
+                                            <span
+                                                class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
+                                                {{ $loc['label'] }}
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </fieldset>
+                        </div>
+
+                        {{-- Is public toggle --}}
+                        <div>
+                            <label for="isPublic"
+                                class="mb-2 block text-sm font-semibold text-stone-800">
+                                {{ __('notices.admin.is_public') }}
+                            </label>
+                            <label for="isPublic"
+                                class="flex cursor-pointer items-center justify-between rounded-2xl border border-brand-300/50 bg-brand-100/30 px-4 py-3 transition-colors hover:border-brand-600/50 hover:bg-brand-100/50">
+                                <div>
+                                    <p class="text-sm font-semibold text-brand-900">
+                                        {{ __('notices.admin.is_public') }}</p>
+                                    <p class="text-xs text-stone-600">
+                                        {{ $isPublic ? __('notices.admin.publish') : __('notices.admin.unpublish') }}
+                                    </p>
+                                </div>
                                 <span
-                                    class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform {{ $isPublic ? 'translate-x-6' : 'translate-x-1' }}"></span>
-                            </span>
-                            <input id="isPublic" type="checkbox" wire:model.live="isPublic"
-                                class="sr-only" />
-                        </label>
+                                    class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors {{ $isPublic ? 'bg-brand-600' : 'bg-stone-300' }}">
+                                    <span
+                                        class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform {{ $isPublic ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                </span>
+                                <input id="isPublic" type="checkbox" wire:model.live="isPublic"
+                                    class="sr-only" />
+                            </label>
+                        </div>
                     </div>
-                </div>
 
-                <div class="mt-6 flex gap-3">
-                    <button type="submit"
-                        class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                        {{ $editingId ? __('general.buttons.save') : __('general.buttons.create_new') }}
-                    </button>
-                    <button type="button" wire:click="cancelForm"
-                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                        {{ __('general.buttons.cancel') }}
-                    </button>
-                </div>
-            </form>
+                    <div class="mt-6 flex gap-3">
+                        <button type="submit"
+                            class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                            {{ $editingId ? __('general.buttons.save') : __('general.buttons.create_new') }}
+                        </button>
+                        <button type="button" wire:click="cancelForm"
+                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                            {{ __('general.buttons.cancel') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     @endif
 
     {{-- Notices table --}}
-    <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                        {{ __('notices.admin.title_eu') }}
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                        {{ __('notices.admin.locations') }}
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                        {{ __('notices.admin.published_status') }}
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                        {{ __('notices.published_at') }}
-                    </th>
-                    <th scope="col" class="relative px-6 py-3">
-                        <span class="sr-only">{{ __('general.buttons.edit') }}</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-                @forelse ($notices as $notice)
-                    <tr wire:key="notice-row-{{ $notice->id }}">
-                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                            {{ $notice->title_eu }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-500">
-                            @if ($notice->locations->isNotEmpty())
-                                <div class="flex flex-wrap gap-1">
-                                    @foreach ($notice->locations as $loc)
-                                        <span
-                                            class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-                                            {{ $loc->location_code }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                            @else
-                                <span class="text-gray-400">—</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 text-sm">
-                            <button type="button"
-                                wire:click="confirmPublish({{ $notice->id }}, {{ $notice->is_public ? 'false' : 'true' }})"
-                                title="{{ $notice->is_public ? __('notices.admin.unpublish') : __('notices.admin.publish') }}"
-                                class="inline-flex min-w-28 items-center justify-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors {{ $notice->is_public ? 'border-green-200 bg-green-50 text-green-700 hover:border-green-300 hover:bg-green-100' : 'border-red-200 bg-red-50 text-red-600 hover:border-red-300 hover:bg-red-100' }}">
-                                @if ($notice->is_public)
-                                    <flux:icon.check-circle class="size-4" />
-                                @else
-                                    <flux:icon.x-circle class="size-4" />
-                                @endif
-                                <span>{{ $notice->is_public ? __('notices.admin.published_status') : __('notices.admin.is_public') }}</span>
-                            </button>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-500">
-                            {{ $notice->published_at?->format('d/m/Y') ?? '—' }}
-                        </td>
-                        <td class="px-6 py-4 text-right text-sm font-medium">
-                            <div class="flex items-center justify-end gap-2">
-                                {{-- Edit --}}
-                                <button type="button" wire:click="editNotice({{ $notice->id }})"
-                                    title="{{ __('general.buttons.edit') }}"
-                                    class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
-                                    <flux:icon.pencil-square class="size-4" />
-                                </button>
-
-                                {{-- Delete --}}
-                                <button type="button"
-                                    wire:click="confirmDelete({{ $notice->id }})"
-                                    title="{{ __('general.buttons.delete') }}"
-                                    class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-500">
-                                    <flux:icon.trash class="size-4" />
-                                </button>
+    <x-admin.panel-table table-class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('notices.admin.title_eu') }}
+                </th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('notices.admin.locations') }}
+                </th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('notices.admin.published_status') }}
+                </th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('notices.published_at') }}
+                </th>
+                <th scope="col" class="relative px-6 py-3">
+                    <span class="sr-only">{{ __('general.buttons.edit') }}</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+            @forelse ($notices as $notice)
+                <tr wire:key="notice-row-{{ $notice->id }}">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                        {{ $notice->title_eu }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        @if ($notice->locations->isNotEmpty())
+                            <div class="flex flex-wrap gap-1">
+                                @foreach ($notice->locations as $loc)
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                                        {{ $loc->location_code }}
+                                    </span>
+                                @endforeach
                             </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
-                            {{ __('notices.empty') }}
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                        @else
+                            <span class="text-gray-400">—</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <button type="button"
+                            wire:click="confirmPublish({{ $notice->id }}, {{ $notice->is_public ? 'false' : 'true' }})"
+                            title="{{ $notice->is_public ? __('notices.admin.unpublish') : __('notices.admin.publish') }}"
+                            class="inline-flex min-w-28 items-center justify-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors {{ $notice->is_public ? 'border-green-200 bg-green-50 text-green-700 hover:border-green-300 hover:bg-green-100' : 'border-red-200 bg-red-50 text-red-600 hover:border-red-300 hover:bg-red-100' }}">
+                            @if ($notice->is_public)
+                                <flux:icon.check-circle class="size-4" />
+                            @else
+                                <flux:icon.x-circle class="size-4" />
+                            @endif
+                            <span>{{ $notice->is_public ? __('notices.admin.published_status') : __('notices.admin.is_public') }}</span>
+                        </button>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {{ $notice->published_at?->format('d/m/Y') ?? '—' }}
+                    </td>
+                    <td class="px-6 py-4 text-right text-sm font-medium">
+                        <div class="flex items-center justify-end gap-2">
+                            {{-- Edit --}}
+                            <button type="button" wire:click="editNotice({{ $notice->id }})"
+                                title="{{ __('general.buttons.edit') }}"
+                                class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
+                                <flux:icon.pencil-square class="size-4" />
+                            </button>
+
+                            {{-- Delete --}}
+                            <button type="button" wire:click="confirmDelete({{ $notice->id }})"
+                                title="{{ __('general.buttons.delete') }}"
+                                class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-500">
+                                <flux:icon.trash class="size-4" />
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
+                        {{ __('notices.empty') }}
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </x-admin.panel-table>
 
     @if ($notices->hasPages())
         <div class="mt-6">

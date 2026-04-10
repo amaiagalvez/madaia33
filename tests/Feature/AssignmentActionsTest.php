@@ -8,9 +8,10 @@ use App\Actions\UnassignPropertyAction;
 use Illuminate\Validation\ValidationException;
 
 describe('AssignPropertyAction', function () {
-    it('creates an active assignment for an unassigned property', function () {
+    it('creates an active assignment for an unassigned property and activates owner user', function () {
         $property = Property::factory()->create();
         $owner = Owner::factory()->create();
+        $owner->user()->update(['is_active' => false]);
 
         $action = new AssignPropertyAction;
         $assignment = $action->execute($property, $owner, '2026-01-01');
@@ -20,7 +21,8 @@ describe('AssignPropertyAction', function () {
             ->and($assignment->owner_id)->toBe($owner->id)
             ->and($assignment->end_date)->toBeNull()
             ->and($assignment->admin_validated)->toBeFalse()
-            ->and($assignment->owner_validated)->toBeFalse();
+            ->and($assignment->owner_validated)->toBeFalse()
+            ->and($owner->user->fresh()->is_active)->toBeTrue();
     });
 
     it('throws a validation exception when property already has an active assignment', function () {
@@ -36,7 +38,7 @@ describe('AssignPropertyAction', function () {
 
         $action = new AssignPropertyAction;
 
-        expect(fn () => $action->execute($property, $owner2, '2026-06-01'))
+        expect(fn() => $action->execute($property, $owner2, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -59,13 +61,35 @@ describe('AssignPropertyAction', function () {
 });
 
 describe('UnassignPropertyAction', function () {
-    it('sets end_date on an active assignment', function () {
+    it('sets end_date on an active assignment and deactivates user when no active assignments remain', function () {
         $assignment = PropertyAssignment::factory()->create(['end_date' => null]);
+        $assignment->owner->user()->update(['is_active' => true]);
 
         $action = new UnassignPropertyAction;
         $result = $action->execute($assignment, '2026-03-31');
 
-        expect($result->end_date->format('Y-m-d'))->toBe('2026-03-31');
+        expect($result->end_date->format('Y-m-d'))->toBe('2026-03-31')
+            ->and($assignment->owner->user->fresh()->is_active)->toBeFalse();
+    });
+
+    it('keeps user active when owner still has at least one active assignment', function () {
+        $owner = Owner::factory()->create();
+        $owner->user()->update(['is_active' => true]);
+
+        $assignmentToClose = PropertyAssignment::factory()->create([
+            'owner_id' => $owner->id,
+            'end_date' => null,
+        ]);
+
+        PropertyAssignment::factory()->create([
+            'owner_id' => $owner->id,
+            'end_date' => null,
+        ]);
+
+        $action = new UnassignPropertyAction;
+        $action->execute($assignmentToClose, '2026-03-31');
+
+        expect($owner->user->fresh()->is_active)->toBeTrue();
     });
 
     it('throws a validation exception when assignment is already closed', function () {
@@ -73,7 +97,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn () => $action->execute($assignment, '2026-06-01'))
+        expect(fn() => $action->execute($assignment, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -82,7 +106,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn () => $action->execute($assignment, '2026-03-09'))
+        expect(fn() => $action->execute($assignment, '2026-03-09'))
             ->toThrow(ValidationException::class);
     });
 });

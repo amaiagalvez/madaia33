@@ -11,9 +11,6 @@
         <div class="flex gap-2">
             <flux:button variant="ghost" wire:click="$set('showEditForm', true)">
                 {{ __('admin.owners.edit_data') }}</flux:button>
-            <flux:button variant="danger" wire:click="deactivateOwner" data-action="deactivate-owner">
-                {{ __('admin.owners.deactivate') }}
-            </flux:button>
         </div>
     </div>
 
@@ -113,68 +110,104 @@
         </div>
     @endif
 
-    <div
-        class="overflow-x-auto rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-        <table class="min-w-full text-sm">
-            <thead class="border-b border-zinc-200 dark:border-zinc-700">
-                <tr class="text-left text-zinc-600 dark:text-zinc-300">
-                    <th class="px-4 py-3">{{ __('admin.owners.location') }}</th>
-                    <th class="px-4 py-3">{{ __('admin.owners.property') }}</th>
-                    <th class="px-4 py-3">{{ __('admin.owners.start_date') }}</th>
-                    <th class="px-4 py-3">{{ __('admin.owners.end_date') }}</th>
-                    <th class="px-4 py-3">{{ __('admin.owners.status') }}</th>
-                    <th class="px-4 py-3"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($assignments as $assignment)
-                    <tr wire:key="assignment-{{ $assignment->id }}"
-                        data-assignment-id="{{ $assignment->id }}"
-                        class="border-b border-zinc-100 dark:border-zinc-700">
-                        <td class="px-4 py-3">{{ $assignment->property->location->code }}</td>
-                        <td class="px-4 py-3">{{ $assignment->property->name }}</td>
-                        <td class="px-4 py-3">
-                            {{ optional($assignment->start_date)->format('Y-m-d') }}</td>
-                        <td class="px-4 py-3">
-                            @if ($unassigningId === $assignment->id)
-                                <div class="flex items-center gap-2">
-                                    <flux:input type="date" wire:model="unassignEndDate"
-                                        size="sm" />
-                                    <flux:button variant="primary" size="sm"
-                                        wire:click="confirmUnassign">
-                                        {{ __('general.buttons.confirm') }}
-                                    </flux:button>
-                                    <flux:button variant="ghost" size="sm"
-                                        wire:click="cancelUnassign">
-                                        {{ __('general.buttons.cancel') }}
-                                    </flux:button>
-                                </div>
-                            @else
-                                {{ optional($assignment->end_date)->format('Y-m-d') ?? '—' }}
-                            @endif
-                        </td>
-                        <td class="px-4 py-3">
-                            <flux:badge :color="$assignment->isActive() ? 'green' : 'zinc'">
-                                {{ $assignment->isActive() ? __('admin.owners.active') : __('admin.owners.closed') }}
-                            </flux:badge>
-                        </td>
-                        <td class="px-4 py-3">
-                            @if ($assignment->isActive() && $unassigningId !== $assignment->id)
-                                <flux:button variant="ghost" size="sm"
-                                    wire:click="startUnassign({{ $assignment->id }})">
-                                    {{ __('admin.owners.unassign') }}
+    <x-admin.panel-table>
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.location') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.property') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.start_date') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.end_date') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.admin_validated') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.owner_validated') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.status') }}</th>
+                <th scope="col" class="relative px-6 py-3">
+                    <span class="sr-only">{{ __('admin.owners.unassign') }}</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+            @forelse($assignments as $assignment)
+                <tr wire:key="assignment-{{ $assignment->id }}"
+                    data-assignment-id="{{ $assignment->id }}">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                        {{ $assignment->property->location->code }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ $assignment->property->name }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {{ optional($assignment->start_date)->format('Y-m-d') }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        @if ($unassigningId === $assignment->id)
+                            <div class="flex items-center gap-2">
+                                <flux:input type="date" wire:model="unassignEndDate"
+                                    size="sm" />
+                                <flux:button variant="primary" size="sm"
+                                    wire:click="confirmUnassign">
+                                    {{ __('general.buttons.confirm') }}
                                 </flux:button>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-zinc-400">
-                            {{ __('admin.owners.no_assignments') }}
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                                <flux:button variant="ghost" size="sm"
+                                    wire:click="cancelUnassign">
+                                    {{ __('general.buttons.cancel') }}
+                                </flux:button>
+                            </div>
+                        @else
+                            {{ optional($assignment->end_date)->format('Y-m-d') ?? '—' }}
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox"
+                                class="h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]"
+                                @checked($assignment->admin_validated) @disabled(!$assignment->isActive())
+                                data-assignment-admin-validated-toggle="{{ $assignment->id }}"
+                                wire:change="toggleAssignmentValidation({{ $assignment->id }}, 'admin_validated')">
+                            <span class="text-xs text-gray-500">{{ __('admin.common.yes') }}</span>
+                        </label>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox"
+                                class="h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]"
+                                @checked($assignment->owner_validated) @disabled(!$assignment->isActive())
+                                data-assignment-owner-validated-toggle="{{ $assignment->id }}"
+                                wire:change="toggleAssignmentValidation({{ $assignment->id }}, 'owner_validated')">
+                            <span class="text-xs text-gray-500">{{ __('admin.common.yes') }}</span>
+                        </label>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <flux:badge :color="$assignment->isActive() ? 'green' : 'zinc'">
+                            {{ $assignment->isActive() ? __('admin.owners.active') : __('admin.owners.closed') }}
+                        </flux:badge>
+                    </td>
+                    <td class="px-6 py-4 text-right text-sm font-medium">
+                        @if ($assignment->isActive() && $unassigningId !== $assignment->id)
+                            <flux:button variant="ghost" size="sm"
+                                wire:click="startUnassign({{ $assignment->id }})">
+                                {{ __('admin.owners.unassign') }}
+                            </flux:button>
+                        @endif
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
+                        {{ __('admin.owners.no_assignments') }}
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </x-admin.panel-table>
 </div>

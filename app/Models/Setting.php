@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\SupportedLocales;
-use Database\Factories\SettingFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,6 +24,8 @@ class Setting extends Model
 
     public const SECTION_RECAPTCHA = 'recaptcha';
 
+    public const SECTION_OWNERS = 'owners';
+
     protected $fillable = [
         'key',
         'value',
@@ -43,6 +44,7 @@ class Setting extends Model
             self::SECTION_GALLERY,
             self::SECTION_GENERAL,
             self::SECTION_RECAPTCHA,
+            self::SECTION_OWNERS,
         ];
     }
 
@@ -71,7 +73,7 @@ class Setting extends Model
         return self::query()
             ->whereIn('key', $keys)
             ->pluck('value', 'key')
-            ->map(static fn (mixed $value): string => (string) $value)
+            ->map(static fn(mixed $value): string => (string) $value)
             ->all();
     }
 

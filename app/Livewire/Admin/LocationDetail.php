@@ -13,6 +13,10 @@ class LocationDetail extends Component
 
     public string $newPropertyName = '';
 
+    public string $newCommunityPct = '';
+
+    public string $newLocationPct = '';
+
     public bool $showAddForm = false;
 
     public ?int $editingPropertyId = null;
@@ -38,18 +42,40 @@ class LocationDetail extends Component
         ];
     }
 
+    private function normalizeDecimalInput(string $value): string
+    {
+        return str_replace(',', '.', trim($value));
+    }
+
     public function addProperty(): void
     {
-        $this->validateOnly('newPropertyName');
+        $isStorage = $this->location->type === 'storage';
+
+        if (! $isStorage) {
+            $this->newCommunityPct = $this->normalizeDecimalInput($this->newCommunityPct);
+            $this->newLocationPct = $this->normalizeDecimalInput($this->newLocationPct);
+        }
+
+        $this->validate([
+            'newPropertyName' => 'required|string|max:20',
+            'newCommunityPct' => $isStorage ? 'nullable' : 'required|numeric|min:0|max:100',
+            'newLocationPct' => $isStorage ? 'nullable' : 'required|numeric|min:0|max:100',
+        ], [], [
+            'newPropertyName' => __('admin.locations.property_name'),
+            'newCommunityPct' => __('admin.locations.community_pct'),
+            'newLocationPct' => __('admin.locations.location_pct'),
+        ]);
 
         Property::create([
             'location_id' => $this->location->id,
             'name' => $this->newPropertyName,
-            'community_pct' => null,
-            'location_pct' => null,
+            'community_pct' => $isStorage ? null : $this->newCommunityPct,
+            'location_pct' => $isStorage ? null : $this->newLocationPct,
         ]);
 
         $this->newPropertyName = '';
+        $this->newCommunityPct = '';
+        $this->newLocationPct = '';
         $this->showAddForm = false;
     }
 
@@ -65,6 +91,11 @@ class LocationDetail extends Component
 
     public function saveProperty(): void
     {
+        if ($this->location->type !== 'storage') {
+            $this->editCommunityPct = $this->normalizeDecimalInput($this->editCommunityPct);
+            $this->editLocationPct = $this->normalizeDecimalInput($this->editLocationPct);
+        }
+
         $this->validate([
             'editName' => 'required|string|max:20',
             'editCommunityPct' => $this->location->type === 'storage' ? 'nullable' : 'required|numeric|min:0|max:100',

@@ -8,7 +8,6 @@ use App\Models\Property;
 use App\Models\PropertyAssignment;
 use Illuminate\Contracts\View\View;
 use App\Actions\AssignPropertyAction;
-use App\Actions\DeactivateOwnerAction;
 use App\Actions\UnassignPropertyAction;
 use Illuminate\Validation\ValidationException;
 
@@ -17,8 +16,6 @@ class OwnerDetail extends Component
     private AssignPropertyAction $assignPropertyAction;
 
     private UnassignPropertyAction $unassignPropertyAction;
-
-    private DeactivateOwnerAction $deactivateOwnerAction;
 
     public Owner $owner;
 
@@ -58,11 +55,9 @@ class OwnerDetail extends Component
     public function boot(
         AssignPropertyAction $assignPropertyAction,
         UnassignPropertyAction $unassignPropertyAction,
-        DeactivateOwnerAction $deactivateOwnerAction,
     ): void {
         $this->assignPropertyAction = $assignPropertyAction;
         $this->unassignPropertyAction = $unassignPropertyAction;
-        $this->deactivateOwnerAction = $deactivateOwnerAction;
     }
 
     public function mount(Owner $owner): void
@@ -167,9 +162,23 @@ class OwnerDetail extends Component
         $this->unassignEndDate = '';
     }
 
-    public function deactivateOwner(): void
+    public function toggleAssignmentValidation(int $assignmentId, string $field): void
     {
-        $this->deactivateOwnerAction->execute($this->owner);
+        if (! in_array($field, ['admin_validated', 'owner_validated'], true)) {
+            return;
+        }
+
+        $assignment = $this->owner->assignments()->findOrFail($assignmentId);
+
+        // Closed assignments are historical records and cannot be validated anymore.
+        if ($assignment->end_date !== null) {
+            return;
+        }
+
+        $assignment->update([
+            $field => ! $assignment->{$field},
+        ]);
+
         $this->owner->refresh();
     }
 

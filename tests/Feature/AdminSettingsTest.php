@@ -122,6 +122,24 @@ it('guarda la configuración de correo en la tabla settings', function () {
         ->and(settingValue('legal_text_es'))->toBe('<p>Aviso legal</p>');
 });
 
+it('guarda la configuración del email de nuevas propietarias en settings', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_OWNERS)
+        ->set('ownersWelcomeSubjectEu', 'Gaia EU')
+        ->set('ownersWelcomeSubjectEs', 'Asunto ES')
+        ->set('ownersWelcomeTextEu', '<p>Testu EU</p>##info##')
+        ->set('ownersWelcomeTextEs', '<p>Texto ES</p>##info##')
+        ->call('save');
+
+    expect(settingValue('owners_welcome_subject_eu'))->toBe('Gaia EU')
+        ->and(settingValue('owners_welcome_subject_es'))->toBe('Asunto ES')
+        ->and(settingValue('owners_welcome_text_eu'))->toBe('<p>Testu EU</p>##info##')
+        ->and(settingValue('owners_welcome_text_es'))->toBe('<p>Texto ES</p>##info##');
+});
+
 it('el campo recaptcha_secret_key se renderiza como type=password', function () {
     $user = User::factory()->create();
 
@@ -210,6 +228,16 @@ it('renderiza los campos de configuración de correo dentro de su sección', fun
         ->assertSeeHtml('data-bilingual-field="emailLegalTextEu"');
 });
 
+it('renderiza los campos del email de nuevas propietarias dentro de su sección', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_OWNERS)
+        ->assertSeeHtml('data-bilingual-field="ownersWelcomeSubjectEu"')
+        ->assertSeeHtml('data-bilingual-field="ownersWelcomeTextEu"');
+});
+
 it('mantiene visible el botón guardar en la sección front', function () {
     $user = User::factory()->create();
 
@@ -260,7 +288,7 @@ it('el dashboard muestra estadísticas reales', function () {
 it('los settings creados con factory tienen sección válida', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
