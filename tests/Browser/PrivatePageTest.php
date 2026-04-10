@@ -21,7 +21,7 @@ test('private page shows placeholder with login link for unauthenticated visitor
     });
 });
 
-test('private page shows development message for authenticated admin', function () {
+test('private page redirects authenticated admin to dashboard', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
     $privatePath = '/eu/pribatua';
 
@@ -29,8 +29,7 @@ test('private page shows development message for authenticated admin', function 
     $this->browse(function (Browser $browser) use ($admin, $privatePath) {
         $browser->loginAs($admin)
             ->visit($privatePath)
-            ->assertPathIs($privatePath)
-            ->assertPresent('[data-private-placeholder]')
-            ->assertSee('Eremu pribatuan sartu');
+            ->waitForLocation('/admin')
+            ->assertPathIs('/admin');
     });
 });

@@ -1,13 +1,22 @@
 <?php
 
 use App\Models\User;
+use App\Models\Owner;
 use Laravel\Fortify\Features;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 test('login screen can be rendered', function () {
     $response = test()->get(route('login'));
 
-    $response->assertOk();
+    $response->assertRedirect(route('private.eu'));
+});
+
+test('login screen redirect keeps the current locale', function () {
+    test()->get(route('private.es'));
+
+    $response = test()->get(route('login'));
+
+    $response->assertRedirect(route('private.es'));
 });
 
 test('users can authenticate using the login screen', function () {
@@ -27,7 +36,11 @@ test('users can authenticate using the login screen', function () {
 });
 
 test('users can authenticate with dni as login identifier', function () {
-    $user = User::factory()->create(['name' => '12345678Z']);
+    $user = User::factory()->create();
+
+    Owner::factory()->for($user)->create([
+        'coprop1_dni' => '12345678Z',
+    ]);
 
     $response = test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('login.store'), [
@@ -42,12 +55,44 @@ test('users can authenticate with dni as login identifier', function () {
     test()->assertAuthenticated();
 });
 
+test('users without owner can not authenticate with dni as login identifier', function () {
+    User::factory()->create();
+
+    $response = test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => '12345678Z',
+            'password' => 'password',
+        ]);
+
+    $response->assertSessionHasErrorsIn('email');
+
+    test()->assertGuest();
+});
+
 test('inactive users can not authenticate', function () {
     $user = User::factory()->create(['is_active' => false]);
 
     $response = test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('login.store'), [
             'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+    $response->assertSessionHasErrorsIn('email');
+
+    test()->assertGuest();
+});
+
+test('inactive users with owner can not authenticate with dni', function () {
+    $user = User::factory()->create(['is_active' => false]);
+
+    Owner::factory()->for($user)->create([
+        'coprop1_dni' => '12345678Z',
+    ]);
+
+    $response = test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => '12345678Z',
             'password' => 'password',
         ]);
 

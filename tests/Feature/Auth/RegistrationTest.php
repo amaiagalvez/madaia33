@@ -1,29 +1,20 @@
 <?php
 
-use Laravel\Fortify\Features;
-use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use App\Models\User;
 
-beforeEach(function () {
-    $this->skipUnlessFortifyFeature(Features::registration());
+test('registration screen is not available', function () {
+    test()->get('/register')->assertNotFound();
 });
 
-test('registration screen can be rendered', function () {
-    $response = $this->get(route('register'));
+test('new users can not register from the public routes', function () {
+    $response = test()->post('/register', [
+        'name' => 'John Doe',
+        'email' => 'test@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
 
-    $response->assertOk();
-});
+    $response->assertNotFound();
 
-test('new users can register', function () {
-    $response = $this->withoutMiddleware(PreventRequestForgery::class)
-        ->post(route('register.store'), [
-            'name' => 'John Doe',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
-
-    $response->assertSessionHasNoErrors()
-        ->assertRedirect('/admin');
-
-    $this->assertAuthenticated();
+    expect(User::query()->where('email', 'test@example.com')->exists())->toBeFalse();
 });

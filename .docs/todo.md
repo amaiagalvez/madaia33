@@ -64,7 +64,13 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] en settings, en la sección "contac_form" añadir dos nuevos para el asunto del email (eu y es). Al enviar el mensaje cuando se rellena el formulario, tiene que usar lo que hay en estos campos. El idioma que se usará para enviarr el email será el idioma actual
 - [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente?
 - [ ] en el aginte-panela añade estadísticas de las nuevas tablas
-
+- [ ] settings texto argazkiak eskatzeko en section front, reemplazarlo
+- [ ] settings email principal en section front Reemplazar por este todo los info@madaia33.eus
+- [ ] settigns nombre web en section front. Reemplazar donde se utilice APP_NAME por este nuevo campo
+- [ ] settings cookien testu legala n section front, crea otra ruta como con lege-oharrra y añadela en eel footer junto con las otas dos.
+- [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
+- [ ] erabiltzaileen zerrenda loginAs botoiarekin
+- [ ] añadir al menu un enlace debajo del menu aginte-panela para ir a la web publica
 
 # Egiten ...
 
@@ -83,26 +89,6 @@ crear una miniweb en html con las instrucciones para usar la aplicación, añade
 añadir una ruta al menú del panel 
 tiene que estar en dos idiomas eu y es
 añadir una regla al agente amalur para que lo mantenga actualizado 
-
-## profile
-arreglar la ruta profile
-
-## login
-la ruta login me tiene llevar a la ruta privado en el idioma en el que este navegando, si no hay idioma por defecto en euskera
-
-en la ruta privado, el botón "Saioa hasi" tiene que hacer lo mismo que lo que hace el botón "Sartu" del login actual
-
-adapta las vistas del /forgot-password al estilo del proyecto
-
-si el user tiene un owner asignado, podrá logearse con el email o con el dni pero solo si is_active = 1, sino no se podrá logear
-si el user no tiene un owner asignado solo podrá logearse con el email siempre que tenga is_active = 1
-
-
-## limpieza
-quita el blade login actual, no lo uso
-quita el dashboard de laravel /dashboard, no lo uso
-/settings/profile muevelo al menu superior
-no se pueden crear usuarios nuevos desde fuera, quita las vistas correspondientes
 
 ## Txuletak
 /dusk-test pasar los dusk test
