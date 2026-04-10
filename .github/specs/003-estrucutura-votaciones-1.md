@@ -214,3 +214,61 @@ owner_audit_logs     → id, owner_id, changed_by_user_id,
 - [x] `composer quality` (phpstan, phpmd) (**saltatuta erabiltzailearen baimenarekin**)
 - [x] `php artisan test --compact`
 - [ ] Dusk testak ez dira beharrezkoak fase honetan (admin UI berria, ez flow publiko aldatua)
+
+# Zuzenketak
+- [ ] crear un seeder para cargar las propiedades, por cada portal que genere 1-A, 1-B, 1-C, 2-A, 2-B, 2-C, .... 6-A, 6-B, 6-C, por cada garaje que genere 1, 2...180
+- [ ] ordernar los menus, crear diferentes apartados. Web: Iragarkiiak, Argazkiak, Mezuak Komunitatea: Kokalekuak, Jabeak Konfigurazioa: Ezarpenak
+- [ ] crear un compoonente para que todas las tablas del panel tengan el mismo aspecto
+- [ ] necesito poder crear nuevas propietarias
+
+## Inplementazio plana (Zuzenketak)
+
+### Helburua
+
+- Zuzenketa-pakete bakarrean 4 behar hauek entregatzea: hasierako propietate-seeding automatikoa, admin menuaren antolaketa berria, panel osorako taula-komponente bateratua, eta jabe berriak sortzeko fluxu erabilgarria.
+
+### Erabaki teknikoak
+
+- Seeder berria idempotentea izango da (`upsert`/egiaztapenekin), exekuzio errepikatuan ez dadin datu bikoizketarik sortu.
+- Propietateen sorrera `locations.type`-aren arabera egingo da:
+  - `portal`: `1-A`..`6-C` (18 erregistro portal bakoitzeko)
+  - `garage`: `1`..`180` (180 erregistro garaje bakoitzeko)
+  - `storage`: oraingoz ez da automatikoki sortuko, eskaeran ez delako patroia zehaztu.
+- Admin menua taldekatuta antolatuko da lehendik dagoen layout-ean, route izenak eta baimen-eredua hautsi gabe.
+- Panel-taulen estiloa Blade osagai partekatu batera aterako da DRY bermatzeko.
+- Jabe berria sortzeko UIa lehendik dagoen `CreateOwnerAction`-arekin lotuko da; ez da negozio-logika bikoiztuko Livewire osagaian.
+
+### Exekuzio urratsak
+
+- [ ] 1. Seeder-aren diseinua eta datu sortze-eredua finkatu (`locations` + `properties`).
+- [ ] 2. Seeder berria sortu eta `DatabaseSeeder`-ean erregistratu.
+- [ ] 3. Seeder-aren testak gehitu (zenbaketa + formatu + idempotentzia).
+- [ ] 4. Admin menuaren egitura berrantolatu: Web / Komunitatea / Konfigurazioa.
+- [ ] 5. Taula-base osagai bateratua sortu eta gutxienez 2 zerrendatan integratu.
+- [ ] 6. “Propietaria berria” sortzeko bidea gehitu (zerrendatik formulariora + gordetze-fluxua).
+- [ ] 7. Balidazioak eta errore-mezuak i18n bidez osatu (`lang/eu` eta `lang/es`).
+- [ ] 8. Pint + test minimo eraginkorrak exekutatu Docker barruan.
+
+### Egin beharreko lanak (fitxategi-maila, orientagarria)
+
+- [ ] `database/seeders/PropertySeeder.php` (berria)
+- [ ] `database/seeders/DatabaseSeeder.php` (deia gehitu)
+- [ ] `tests/Feature/...` edo `tests/Unit/...` (seeder testak)
+- [ ] `resources/views/layouts/...` (admin menuaren antolaketa)
+- [ ] `resources/views/components/...` (taula-base osagai berria)
+- [ ] `resources/views/livewire/admin/owners/...` (sortze-formularioa eta zerrenda lotura)
+- [ ] `app/Livewire/Admin/...` (create flow wiring, behar den neurrian)
+- [ ] `lang/eu/*.php` eta `lang/es/*.php` (testu berriak)
+
+### Arriskuak eta zalantzak
+
+- `storage` propietateen seeding patroia ez dago esplizituki definituta; baieztatu behar da automatikoki sortu behar diren ala ez.
+- “Menua ordenatu” atalak layout zehatza eskatzen du: sidebar bakarra ala goiko nabigazio konbinatua.
+- Taula-osagai bateratuan zein mailatan estandarizatu behar den zehaztu behar da (wrapper bakarrik vs. columns API osatua).
+
+### Balidazioa
+
+- [ ] `vendor/bin/pint --dirty --format agent`
+- [ ] `php artisan test --compact --filter=Seeder` (edo dagokion fitxategia)
+- [ ] `php artisan test --compact --filter=Admin` (ukitutako fluxuen arabera)
+- [ ] VS Code Problems panelean ukitutako fitxategiak garbi daudela baieztatu
