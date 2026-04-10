@@ -11,7 +11,7 @@
 ## Shared Domain Constants
 
 - Keep community location data in the database (`locations`, `properties`) and avoid hardcoded location lists in Livewire classes or tests.
-- For notices, `notice_locations` must point to `location_id` and optionally `property_id`.
+- For notices, `notice_locations` must point to `location_id`.
 
 ## Execution Preferences
 

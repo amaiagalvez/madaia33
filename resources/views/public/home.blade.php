@@ -85,7 +85,7 @@
                             {{ __('home.history_photos_title') }}
                         </p>
                         <p class="mt-0.5 text-xs text-gray-500 leading-relaxed">
-                            {{ __('home.history_photos_summary', ['email' => 'admin@madaia.eus']) }}
+                            {{ __('home.history_photos_summary', ['email' => 'info@madaia.eus']) }}
                         </p>
                     </div>
                     <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"

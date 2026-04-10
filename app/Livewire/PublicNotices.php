@@ -48,14 +48,12 @@ class PublicNotices extends Component
     public function getNoticesProperty(): LengthAwarePaginator
     {
         return Notice::public()
-            ->with(['locations.location', 'locations.property.location'])
+            ->with(['locations.location'])
             ->when($this->locationFilter !== '', function ($query) {
                 $query->where(function ($q) {
                     // Include notices with the selected location
                     $q->whereHas('locations', function ($locationQuery): void {
-                        $locationQuery
-                            ->whereHas('location', fn($query) => $query->where('code', $this->locationFilter))
-                            ->orWhereHas('property.location', fn($query) => $query->where('code', $this->locationFilter));
+                        $locationQuery->whereHas('location', fn($query) => $query->where('code', $this->locationFilter));
                     });
                     // Also include general notices (no locations)
                     $q->orWhereDoesntHave('locations');

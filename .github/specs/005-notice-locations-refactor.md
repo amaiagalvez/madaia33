@@ -9,7 +9,7 @@ reorganizar notice-locations para que use las tablas locations y properties y mo
 
 ### Erabaki teknikoak
 
-- [x] `notice_locations` taulak FK bidez lan egingo du: `location_id` edo `property_id` erabiliz, eta ez `location_type`/`location_code` testu gordinarekin.
+- [x] `notice_locations` taulak FK bidez lan egingo du: `location_id` erabiliz, eta ez `location_type`/`location_code` testu gordinarekin.
 - [x] Datu-migrazioak lehendik dauden erregistroak `locations.code` bidez backfill egingo ditu, datuak galdu gabe.
 - [x] Admin eta front-eko hautatzaileek `Location` eta `Property` erregistroetatik eraikiko dituzte aukerak; ez dute gehiago `App\CommunityLocations` erabiliko.
 - [x] `Notice`, `NoticeLocation`, `PublicNotices` eta admin notice manager-ek erlazio eager-loaded-ak erabiliko dituzte N+1 saihesteko.

@@ -70,7 +70,7 @@ class AdminNoticeManager extends Component
 
     public function editNotice(int $id): void
     {
-        $notice = Notice::with(['locations.location', 'locations.property.location'])->findOrFail($id);
+        $notice = Notice::with(['locations.location'])->findOrFail($id);
 
         $this->editingId = $notice->id;
         $this->titleEu = $notice->title_eu ?? '';
@@ -79,13 +79,7 @@ class AdminNoticeManager extends Component
         $this->contentEs = $notice->content_es ?? '';
         $this->isPublic = $notice->is_public;
         $this->selectedLocations = $notice->locations
-            ->map(function (NoticeLocation $location): ?string {
-                if ($location->property_id !== null) {
-                    return $location->location_code;
-                }
-
-                return $location->location_code;
-            })
+            ->map(fn(NoticeLocation $location): ?string => $location->location_code)
             ->filter()
             ->values()
             ->all();
@@ -248,16 +242,15 @@ class AdminNoticeManager extends Component
         $rows = [];
 
         foreach (array_values(array_unique($this->selectedLocations)) as $selected) {
-            [$locationId, $propertyId] = $this->resolveSelectionToForeignKeys((string) $selected);
+            $locationId = $this->resolveSelectionToForeignKey((string) $selected);
 
-            if ($locationId === null && $propertyId === null) {
+            if ($locationId === null) {
                 continue;
             }
 
             $rows[] = [
                 'notice_id' => $notice->id,
                 'location_id' => $locationId,
-                'property_id' => $propertyId,
             ];
         }
 
@@ -266,16 +259,11 @@ class AdminNoticeManager extends Component
         }
     }
 
-    /**
-     * @return array{0: int|null, 1: int|null}
-     */
-    private function resolveSelectionToForeignKeys(string $selected): array
+    private function resolveSelectionToForeignKey(string $selected): ?int
     {
-        $locationId = Location::query()
+        return Location::query()
             ->where('code', $selected)
             ->value('id');
-
-        return [$locationId, null];
     }
 
     /**
@@ -310,7 +298,7 @@ class AdminNoticeManager extends Component
 
     public function render(): View
     {
-        $notices = Notice::with(['locations.location', 'locations.property.location'])->latest()->paginate(12);
+        $notices = Notice::with(['locations.location'])->latest()->paginate(12);
 
         return view('livewire.admin.notice-manager', [
             'notices' => $notices,

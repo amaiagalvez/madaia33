@@ -10,7 +10,6 @@ return new class extends Migration {
   {
     Schema::table('notice_locations', function (Blueprint $table): void {
       $table->foreignId('location_id')->nullable()->after('notice_id')->constrained('locations')->nullOnDelete();
-      $table->foreignId('property_id')->nullable()->after('location_id')->constrained('properties')->nullOnDelete();
     });
 
     $codeToLocationId = DB::table('locations')
@@ -44,14 +43,10 @@ return new class extends Migration {
 
     DB::table('notice_locations')
       ->leftJoin('locations', 'notice_locations.location_id', '=', 'locations.id')
-      ->leftJoin('properties', 'notice_locations.property_id', '=', 'properties.id')
-      ->leftJoin('locations as property_locations', 'properties.location_id', '=', 'property_locations.id')
       ->select([
         'notice_locations.id',
         'locations.type as direct_type',
         'locations.code as direct_code',
-        'property_locations.type as property_type',
-        'property_locations.code as property_code',
       ])
       ->orderBy('notice_locations.id')
       ->chunkById(200, function ($rows): void {
@@ -59,14 +54,13 @@ return new class extends Migration {
           DB::table('notice_locations')
             ->where('id', $row->id)
             ->update([
-              'location_type' => $row->direct_type ?? $row->property_type,
-              'location_code' => $row->direct_code ?? $row->property_code,
+              'location_type' => $row->direct_type,
+              'location_code' => $row->direct_code,
             ]);
         }
       }, 'notice_locations.id');
 
     Schema::table('notice_locations', function (Blueprint $table): void {
-      $table->dropConstrainedForeignId('property_id');
       $table->dropConstrainedForeignId('location_id');
     });
   }

@@ -16,7 +16,6 @@ class NoticeLocation extends Model
     protected $fillable = [
         'notice_id',
         'location_id',
-        'property_id',
     ];
 
     /**
@@ -36,14 +35,6 @@ class NoticeLocation extends Model
     }
 
     /**
-     * @return BelongsTo<Property, $this>
-     */
-    public function property(): BelongsTo
-    {
-        return $this->belongsTo(Property::class);
-    }
-
-    /**
      * Virtual compatibility attribute used in views/tests.
      */
     protected function locationCode(): Attribute
@@ -53,13 +44,7 @@ class NoticeLocation extends Model
                 return $this->location->code;
             }
 
-            if ($this->relationLoaded('property') && $this->property !== null) {
-                if ($this->property->relationLoaded('location') && $this->property->location !== null) {
-                    return $this->property->location->code;
-                }
-            }
-
-            return $this->location?->code ?? $this->property?->location?->code;
+            return $this->location?->code;
         });
     }
 
@@ -73,13 +58,7 @@ class NoticeLocation extends Model
                 return $this->location->type;
             }
 
-            if ($this->relationLoaded('property') && $this->property !== null) {
-                if ($this->property->relationLoaded('location') && $this->property->location !== null) {
-                    return $this->property->location->type;
-                }
-            }
-
-            return $this->location?->type ?? $this->property?->location?->type;
+            return $this->location?->type;
         });
     }
 }

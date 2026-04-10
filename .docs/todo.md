@@ -17,7 +17,7 @@
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario
 - [ ] añadir en los agentes amalurra y sorgina una nueva regla para que usen siempre que se pueda test unitarios sin usar la base de datos para que los test sean lo más rápidos posibles
-- [ ] 
+
 - donde añado cuando se creen nuevos ficheros el ident sea de 4 espacios?
 - dividir la carpeta Actions por features o modelos, lo que creas más conveniente
 - para las partes de las views  que sean sensibles, crear dusk-test
