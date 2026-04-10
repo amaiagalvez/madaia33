@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\SupportedLocales;
 use Illuminate\Support\Facades\Route;
 
@@ -32,7 +33,7 @@ it('private page shows centered responsive placeholder', function (string $local
 })->with('supported_locales');
 
 it('private page redirects authenticated users to the admin dashboard', function (string $locale) {
-    $user = \App\Models\User::factory()->create();
+    $user = User::factory()->create();
 
     $response = test()->actingAs($user)->get(route(SupportedLocales::routeName('private', $locale)));
 

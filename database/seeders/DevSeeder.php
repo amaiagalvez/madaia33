@@ -2,24 +2,24 @@
 
 namespace Database\Seeders;
 
-use App\Actions\CastVotingBallotAction;
-use App\Models\Image;
-use App\Models\Location;
-use App\Models\Notice;
-use App\Models\Owner;
-use App\Models\Property;
 use App\Models\Role;
-use App\Models\Setting;
 use App\Models\User;
+use App\Models\Image;
+use App\Models\Owner;
+use App\Models\Notice;
 use App\Models\Voting;
-use App\Support\VotingEligibilityService;
+use App\Models\Setting;
+use App\Models\Location;
+use App\Models\Property;
 use Illuminate\Support\Str;
-use App\Models\PropertyAssignment;
 use App\Models\ContactMessage;
 use App\Models\NoticeLocation;
 use Illuminate\Database\Seeder;
+use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Hash;
+use App\Actions\CastVotingBallotAction;
 use Illuminate\Support\Facades\Storage;
+use App\Support\VotingEligibilityService;
 
 class DevSeeder extends Seeder
 {
@@ -43,7 +43,7 @@ class DevSeeder extends Seeder
         $this->seedImages();
         $this->seedOwnersAndProperties();
         $this->seedRoleUsers();
-        $this->call(\Database\Seeders\VotingSeeder::class);
+        $this->call(VotingSeeder::class);
         $this->seedVotingBallots();
         $this->seedContactMessages();
     }
@@ -361,7 +361,7 @@ class DevSeeder extends Seeder
                 }
 
                 $delegatedOwner = $eligibleOwners->first(
-                    fn(Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
+                    fn (Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
                 );
 
                 if (! $delegatedOwner instanceof Owner || ! $delegatedUser instanceof User) {
@@ -439,8 +439,8 @@ class DevSeeder extends Seeder
         Storage::disk('public')->makeDirectory('images');
 
         foreach ($items as $index => $item) {
-            $filename = Str::uuid() . '.svg';
-            $path = 'images/' . $filename;
+            $filename = Str::uuid().'.svg';
+            $path = 'images/'.$filename;
             $imageText = $item['alt_es'];
 
             Storage::disk('public')->put(

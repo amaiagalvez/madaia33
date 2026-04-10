@@ -76,13 +76,13 @@
                         aria-current="{{ request()->routeIs('contact.*') ? 'page' : 'false' }}">
                         {{ __('general.nav.contact') }}
                     </a>
-                    @auth
+                    @if ($showVotingsLink)
                         <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
                             class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('votings.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
                             aria-current="{{ request()->routeIs('votings.*') ? 'page' : 'false' }}">
                             {{ __('general.nav.votings') }}
                         </a>
-                    @endauth
+                    @endif
                     <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
                         class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('private.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
                         aria-current="{{ request()->routeIs('private.*') ? 'page' : 'false' }}">
@@ -155,13 +155,13 @@
                     aria-current="{{ request()->routeIs('contact.*') ? 'page' : 'false' }}">
                     {{ __('general.nav.contact') }}
                 </a>
-                @auth
+                @if ($showVotingsLink)
                     <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
                         class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('votings.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
                         aria-current="{{ request()->routeIs('votings.*') ? 'page' : 'false' }}">
                         {{ __('general.nav.votings') }}
                     </a>
-                @endauth
+                @endif
                 <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
                     class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('private.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
                     aria-current="{{ request()->routeIs('private.*') ? 'page' : 'false' }}">

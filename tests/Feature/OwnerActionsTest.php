@@ -2,13 +2,13 @@
 
 use App\Models\User;
 use App\Models\Owner;
-use App\Models\Property;
 use App\Models\Location;
+use App\Models\Property;
 use App\Mail\OwnerWelcomeMail;
 use App\Actions\CreateOwnerAction;
-use App\Actions\DeactivateOwnerAction;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Mail;
+use App\Actions\DeactivateOwnerAction;
 use Illuminate\Validation\ValidationException;
 
 describe('CreateOwnerAction', function () {
@@ -157,7 +157,7 @@ describe('CreateOwnerAction', function () {
 
         $action = new CreateOwnerAction;
 
-        expect(fn() => $action->execute([
+        expect(fn () => $action->execute([
             'coprop1_name' => 'Miren Etxeberria',
             'coprop1_dni' => '12345678Z',
             'coprop1_email' => 'miren@example.com',

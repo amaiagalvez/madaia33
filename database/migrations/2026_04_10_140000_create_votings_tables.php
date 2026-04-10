@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration {
     public function up(): void
@@ -51,6 +51,11 @@ return new class extends Migration {
             $table->foreignId('voting_id')->constrained()->cascadeOnDelete();
             $table->foreignId('owner_id')->constrained()->cascadeOnDelete();
             $table->foreignId('cast_by_user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->ipAddress('cast_ip_address')->nullable();
+            $table->decimal('cast_latitude', 10, 7)->nullable();
+            $table->decimal('cast_longitude', 10, 7)->nullable();
+            $table->string('cast_delegate_dni')->nullable();
+            $table->boolean('is_in_person')->default(false);
             $table->timestamp('voted_at');
             $table->timestamps();
             $table->softDeletes();

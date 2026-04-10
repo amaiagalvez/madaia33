@@ -2,14 +2,14 @@
 
 use App\Models\User;
 use App\Models\Owner;
-use App\Mail\OwnerWelcomeMail;
 use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
 use App\Livewire\Admin\Owners;
-use App\Livewire\Admin\OwnerDetail;
+use App\Mail\OwnerWelcomeMail;
 use App\Livewire\Admin\Locations;
 use App\Models\PropertyAssignment;
+use App\Livewire\Admin\OwnerDetail;
 use Illuminate\Support\Facades\Mail;
 use App\Livewire\Admin\LocationDetail;
 

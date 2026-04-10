@@ -15,6 +15,7 @@
 # Copilot
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario
+- [ ] agente auditor de ENS e 27001
 
 # Code
 - [ ] test en ingles
@@ -62,13 +63,16 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] añadir hizkuntza a la ficha de propietaria y al user, mantener sincronizados tanto el idioma como el nombre y el email con el nombre y el email del koop1. Al loguearse por defecto se cargará el idioma del user logeado
 - [ ] en el skill db-schema separar las tablas de las votoaciones en otro bloque
 - [ ] traducciones en la tabla Erabiltzaileak
-- [ ] moverlo al apartado configución del menu
-- [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla con el user_id, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje
+- [ ] mover le menú Erabiltzaileak al apartado configución del menu y ponerle icono de users
+- [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla "receivers" con el user_id de a quien se le ha enviado, el email al que se ha enviado, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje
 - [ ] Trackea los mensajes para que se pueda saber quien lo ha habierto y quien ha pinchado en los enlaces del mensaje si los hubiera
 - [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
-- [ ] usa el mismo componente para mostrar en el menu del front y del aginte-panela el nombre de usuario y el logout, usa como referencia el del aginte panela que está mejor
 
-# profila
+
+
+ profila
+- [ ] usa el mismo componente para mostrar en el menu del front y del aginte-panela el nombre de usuario y el logout, usa como referencia el del aginte panela que está mejor
+- [ ] 
 un usuario tiene que tener un perfil desde el que pueda ver:
 
 organizar la información en diferentes pestañas

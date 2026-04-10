@@ -5,9 +5,9 @@
 
 use App\Models\User;
 use App\Models\Notice;
+use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
-use Livewire\Livewire;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Propiedad 8: Toggle de publicación de avisos es reversible

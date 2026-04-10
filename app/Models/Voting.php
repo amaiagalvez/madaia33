@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\ResolvesLocalizedAttributes;
 use Database\Factories\VotingFactory;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Concerns\ResolvesLocalizedAttributes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Voting extends Model
 {

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Owner;
 use App\Models\Voting;
 use Livewire\Component;
+use App\SupportedLocales;
 use App\Models\VotingBallot;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -16,175 +17,444 @@ use App\Http\Controllers\PublicVotingController;
 
 class PublicVotings extends Component
 {
-  private VotingEligibilityService $eligibilityService;
+    private VotingEligibilityService $eligibilityService;
 
-  private CastVotingBallotAction $castVotingBallotAction;
+    private CastVotingBallotAction $castVotingBallotAction;
 
-  public ?Owner $activeOwner = null;
+    public ?Owner $activeOwner = null;
 
-  public bool $isDelegated = false;
+    public bool $isDelegated = false;
 
-  public bool $canCastVotes = true;
+    public bool $isInPersonVoting = false;
 
-  /**
-   * @var array<int, int>
-   */
-  public array $selectedOptions = [];
+    public bool $canCastVotes = true;
 
-  public function boot(
-    VotingEligibilityService $eligibilityService,
-    CastVotingBallotAction $castVotingBallotAction,
-  ): void {
-    $this->eligibilityService = $eligibilityService;
-    $this->castVotingBallotAction = $castVotingBallotAction;
-  }
+    public bool $canManageDelegatedVoting = false;
 
-  public function mount(): void
-  {
-    $user = $this->currentUser();
+    public bool $showDelegatedModal = false;
 
-    abort_unless($user !== null, 403);
+    /**
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     */
+    public array $delegatedRows = [];
 
-    if ($user->isSuperadmin()) {
-      $this->canCastVotes = false;
+    /**
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     */
+    public array $filteredDelegatedRows = [];
 
-      return;
+    public string $delegatedSearch = '';
+
+    public string $delegateDni = '';
+
+    public bool $showInPersonModal = false;
+
+    /**
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     */
+    public array $inPersonRows = [];
+
+    /**
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     */
+    public array $filteredInPersonRows = [];
+
+    public string $inPersonSearch = '';
+
+    /**
+     * @var array<int, int>
+     */
+    public array $selectedOptions = [];
+
+    public ?float $voteLatitude = null;
+
+    public ?float $voteLongitude = null;
+
+    public function boot(
+        VotingEligibilityService $eligibilityService,
+        CastVotingBallotAction $castVotingBallotAction,
+    ): void {
+        $this->eligibilityService = $eligibilityService;
+        $this->castVotingBallotAction = $castVotingBallotAction;
     }
 
-    abort_unless($user->canVoteInVotings() || $user->canUseDelegatedVoting(), 403);
+    public function mount(): void
+    {
+        $user = $this->currentUser();
+        $delegatedOwnerId = (int) session()->get(PublicVotingController::DELEGATED_OWNER_SESSION_KEY, 0);
+        $inPersonOwnerId = (int) session()->get(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY, 0);
 
-    $this->activeOwner = $this->resolveOwner();
-  }
+        abort_unless($user !== null, 403);
 
-  public function vote(int $votingId): void
-  {
-    if (! $this->canCastVotes) {
-      $this->addError("selectedOptions.$votingId", __('votings.errors.not_allowed'));
+        $this->canManageDelegatedVoting = $this->canManageDelegatedVotingForCurrentUser();
 
-      return;
+        if ($user->isSuperadmin()) {
+            if ($delegatedOwnerId > 0 || $inPersonOwnerId > 0) {
+                $this->canCastVotes = true;
+                $this->activeOwner = $this->resolveOwner();
+
+                return;
+            }
+
+            $this->canCastVotes = false;
+
+            return;
+        }
+
+        abort_unless($user->canVoteInVotings() || $user->canUseDelegatedVoting(), 403);
+
+        if ($user->canUseDelegatedVoting() && ($delegatedOwnerId > 0 || $inPersonOwnerId > 0)) {
+            $this->canCastVotes = true;
+            $this->activeOwner = $this->resolveOwner();
+
+            return;
+        }
+
+        if ($user->canUseDelegatedVoting() && $delegatedOwnerId === 0 && $inPersonOwnerId === 0 && $user->owner === null) {
+            $this->canCastVotes = false;
+
+            return;
+        }
+
+        $this->activeOwner = $this->resolveOwner();
     }
 
-    $voting = Voting::query()
-      ->with(['options', 'locations.location'])
-      ->publishedOpen()
-      ->findOrFail($votingId);
+    public function openDelegatedVoteModal(): void
+    {
+        abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
-    $selectedOptionId = $this->selectedOptions[$votingId] ?? null;
+        $this->delegatedRows = $this->eligibilityService
+            ->ownersWithPendingDelegations()
+            ->map(static function (array $row): array {
+                return [
+                    'owner_id' => $row['owner']->id,
+                    'owner_name' => $row['owner']->coprop1_name,
+                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
+                    'pending_votings' => $row['pending_votings'],
+                    'portal_codes' => $row['portal_codes'],
+                    'garage_codes' => $row['garage_codes'],
+                    'search_index' => $row['search_index'],
+                ];
+            })
+            ->values()
+            ->all();
 
-    if ($selectedOptionId === null) {
-      $this->addError("selectedOptions.$votingId", __('votings.errors.option_required'));
-
-      return;
+        $this->delegatedSearch = '';
+        $this->applyDelegatedFilter();
+        $this->showDelegatedModal = true;
     }
 
-    if (! $voting->options->pluck('id')->contains($selectedOptionId)) {
-      $this->addError("selectedOptions.$votingId", __('votings.errors.invalid_option'));
-
-      return;
+    public function updatedDelegatedSearch(): void
+    {
+        $this->applyDelegatedFilter();
     }
 
-    try {
-      $user = $this->currentUser();
-
-      abort_unless($user !== null, 403);
-
-      $this->castVotingBallotAction->execute(
-        $voting,
-        $this->activeOwner,
-        (int) $selectedOptionId,
-        $user,
-      );
-
-      unset($this->selectedOptions[$votingId]);
-      session()->flash('message', __('votings.front.vote_saved'));
-    } catch (ValidationException $exception) {
-      $firstError = collect($exception->errors())->flatten()->first();
-
-      if (is_string($firstError) && $firstError !== '') {
-        $this->addError("selectedOptions.$votingId", $firstError);
-      }
-    }
-  }
-
-  public function clearDelegatedMode(): void
-  {
-    if (! $this->canCastVotes) {
-      return;
+    public function closeDelegatedVoteModal(): void
+    {
+        $this->showDelegatedModal = false;
+        $this->delegatedSearch = '';
+        $this->delegatedRows = [];
+        $this->filteredDelegatedRows = [];
     }
 
-    session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
-    $this->isDelegated = false;
-    $this->activeOwner = $this->resolveOwner();
-  }
+    public function startDelegatedVote(int $ownerId): void
+    {
+        abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
-  public function render(): View
-  {
-    if (! $this->canCastVotes) {
-      $votings = Voting::query()
-        ->with(['options', 'locations.location', 'optionTotals.option'])
-        ->publishedOpen()
-        ->orderBy('starts_at')
-        ->get();
+        $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
+            ->map(static fn (array $row): int => $row['owner']->id)
+            ->all();
 
-      abort_if($votings->isEmpty(), 404);
+        abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
 
-      return view('livewire.front.public-votings', [
-        'votings' => $votings,
-        'votedVotingIds' => [],
-      ]);
+        session()->forget(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY);
+        session()->put(PublicVotingController::DELEGATED_OWNER_SESSION_KEY, $ownerId);
+        $this->redirectRoute(SupportedLocales::routeName('votings'));
     }
 
-    $votings = $this->eligibilityService
-      ->openEligibleVotingsForOwner($this->activeOwner)
-      ->load('ballots');
+    public function openInPersonVoteModal(): void
+    {
+        abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
-    abort_if($votings->isEmpty(), 404);
+        $this->inPersonRows = $this->eligibilityService
+            ->ownersWithPendingDelegations()
+            ->map(static function (array $row): array {
+                return [
+                    'owner_id' => $row['owner']->id,
+                    'owner_name' => $row['owner']->coprop1_name,
+                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
+                    'pending_votings' => $row['pending_votings'],
+                    'portal_codes' => $row['portal_codes'],
+                    'garage_codes' => $row['garage_codes'],
+                    'search_index' => $row['search_index'],
+                ];
+            })
+            ->values()
+            ->all();
 
-    $votedVotingIds = VotingBallot::query()
-      ->where('owner_id', $this->activeOwner->id)
-      ->whereIn('voting_id', $votings->pluck('id'))
-      ->pluck('voting_id')
-      ->all();
-
-    return view('livewire.front.public-votings', [
-      'votings' => $votings,
-      'votedVotingIds' => $votedVotingIds,
-    ]);
-  }
-
-  private function resolveOwner(): Owner
-  {
-    $user = $this->currentUser();
-
-    $delegatedOwnerId = (int) session()->get(PublicVotingController::DELEGATED_OWNER_SESSION_KEY, 0);
-
-    if ($delegatedOwnerId > 0 && $user?->owner !== null) {
-      session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
-      $delegatedOwnerId = 0;
+        $this->inPersonSearch = '';
+        $this->applyInPersonFilter();
+        $this->showInPersonModal = true;
     }
 
-    if ($delegatedOwnerId > 0) {
-      $this->isDelegated = true;
-
-      return Owner::query()
-        ->with(['user', 'activeAssignments.property.location'])
-        ->findOrFail($delegatedOwnerId);
+    public function updatedInPersonSearch(): void
+    {
+        $this->applyInPersonFilter();
     }
 
-    $owner = $user?->owner;
+    public function closeInPersonVoteModal(): void
+    {
+        $this->showInPersonModal = false;
+        $this->inPersonSearch = '';
+        $this->inPersonRows = [];
+        $this->filteredInPersonRows = [];
+    }
 
-    abort_unless($owner instanceof Owner, 404);
+    public function startInPersonVote(int $ownerId): void
+    {
+        abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
-    $this->isDelegated = false;
+        $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
+            ->map(static fn (array $row): int => $row['owner']->id)
+            ->all();
 
-    return $owner->loadMissing(['user', 'activeAssignments.property.location']);
-  }
+        abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
 
-  private function currentUser(): ?User
-  {
-    /** @var User|null $user */
-    $user = Auth::user();
+        session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
+        session()->put(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY, $ownerId);
+        $this->redirectRoute(SupportedLocales::routeName('votings'));
+    }
 
-    return $user;
-  }
+    public function vote(int $votingId): void
+    {
+        if (! $this->canCastVotes) {
+            $this->addError("selectedOptions.$votingId", __('votings.errors.not_allowed'));
+
+            return;
+        }
+
+        $voting = Voting::query()
+            ->with(['options', 'locations.location'])
+            ->publishedOpen()
+            ->findOrFail($votingId);
+
+        $selectedOptionId = $this->selectedOptions[$votingId] ?? null;
+
+        if ($selectedOptionId === null) {
+            $this->addError("selectedOptions.$votingId", __('votings.errors.option_required'));
+
+            return;
+        }
+
+        if (! $voting->options->pluck('id')->contains($selectedOptionId)) {
+            $this->addError("selectedOptions.$votingId", __('votings.errors.invalid_option'));
+
+            return;
+        }
+
+        if ($this->isDelegated && trim($this->delegateDni) === '') {
+            $this->addError('delegateDni', __('votings.errors.delegate_dni_required'));
+
+            return;
+        }
+
+        try {
+            $user = $this->currentUser();
+
+            abort_unless($user !== null, 403);
+
+            $this->castVotingBallotAction->execute(
+                $voting,
+                $this->activeOwner,
+                (int) $selectedOptionId,
+                $user,
+                request()->ip(),
+                $this->voteLatitude,
+                $this->voteLongitude,
+                $this->isDelegated ? trim($this->delegateDni) : null,
+                $this->isInPersonVoting,
+            );
+
+            unset($this->selectedOptions[$votingId]);
+            session()->flash('message', __('votings.front.vote_saved'));
+        } catch (ValidationException $exception) {
+            $firstError = collect($exception->errors())->flatten()->first();
+
+            if (is_string($firstError) && $firstError !== '') {
+                $this->addError("selectedOptions.$votingId", $firstError);
+            }
+        }
+    }
+
+    public function setVoteCoordinates(?float $latitude = null, ?float $longitude = null): void
+    {
+        $this->voteLatitude = $this->normalizeCoordinate($latitude, -90, 90);
+        $this->voteLongitude = $this->normalizeCoordinate($longitude, -180, 180);
+    }
+
+    public function clearDelegatedMode(): void
+    {
+        if (! $this->canCastVotes) {
+            return;
+        }
+
+        session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
+        session()->forget(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY);
+
+        $this->delegateDni = '';
+
+        if ($this->currentUser()?->isSuperadmin() || $this->currentUser()?->canUseDelegatedVoting()) {
+            $this->canCastVotes = false;
+            $this->isDelegated = false;
+            $this->isInPersonVoting = false;
+            $this->activeOwner = null;
+
+            return;
+        }
+
+        $this->isDelegated = false;
+        $this->isInPersonVoting = false;
+        $this->activeOwner = $this->resolveOwner();
+    }
+
+    public function render(): View
+    {
+        if (! $this->canCastVotes) {
+            $votings = Voting::query()
+                ->with(['options', 'locations.location', 'optionTotals.option'])
+                ->publishedOpen()
+                ->orderBy('starts_at')
+                ->get();
+
+            abort_if($votings->isEmpty(), 404);
+
+            return view('livewire.front.public-votings', [
+                'votings' => $votings,
+                'votedVotingIds' => [],
+            ]);
+        }
+
+        $votings = $this->eligibilityService
+            ->openEligibleVotingsForOwner($this->activeOwner)
+            ->load('ballots');
+
+        abort_if($votings->isEmpty(), 404);
+
+        $votedVotingIds = VotingBallot::query()
+            ->where('owner_id', $this->activeOwner->id)
+            ->whereIn('voting_id', $votings->pluck('id'))
+            ->pluck('voting_id')
+            ->all();
+
+        return view('livewire.front.public-votings', [
+            'votings' => $votings,
+            'votedVotingIds' => $votedVotingIds,
+        ]);
+    }
+
+    private function resolveOwner(): Owner
+    {
+        $user = $this->currentUser();
+
+        $delegatedOwnerId = (int) session()->get(PublicVotingController::DELEGATED_OWNER_SESSION_KEY, 0);
+        $inPersonOwnerId = (int) session()->get(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY, 0);
+
+        if (($delegatedOwnerId > 0 || $inPersonOwnerId > 0) && $user?->owner !== null) {
+            session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
+            session()->forget(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY);
+            $delegatedOwnerId = 0;
+            $inPersonOwnerId = 0;
+        }
+
+        if ($delegatedOwnerId > 0) {
+            $this->isDelegated = true;
+            $this->isInPersonVoting = false;
+
+            return Owner::query()
+                ->with(['user', 'activeAssignments.property.location'])
+                ->findOrFail($delegatedOwnerId);
+        }
+
+        if ($inPersonOwnerId > 0) {
+            $this->isDelegated = false;
+            $this->isInPersonVoting = true;
+
+            return Owner::query()
+                ->with(['user', 'activeAssignments.property.location'])
+                ->findOrFail($inPersonOwnerId);
+        }
+
+        $owner = $user?->owner;
+
+        abort_unless($owner instanceof Owner, 404);
+
+        $this->isDelegated = false;
+        $this->isInPersonVoting = false;
+
+        return $owner->loadMissing(['user', 'activeAssignments.property.location']);
+    }
+
+    private function currentUser(): ?User
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        return $user;
+    }
+
+    private function normalizeCoordinate(?float $value, float $min, float $max): ?float
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if ($value < $min || $value > $max) {
+            return null;
+        }
+
+        return round($value, 7);
+    }
+
+    private function canManageDelegatedVotingForCurrentUser(): bool
+    {
+        $user = $this->currentUser();
+
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $user->isSuperadmin() || $user->canUseDelegatedVoting();
+    }
+
+    private function applyDelegatedFilter(): void
+    {
+        $search = mb_strtolower(trim($this->delegatedSearch));
+
+        if ($search === '') {
+            $this->filteredDelegatedRows = $this->delegatedRows;
+
+            return;
+        }
+
+        $this->filteredDelegatedRows = array_values(array_filter(
+            $this->delegatedRows,
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
+        ));
+    }
+
+    private function applyInPersonFilter(): void
+    {
+        $search = mb_strtolower(trim($this->inPersonSearch));
+
+        if ($search === '') {
+            $this->filteredInPersonRows = $this->inPersonRows;
+
+            return;
+        }
+
+        $this->filteredInPersonRows = array_values(array_filter(
+            $this->inPersonRows,
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
+        ));
+    }
 }

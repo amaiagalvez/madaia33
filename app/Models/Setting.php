@@ -73,7 +73,7 @@ class Setting extends Model
         return self::query()
             ->whereIn('key', $keys)
             ->pluck('value', 'key')
-            ->map(static fn(mixed $value): string => (string) $value)
+            ->map(static fn (mixed $value): string => (string) $value)
             ->all();
     }
 

@@ -25,15 +25,26 @@ class CastVotingBallotAction
     /**
      * @throws ValidationException
      */
-    public function execute(Voting $voting, Owner $owner, int $optionId, User $authenticatedUser): VotingBallot
-    {
-        if (! $authenticatedUser->canVoteInVotings() && ! $authenticatedUser->canUseDelegatedVoting()) {
+    public function execute(
+        Voting $voting,
+        Owner $owner,
+        int $optionId,
+        User $authenticatedUser,
+        ?string $castIpAddress = null,
+        ?float $castLatitude = null,
+        ?float $castLongitude = null,
+        ?string $castDelegateDni = null,
+        bool $isInPerson = false,
+    ): VotingBallot {
+        if (! $authenticatedUser->isSuperadmin() && ! $authenticatedUser->canVoteInVotings() && ! $authenticatedUser->canUseDelegatedVoting()) {
             throw ValidationException::withMessages([
                 'vote' => __('votings.errors.not_allowed'),
             ]);
         }
 
-        $ballot = DB::transaction(function () use ($voting, $owner, $optionId, $authenticatedUser): VotingBallot {
+        $castIpAddress = $castIpAddress ?? request()->ip();
+
+        $ballot = DB::transaction(function () use ($voting, $owner, $optionId, $authenticatedUser, $castIpAddress, $castLatitude, $castLongitude, $castDelegateDni, $isInPerson): VotingBallot {
             $lockedVoting = Voting::query()
                 ->with(['options', 'locations.location'])
                 ->lockForUpdate()
@@ -75,6 +86,11 @@ class CastVotingBallotAction
                 'voting_id' => $lockedVoting->id,
                 'owner_id' => $owner->id,
                 'cast_by_user_id' => $authenticatedUser->id === $owner->user_id ? null : $authenticatedUser->id,
+                'cast_ip_address' => $castIpAddress,
+                'cast_latitude' => $castLatitude,
+                'cast_longitude' => $castLongitude,
+                'cast_delegate_dni' => $isInPerson ? null : $castDelegateDni,
+                'is_in_person' => $isInPerson,
                 'voted_at' => now(),
             ]);
 
