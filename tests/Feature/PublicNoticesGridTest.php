@@ -3,7 +3,6 @@
 use App\Models\Notice;
 use Livewire\Livewire;
 use App\SupportedLocales;
-use App\Models\NoticeLocation;
 
 dataset('supported_locales', SupportedLocales::all());
 
@@ -67,18 +66,10 @@ test('notices page filter selector is visible and responsive', function (string 
 test('notices page filter updates grid when location selected', function (string $locale) {
     $portal1 = 'A';
     $notice1 = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice1->id,
-        'location_type' => 'portal',
-        'location_code' => $portal1,
-    ]);
+    attachNoticeToLocationCode($notice1, $portal1);
 
     $notice2 = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice2->id,
-        'location_type' => 'portal',
-        'location_code' => 'B',
-    ]);
+    attachNoticeToLocationCode($notice2, 'B');
 
     test()->get(route(SupportedLocales::routeName('notices', $locale)))
         ->assertSee($notice1->title)

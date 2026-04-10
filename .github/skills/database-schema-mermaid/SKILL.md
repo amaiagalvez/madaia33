@@ -41,6 +41,7 @@ flowchart LR
     LOCATIONS --> PROPERTIES
     PROPERTIES --> PROPERTY_ASSIGNMENTS
     NOTICES --> NOTICE_LOCATIONS
+    LOCATIONS --> NOTICE_LOCATIONS
 ```
 
 ### 2) Core domain (community ownership)
@@ -133,8 +134,7 @@ erDiagram
     NOTICE_LOCATIONS {
         bigint id
         bigint notice_id
-        string location_type
-        string location_code
+        bigint location_id
         datetime deleted_at
     }
 
@@ -165,6 +165,7 @@ erDiagram
     }
 
     NOTICES ||--o{ NOTICE_LOCATIONS : has_many
+    LOCATIONS ||--o{ NOTICE_LOCATIONS : has_many
 ```
 
 ### 4) Framework tables

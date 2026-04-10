@@ -4,7 +4,6 @@ use App\Models\Image;
 use App\Models\Notice;
 use App\Models\Setting;
 use App\SupportedLocales;
-use App\Models\NoticeLocation;
 use Illuminate\Support\Facades\Storage;
 
 dataset('supported_locales', SupportedLocales::all());
@@ -135,11 +134,7 @@ test('home page separates general notices from notices with location', function 
         'title_es' => 'Aviso con Ubicacion',
     ]);
 
-    NoticeLocation::create([
-        'notice_id' => $locationNotice->id,
-        'location_type' => 'portal',
-        'location_code' => 'A',
-    ]);
+    attachNoticeToLocationCode($locationNotice, 'A');
 
     $response = test()->get(route(SupportedLocales::routeName('home', $locale)));
 

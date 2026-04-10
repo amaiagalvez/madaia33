@@ -3,7 +3,6 @@
 use App\Models\Notice;
 use Livewire\Livewire;
 use App\SupportedLocales;
-use App\Models\NoticeLocation;
 use App\Livewire\PublicNotices;
 use Illuminate\Support\Facades\App;
 
@@ -24,18 +23,10 @@ test('livewire public notices displays 9 items per page', function () {
 test('livewire public notices filter selector is reactive', function () {
     $portal = 'A';
     $notice1 = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice1->id,
-        'location_type' => 'portal',
-        'location_code' => $portal,
-    ]);
+    attachNoticeToLocationCode($notice1, $portal);
 
     $notice2 = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice2->id,
-        'location_type' => 'portal',
-        'location_code' => 'B',
-    ]);
+    attachNoticeToLocationCode($notice2, 'B');
 
     Livewire::test(PublicNotices::class)
         ->assertSee($notice1->title)
@@ -49,11 +40,7 @@ test('livewire public notices filter resets pagination', function () {
     for ($i = 0; $i < 12; $i++) {
         $notice = Notice::factory()->public()->create(['published_at' => now()->subMinutes($i)]);
         if ($i < 6) {
-            NoticeLocation::create([
-                'notice_id' => $notice->id,
-                'location_type' => 'portal',
-                'location_code' => $portal,
-            ]);
+            attachNoticeToLocationCode($notice, $portal);
         }
     }
 
@@ -108,11 +95,7 @@ test('livewire public notices filter with general notices', function () {
     $portal = 'A';
     // Notice with portal location
     $notice1 = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice1->id,
-        'location_type' => 'portal',
-        'location_code' => $portal,
-    ]);
+    attachNoticeToLocationCode($notice1, $portal);
 
     // Notice with no locations (general)
     $notice2 = Notice::factory()->public()->create();
@@ -129,7 +112,7 @@ test('livewire public notices orders by published_at descending', function () {
     $notice3 = Notice::factory()->public()->create(['published_at' => now()]);
 
     Livewire::test(PublicNotices::class)
-        ->assertViewHas('notices', fn ($notices) => $notices->count() === 3);
+        ->assertViewHas('notices', fn($notices) => $notices->count() === 3);
 });
 
 test('livewire public notices handles empty state', function () {

@@ -10,8 +10,8 @@
 
 ## Shared Domain Constants
 
-- Keep shared domain constants such as community location codes in a single shared class, not duplicated across Livewire classes, view-based components, or tests.
-- In this repo the single source of truth is App\\CommunityLocations.
+- Keep community location data in the database (`locations`, `properties`) and avoid hardcoded location lists in Livewire classes or tests.
+- For notices, `notice_locations` must point to `location_id`.
 
 ## Execution Preferences
 

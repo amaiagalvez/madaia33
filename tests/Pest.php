@@ -1,7 +1,10 @@
 <?php
 
 use Tests\TestCase;
+use App\Models\Notice;
+use App\Models\Location;
 use App\Models\Setting;
+use App\Models\NoticeLocation;
 use Tests\DuskTestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -52,4 +55,22 @@ function settingValue(string $key, mixed $default = null): mixed
 function createSetting(string $key, mixed $value): Setting
 {
     return Setting::factory()->forKey($key, (string) $value)->create();
+}
+
+function attachNoticeToLocationCode(Notice $notice, string $code): NoticeLocation
+{
+    $locationId = Location::query()->where('code', $code)->value('id');
+
+    if ($locationId === null) {
+        $locationId = Location::factory()->create([
+            'type' => str_starts_with($code, 'P-') ? 'garage' : 'portal',
+            'code' => $code,
+            'name' => 'Location ' . $code,
+        ])->id;
+    }
+
+    return NoticeLocation::create([
+        'notice_id' => $notice->id,
+        'location_id' => $locationId,
+    ]);
 }

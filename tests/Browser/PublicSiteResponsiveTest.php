@@ -10,7 +10,6 @@ use App\Models\Setting;
 use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 use App\Models\ContactMessage;
-use App\Models\NoticeLocation;
 use Illuminate\Support\Facades\Http;
 
 function mailhogDeliveredMessages(string $subject, array $recipients): bool
@@ -86,22 +85,14 @@ test('notices page smoke checks responsive grid filter and pagination', function
         'title_es' => 'Smoke Notice A',
         'published_at' => now()->addMinutes(2),
     ]);
-    NoticeLocation::create([
-        'notice_id' => $matchingNotice->id,
-        'location_type' => 'portal',
-        'location_code' => '33-A',
-    ]);
+    attachNoticeToLocationCode($matchingNotice, '33-A');
 
     $nonMatchingNotice = Notice::factory()->public()->create([
         'title_eu' => 'Smoke Notice B',
         'title_es' => 'Smoke Notice B',
         'published_at' => now()->addMinute(),
     ]);
-    NoticeLocation::create([
-        'notice_id' => $nonMatchingNotice->id,
-        'location_type' => 'portal',
-        'location_code' => '33-B',
-    ]);
+    attachNoticeToLocationCode($nonMatchingNotice, '33-B');
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
