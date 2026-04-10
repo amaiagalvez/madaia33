@@ -36,10 +36,12 @@ test('admin can access owner detail sensitive view and sees assignment controls'
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $owner) {
         $browser->loginAs($admin)
-            ->visit('/admin/propietarias/'.$owner->id)
+            ->visit('/admin/propietarias/' . $owner->id)
             ->waitFor('[data-assignment-id]', 5)
             ->assertPresent('[data-assignment-id]')
-            ->assertPresent('[data-action="deactivate-owner"]');
+            ->assertPresent('[data-assignment-admin-validated-toggle]')
+            ->assertPresent('[data-assignment-owner-validated-toggle]')
+            ->assertMissing('[data-action="deactivate-owner"]');
     });
 });
 
@@ -56,12 +58,12 @@ test('admin can access location detail sensitive view and sees editable property
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $location, $property) {
         $browser->loginAs($admin)
-            ->visit('/admin/ubicaciones/'.$location->id)
-            ->waitFor('[data-property-id="'.$property->id.'"]', 5)
-            ->assertPresent('[data-property-id="'.$property->id.'"]')
+            ->visit('/admin/ubicaciones/' . $location->id)
+            ->waitFor('[data-property-id="' . $property->id . '"]', 5)
+            ->assertPresent('[data-property-id="' . $property->id . '"]')
             ->assertPresent('[data-assigned]')
-            ->assertPresent('[data-admin-validated]')
-            ->assertPresent('[data-owner-validated]');
+            ->assertMissing('[data-admin-validated]')
+            ->assertMissing('[data-owner-validated]');
     });
 });
 
@@ -72,10 +74,10 @@ test('guest cannot access sensitive owner and location admin views', function ()
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($owner, $location) {
         $browser->visit('/_dusk/logout')
-            ->visit('/admin/propietarias/'.$owner->id)
+            ->visit('/admin/propietarias/' . $owner->id)
             ->waitForLocation('/login')
             ->assertPathIs('/login')
-            ->visit('/admin/ubicaciones/'.$location->id)
+            ->visit('/admin/ubicaciones/' . $location->id)
             ->waitForLocation('/login')
             ->assertPathIs('/login');
     });

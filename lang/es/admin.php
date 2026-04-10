@@ -50,6 +50,12 @@ return [
         'editor_link' => '🔗',
         'editor_link_prompt' => 'Introduce la URL del enlace',
         'language_tabs' => 'Pestañas de idioma',
+        'owners_welcome_subject' => 'Asunto del email de nueva propietaria',
+        'owners_welcome_subject_eu' => 'Asunto (EU)',
+        'owners_welcome_subject_es' => 'Asunto (ES)',
+        'owners_welcome_text' => 'Texto del email de nueva propietaria',
+        'owners_welcome_text_eu' => 'Texto (EU)',
+        'owners_welcome_text_es' => 'Texto (ES)',
     ],
     'stats' => [
         'published_notices' => 'Avisos publicados',
@@ -70,6 +76,7 @@ return [
         'gallery' => 'Galería',
         'general' => 'General',
         'recaptcha' => 'reCAPTCHA',
+        'owners' => 'Propietarias',
     ],
     'test_email' => [
         'button' => 'Enviar correo de prueba',
@@ -90,11 +97,17 @@ return [
         'yes' => 'Sí',
         'no' => 'No',
     ],
+    'sidebar' => [
+        'web' => 'Web',
+        'community' => 'Comunidad',
+        'configuration' => 'Configuración',
+    ],
     'locations' => [
         'menu' => 'Ubicaciones',
         'title' => 'Ubicaciones',
         'detail_title' => 'Detalle de ubicación',
         'back_to_list' => 'Volver a ubicaciones',
+        'breadcrumb' => 'Ruta de ubicaciones',
         'types' => [
             'portal' => 'Portales',
             'garage' => 'Garajes',
@@ -120,6 +133,8 @@ return [
     'owners' => [
         'menu' => 'Propietarias',
         'title' => 'Propietarias',
+        'create' => 'Nueva propietaria',
+        'create_submit' => 'Crear propietaria',
         'detail_title' => 'Detalle de propietaria',
         'back_to_list' => 'Volver a propietarias',
         'view' => 'Ver',
@@ -134,6 +149,8 @@ return [
         'end_date' => 'Fecha fin',
         'status' => 'Estado',
         'location' => 'Ubicación',
+        'admin_validated' => 'Val. admin',
+        'owner_validated' => 'Val. propietaria',
         'assign' => 'Asignar',
         'unassign' => 'Desasignar',
         'active' => 'Activa',
@@ -146,6 +163,8 @@ return [
             'all_portals' => 'Todos los portales',
             'all_garages' => 'Todos los garajes',
             'all_storages' => 'Todos los trasteros',
+            'without_properties' => 'Sin propiedades activas',
+            'back_to_default' => 'Volver a filtros por defecto',
         ],
         'columns' => [
             'coprop1' => 'Copropietaria 1',
@@ -163,6 +182,12 @@ return [
             'coprop2_dni' => 'DNI copropietaria 2',
             'coprop2_phone' => 'Teléfono copropietaria 2',
             'coprop2_email' => 'Email copropietaria 2',
+        ],
+        'email' => [
+            'default_subject' => 'Madaia 33 - Confirmación de propiedad',
+            'default_body' => '<p>Hola,</p><p>Se te han asignado las siguientes propiedades:</p>##info##',
+            'no_properties' => 'No hay propiedades asignadas.',
+            'reset_action' => 'Configurar contraseña',
         ],
     ],
 ];

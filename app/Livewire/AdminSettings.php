@@ -60,6 +60,14 @@ class AdminSettings extends Component
 
     public string $emailLegalTextEs = '';
 
+    public string $ownersWelcomeSubjectEu = '';
+
+    public string $ownersWelcomeSubjectEs = '';
+
+    public string $ownersWelcomeTextEu = '';
+
+    public string $ownersWelcomeTextEs = '';
+
     public bool $saved = false;
 
     public bool $showTestEmailModal = false;
@@ -106,6 +114,12 @@ class AdminSettings extends Component
                 'recaptchaSiteKey' => 'recaptcha_site_key',
                 'recaptchaSecretKey' => 'recaptcha_secret_key',
             ],
+            Setting::SECTION_OWNERS => [
+                'ownersWelcomeSubjectEu' => 'owners_welcome_subject_eu',
+                'ownersWelcomeSubjectEs' => 'owners_welcome_subject_es',
+                'ownersWelcomeTextEu' => 'owners_welcome_text_eu',
+                'ownersWelcomeTextEs' => 'owners_welcome_text_es',
+            ],
         ];
     }
 
@@ -144,6 +158,10 @@ class AdminSettings extends Component
         $this->smtpEncryption = $settings['smtp_encryption'] ?? '';
         $this->emailLegalTextEu = $settings['legal_text_eu'] ?? '';
         $this->emailLegalTextEs = $settings['legal_text_es'] ?? '';
+        $this->ownersWelcomeSubjectEu = $settings['owners_welcome_subject_eu'] ?? '';
+        $this->ownersWelcomeSubjectEs = $settings['owners_welcome_subject_es'] ?? '';
+        $this->ownersWelcomeTextEu = $settings['owners_welcome_text_eu'] ?? '';
+        $this->ownersWelcomeTextEs = $settings['owners_welcome_text_es'] ?? '';
         $this->historyTextEu = $settings['home_history_text_eu'] ?? '';
         $this->historyTextEs = $settings['home_history_text_es'] ?? '';
         $this->privacyContentEu = $settings['legal_page_privacy_policy_eu'] ?? '';

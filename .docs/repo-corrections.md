@@ -76,3 +76,17 @@
 - In Dusk/Browser tests with seeded data, avoid hardcoded unique keys (e.g., location `code`); use factory-generated unique values or explicitly non-conflicting values to prevent intermittent `UNIQUE constraint failed` errors.
 - If `is_active` is added to users for deactivation, enforce it in Fortify authentication (`authenticateUsing`) and add a Feature test; toggling the flag alone does not block login.
 - To prevent duplicate active ownership assignments, combine transactional `lockForUpdate()` checks with a DB-level uniqueness strategy for active rows.
+- When extracting a shared Blade table component, avoid wrapping an already-existing <table> with another <table>; pass table classes via component props and keep a single table element to prevent invalid markup.
+- To truly standardize table UI from a base view, align wrapper and inner table semantics together (`thead`, `tbody`, `th`, `td` classes); changing only the container component leaves visual drift.
+- In owners list UX, keep all filters in one horizontal row and use horizontal overflow when needed; reserve vertical space for table rows and pair it with pagination to keep dense admin listings usable.
+- For configurable owner-onboarding emails, keep subject/body in settings by locale and replace a stable placeholder like ##info## server-side with assignment data; cover both settings persistence and email rendering in Feature tests.
+- In admin forms, avoid mixed primary button palettes (Flux default + brand). Reuse a shared brand-primary style/component so create/save actions keep a consistent visual hierarchy.
+- Browser test files under tests/Browser in this repo may fail with "no such table" if run as plain php artisan test; use the dedicated Dusk Docker workflow (serve + migrate/seed + selenium APP_URL) for reliable execution.
+- If a UI action is explicitly removed by requirement (e.g., owner deactivation from detail page), remove both the button and the Livewire handler/dependency injection to avoid dead callable paths.
+- When asserting owners index content in Feature tests, remember default filter is active-only; seed at least one active assignment or switch filter state explicitly to avoid false negatives.
+- For admin list create flows, replacing inline forms with a fixed right-side panel (`fixed inset-0` + backdrop + `right-0` container) preserves Livewire state while clearly indicating context switch without changing backend logic.
+- In right-side create panels, avoid mixing tight 12-column spans with inline action buttons in the same row; move actions to a separate footer row and use simpler responsive grids to prevent overlap/clipping.
+- For admin detail pages with wide tables, keep the page header container at full width (`w-full`) and reduce vertical padding to avoid visual height bloat; style breadcrumbs as a bordered inline bar to keep alignment and hierarchy consistent.
+- Keep owner user activation state synchronized from assignment actions (assign/unassign), and delegate Livewire close flows to those actions to avoid duplicated lifecycle side effects.
+- For decimal fields that must accept comma input, use text inputs with `inputmode="decimal"` and normalize `,` to `.` in Livewire before numeric validation and persistence.
+- In admin listings, keep edit/delete actions visually consistent with the notice-manager icon-button pattern (`rounded-full` action buttons with matching hover semantics) to prevent UI drift between tables.

@@ -50,6 +50,12 @@ return [
         'editor_link' => '🔗',
         'editor_link_prompt' => 'Sartu estekaren URLa',
         'language_tabs' => 'Hizkuntza fitxak',
+        'owners_welcome_subject' => 'Jabe berriaren emailaren gaia',
+        'owners_welcome_subject_eu' => 'Gaia (EU)',
+        'owners_welcome_subject_es' => 'Gaia (ES)',
+        'owners_welcome_text' => 'Jabe berriaren emailaren testua',
+        'owners_welcome_text_eu' => 'Testua (EU)',
+        'owners_welcome_text_es' => 'Testua (ES)',
     ],
     'stats' => [
         'published_notices' => 'Argitaratutako iragarkiak',
@@ -70,6 +76,7 @@ return [
         'gallery' => 'Argazki-bilduma',
         'general' => 'Orokorra',
         'recaptcha' => 'reCAPTCHA',
+        'owners' => 'Jabeak',
     ],
     'test_email' => [
         'button' => 'Bidali proba-eposta',
@@ -90,11 +97,17 @@ return [
         'yes' => 'Bai',
         'no' => 'Ez',
     ],
+    'sidebar' => [
+        'web' => 'Web',
+        'community' => 'Komunitatea',
+        'configuration' => 'Konfigurazioa',
+    ],
     'locations' => [
         'menu' => 'Kokalekuak',
         'title' => 'Kokalekuak',
         'detail_title' => 'Kokalekuaren xehetasuna',
         'back_to_list' => 'Itzuli kokalekuetara',
+        'breadcrumb' => 'Kokalekuen ogi-apurrak',
         'types' => [
             'portal' => 'Atariak',
             'garage' => 'Garajeak',
@@ -120,6 +133,8 @@ return [
     'owners' => [
         'menu' => 'Jabeak',
         'title' => 'Jabeak',
+        'create' => 'Jabe berria',
+        'create_submit' => 'Sortu jabea',
         'detail_title' => 'Jabearen xehetasuna',
         'back_to_list' => 'Itzuli jabeetara',
         'view' => 'Ikusi',
@@ -134,6 +149,8 @@ return [
         'end_date' => 'Amaiera-data',
         'status' => 'Egoera',
         'location' => 'Kokalekua',
+        'admin_validated' => 'Adm. bal.',
+        'owner_validated' => 'Jabearen bal.',
         'assign' => 'Esleitu',
         'unassign' => 'Desesleitu',
         'active' => 'Aktiboa',
@@ -146,6 +163,8 @@ return [
             'all_portals' => 'Atari guztiak',
             'all_garages' => 'Garaje guztiak',
             'all_storages' => 'Trasteleku guztiak',
+            'without_properties' => 'Jabetzarik gabekoak',
+            'back_to_default' => 'Filtro arruntetara itzuli',
         ],
         'columns' => [
             'coprop1' => 'Ko-jabea 1',
@@ -163,6 +182,12 @@ return [
             'coprop2_dni' => 'Ko-jabe 2 NAN',
             'coprop2_phone' => 'Ko-jabe 2 telefonoa',
             'coprop2_email' => 'Ko-jabe 2 emaila',
+        ],
+        'email' => [
+            'default_subject' => 'Madaia 33 - Jabetza baieztapena',
+            'default_body' => '<p>Kaixo,</p><p>Ondoko jabetzak esleitu zaizkizu:</p>##info##',
+            'no_properties' => 'Ez dago esleitutako jabetzarik.',
+            'reset_action' => 'Pasahitza ezarri',
         ],
     ],
 ];

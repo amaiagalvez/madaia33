@@ -64,6 +64,8 @@
             @include('livewire.admin.settings.partials.front-tab')
         @elseif ($activeSection === 'recaptcha')
             @include('livewire.admin.settings.partials.recaptcha-tab')
+        @elseif ($activeSection === 'owners')
+            @include('livewire.admin.settings.partials.owners-tab')
         @endif
 
         <div>

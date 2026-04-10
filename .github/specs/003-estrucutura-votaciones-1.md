@@ -216,10 +216,11 @@ owner_audit_logs     → id, owner_id, changed_by_user_id,
 - [ ] Dusk testak ez dira beharrezkoak fase honetan (admin UI berria, ez flow publiko aldatua)
 
 # Zuzenketak
-- [ ] crear un seeder para cargar las propiedades, por cada portal que genere 1-A, 1-B, 1-C, 2-A, 2-B, 2-C, .... 6-A, 6-B, 6-C, por cada garaje que genere 1, 2...180
-- [ ] ordernar los menus, crear diferentes apartados. Web: Iragarkiiak, Argazkiak, Mezuak Komunitatea: Kokalekuak, Jabeak Konfigurazioa: Ezarpenak
-- [ ] crear un compoonente para que todas las tablas del panel tengan el mismo aspecto
-- [ ] necesito poder crear nuevas propietarias
+- [x] crear un seeder para cargar las propiedades, por cada portal que genere 1-A, 1-B, 1-C, 2-A, 2-B, 2-C, .... 6-A, 6-B, 6-C, por cada garaje que genere 1, 2...180
+- [x] ordernar los menus, crear diferentes apartados. Web: Iragarkiiak, Argazkiak, Mezuak Komunitatea: Kokalekuak, Jabeak Konfigurazioa: Ezarpenak
+- [x] crear un compoonente para que todas las tablas del panel tengan el mismo aspecto
+hobeto esan => "usa la tabla que hay en /admin/avisos como base para que todas las tablas tengan el mismo estilo, colores, iconos, botones... cambia kokalekuak y jabeak"
+- [x] necesito poder crear nuevas propietarias
 
 ## Inplementazio plana (Zuzenketak)
 
@@ -240,25 +241,25 @@ owner_audit_logs     → id, owner_id, changed_by_user_id,
 
 ### Exekuzio urratsak
 
-- [ ] 1. Seeder-aren diseinua eta datu sortze-eredua finkatu (`locations` + `properties`).
-- [ ] 2. Seeder berria sortu eta `DatabaseSeeder`-ean erregistratu.
-- [ ] 3. Seeder-aren testak gehitu (zenbaketa + formatu + idempotentzia).
-- [ ] 4. Admin menuaren egitura berrantolatu: Web / Komunitatea / Konfigurazioa.
-- [ ] 5. Taula-base osagai bateratua sortu eta gutxienez 2 zerrendatan integratu.
-- [ ] 6. “Propietaria berria” sortzeko bidea gehitu (zerrendatik formulariora + gordetze-fluxua).
-- [ ] 7. Balidazioak eta errore-mezuak i18n bidez osatu (`lang/eu` eta `lang/es`).
-- [ ] 8. Pint + test minimo eraginkorrak exekutatu Docker barruan.
+- [x] 1. Seeder-aren diseinua eta datu sortze-eredua finkatu (`locations` + `properties`).
+- [x] 2. Seeder berria sortu eta `DatabaseSeeder`-ean erregistratu.
+- [x] 3. Seeder-aren testak gehitu (zenbaketa + formatu + idempotentzia).
+- [x] 4. Admin menuaren egitura berrantolatu: Web / Komunitatea / Konfigurazioa.
+- [x] 5. Taula-base osagai bateratua sortu eta gutxienez 2 zerrendatan integratu.
+- [x] 6. “Propietaria berria” sortzeko bidea gehitu (zerrendatik formulariora + gordetze-fluxua).
+- [x] 7. Balidazioak eta errore-mezuak i18n bidez osatu (`lang/eu` eta `lang/es`).
+- [x] 8. Pint + test minimo eraginkorrak exekutatu Docker barruan.
 
 ### Egin beharreko lanak (fitxategi-maila, orientagarria)
 
-- [ ] `database/seeders/PropertySeeder.php` (berria)
-- [ ] `database/seeders/DatabaseSeeder.php` (deia gehitu)
-- [ ] `tests/Feature/...` edo `tests/Unit/...` (seeder testak)
-- [ ] `resources/views/layouts/...` (admin menuaren antolaketa)
-- [ ] `resources/views/components/...` (taula-base osagai berria)
-- [ ] `resources/views/livewire/admin/owners/...` (sortze-formularioa eta zerrenda lotura)
-- [ ] `app/Livewire/Admin/...` (create flow wiring, behar den neurrian)
-- [ ] `lang/eu/*.php` eta `lang/es/*.php` (testu berriak)
+- [x] `database/seeders/PropertySeeder.php` (berria)
+- [x] `database/seeders/DatabaseSeeder.php` (deia gehitu)
+- [x] `tests/Feature/...` edo `tests/Unit/...` (seeder testak)
+- [x] `resources/views/layouts/...` (admin menuaren antolaketa)
+- [x] `resources/views/components/...` (taula-base osagai berria)
+- [x] `resources/views/livewire/admin/owners/...` (sortze-formularioa eta zerrenda lotura)
+- [x] `app/Livewire/Admin/...` (create flow wiring, behar den neurrian)
+- [x] `lang/eu/*.php` eta `lang/es/*.php` (testu berriak)
 
 ### Arriskuak eta zalantzak
 
@@ -268,7 +269,285 @@ owner_audit_logs     → id, owner_id, changed_by_user_id,
 
 ### Balidazioa
 
-- [ ] `vendor/bin/pint --dirty --format agent`
-- [ ] `php artisan test --compact --filter=Seeder` (edo dagokion fitxategia)
-- [ ] `php artisan test --compact --filter=Admin` (ukitutako fluxuen arabera)
-- [ ] VS Code Problems panelean ukitutako fitxategiak garbi daudela baieztatu
+- [x] `vendor/bin/pint --dirty --format agent`
+- [x] `php artisan test --compact --filter=Seeder` (edo dagokion fitxategia)
+- [x] `php artisan test --compact --filter=Admin` (ukitutako fluxuen arabera)
+- [x] VS Code Problems panelean ukitutako fitxategiak garbi daudela baieztatu
+
+# Zuzenketak 2
+- [x] Aldatu eye ikonoa eta jarri bars ikonoa owners zerrendan
+- [x] admin/ubicaciones/xx zerrendatan erabili zerrenden konponentea
+- [x] admin/ubicaciones/xx headerren azpian gehitu breadcrum-a itzultzeko dagokion zerrendara, atariak, garajeak edo trastelekuak
+- [x] jabeak zerrendan behar dut botoi bat ikusteko jabetzarik ez dutenak
+- [x] jabe berri bat sortzean, eskatu behar dit sartzeko bere jabetzak (atariak, garajeak eta trasteroak) hasiera eta bukaera datakin, behar diren guztiak sartzeko aukera egon behar da.
+
+## Inplementazio plana (Zuzenketak 2)
+
+### Helburua
+
+- [x] Admin kudeaketan erabilgarritasuna eta koherentzia hobetzea: ikonoak bateratu, kokalekuetako taulak estandarizatu, breadcrumb nabigazioa gehitu, jabetzarik gabeko jabeak ikusgai jarri, eta jabe-sorreran jabetzen esleipen anitza ahalbidetu.
+
+### Erabaki teknikoak
+
+- [x] `owners` zerrendako `bars` ikonoa detail bistara joateko botoi zuzena izango da (ez ekintza-menu baterako).
+- [x] `admin/ubicaciones/*` zerrenda guztiak taula-base osagai partekatura migrauko dira, `admin/avisos`-eko estilo bera erabiliz.
+- [x] Breadcrumb-a `heading` azpian gehituko da, itzulera esteka testuinguruaren arabera (`atariak`, `garajeak`, `trasteroak`) kalkulatuta.
+- [x] Jabeen zerrendan iragazki/txandakatze bat gehituko da: `jabetzarik gabeak` = `property_assignments`-en erregistrorik ez dutenak EDO dituzten esleipen guztiek `end_date` beteta dutenak (esleipen aktiborik ez).
+- [x] Jabe berria sortzeko fluxuan, jabetza-esleipen anitz dinamikoa gehituko da (`property_id`, `start_date`, `end_date?`), eta jabetza motak (atariak, garajeak, trastelekuak) denak batera erakutsiko dira hautaketa berean.
+- [x] Propietarien zerrendako filtroak lerro bakarrean antolatuko dira (usability), taulan erregistro gehiago ikusgai gera daitezen.
+- [x] Propietarien zerrenda paginatua izango da (Livewire pagination), errendimendua eta irakurgarritasuna hobetzeko.
+
+### Exekuzio urratsak
+
+- [x] 1. `owners` zerrendako eye ikonoa ordezkatu `bars` ikonoarekin eta test selektore egonkorra mantendu.
+- [x] 2. `admin/ubicaciones/*` zerrenden bistak berrikusi eta taula-base osagai komunera pasatu.
+- [x] 3. `admin/ubicaciones/*/show` edo dagokion detail bistetan breadcrumb osagaia txertatu, mota bakoitzeko itzulera-URLarekin.
+- [x] 4. `Owners` Livewire osagaian iragazki berria gehitu (`with_properties` / `without_properties`) eta kontsulta optimizatu esleipen aktiboen logikarekin (`whereHas(... whereNull(end_date))` / `whereDoesntHave(... whereNull(end_date))`).
+- [x] 5. Propietarien zerrendako filtro-barra lerro bakarrean antolatu (wrap gabe desktop-en), eta mobile-n degradazio kontrolatuarekin mantendu.
+- [x] 6. Propietarien zerrendan paginazioa aktibatu eta orri-aldaketan filtro-egoera mantendu.
+- [x] 7. `Owner` sortze-formularioan jabetza lerro errepikagarriak gehitu, jabetza mota guztiak batera zerrendatuta (atariak + garajeak + trastelekuak) eta data-eremuekin.
+- [x] 8. Balidazioa ezarri: esleipen bakoitzean `property_id` eta `start_date` derrigorrezkoak; `end_date` >= `start_date` bada bakarrik onartu.
+- [x] 9. Gordetzean transakzioa erabili: jabea sortu + esleipen guztiak sortu + esklusibitate araua aplikatu (jabetza aktibo bikoitzik ez).
+- [x] 10. UI/Feature testak gehitu eta eguneratu, batez ere: iragazkia, filtroen lerro bakarra, paginazioa, breadcrumb-a eta create-flow berria.
+
+### Egin beharreko lanak
+
+- [x] `app/Livewire/Admin/Owners.php`
+- [x] `resources/views/livewire/admin/owners/index.blade.php`
+- [ ] `resources/views/livewire/admin/owners/create.blade.php` (edo dagokion create ikuspegia)
+- [x] `app/Actions/CreateOwnerAction.php`
+- [ ] `app/Actions/AssignPropertyAction.php` (beharrezkoa bada lerro anitzeko sortzearekin lerrokatzeko)
+- [x] `resources/views/admin/locations/*` eta/edo `resources/views/livewire/admin/locations/*`
+- [ ] `resources/views/components/*` (breadcrumb edo taula osagai partekatua, beharrezkoa bada)
+- [x] `lang/eu/*.php` eta `lang/es/*.php` (testu berriak)
+- [x] `tests/Feature/*Owners*Test.php`
+- [x] `tests/Feature/*Locations*Test.php`
+- [ ] `tests/Feature/*Owners*Pagination*Test.php` (beharrezkoa bada)
+
+### Arriskuak eta argitu beharrekoak
+
+- [x] “jabetzarik ez dutenak” definizioa itxita: `property_assignments`-en ezer ez dutenak edo esleipen guztiak amaituta (`end_date` beteta) dituztenak.
+- [x] Jabe berriaren hasierako esleipenetan jabetza mota guztiak batera erakutsiko dira (ez taldekatuta separatuki).
+
+### Balidazioa
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact --filter=Owners`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact --filter=Locations`
+- [x] VS Code Problems panelean ukitutako fitxategiek errore/warning berririk ez dutela baieztatu
+
+# Zuzenketak 3
+
+- [x] En settings añadir una nueva section "Jabeak" y añadir dos campos para el asunto (eu, es) y otros dos campos para el texto (eu, es). 
+- [x] El email que se envia cuando se crea una nueva propietaria tomará los datos es estos nuevos campos
+
+# Zuzenketak 4
+
+- [x] los botones para crear un nuevo registro tienen que ser siempre como eel que que hay en Iragarkiak. Cambiale el título y ponle "Sortu berria", crear un componente?
+- [x] le header de las páginas, separarlo un poco del menu superioor y debe de ser un pco más estrecho para tener más sitio en la pantalla
+- [x] los campos que hay en admin/ubicaciones/{id} de validar admin y validar propietaria no van aquí, deben de ir en admin/propietarias/{} asociados a una propietarria y a una propiedad, en esta lista es donde se tiene que validar
+- [x] en la lista admin/propietarias/{} quita el boton "desaktibatu" y su funcionalidad.
+- [x] en la lista /admin/propietarias en vez de el icono bars, es más práctico si justo debajo de esa linea en la tabla se abre un pequeño espacio para mostrar las propiedades de esa propietaria y desde esa misma lista se editen y se creen nuevas
+- [x] al crear una nueva ubicación me tiene que pedir también loos campos de los porcentajes
+- [x] dale un poco de formato al breadcrum, adecuado al estilo que se usa en el proyecto y el headerr que llegue hasta el final para que quede alineado con lass tablas y un poco menos alto
+- [x] en la lista de jabeak añade el botón de editar siguiendo el estilo de la tabla anuncios
+- [x] reordenar los campos de los coopropietarios en el formulario de jabeak, una columna para el 1 con los campos marcados como obligatorios y otra columa para el 2 sin ser obligatorios
+- [x] en las listas, al pinchar en el boton "Sortu berria" en vez de aparecer el formulario encima de la lista quedaría más bonito si aparece desde la derecha por encima de la lista un panel con el formulario.
+- [x] en ubucaciones, los campos de los porcentajes tanto al crear como al editar deben permitir tanto . como , para loos decimales, luego se guardará siempre con .
+- [x] al asignar una nueva propiedad a un owner, asegurarse de que su user tiene is_active=1
+- [x] al modificar la fecha fin de una asignación, si el owner de esa asignación tiene todas cerradas, es decir, con fecha de fin, cambiar en su user is_active=0
+
+## Inplementazio plana (Zuzenketak 4 - Balidazio eremuak esleipen-zerrendara mugitzea)
+
+### Helburua
+
+- [x] `admin/ubicaciones/{id}` bistatik `validado admin` eta `validado propietaria` kentzea.
+- [x] `admin/propietarias/{id}` bistako esleipen-zerrendan (owner + property) bi balidazio horiek editagarri bihurtzea.
+
+### Erabaki teknikoak
+
+- [x] Balidazio boolearrak `property_assignments` erregistroari lotuta mantenduko dira; ez da eskema aldaketarik behar.
+- [x] Kokalekuen detail zerrendan `asignado` egoera bakarrik utziko da; balidazioak ez dira han erakutsiko.
+- [x] Jabeen detail zerrendan assignment bakoitzeko bi kontrol gehitu dira (`admin_validated`, `owner_validated`) eta assignment bakoitza banaka balidatzen da (one-by-one).
+- [x] Eguneratzea assignment mailan egiten da (ID bidez), eta esleipena itxita badago (`end_date` beteta) balidazioa blokeatzen da.
+
+### Exekuzio urratsak
+
+- [x] 1. `app/Livewire/Admin/LocationDetail.php` eta bere bistan balidazio-zutabeen erreferentziak kendu.
+- [x] 2. `app/Livewire/Admin/OwnerDetail.php`-n action berria gehitu: `toggleAssignmentValidation(int $assignmentId, string $field)` + guard clause (`end_date !== null` bada, ez eguneratu).
+- [x] 3. `resources/views/livewire/admin/owners/detail.blade.php`-n `Admin balidatua` eta `Jabeak balidatua` zutabeak gehitu (checkbox/toggle estiloko kontrolarekin).
+- [x] 4. `lang/eu/admin.php` eta `lang/es/admin.php`-n etiketa berriak osatu (owners assignment validation zutabeetarako).
+- [x] 5. Feature testak eguneratu:
+- [x]    - kokalekuen detail testetan `data-admin-validated`/`data-owner-validated` ez direla ageri.
+- [x]    - owner detail test batean assignment-eko bi balidazioak alda daitezkeela eta DBn gordetzen direla.
+- [x] 6. Dusk test sentikorra eguneratu, selector berriekin.
+
+### Arriskuak
+
+- [ ] `admin/propietarias/{id}` zerrendak assignment asko baditu, toggle bakoitzak request bat egingo du; beharrezkoa bada debounce/optimizazioa baloratuko da.
+- [x] Balidazioa assignment ez-aktiboetan blokeatuko da (itxita bada, ezin da baimendu).
+
+### Balidazioa
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersAndLocationsTest.php`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/OwnerActionsTest.php`
+
+## Inplementazio plana (Zuzenketak 4 - `is_active` sinkronizazioa esleipenen bizi-zikloan)
+
+### Helburua
+
+- [x] Esleipen aktibo berria sortzen denean, jabearen `user.is_active = 1` bermatzea.
+- [x] Esleipen baten `end_date` ezartzean, jabe horrek esleipen aktiborik ez badu, `user.is_active = 0` ezartzea.
+
+### Erabaki teknikoak
+
+- [x] Aktibazioa/desaktibazioa action mailan zentralizatzea (`AssignPropertyAction` eta `UnassignPropertyAction`), Livewire osagaietan logika ez bikoizteko.
+- [x] `Owners` osagaiko inline fluxuan, `saveAssignment()`-etik zuzenean eguneratu beharrean, ixte-eragiketa `UnassignPropertyAction`-era delegatzea.
+- [x] `CreateOwnerAction`-eko gaur egungo portaera mantentzea (jabe berria sortzean `is_active = true`), eta arau berria assignment lifecycle-arekin lerrokatzea.
+- [x] Desaktibazioa kalkulatzeko, jabe beraren esleipen aktiboak kontsulta bakarrean egiaztatzea (`whereNull('end_date')->exists()`).
+
+### Exekuzio urratsak
+
+- [x] 1. `AssignPropertyAction::execute()` amaieran jabearen user-a `is_active = true` ezarri (jada true bada, idempotentea).
+- [x] 2. `UnassignPropertyAction::execute()`-n `end_date` ezarri ondoren, owner-ak aktiborik duen egiaztatu; ez badu, lotutako user-a desaktibatu.
+- [x] 3. `Owners::saveAssignment()`-en `end_date` ezartzen den adarrean `UnassignPropertyAction` erabiltzea, arau bakarra mantentzeko.
+- [x] 4. `Owners::createInlineAssignment()`-en assignment aktibo berriak `AssignPropertyAction` erabiltzeari eutsi (eta horren bidez aktibazioa bermatu).
+- [x] 5. Errore-mezuak/portaera existentzia mantendu eta regressionik ez dela egiaztatu.
+
+### Egin beharreko lanak
+
+- [x] `app/Actions/AssignPropertyAction.php`
+- [x] `app/Actions/UnassignPropertyAction.php`
+- [x] `app/Livewire/Admin/Owners.php`
+- [x] `tests/Feature/AssignmentActionsTest.php`
+- [x] `tests/Feature/AdminOwnersAndLocationsTest.php`
+
+### Arriskuak
+
+- [ ] `saveAssignment()`-en egun dauden balidazio boolearren portaera aldatu gabe mantendu behar da assignment itxietan.
+- [ ] Data-aldaketa hutsa (`start_date`) eta itxiera (`end_date`) bereiztea beharrezkoa da, nahi gabeko desaktibazioak saihesteko.
+- [ ] Esleipen historikoak sortzeak (`end_date` beteta) ez du erabiltzailea aktibatu behar.
+
+### Balidazioa
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AssignmentActionsTest.php`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersAndLocationsTest.php`
+
+## Inplementazio plana (Zuzenketak 4 - Ehuneko hamartarrak `,` eta `.` onartzea)
+
+### Helburua
+
+- [x] `admin/ubicaciones`-eko ehuneko eremuek sarreran `,` eta `.` onartzea (sortu eta editatu fluxuetan).
+- [x] Datu-basean balioa beti puntuarekin (`.`) normalizatuta gordetzea.
+
+### Erabaki teknikoak
+
+- [x] Normalizazioa `LocationDetail` Livewire osagaian zentralizatzea, helper pribatu batekin (`string` -> `normalized decimal string`).
+- [x] Balidazioak normalizatutako balioaren gainean egitea (`numeric|min:0|max:100`), eta input originala UIan mantentzea errorea badago.
+- [x] `storage` motarako portaera bere horretan uztea (ehunekoak `null`).
+- [x] Ikuspegiko `type="number"` murrizketa saihesteko, ehuneko eremuak `type="text"` + `inputmode="decimal"` erabiltzera pasatzea, `,` idazketa erosoa bermatzeko.
+
+### Exekuzio urratsak
+
+- [x] 1. `app/Livewire/Admin/LocationDetail.php`-n normalizazio metodoa gehitu (`str_replace(',', '.', ...)` + trim).
+- [x] 2. `addProperty()`-n normalizatutako balioak erabili balidazioan eta `Property::create()` deian.
+- [x] 3. `saveProperty()`-n normalizatutako balioak erabili balidazioan eta `update()` deian.
+- [x] 4. `resources/views/livewire/admin/locations/detail.blade.php`-n ehuneko inputak `text` + `inputmode="decimal"` bihurtu (create/edit bi kasuetan).
+- [x] 5. Feature testak gehitu/eguneratu `1,25` eta `2,5` bezalako sarrerak DBn `1.25`/`2.5` gisa gordetzen direla egiaztatzeko.
+
+### Egin beharreko lanak
+
+- [x] `app/Livewire/Admin/LocationDetail.php`
+- [x] `resources/views/livewire/admin/locations/detail.blade.php`
+- [x] `tests/Feature/AdminOwnersAndLocationsTest.php`
+
+### Arriskuak
+
+- [ ] Input testu bihurtzean, frontend-eko UXek ez du atzera egin behar (placeholder/focus/errore mezuekin).
+- [ ] `numeric` balidazio estandarrarekin koherentzia mantendu behar da normalizazioa egin aurretik/ondoren.
+
+### Balidazioa
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersAndLocationsTest.php`
+
+## Inplementazio plana (Zuzenketak 4 - "Sortu berria" eskuineko panela)
+
+### Helburua
+
+- [x] Zerrendetan `Sortu berria` sakatzean formularioa ez agertzea goian inline moduan.
+- [x] Horren ordez, formularioa eskuinetik sartzen den overlay/slideover panel batean erakustea, zerrendaren gainetik.
+
+### Erabaki teknikoak
+
+- [x] Egoera-logika berdina berrerabili (`showForm`, `showCreateForm`, `showAddForm`), ikuspegi-egitura bakarrik aldatuz.
+- [x] Panela eskuinean kokatu (`right-0`) eta atzeko geruza ilundua gehitu (`backdrop`) itxiera UX argiarekin.
+- [x] Itxiera bikoitza onartu: `Utzi` botoia eta atzeko geruza klik egitea.
+- [x] Mugikorrean pantaila osoa okupatu dezake; desktop-en zabalera mugatua mantendu (`max-w-*`).
+- [x] Z-index eta scroll portaera kontrolatu, taula atzean geratzeko baina layout-a ez hausteko.
+
+### Exekuzio urratsak
+
+- [x] 1. Eragina duten bistak identifikatu: jabeak, kokaleku-detail zerrendak eta iragarkiak (non `Sortu berria` badago).
+- [x] 2. Bista bakoitzean inline formulario blokea panel osagai-egitura bihurtu, estetikoki bateratuta.
+- [ ] 3. Trantsizio sinplea gehitu (`translate-x-full` -> `translate-x-0`) eskuinetik sartzeko efektuarekin.
+- [x] 4. Focus/itxiera portaera balidatu (`wire:click` bidez) eta formularioaren bidalketa-logika lehengo moduan mantendu.
+- [ ] 5. Feature testetan selector egonkorrak gehitu/eguneratu (`data-*`) panela agertu/desagertu dela egiaztatzeko.
+
+### Egin beharreko lanak
+
+- [x] `resources/views/livewire/admin/owners/index.blade.php`
+- [x] `resources/views/livewire/admin/locations/detail.blade.php`
+- [x] `resources/views/livewire/admin/notice-manager.blade.php`
+- [ ] `resources/views/components/` (beharrezkoa bada panel partekatu berria)
+- [ ] `tests/Feature/AdminOwnersAndLocationsTest.php`
+- [ ] `tests/Feature/AdminNoticeManagerTest.php` (edo dagokion fitxategia)
+
+### Arriskuak
+
+- [ ] Panel irekiak paginazio/filtro aldaketetan egoera zaharkitua utz dezake; reset politika gehitu beharko da.
+- [ ] Overlay z-index txarrarekin, goiko header/menua panelaren gainetik gera daiteke.
+- [ ] Test zaharrek inline formularioa espero badute, selector egonkorrak egokitu beharko dira.
+
+### Balidazioa
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersAndLocationsTest.php`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact --filter=Notice`
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Browser/AdminSensitiveViewsTest.php` (**sqlite test inguruneko taulak ez daude prestatuta; Dusk workflow dedikatua behar du**)
+
+## Inplementazio plana (Zuzenketak 4 - Jabeen zerrenda hedakorra, detail bistarik gabe)
+
+### Helburua
+
+- [x] `admin/propietarias` zerrendan `bars` ikonoaren ordez lerro hedagarria erabiltzea.
+- [x] Lerro hedatuan jabearen assignment-ak erakutsi, eta bertatik assignment-ak editatu/sortu ahal izatea.
+
+### Erabaki teknikoak
+
+- [x] `OwnerDetail` full-page ikuspegiaren ordez ez da route berririk sortuko; `Owners` Livewire osagaian bertan kudeatzen da hedadura.
+- [x] Lerro bakoitzak `expandedOwnerId` egoera dauka; row nagusiaren azpian `<tr>` osagarri bat irekitzen da `colspan` erabilita.
+- [x] Assignment edit/sortze ekintzak jabearen mailan egiten dira, assignment bakoitza banaka eta baliozkotuta.
+- [x] Esleipen itxietan (`end_date` beteta) balidazio aldaketak blokeatuta mantentzen dira.
+
+### Exekuzio urratsak
+
+- [x] 1. `app/Livewire/Admin/Owners.php`-n egoera berriak gehitu: `expandedOwnerId`, owner bakoitzeko assignment draft/edizioa.
+- [x] 2. `OwnerDetail`-eko assignment logikaren beharrezko zatia `Owners` osagaira ekarri (DRY mantenduz, action existentziak berrerabilita sortze aktiboan).
+- [x] 3. `resources/views/livewire/admin/owners/index.blade.php`-n bars botoia kendu eta row-expand botoi/portaera ezarri.
+- [x] 4. Lerro hedatuan mini-taula/panel trinkoa txertatu: assignment zerrenda + sortze lerroa + edizio ekintzak.
+- [x] 5. `admin/owners/show` esteka-dependentziak egokitu testetan (bars selector zaharra kenduta).
+- [x] 6. Feature testak eguneratu: row hedadura ireki, assignment sortu/editatu, eta datuak zerrenda berean eguneratzen direla egiaztatu.
+
+### Arriskuak
+
+- [ ] Row hedadura + paginazioa batera erabiltzean egoera gal daiteke orri-aldaketan; `expandedOwnerId` reset politika zehaztu behar da.
+- [ ] Osagai bakarrean logika gehiegi pilatzeko arriskua dago; beharrezkoa bada metodoak action klasera aterako dira.
+
+### Balidazioa
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersAndLocationsTest.php`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/OwnerActionsTest.php`

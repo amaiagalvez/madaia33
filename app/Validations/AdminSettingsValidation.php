@@ -75,6 +75,12 @@ class AdminSettingsValidation
                 'recaptchaSiteKey' => 'nullable|string|max:255',
                 'recaptchaSecretKey' => 'nullable|string|max:255',
             ],
+            Setting::SECTION_OWNERS => [
+                'ownersWelcomeSubjectEu' => ['nullable', 'string', 'max:255'],
+                'ownersWelcomeSubjectEs' => ['nullable', 'string', 'max:255'],
+                'ownersWelcomeTextEu' => ['nullable', 'string', 'max:5000', new NoScriptTags],
+                'ownersWelcomeTextEs' => ['nullable', 'string', 'max:5000', new NoScriptTags],
+            ],
             default => [],
         };
     }

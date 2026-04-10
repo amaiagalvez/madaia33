@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use Carbon\CarbonImmutable;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class UnassignPropertyAction
@@ -28,7 +29,18 @@ class UnassignPropertyAction
             ]);
         }
 
-        $assignment->update(['end_date' => $endDate]);
+        DB::transaction(function () use ($assignment, $endDate): void {
+            $assignment->update(['end_date' => $endDate]);
+
+            $ownerHasActiveAssignments = PropertyAssignment::query()
+                ->where('owner_id', $assignment->owner_id)
+                ->whereNull('end_date')
+                ->exists();
+
+            if (! $ownerHasActiveAssignments) {
+                $assignment->owner()->first()?->user()->update(['is_active' => false]);
+            }
+        });
 
         return $assignment->fresh();
     }

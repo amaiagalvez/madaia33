@@ -2,17 +2,24 @@
 
 namespace App\Actions;
 
+use App\Mail\OwnerWelcomeMail;
+use App\Models\Property;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Owner;
+use App\Models\PropertyAssignment;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 
 class CreateOwnerAction
 {
     /**
      * @param  array<string, mixed>  $data
+     * @throws ValidationException
      */
     public function execute(array $data): Owner
     {
@@ -38,6 +45,36 @@ class CreateOwnerAction
                 'coprop2_email' => $data['coprop2_email'] ?? null,
             ]);
 
+            $assignments = $data['assignments'] ?? [];
+
+            foreach ($assignments as $assignment) {
+                $propertyId = (int) $assignment['property_id'];
+                $endDate = $assignment['end_date'] ?? null;
+
+                if ($endDate === null) {
+                    $hasActiveAssignment = PropertyAssignment::query()
+                        ->where('property_id', $propertyId)
+                        ->whereNull('end_date')
+                        ->lockForUpdate()
+                        ->exists();
+
+                    if ($hasActiveAssignment) {
+                        throw ValidationException::withMessages([
+                            'assignments' => __('La propiedad ya tiene una propietaria activa. Cierra la asignación anterior antes de asignar una nueva.'),
+                        ]);
+                    }
+                }
+
+                PropertyAssignment::create([
+                    'property_id' => $propertyId,
+                    'owner_id' => $owner->id,
+                    'start_date' => $assignment['start_date'],
+                    'end_date' => $endDate,
+                    'admin_validated' => false,
+                    'owner_validated' => false,
+                ]);
+            }
+
             return [
                 'owner' => $owner,
                 'user' => $user,
@@ -49,10 +86,90 @@ class CreateOwnerAction
         /** @var User $user */
         $user = $result['user'];
 
-        $user->sendPasswordResetNotification(
-            Password::createToken($user)
-        );
+        $settings = Setting::stringValues([
+            'from_address',
+            'from_name',
+            'owners_welcome_subject_eu',
+            'owners_welcome_subject_es',
+            'owners_welcome_text_eu',
+            'owners_welcome_text_es',
+        ]);
+
+        $subject = (string) (Setting::localizedStringFrom(
+            $settings,
+            'owners_welcome_subject',
+            __('admin.owners.email.default_subject'),
+        ) ?? __('admin.owners.email.default_subject'));
+
+        $bodyTemplate = (string) (Setting::localizedStringFrom(
+            $settings,
+            'owners_welcome_text',
+            __('admin.owners.email.default_body'),
+        ) ?? __('admin.owners.email.default_body'));
+
+        $bodyHtml = str_replace('##info##', $this->buildAssignmentsInfoHtml($data), $bodyTemplate);
+
+        $resetToken = Password::createToken($user);
+        $resetUrl = route('password.reset', [
+            'token' => $resetToken,
+            'email' => $user->email,
+        ]);
+
+        Mail::to($user->email)->send(new OwnerWelcomeMail(
+            $settings['from_address'] ?? null,
+            $settings['from_name'] ?? null,
+            $subject,
+            $bodyHtml,
+            $resetUrl,
+        ));
 
         return $owner;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function buildAssignmentsInfoHtml(array $data): string
+    {
+        /** @var array<int, array{property_id: int|string, start_date?: string, end_date?: string|null}> $assignments */
+        $assignments = $data['assignments'] ?? [];
+
+        if ($assignments === []) {
+            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
+        }
+
+        $propertyIds = collect($assignments)
+            ->pluck('property_id')
+            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
+            ->unique()
+            ->values()
+            ->all();
+
+        $properties = Property::query()
+            ->with('location:id,code,type')
+            ->whereIn('id', $propertyIds)
+            ->get()
+            ->keyBy('id');
+
+        $items = collect($assignments)
+            ->map(function (array $assignment) use ($properties): ?string {
+                $property = $properties->get((int) $assignment['property_id']);
+
+                if ($property === null || $property->location === null) {
+                    return null;
+                }
+
+                $label = $property->location->code . ' ' . $property->name;
+
+                return '<li>' . e($label) . '</li>';
+            })
+            ->filter()
+            ->values();
+
+        if ($items->isEmpty()) {
+            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
+        }
+
+        return '<ul>' . $items->implode('') . '</ul>';
     }
 }

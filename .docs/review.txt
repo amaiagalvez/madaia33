@@ -22,8 +22,12 @@ Añade:
 - apoyate en el agente lamia cuando tengas que hacer cosas de diseño
 - siempre que sea posible utiliza TDD para implementar la feature 
 - Si hay fallos: NO marques la tarea como completada, reporta los fallos y proporciona pasos para corregir
- 
 
+
+⛰️ amalurra
 003-estrucutura-votaciones-1
 Lee la spec 003-estrucutura-votaciones-1 con mis especificaciones y crea un plan de acción
+
+🧙‍♀️ sorgina
+Repasa los ficheros que están sin commitear
 
