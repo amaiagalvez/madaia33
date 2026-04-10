@@ -4,6 +4,7 @@ use App\Livewire\Admin\Votings;
 use App\Models\Location;
 use App\Models\Owner;
 use App\Models\Property;
+use App\Models\Role;
 use App\Models\PropertyAssignment;
 use App\Models\User;
 use App\Models\Voting;
@@ -11,8 +12,29 @@ use App\Models\VotingBallot;
 use App\Models\VotingOption;
 use Livewire\Livewire;
 
+beforeEach(function () {
+  foreach (Role::names() as $roleName) {
+    Role::query()->firstOrCreate([
+      'name' => $roleName,
+    ]);
+  }
+});
+
+it('allows superadmin id 1 to access admin votings route', function () {
+  $superadmin = User::factory()->create([
+    'id' => 1,
+    'email' => 'superadmin@example.com',
+  ]);
+  $superadmin->assignRole(Role::SUPER_ADMIN);
+
+  test()->actingAs($superadmin)
+    ->get(route('admin.votings'))
+    ->assertOk();
+});
+
 it('shows active votings with census and votes in admin component', function () {
   $admin = User::factory()->create();
+  $admin->assignRole(Role::SUPER_ADMIN);
 
   $owner = Owner::factory()->create();
   $portal = Location::factory()->portal()->create(['code' => '88-A']);
@@ -51,6 +73,7 @@ it('shows active votings with census and votes in admin component', function () 
 
 it('shows delegated voter name in voters modal for audit visibility', function () {
   $admin = User::factory()->create(['name' => 'Admin Delegatua']);
+  $admin->assignRole(Role::SUPER_ADMIN);
 
   $owner = Owner::factory()->create(['coprop1_name' => 'Jabe Delegatua']);
   $portal = Location::factory()->portal()->create(['code' => '99-A']);

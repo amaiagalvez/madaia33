@@ -94,13 +94,6 @@ añadir el icono para accedeer al perfil junto al nombre del usuario, tanto en e
 - [ ] bozka delegatua zerrenda, handitu modala. bilatzailea behar du, portal, garaje, jabearen edozein datu (koop1 edo koop 2)
 - [ ] al guardar el voto delegado, junto con el id del usuario también guardar la IP y si se han podido detectar, las coordenadas
  
-
-
-
-
-
-# Egiten ...
-
 ## Comprobar
 
 https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696

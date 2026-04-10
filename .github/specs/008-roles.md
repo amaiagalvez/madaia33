@@ -104,3 +104,8 @@ necesito un CRUD para los usarios y para poder asignarles permisos, en el listad
 # Kritikotasuna
 - [x] ahora necesito que me asegures que todo este flujo está bien validado con test y con dusk-test para el front y que es completamente auditable para no tener ningún problema cuando lo ponga en marcha
 - [x] vuleve a repasarlo es un código MUY CRITICO
+
+# Zuzenketak 2
+- [x] superadmin (`id=1`) erabiltzaileak [admin/votaciones](admin/votaciones) sarbidea izatea konpondu da
+- [x] admin bozketen Livewire osagaiko baimen-checkak route middlewarearekin lerrokatu dira
+- [x] regresio testa gehitu da: superadmin `id=1` erabiltzaileak admin bozketen routea ireki dezake
