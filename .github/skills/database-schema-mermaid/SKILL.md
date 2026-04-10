@@ -42,6 +42,16 @@ flowchart LR
     PROPERTIES --> PROPERTY_ASSIGNMENTS
     NOTICES --> NOTICE_LOCATIONS
     LOCATIONS --> NOTICE_LOCATIONS
+    VOTINGS --> VOTING_OPTIONS
+    VOTINGS --> VOTING_LOCATIONS
+    LOCATIONS --> VOTING_LOCATIONS
+    VOTINGS --> VOTING_BALLOTS
+    OWNERS --> VOTING_BALLOTS
+    USERS --> VOTING_BALLOTS
+    VOTING_BALLOTS --> VOTING_SELECTIONS
+    VOTING_OPTIONS --> VOTING_SELECTIONS
+    VOTINGS --> VOTING_OPTION_TOTALS
+    VOTING_OPTIONS --> VOTING_OPTION_TOTALS
 ```
 
 ### 2) Core domain (community ownership)
@@ -108,13 +118,79 @@ erDiagram
         text new_value
     }
 
+    VOTINGS {
+        bigint id
+        string name_eu
+        string name_es
+        text question_eu
+        text question_es
+        date starts_at
+        date ends_at
+        boolean is_published
+        boolean is_anonymous
+        datetime deleted_at
+    }
+
+    VOTING_OPTIONS {
+        bigint id
+        bigint voting_id
+        string label_eu
+        string label_es
+        smallint position
+        datetime deleted_at
+    }
+
+    VOTING_LOCATIONS {
+        bigint id
+        bigint voting_id
+        bigint location_id
+        datetime deleted_at
+    }
+
+    VOTING_BALLOTS {
+        bigint id
+        bigint voting_id
+        bigint owner_id
+        bigint cast_by_user_id
+        timestamp voted_at
+        datetime deleted_at
+    }
+
+    VOTING_SELECTIONS {
+        bigint id
+        bigint voting_id
+        bigint voting_ballot_id
+        bigint owner_id
+        bigint voting_option_id
+        datetime deleted_at
+    }
+
+    VOTING_OPTION_TOTALS {
+        bigint id
+        bigint voting_id
+        bigint voting_option_id
+        integer votes_count
+        datetime deleted_at
+    }
+
     USERS ||--o{ OWNERS : has_many
     USERS ||--o{ SESSIONS : has_many
     USERS ||--o{ OWNER_AUDIT_LOGS : changed_by
     OWNERS ||--o{ PROPERTY_ASSIGNMENTS : has_many
     OWNERS ||--o{ OWNER_AUDIT_LOGS : has_many
+    OWNERS ||--o{ VOTING_BALLOTS : has_many
     LOCATIONS ||--o{ PROPERTIES : has_many
     PROPERTIES ||--o{ PROPERTY_ASSIGNMENTS : has_many
+    USERS ||--o{ VOTING_BALLOTS : delegated_by
+    VOTINGS ||--o{ VOTING_OPTIONS : has_many
+    VOTINGS ||--o{ VOTING_LOCATIONS : has_many
+    VOTINGS ||--o{ VOTING_BALLOTS : has_many
+    VOTINGS ||--o{ VOTING_SELECTIONS : has_many
+    VOTINGS ||--o{ VOTING_OPTION_TOTALS : has_many
+    LOCATIONS ||--o{ VOTING_LOCATIONS : has_many
+    VOTING_OPTIONS ||--o{ VOTING_SELECTIONS : has_many
+    VOTING_OPTIONS ||--o{ VOTING_OPTION_TOTALS : has_many
+    VOTING_BALLOTS ||--o{ VOTING_SELECTIONS : has_many
 ```
 
 ### 3) Content and settings domain

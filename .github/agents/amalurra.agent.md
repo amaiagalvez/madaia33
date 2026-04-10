@@ -215,6 +215,8 @@ Spec-ak ukitzen duen esparruaren arabera, dagokion skill-a irakurri behar dut ko
 - **Clean Blade rule**: ez datu-base kontsultarik `resources/views/**` barruan
 - **Admin taula ekintzen koherentzia**: edit/delete ekintzetan notice taulako icon-button eredua lehenetsi (`rounded-full`, hover-egoera koherenteak), zerrenda desberdinen artean UI drift-a saihesteko
 - **Spec-a da egia iturri**: exekuzioaren egoera spec berean islatu behar da, ez aparteko zerrenda pribatuetan soilik
+- **Bozketen osotasun araua**: boto-paper bakoitzak aukera bakarra izan behar badu, ezarri beti DB unique muga egokia (`voting_ballot_id`) aplikazio-balidazioaz gain
+- **Admin agregazio araua**: zerrenda orrietan per-row count/query kalkuluak saihestu; query bakarreko agregazioa edo mapaketa in-memory bakarra erabili N+1 saihesteko
 
 ---
 

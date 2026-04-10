@@ -10,6 +10,32 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 class="sr-only">{{ __('home.title') }}</h1>
 
+        @if ($hasOpenVotings)
+            <section
+                class="section-shell mb-6 overflow-hidden border border-[#d9755b]/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6"
+                data-home-votings-callout>
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                            {{ __('home.votings_badge') }}
+                        </p>
+                        <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
+                            {{ __('home.votings_title') }}
+                        </h2>
+                        <p class="mt-1.5 text-sm text-gray-600">
+                            {{ __('home.votings_summary') }}
+                        </p>
+                    </div>
+
+                    <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
+                        class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap"
+                        data-home-votings-cta>
+                        {{ __('home.votings_cta') }}
+                    </a>
+                </div>
+            </section>
+        @endif
+
         <div class="grid gap-6 lg:grid-cols-12 lg:items-start">
             <div class="space-y-8 lg:col-span-8">
                 <section class="section-shell overflow-hidden p-5 sm:p-6" data-home-notices-general>
@@ -158,8 +184,8 @@
                         </p>
                     </div>
                     <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
-                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                        aria-hidden="true">
+                        fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>

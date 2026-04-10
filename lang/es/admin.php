@@ -203,4 +203,7 @@ return [
             'reset_action' => 'Configurar contraseña',
         ],
     ],
+    'votings' => [
+        'menu' => 'Votaciones',
+    ],
 ];

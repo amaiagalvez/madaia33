@@ -105,6 +105,16 @@
                     {{ __('admin.owners.menu') }}
                 </a>
 
+                <a href="{{ route('admin.votings') }}"
+                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.votings') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 5.25h16.5m-16.5 6h16.5m-16.5 6h16.5" />
+                    </svg>
+                    {{ __('admin.votings.menu') }}
+                </a>
+
                 <p class="px-3 pt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
                     {{ __('admin.sidebar.configuration') }}
                 </p>
@@ -190,6 +200,8 @@
                             class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.locations.menu') }}</a>
                         <a href="{{ route('admin.owners.index') }}"
                             class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.owners.menu') }}</a>
+                        <a href="{{ route('admin.votings') }}"
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.votings.menu') }}</a>
                         <p
                             class="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-stone-400">
                             {{ __('admin.sidebar.configuration') }}

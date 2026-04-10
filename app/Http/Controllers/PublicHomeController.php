@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Image;
 use App\Models\Notice;
 use App\Models\Setting;
+use App\Models\Voting;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,7 +17,7 @@ class PublicHomeController extends Controller
             ->oldest()
             ->limit(3)
             ->get()
-            ->map(fn (Image $image): string => Storage::url($image->path))
+            ->map(fn(Image $image): string => Storage::url($image->path))
             ->values();
 
         if ($historyImageUrls->isEmpty()) {
@@ -30,12 +31,12 @@ class PublicHomeController extends Controller
             ->get();
 
         $generalNotices = $latestNotices
-            ->filter(fn (Notice $notice) => $notice->locations->isEmpty())
+            ->filter(fn(Notice $notice) => $notice->locations->isEmpty())
             ->take(6)
             ->values();
 
         $locationNotices = $latestNotices
-            ->filter(fn (Notice $notice) => $notice->locations->isNotEmpty())
+            ->filter(fn(Notice $notice) => $notice->locations->isNotEmpty())
             ->take(6)
             ->values();
 
@@ -47,6 +48,7 @@ class PublicHomeController extends Controller
             'generalNotices' => $generalNotices,
             'locationNotices' => $locationNotices,
             'showViewAllButton' => $latestNotices->count() > 6,
+            'hasOpenVotings' => Voting::query()->publishedOpen()->exists(),
         ]);
     }
 }

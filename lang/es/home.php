@@ -23,6 +23,10 @@ return [
     'history_image_alt' => 'Imagen representativa de la historia de la comunidad',
     'history_photos_title' => 'Tienes fotos antiguas de la comunidad?',
     'history_photos_summary' => 'Si quieres compartirlas, escribenos a :email y las incorporaremos a la memoria colectiva.',
+    'votings_badge' => 'Votaciones abiertas',
+    'votings_title' => 'Hay votaciones activas pendientes',
+    'votings_summary' => 'Accede al area de votaciones y registra tu voto antes del cierre.',
+    'votings_cta' => 'Ir a votaciones',
     'promises' => [
         'informed_title' => 'Mantenerse al día',
         'informed_body' => 'Los avisos recientes y la información útil aparecen en primer plano.',
