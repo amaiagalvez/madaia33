@@ -75,10 +75,10 @@ test('guest cannot access sensitive owner and location admin views', function ()
     $this->browse(function (Browser $browser) use ($owner, $location) {
         $browser->visit('/_dusk/logout')
             ->visit('/admin/propietarias/' . $owner->id)
-            ->waitForLocation('/login')
-            ->assertPathIs('/login')
+            ->waitForLocation('/eu/pribatua')
+            ->assertPathIs('/eu/pribatua')
             ->visit('/admin/ubicaciones/' . $location->id)
-            ->waitForLocation('/login')
-            ->assertPathIs('/login');
+            ->waitForLocation('/eu/pribatua')
+            ->assertPathIs('/eu/pribatua');
     });
 });

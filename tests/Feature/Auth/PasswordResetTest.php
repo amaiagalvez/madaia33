@@ -7,13 +7,15 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 beforeEach(function () {
-    $this->skipUnlessFortifyFeature(Features::resetPasswords());
+    test()->skipUnlessFortifyFeature(Features::resetPasswords());
 });
 
 test('reset password link screen can be rendered', function () {
-    $response = $this->get(route('password.request'));
+    $response = test()->get(route('password.request'));
 
-    $response->assertOk();
+    $response->assertOk()
+        ->assertSee(__('admin.password_reset.request_title'))
+        ->assertSee(__('admin.password_reset.request_description'));
 });
 
 test('reset password link can be requested', function () {
@@ -21,7 +23,7 @@ test('reset password link can be requested', function () {
 
     $user = User::factory()->create();
 
-    $this->withoutMiddleware(PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class);
@@ -32,13 +34,15 @@ test('reset password screen can be rendered', function () {
 
     $user = User::factory()->create();
 
-    $this->withoutMiddleware(PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-        $response = $this->get(route('password.reset', $notification->token));
+        $response = test()->get(route('password.reset', $notification->token));
 
-        $response->assertOk();
+        $response->assertOk()
+            ->assertSee(__('admin.password_reset.reset_title'))
+            ->assertSee(__('admin.password_reset.reset_description'));
 
         return true;
     });
@@ -49,11 +53,11 @@ test('password can be reset with valid token', function () {
 
     $user = User::factory()->create();
 
-    $this->withoutMiddleware(PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = $this->withoutMiddleware(PreventRequestForgery::class)
+        $response = test()->withoutMiddleware(PreventRequestForgery::class)
             ->post(route('password.update'), [
                 'token' => $notification->token,
                 'email' => $user->email,

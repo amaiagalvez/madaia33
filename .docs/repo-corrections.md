@@ -92,3 +92,4 @@
 - In admin listings, keep edit/delete actions visually consistent with the notice-manager icon-button pattern (`rounded-full` action buttons with matching hover semantics) to prevent UI drift between tables.
 - For large Mermaid schema diagrams, split documentation into domain-focused diagrams plus a small overview graph; a single monolithic ERD becomes unreadable in chat/UI even if syntax is valid.
 - For large Mermaid view-architecture diagrams, split into focused maps (public, admin, auth/settings, shared partials) plus one high-level overview to keep labels readable at normal zoom.
+- Fortify with `lowercase_usernames=true` lowercases the login identifier before `authenticateUsing`; if DNI login is allowed, normalize email and DNI separately (`Str::lower` for email, `Str::upper` for DNI) or owner-based DNI auth will fail silently in tests and production.

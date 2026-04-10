@@ -26,16 +26,25 @@
                     {{ __('general.private.guest_message') }}
                 </p>
 
-                <form class="mt-7 space-y-4" action="#" method="post" onsubmit="return false"
+                @if ($errors->has('email'))
+                    <div class="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+                        role="alert" data-private-login-error>
+                        {{ $errors->first('email') }}
+                    </div>
+                @endif
+
+                <form class="mt-7 space-y-4" action="{{ route('login.store') }}" method="POST"
                     x-data="{ showPassword: false }" novalidate>
+                    @csrf
                     <div>
                         <label for="private-username"
                             class="mb-1 block text-sm font-medium text-gray-700">
                             {{ __('general.private.username') }}
                         </label>
-                        <input id="private-username" name="username" type="text"
+                        <input id="private-username" name="email" type="text"
                             autocomplete="username"
                             class="block w-full min-h-11 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
+                            value="{{ old('email') }}"
                             placeholder="{{ __('general.private.username_placeholder') }}" />
                     </div>
 
@@ -79,7 +88,8 @@
                     </div>
 
                     <button type="submit"
-                        class="btn-brand inline-flex min-h-11 w-full justify-center">
+                        class="btn-brand inline-flex min-h-11 w-full justify-center"
+                        data-test="login-button">
                         {{ __('general.private.login_cta') }}
                     </button>
 

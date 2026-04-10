@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\SupportedLocales;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
@@ -51,15 +52,21 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::authenticateUsing(function (Request $request): ?User {
             $login = trim((string) $request->input(Fortify::username()));
             $password = (string) $request->input('password');
+            $emailLogin = Str::lower($login);
+            $dniLogin = Str::upper($login);
 
             if ($login === '' || $password === '') {
                 return null;
             }
 
             $user = User::query()
-                ->where(function ($query) use ($login): void {
-                    $query->where('email', $login)
-                        ->orWhere('name', $login);
+                ->where(function ($query) use ($emailLogin, $dniLogin): void {
+                    $query->where('email', $emailLogin)
+                        ->orWhereHas('owner', function ($ownerQuery) use ($dniLogin): void {
+                            $ownerQuery
+                                ->where('coprop1_dni', $dniLogin)
+                                ->orWhere('coprop2_dni', $dniLogin);
+                        });
                 })
                 ->where('is_active', true)
                 ->first();
@@ -77,7 +84,9 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn () => view('pages::auth.login'));
+        Fortify::loginView(function () {
+            return redirect()->route(SupportedLocales::routeName('private'));
+        });
         Fortify::verifyEmailView(fn () => view('pages::auth.verify-email'));
         Fortify::twoFactorChallengeView(fn () => view('pages::auth.two-factor-challenge'));
         Fortify::confirmPasswordView(fn () => view('pages::auth.confirm-password'));

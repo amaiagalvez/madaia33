@@ -31,6 +31,6 @@ test('admin login with invalid credentials shows error', function () {
             ->type('input[name=password]', 'wrong-password')
             ->press('[data-test="login-button"]')
             ->pause(2000)
-            ->assertPathIs('/login');
+            ->assertPathIs('/eu/pribatua');
     });
 });

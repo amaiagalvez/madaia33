@@ -4,15 +4,21 @@ use App\Models\User;
 use Livewire\Livewire;
 
 test('profile page is displayed', function () {
-    $this->actingAs($user = User::factory()->create());
+    test()->actingAs($user = User::factory()->create());
 
-    $this->get(route('profile.edit'))->assertOk();
+    test()->get(route('profile.edit'))->assertOk();
+});
+
+test('profile alias redirects to the settings profile page', function () {
+    test()->actingAs(User::factory()->create());
+
+    test()->get(route('profile'))->assertRedirect(route('profile.edit', absolute: false));
 });
 
 test('profile information can be updated', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user);
+    test()->actingAs($user);
 
     $response = Livewire::test('pages::settings.profile')
         ->set('name', 'Test User')
@@ -31,7 +37,7 @@ test('profile information can be updated', function () {
 test('email verification status is unchanged when email address is unchanged', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user);
+    test()->actingAs($user);
 
     $response = Livewire::test('pages::settings.profile')
         ->set('name', 'Test User')
@@ -46,7 +52,7 @@ test('email verification status is unchanged when email address is unchanged', f
 test('user can delete their account', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user);
+    test()->actingAs($user);
 
     $response = Livewire::test('pages::settings.delete-user-modal')
         ->set('password', 'password')
@@ -58,13 +64,13 @@ test('user can delete their account', function () {
 
     expect($user->fresh())->not->toBeNull();
     expect($user->fresh()->deleted_at)->not->toBeNull();
-    expect(auth()->check())->toBeFalse();
+    expect(auth()->guard()->check())->toBeFalse();
 });
 
 test('correct password must be provided to delete account', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user);
+    test()->actingAs($user);
 
     $response = Livewire::test('pages::settings.delete-user-modal')
         ->set('password', 'wrong-password')

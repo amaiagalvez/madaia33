@@ -1,27 +1,23 @@
-<x-layouts::shared.auth :title="__('Reset password')">
-    <x-auth.form-shell :title="__('Reset password')" :description="__('Please enter your new password below')">
+<x-layouts::shared.auth :title="__('admin.password_reset.reset_title')">
+    <x-auth.form-shell :title="__('admin.password_reset.reset_title')" :description="__('admin.password_reset.reset_description')">
         <form method="POST" action="{{ route('password.update') }}" class="flex flex-col gap-6">
             @csrf
-            <!-- Token -->
             <input type="hidden" name="token" value="{{ request()->route('token') }}">
 
-            <!-- Email Address -->
-            <flux:input name="email" value="{{ request('email') }}" :label="__('Email')"
+            <flux:input name="email" value="{{ request('email') }}" :label="__('admin.password_reset.email')"
                 type="email" required autocomplete="email" />
 
-            <!-- Password -->
-            <flux:input name="password" :label="__('Password')" type="password" required
-                autocomplete="new-password" :placeholder="__('Password')" viewable />
+            <flux:input name="password" :label="__('admin.password_reset.password')" type="password" required
+                autocomplete="new-password" :placeholder="__('admin.password_reset.password')" viewable />
 
-            <!-- Confirm Password -->
-            <flux:input name="password_confirmation" :label="__('Confirm password')" type="password"
-                required autocomplete="new-password" :placeholder="__('Confirm password')"
+            <flux:input name="password_confirmation" :label="__('admin.password_reset.password_confirmation')" type="password"
+                required autocomplete="new-password" :placeholder="__('admin.password_reset.password_confirmation')"
                 viewable />
 
             <div class="flex items-center justify-end">
                 <flux:button type="submit" variant="primary" class="w-full"
                     data-test="reset-password-button">
-                    {{ __('Reset password') }}
+                    {{ __('admin.password_reset.reset_submit') }}
                 </flux:button>
             </div>
         </form>
