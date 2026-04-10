@@ -92,6 +92,7 @@ flowchart TD
     R2 --> VAOI[admin.owners.index]
     R2 --> VAOS[admin.owners.show]
     R2 --> VAV[admin.votings]
+    R2 --> VAU[admin.users.index]
 
     VAD --> LA[layouts.admin.main]
     VAN --> LA
@@ -103,6 +104,7 @@ flowchart TD
     VAOI --> LA
     VAOS --> LA
     VAV --> LA
+    VAU --> LA
 
     VAD --> CADM[x-admin.page-header]
     VAN --> CADM
@@ -111,6 +113,7 @@ flowchart TD
     VAS --> CADM
     VALI --> CADM
     VAV --> CADM
+    VAU --> CADM
 
     VAN --> LMAN[livewire admin-notice-manager]
     VAI --> LMAI[livewire admin-image-manager]
@@ -121,6 +124,7 @@ flowchart TD
     VAOI --> LMOI[livewire admin.owners]
     VAOS --> LMOD[livewire admin.owner-detail]
     VAV --> LMOV[livewire admin.votings]
+    VAU --> LMUS[livewire admin.users]
     LMAS --> CATB[admin settings tab partials]
 ```
 

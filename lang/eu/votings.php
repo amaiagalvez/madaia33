@@ -45,6 +45,7 @@ return [
     'vote_button' => 'Bozkatu',
     'vote_saved' => 'Zure botoa ondo erregistratu da.',
     'already_voted' => 'Bozkatuta',
+    'read_only_superadmin' => 'Superadmin gisa bozketak ikus ditzakezu, baina ezin duzu bozkatu.',
     'delegated_mode' => 'Boto delegatuan zaude: :owner jabe gisa bozkatu duzu.',
     'leave_delegated_mode' => 'Boto delegatua itxi',
   ],

@@ -6,6 +6,13 @@
         </div>
     @endif
 
+    @if (!$canCastVotes)
+        <div
+            class="mb-6 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+            {{ __('votings.front.read_only_superadmin') }}
+        </div>
+    @endif
+
     @if ($isDelegated)
         <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
             data-votings-delegated-banner>
@@ -35,6 +42,11 @@
                     <div
                         class="mt-4 inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
                         {{ __('votings.front.already_voted') }}
+                    </div>
+                @elseif (!$canCastVotes)
+                    <div
+                        class="mt-4 inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                        {{ __('votings.front.read_only_superadmin') }}
                     </div>
                 @else
                     <div class="mt-4 space-y-2">

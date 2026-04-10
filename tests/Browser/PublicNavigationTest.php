@@ -4,6 +4,7 @@
  * Validates: Requirements 2.1, 3.1, 5.2, 5.3
  */
 
+use App\Models\User;
 use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
@@ -22,5 +23,19 @@ test('public navigation reaches notices, gallery and contact pages', function ()
             ->clickLink('Kontaktua')
             ->assertPathIs('/eu/harremana')
             ->assertSee('Kontaktua');
+    });
+});
+
+test('authenticated users see their name and logout button in front header', function () {
+    $user = User::factory()->create([
+        'name' => 'Header User',
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($user) {
+        $browser->loginAs($user)
+            ->visit('/eu')
+            ->assertSee('Header User')
+            ->assertSee('Saioa itxi');
     });
 });

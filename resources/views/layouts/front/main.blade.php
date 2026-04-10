@@ -76,6 +76,13 @@
                         aria-current="{{ request()->routeIs('contact.*') ? 'page' : 'false' }}">
                         {{ __('general.nav.contact') }}
                     </a>
+                    @auth
+                        <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('votings.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                            aria-current="{{ request()->routeIs('votings.*') ? 'page' : 'false' }}">
+                            {{ __('general.nav.votings') }}
+                        </a>
+                    @endauth
                     <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
                         class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('private.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
                         aria-current="{{ request()->routeIs('private.*') ? 'page' : 'false' }}">
@@ -85,6 +92,21 @@
 
                 {{-- Right section: Language switcher + Mobile menu button --}}
                 <div class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+                    @auth
+                        <div
+                            class="hidden min-w-0 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 shadow-sm md:flex">
+                            <span
+                                class="max-w-36 truncate text-sm font-medium text-stone-700">{{ auth()->user()->name }}</span>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="inline-flex items-center rounded-md border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">
+                                    {{ __('admin.logout') }}
+                                </button>
+                            </form>
+                        </div>
+                    @endauth
+
                     {{-- Language switcher (always visible) --}}
                     <livewire:language-switcher />
 
@@ -133,11 +155,32 @@
                     aria-current="{{ request()->routeIs('contact.*') ? 'page' : 'false' }}">
                     {{ __('general.nav.contact') }}
                 </a>
+                @auth
+                    <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
+                        class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('votings.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
+                        aria-current="{{ request()->routeIs('votings.*') ? 'page' : 'false' }}">
+                        {{ __('general.nav.votings') }}
+                    </a>
+                @endauth
                 <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
                     class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('private.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
                     aria-current="{{ request()->routeIs('private.*') ? 'page' : 'false' }}">
                     {{ __('general.nav.private') }}
                 </a>
+
+                @auth
+                    <div class="mt-2 border-t border-gray-200 pt-3">
+                        <p class="px-3 text-sm font-medium text-stone-700">{{ auth()->user()->name }}
+                        </p>
+                        <form method="POST" action="{{ route('logout') }}" class="mt-2 px-3">
+                            @csrf
+                            <button type="submit"
+                                class="inline-flex min-h-11 w-full items-center justify-center rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">
+                                {{ __('admin.logout') }}
+                            </button>
+                        </form>
+                    </div>
+                @endauth
             </nav>
         </div>
     </header>
@@ -159,7 +202,8 @@
     </main>
 
     {{-- Footer --}}
-    <footer class="mt-auto border-t border-gray-200 bg-gray-50/90 pb-[env(safe-area-inset-bottom)]">
+    <footer
+        class="mt-auto border-t border-gray-200 bg-gray-50/90 pb-[env(safe-area-inset-bottom)]">
         <div class="h-0.5 bg-linear-to-r from-[#793d3d] via-[#d9755b] to-[#f1bd4d]"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div

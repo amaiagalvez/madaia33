@@ -34,6 +34,7 @@ return [
         'confirm_publish' => '¿Seguro que quieres publicar este aviso?',
         'confirm_unpublish' => '¿Seguro que quieres despublicar este aviso?',
         'locations' => 'Ubicación(es)',
+        'global_only' => 'Este rol solo puede crear avisos para toda la comunidad.',
         'delete_title' => 'Eliminar aviso',
         'confirm_delete' => '¿Estás seguro de que quieres eliminar este aviso?',
     ],

@@ -2,13 +2,14 @@
 
 namespace App\Actions;
 
-use App\Mail\OwnerWelcomeMail;
-use App\Models\Property;
-use App\Models\Setting;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
-use App\Models\PropertyAssignment;
+use App\Models\Setting;
+use App\Models\Property;
 use Illuminate\Support\Str;
+use App\Mail\OwnerWelcomeMail;
+use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -19,6 +20,7 @@ class CreateOwnerAction
 {
     /**
      * @param  array<string, mixed>  $data
+     *
      * @throws ValidationException
      */
     public function execute(array $data): Owner
@@ -85,6 +87,8 @@ class CreateOwnerAction
         $owner = $result['owner'];
         /** @var User $user */
         $user = $result['user'];
+
+        $user->assignRole(Role::PROPERTY_OWNER);
 
         $settings = Setting::stringValues([
             'from_address',

@@ -2,16 +2,17 @@
 
 namespace App\Livewire;
 
-use App\Actions\CastVotingBallotAction;
-use App\Http\Controllers\PublicVotingController;
+use App\Models\User;
 use App\Models\Owner;
 use App\Models\Voting;
+use Livewire\Component;
 use App\Models\VotingBallot;
-use App\Support\VotingEligibilityService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Actions\CastVotingBallotAction;
+use App\Support\VotingEligibilityService;
 use Illuminate\Validation\ValidationException;
-use Livewire\Component;
+use App\Http\Controllers\PublicVotingController;
 
 class PublicVotings extends Component
 {
@@ -19,9 +20,11 @@ class PublicVotings extends Component
 
   private CastVotingBallotAction $castVotingBallotAction;
 
-  public Owner $activeOwner;
+  public ?Owner $activeOwner = null;
 
   public bool $isDelegated = false;
+
+  public bool $canCastVotes = true;
 
   /**
    * @var array<int, int>
@@ -38,11 +41,29 @@ class PublicVotings extends Component
 
   public function mount(): void
   {
+    $user = $this->currentUser();
+
+    abort_unless($user !== null, 403);
+
+    if ($user->isSuperadmin()) {
+      $this->canCastVotes = false;
+
+      return;
+    }
+
+    abort_unless($user->canVoteInVotings() || $user->canUseDelegatedVoting(), 403);
+
     $this->activeOwner = $this->resolveOwner();
   }
 
   public function vote(int $votingId): void
   {
+    if (! $this->canCastVotes) {
+      $this->addError("selectedOptions.$votingId", __('votings.errors.not_allowed'));
+
+      return;
+    }
+
     $voting = Voting::query()
       ->with(['options', 'locations.location'])
       ->publishedOpen()
@@ -63,11 +84,15 @@ class PublicVotings extends Component
     }
 
     try {
+      $user = $this->currentUser();
+
+      abort_unless($user !== null, 403);
+
       $this->castVotingBallotAction->execute(
         $voting,
         $this->activeOwner,
         (int) $selectedOptionId,
-        Auth::user(),
+        $user,
       );
 
       unset($this->selectedOptions[$votingId]);
@@ -83,6 +108,10 @@ class PublicVotings extends Component
 
   public function clearDelegatedMode(): void
   {
+    if (! $this->canCastVotes) {
+      return;
+    }
+
     session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
     $this->isDelegated = false;
     $this->activeOwner = $this->resolveOwner();
@@ -90,6 +119,21 @@ class PublicVotings extends Component
 
   public function render(): View
   {
+    if (! $this->canCastVotes) {
+      $votings = Voting::query()
+        ->with(['options', 'locations.location', 'optionTotals.option'])
+        ->publishedOpen()
+        ->orderBy('starts_at')
+        ->get();
+
+      abort_if($votings->isEmpty(), 404);
+
+      return view('livewire.front.public-votings', [
+        'votings' => $votings,
+        'votedVotingIds' => [],
+      ]);
+    }
+
     $votings = $this->eligibilityService
       ->openEligibleVotingsForOwner($this->activeOwner)
       ->load('ballots');
@@ -110,9 +154,11 @@ class PublicVotings extends Component
 
   private function resolveOwner(): Owner
   {
+    $user = $this->currentUser();
+
     $delegatedOwnerId = (int) session()->get(PublicVotingController::DELEGATED_OWNER_SESSION_KEY, 0);
 
-    if ($delegatedOwnerId > 0 && Auth::user()?->owner !== null) {
+    if ($delegatedOwnerId > 0 && $user?->owner !== null) {
       session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
       $delegatedOwnerId = 0;
     }
@@ -125,12 +171,20 @@ class PublicVotings extends Component
         ->findOrFail($delegatedOwnerId);
     }
 
-    $owner = Auth::user()?->owner;
+    $owner = $user?->owner;
 
     abort_unless($owner instanceof Owner, 404);
 
     $this->isDelegated = false;
 
     return $owner->loadMissing(['user', 'activeAssignments.property.location']);
+  }
+
+  private function currentUser(): ?User
+  {
+    /** @var User|null $user */
+    $user = Auth::user();
+
+    return $user;
   }
 }

@@ -69,10 +69,35 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] settigns nombre web en section front. Reemplazar donde se utilice APP_NAME por este nuevo campo
 - [ ] settings cookien testu legala n section front, crea otra ruta como con lege-oharrra y añadela en eel footer junto con las otas dos.
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
-- [ ] erabiltzaileen zerrenda loginAs botoiarekin
 - [ ] añadir al menu un enlace debajo del menu aginte-panela para ir a la web publica
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
-- [ ] en el menu del front, si se está logueado que enseñe el nombre y el botón de saioa itxi, como en el aginte-panela
+- [ ] añadir hizkuntza a la ficha de propietaria y al user, mantener sincronizados tanto el idioma como el email con el email del koop1. Al loguearse por defecto se cargará el idioma del user logeado
+- [ ] en el skill db-schema separar las tablas de las votoaciones en otro bloque
+
+# profila
+un usuario tiene que tener un perfil desde el que pueda ver:
+
+organizar la información en diferentes pestañas
+- las votaciones en las que ha tomado parte y cuando
+- las sesiones que ha abierto, su inicio y su fin y el tiempo de conexión
+- un enlace a cambiar contraseña que vaya al de cambiar la contraseña
+- la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
+- su ficha de propietaria y sus propiedades para poder validarlas (asegurate de que no puede la ficha de ningua otra propietaria)
+- la primera vez que un usuario se loguee, pidele que validee sus propiedades, si no las tiene validadas ya (oweer validation)
+
+añadir el icono para accedeer al perfil junto al nombre del usuario, tanto en el menú del front como en el menu del aginte-panaela
+
+
+# konponketak bozka delegatua
+
+- [ ] bozka delegatua error 
+- [ ] bozka delegatua zerrenda, handitu modala. bilatzailea behar du, portal, garaje, jabearen edozein datu (koop1 edo koop 2)
+- [ ] al guardar el voto delegado, junto con el id del usuario también guardar la IP y si se han podido detectar, las coordenadas
+ 
+
+
+
+
 
 # Egiten ...
 

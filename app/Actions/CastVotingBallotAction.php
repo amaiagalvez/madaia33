@@ -2,18 +2,18 @@
 
 namespace App\Actions;
 
-use App\Mail\VotingConfirmationMail;
-use App\Models\Owner;
 use App\Models\User;
+use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\VotingBallot;
 use App\Models\VotingOption;
-use App\Models\VotingOptionTotal;
 use App\Models\VotingSelection;
-use App\Support\VotingEligibilityService;
+use App\Models\VotingOptionTotal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Mail\VotingConfirmationMail;
 use Illuminate\Support\Facades\Mail;
+use App\Support\VotingEligibilityService;
 use Illuminate\Validation\ValidationException;
 
 class CastVotingBallotAction
@@ -27,6 +27,12 @@ class CastVotingBallotAction
      */
     public function execute(Voting $voting, Owner $owner, int $optionId, User $authenticatedUser): VotingBallot
     {
+        if (! $authenticatedUser->canVoteInVotings() && ! $authenticatedUser->canUseDelegatedVoting()) {
+            throw ValidationException::withMessages([
+                'vote' => __('votings.errors.not_allowed'),
+            ]);
+        }
+
         $ballot = DB::transaction(function () use ($voting, $owner, $optionId, $authenticatedUser): VotingBallot {
             $lockedVoting = Voting::query()
                 ->with(['options', 'locations.location'])

@@ -2,23 +2,23 @@
 
 namespace App\Livewire\Admin;
 
-use App\Concerns\BuildsLocaleFieldConfigs;
-use App\Http\Controllers\PublicVotingController;
-use App\Models\Location;
 use App\Models\Owner;
 use App\Models\Voting;
-use App\Models\VotingBallot;
-use App\Models\VotingLocation;
-use App\Models\VotingOption;
-use App\Support\VotingEligibilityService;
-use App\SupportedLocales;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\View\View;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use App\Models\Location;
+use App\SupportedLocales;
+use App\Models\VotingBallot;
+use App\Models\VotingOption;
 use Livewire\WithPagination;
+use App\Models\VotingLocation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use App\Support\VotingEligibilityService;
+use App\Concerns\BuildsLocaleFieldConfigs;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Controllers\PublicVotingController;
 
 class Votings extends Component
 {
@@ -390,6 +390,6 @@ class Votings extends Component
 
   private function canUseDelegatedVoting(): bool
   {
-    return Auth::user()?->owner === null;
+    return Auth::user()?->owner === null && Auth::user()?->canUseDelegatedVoting();
   }
 }
