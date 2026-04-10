@@ -63,6 +63,7 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] en settings, en la sección "contac_form" añadir dos nuevos para el asunto del email (eu y es). Al enviar el mensaje cuando se rellena el formulario, tiene que usar lo que hay en estos campos. El idioma que se usará para enviarr el email será el idioma actual
 - [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente?
 - [ ] en el aginte-panela añade estadísticas de las nuevas tablas
+- [ ] reorganizar notice-locations para que use las tablas locations y properties y modifica todos los sitios en los que se utiliza CommunityLocations. Cuando termines elimina CommunityLocations
 
 # Egiten ...
 
@@ -76,16 +77,10 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Control de acceso a actas
 ✔ Logs de acceso (recomendado para votaciones)
 
-## database
-crear un mermaid con la estructura de la base de datos, guadalo como una skill
-añadir una regla al agente amalur para que lo mantenga actualizado 
-
-## views
-crear un mermaid con la estructura de las bistas y las relaciones entre ellas, guadalo como una skill
-añadir una regla al agente amalur para que lo mantenga actualizado 
-
 ## manual de usuaria
-crear un html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación, guadalo como una skill
+crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación
+añadir una ruta al menú del panel 
+tiene que estar en dos idiomas eu y es
 añadir una regla al agente amalur para que lo mantenga actualizado 
 
 ## profile

@@ -196,6 +196,8 @@ Spec-ak ukitzen duen esparruaren arabera, dagokion skill-a irakurri behar dut ko
 | Pest testak idatzi edo konpondu                    | `.github/skills/pest-testing/SKILL.md`              |
 | Dusk Browser testak exekutatu                      | `.github/skills/dusk-testing/SKILL.md`              |
 | Lighthouse frontend auditoretza                    | `.github/skills/lighthouse-frontend-audit/SKILL.md` |
+| DB egitura Mermaid (ERD) eguneratu                 | `.github/skills/database-schema-mermaid/SKILL.md`   |
+| Bisten egitura Mermaid map-a eguneratu             | `.github/skills/views-structure-mermaid/SKILL.md`   |
 
 **Araua**: Spec batek skill baten esparrua ukitzen badu, skill hori irakurri behar dut inplementazioa hasi aurretik.
 
@@ -207,6 +209,8 @@ Spec-ak ukitzen duen esparruaren arabera, dagokion skill-a irakurri behar dut ko
 - **Pint**: PHP fitxategiak aldatu ondoren `vendor/bin/pint --dirty --format agent` exekutatu
 - **Git branch-a**: aldaketak hasi aurretik spec-aren izenean oinarritutako branch berri bat sortu (`003-estrucutura-votaciones-1` moduan, bide osoa edo `.md` luzapena gabe)
 - **Livewire inplementazioa egiaztatu**: `resources/views/components/⚡*.blade.php` edo `app/Livewire/*.php` benetan zein muntatzen den baieztatu
+- **DB aldaketen dokumentazioa**: `database/migrations/` barruan taula, zutabe, indize edo FK aldaketarik badago, eguneratu `.github/skills/database-schema-mermaid/SKILL.md` fitxategiko Mermaid ERD-a task berean
+- **Bisten egituraren dokumentazioa**: `routes/*.php` edo `resources/views/**` barruan route->view/livewire, layout, include edo component erlazioak aldatzen badira, eguneratu `.github/skills/views-structure-mermaid/SKILL.md` fitxategiko Mermaid mapa task berean
 - **Itzulpenak**: `lang/eu/` eta `lang/es/` eguneratu aldaketa linguistikoak badaude
 - **Clean Blade rule**: ez datu-base kontsultarik `resources/views/**` barruan
 - **Admin taula ekintzen koherentzia**: edit/delete ekintzetan notice taulako icon-button eredua lehenetsi (`rounded-full`, hover-egoera koherenteak), zerrenda desberdinen artean UI drift-a saihesteko

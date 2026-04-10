@@ -90,3 +90,5 @@
 - Keep owner user activation state synchronized from assignment actions (assign/unassign), and delegate Livewire close flows to those actions to avoid duplicated lifecycle side effects.
 - For decimal fields that must accept comma input, use text inputs with `inputmode="decimal"` and normalize `,` to `.` in Livewire before numeric validation and persistence.
 - In admin listings, keep edit/delete actions visually consistent with the notice-manager icon-button pattern (`rounded-full` action buttons with matching hover semantics) to prevent UI drift between tables.
+- For large Mermaid schema diagrams, split documentation into domain-focused diagrams plus a small overview graph; a single monolithic ERD becomes unreadable in chat/UI even if syntax is valid.
+- For large Mermaid view-architecture diagrams, split into focused maps (public, admin, auth/settings, shared partials) plus one high-level overview to keep labels readable at normal zoom.
