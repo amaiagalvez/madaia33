@@ -1,4 +1,4 @@
-<x-layouts::public :title="__('general.nav.private')">
+<x-layouts::front.main :title="__('general.nav.private')">
     @push('meta')
         <meta name="description" content="{{ __('general.private.seo_description') }}">
     @endpush
@@ -99,4 +99,4 @@
             </div>
         </div>
     </div>
-</x-layouts::public>
+</x-layouts::front.main>

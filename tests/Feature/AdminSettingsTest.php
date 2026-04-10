@@ -7,10 +7,12 @@ use App\Models\User;
 use App\Models\Image;
 use App\Models\Notice;
 use Livewire\Livewire;
+use App\Mail\TestEmail;
 use App\Models\Setting;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
+use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 use App\Validations\AdminSettingsValidation;
 
@@ -120,6 +122,24 @@ it('guarda la configuración de correo en la tabla settings', function () {
         ->and(settingValue('legal_text_es'))->toBe('<p>Aviso legal</p>');
 });
 
+it('guarda la configuración del email de nuevas propietarias en settings', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_OWNERS)
+        ->set('ownersWelcomeSubjectEu', 'Gaia EU')
+        ->set('ownersWelcomeSubjectEs', 'Asunto ES')
+        ->set('ownersWelcomeTextEu', '<p>Testu EU</p>##info##')
+        ->set('ownersWelcomeTextEs', '<p>Texto ES</p>##info##')
+        ->call('save');
+
+    expect(settingValue('owners_welcome_subject_eu'))->toBe('Gaia EU')
+        ->and(settingValue('owners_welcome_subject_es'))->toBe('Asunto ES')
+        ->and(settingValue('owners_welcome_text_eu'))->toBe('<p>Testu EU</p>##info##')
+        ->and(settingValue('owners_welcome_text_es'))->toBe('<p>Texto ES</p>##info##');
+});
+
 it('el campo recaptcha_secret_key se renderiza como type=password', function () {
     $user = User::factory()->create();
 
@@ -206,6 +226,16 @@ it('renderiza los campos de configuración de correo dentro de su sección', fun
         ->assertSeeHtml('id="smtpPassword"')
         ->assertSeeHtml('id="smtpEncryption"')
         ->assertSeeHtml('data-bilingual-field="emailLegalTextEu"');
+});
+
+it('renderiza los campos del email de nuevas propietarias dentro de su sección', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_OWNERS)
+        ->assertSeeHtml('data-bilingual-field="ownersWelcomeSubjectEu"')
+        ->assertSeeHtml('data-bilingual-field="ownersWelcomeTextEu"');
 });
 
 it('mantiene visible el botón guardar en la sección front', function () {
@@ -526,7 +556,7 @@ it('sendTestEmail envía un email de prueba con la configuración SMTP', functio
     createSetting('smtp_password', encrypt('password'));
     createSetting('smtp_encryption', 'tls');
 
-    \Illuminate\Support\Facades\Mail::fake();
+    Mail::fake();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -543,7 +573,7 @@ it('sendTestEmail envía un email de prueba con la configuración SMTP', functio
         ->call('sendTestEmail')
         ->assertSet('showTestEmailModal', false);
 
-    \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\TestEmail::class, function ($mail) {
+    Mail::assertSent(TestEmail::class, function ($mail) {
         return $mail->hasTo('recipient@example.com');
     });
 });

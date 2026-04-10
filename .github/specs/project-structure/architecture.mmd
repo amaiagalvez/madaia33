@@ -1,0 +1,141 @@
+flowchart TB
+  subgraph INFRA["Infrastructure and Runtime"]
+    DOCKER["docker-compose.yml"]
+    APPC["madaia33 container | PHP 8.4 + Apache"]
+    DBC["db container | MariaDB 11.7"]
+    VITE["vite.config.js"]
+    CSS["resources/css/app.css | Tailwind v4 + Flux tokens"]
+    JS["resources/js/app.js | minimal entry"]
+
+    DOCKER --> APPC
+    DOCKER --> DBC
+    VITE --> CSS
+    VITE --> JS
+  end
+
+  subgraph ENTRY["HTTP Entry"]
+    WEB["routes/web.php"]
+    SETTINGS["routes/settings.php"]
+    MW["app/Http/Middleware | SetLocale + SecurityHeaders"]
+    FORTIFY["Fortify routes | login register reset 2FA"]
+
+    WEB --> MW
+    SETTINGS --> MW
+    FORTIFY --> MW
+  end
+
+  subgraph CORE["Application Core"]
+    subgraph HTTP["Controllers"]
+      HOMECTRL["PublicHomeController"]
+      LEGALCTRL["LegalPageController"]
+      SITEMAPCTRL["SitemapController"]
+    end
+
+    subgraph LW["Livewire Components"]
+      LW_PUBLIC["ContactForm | PublicNotices | HeroSlider | ImageGallery"]
+      LW_ADMIN["AdminNoticeManager | AdminMessageInbox | AdminSettings"]
+    end
+
+    subgraph MODELS["Eloquent Models"]
+      USERM["User"]
+      NOTICEM["Notice"]
+      IMAGEM["Image"]
+      MSGM["ContactMessage"]
+      SETTINGM["Setting"]
+      LOCM["NoticeLocation"]
+    end
+
+    subgraph DOMAIN["Validation Rules and Support"]
+      VALID["app/Validations | AdminSettingsValidation ContactFormValidation"]
+      RULES["app/Rules | NoScriptTags"]
+      SUPPORT["app/Support | ConfiguredMailSettings"]
+      ACTIONS["app/Actions/Fortify | CreateNewUser ResetUserPassword"]
+    end
+
+    subgraph MAIL["Mailables"]
+      ABSTRACTMAIL["AbstractContactMail"]
+      CONFMAIL["ContactConfirmation"]
+      NOTIFMAIL["ContactNotification"]
+      TESTMAIL["TestEmail"]
+    end
+
+    NOTICEM --> LOCM
+    VALID --> RULES
+    LW_PUBLIC --> VALID
+    LW_ADMIN --> VALID
+    LW_PUBLIC --> SUPPORT
+    ACTIONS --> USERM
+    CONFMAIL --> ABSTRACTMAIL
+    NOTIFMAIL --> ABSTRACTMAIL
+    TESTMAIL --> ABSTRACTMAIL
+  end
+
+  subgraph UI["Presentation Layer"]
+    LAYOUTS["resources/views/layouts | public app admin auth"]
+    PAGES_PUBLIC["resources/views/public | home notices gallery contact legal private"]
+    PAGES_ADMIN["resources/views/admin | dashboard notices images messages settings"]
+    PAGES_AUTH["resources/views/pages/auth"]
+    PAGES_SETTINGS["resources/views/pages/settings | Volt SFC"]
+    COMPONENTS["resources/views/components | admin front auth flux volt"]
+    LWVIEWS["resources/views/livewire | admin front root views"]
+    I18N["lang/eu and lang/es"]
+
+    LAYOUTS --> PAGES_PUBLIC
+    LAYOUTS --> PAGES_ADMIN
+    LAYOUTS --> PAGES_AUTH
+    LAYOUTS --> PAGES_SETTINGS
+    COMPONENTS --> PAGES_PUBLIC
+    COMPONENTS --> PAGES_ADMIN
+    LWVIEWS --> PAGES_PUBLIC
+    LWVIEWS --> PAGES_ADMIN
+    I18N --> PAGES_PUBLIC
+    I18N --> PAGES_ADMIN
+    I18N --> PAGES_AUTH
+  end
+
+  subgraph QUALITY["Quality and Testing"]
+    TESTS["tests | Feature Unit Browser"]
+    PEST["tests/Pest.php"]
+    TCASE["tests/TestCase.php"]
+    DUSK["tests/DuskTestCase.php"]
+    PHPUNIT["phpunit.xml"]
+    PINT["pint.json"]
+    PHPSTAN["phpstan.neon"]
+    PHPMD["phpmd.xml"]
+    COMPOSER["composer.json scripts | test lint quality"]
+
+    PEST --> TESTS
+    TCASE --> TESTS
+    DUSK --> TESTS
+    PHPUNIT --> TESTS
+    PINT --> COMPOSER
+    PHPSTAN --> COMPOSER
+    PHPMD --> COMPOSER
+  end
+
+  APPC --> ENTRY
+  MW --> HOMECTRL
+  MW --> LEGALCTRL
+  MW --> SITEMAPCTRL
+  MW --> LW_PUBLIC
+  MW --> LW_ADMIN
+
+  HOMECTRL --> NOTICEM
+  HOMECTRL --> IMAGEM
+  HOMECTRL --> SETTINGM
+
+  LW_PUBLIC --> MSGM
+  LW_PUBLIC --> NOTICEM
+  LW_PUBLIC --> IMAGEM
+  LW_PUBLIC --> SETTINGM
+  LW_PUBLIC --> MAIL
+
+  LW_ADMIN --> NOTICEM
+  LW_ADMIN --> IMAGEM
+  LW_ADMIN --> MSGM
+  LW_ADMIN --> SETTINGM
+
+  CORE --> UI
+  UI --> APPC
+  QUALITY -. validates .-> CORE
+  QUALITY -. validates .-> UI

@@ -3,12 +3,15 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\ContactMessage;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminMessageInbox extends Component
 {
+    use WithPagination;
+
     public ?int $openMessageId = null;
 
     public ?int $confirmingDeleteId = null;
@@ -53,6 +56,8 @@ class AdminMessageInbox extends Component
             $this->sortBy = $column;
             $this->sortDir = 'desc';
         }
+
+        $this->resetPage();
     }
 
     public function confirmDelete(int $id): void
@@ -82,20 +87,20 @@ class AdminMessageInbox extends Component
     }
 
     /**
-     * @return Collection<int, ContactMessage>
+     * @return LengthAwarePaginator<int, ContactMessage>
      */
-    public function getMessagesProperty(): Collection
+    public function getMessagesProperty(): LengthAwarePaginator
     {
         $allowedSortColumns = ['created_at', 'is_read'];
         $sortBy = in_array($this->sortBy, $allowedSortColumns) ? $this->sortBy : 'created_at';
         $sortDir = in_array($this->sortDir, ['asc', 'desc']) ? $this->sortDir : 'desc';
 
-        return ContactMessage::orderBy($sortBy, $sortDir)->get();
+        return ContactMessage::orderBy($sortBy, $sortDir)->paginate(15);
     }
 
     public function render(): View
     {
-        return view('livewire.admin-message-inbox', [
+        return view('livewire.admin.message-inbox', [
             'messages' => $this->getMessagesProperty(),
         ]);
     }

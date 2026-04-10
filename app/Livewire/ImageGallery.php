@@ -27,14 +27,14 @@ class ImageGallery extends Component
      */
     public function getImagesProperty(): Collection
     {
-        return Image::when($this->activeTag !== '', fn($query) => $query->where('tag', $this->activeTag))
+        return Image::when($this->activeTag !== '', fn ($query) => $query->where('tag', $this->activeTag))
             ->orderByDesc('created_at')
             ->get();
     }
 
     public function render(): View
     {
-        return view('livewire.image-gallery', [
+        return view('livewire.front.image-gallery', [
             'images' => $this->getImagesProperty(),
         ]);
     }

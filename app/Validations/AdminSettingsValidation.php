@@ -4,8 +4,8 @@ namespace App\Validations;
 
 use App\Models\Setting;
 use App\Rules\NoScriptTags;
-use App\Support\ConfiguredMailSettings;
 use Illuminate\Validation\Rule;
+use App\Support\ConfiguredMailSettings;
 
 class AdminSettingsValidation
 {
@@ -74,6 +74,12 @@ class AdminSettingsValidation
             Setting::SECTION_RECAPTCHA => [
                 'recaptchaSiteKey' => 'nullable|string|max:255',
                 'recaptchaSecretKey' => 'nullable|string|max:255',
+            ],
+            Setting::SECTION_OWNERS => [
+                'ownersWelcomeSubjectEu' => ['nullable', 'string', 'max:255'],
+                'ownersWelcomeSubjectEs' => ['nullable', 'string', 'max:255'],
+                'ownersWelcomeTextEu' => ['nullable', 'string', 'max:5000', new NoScriptTags],
+                'ownersWelcomeTextEs' => ['nullable', 'string', 'max:5000', new NoScriptTags],
             ],
             default => [],
         };

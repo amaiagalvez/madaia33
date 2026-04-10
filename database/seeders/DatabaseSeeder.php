@@ -11,6 +11,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             SettingsSeeder::class,
+            LocationSeeder::class,
+            PropertySeeder::class,
         ]);
 
         if (app()->isLocal()) {

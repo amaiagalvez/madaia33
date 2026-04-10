@@ -2,11 +2,11 @@
 
 namespace App\Support;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class ConfiguredMailSettings
 {
@@ -93,12 +93,7 @@ class ConfiguredMailSettings
         $smtpPassword = $this->displayValue('smtp_password', $settings['smtp_password'] ?? '');
         $smtpEncryption = trim((string) ($settings['smtp_encryption'] ?? ''));
 
-        // Laravel 11 scheme: 'smtps' for SSL (port 465), 'smtp' for STARTTLS/TLS (port 587) or plain.
-        $scheme = match ($smtpEncryption) {
-            'ssl' => 'smtps',
-            'tls', '' => 'smtp',
-            default => 'smtp',
-        };
+        $scheme = $smtpEncryption !== '' ? $smtpEncryption : 'smtp';
 
         return [
             ...$config,

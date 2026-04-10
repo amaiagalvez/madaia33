@@ -2,17 +2,19 @@
 
 namespace App\Livewire;
 
-use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Models\Notice;
 use Livewire\Component;
 use App\CommunityLocations;
 use Illuminate\Support\Str;
+use Livewire\WithPagination;
 use App\Models\NoticeLocation;
 use Illuminate\Contracts\View\View;
+use App\Concerns\BuildsLocaleFieldConfigs;
 
 class AdminNoticeManager extends Component
 {
     use BuildsLocaleFieldConfigs;
+    use WithPagination;
 
     // Form state
     public ?int $editingId = null;
@@ -233,20 +235,26 @@ class AdminNoticeManager extends Component
     {
         $notice->locations()->delete();
 
-        foreach ($this->selectedLocations as $code) {
-            NoticeLocation::create([
+        $rows = [];
+
+        foreach (array_values(array_unique($this->selectedLocations)) as $code) {
+            $rows[] = [
                 'notice_id' => $notice->id,
                 'location_type' => CommunityLocations::typeForCode($code),
                 'location_code' => $code,
-            ]);
+            ];
+        }
+
+        if ($rows !== []) {
+            NoticeLocation::insert($rows);
         }
     }
 
     public function render(): View
     {
-        $notices = Notice::with('locations')->latest()->get();
+        $notices = Notice::with('locations')->latest()->paginate(12);
 
-        return view('livewire.admin-notice-manager', [
+        return view('livewire.admin.notice-manager', [
             'notices' => $notices,
             'allLocations' => CommunityLocations::options(__('notices.portal'), __('notices.garage')),
         ]);

@@ -89,6 +89,6 @@ class HeroSlider extends Component
 
     public function render(): View
     {
-        return view('livewire.hero-slider');
+        return view('livewire.front.hero-slider');
     }
 }

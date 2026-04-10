@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Image;
+use App\Models\Owner;
 use App\Models\Notice;
+use App\Models\Location;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
@@ -50,7 +52,7 @@ Route::get('/robots.txt', function () {
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
-        return view('admin.dashboard', [
+        return view('admin.dashboard.index', [
             'publishedNoticesCount' => Notice::where('is_public', true)->count(),
             'totalNoticesCount' => Notice::count(),
             'imagesCount' => Image::count(),
@@ -61,12 +63,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/imagenes', fn () => view('admin.images'))->name('images');
     Route::get('/mensajes', fn () => view('admin.messages'))->name('messages');
     Route::get('/configuracion', fn () => view('admin.settings'))->name('settings');
+    Route::get('/portales', fn () => view('admin.locations.index', ['type' => 'portal']))->name('locations.portals');
+    Route::get('/garajes', fn () => view('admin.locations.index', ['type' => 'garage']))->name('locations.garages');
+    Route::get('/trasteros', fn () => view('admin.locations.index', ['type' => 'storage']))->name('locations.storages');
+    Route::get('/ubicaciones/{location}', fn (Location $location) => view('admin.locations.show', ['location' => $location]))->name('locations.show');
+    Route::get('/propietarias', fn () => view('admin.owners.index'))->name('owners.index');
+    Route::get('/propietarias/{owner}', fn (Owner $owner) => view('admin.owners.show', ['owner' => $owner]))->name('owners.show');
 });
 
 // ─── Auth (Fortify / Breeze) ───────────────────────────────────────────────────
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::view('dashboard', 'pages.dashboard.index')->name('dashboard');
 });
 
 require __DIR__.'/settings.php';

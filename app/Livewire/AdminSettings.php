@@ -2,14 +2,14 @@
 
 namespace App\Livewire;
 
-use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Mail\TestEmail;
 use App\Models\Setting;
-use App\Support\ConfiguredMailSettings;
-use Illuminate\Contracts\View\View;
-use App\Validations\AdminSettingsValidation;
-use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Mail;
+use App\Support\ConfiguredMailSettings;
+use App\Concerns\BuildsLocaleFieldConfigs;
+use App\Validations\AdminSettingsValidation;
 
 class AdminSettings extends Component
 {
@@ -60,6 +60,14 @@ class AdminSettings extends Component
 
     public string $emailLegalTextEs = '';
 
+    public string $ownersWelcomeSubjectEu = '';
+
+    public string $ownersWelcomeSubjectEs = '';
+
+    public string $ownersWelcomeTextEu = '';
+
+    public string $ownersWelcomeTextEs = '';
+
     public bool $saved = false;
 
     public bool $showTestEmailModal = false;
@@ -106,6 +114,12 @@ class AdminSettings extends Component
                 'recaptchaSiteKey' => 'recaptcha_site_key',
                 'recaptchaSecretKey' => 'recaptcha_secret_key',
             ],
+            Setting::SECTION_OWNERS => [
+                'ownersWelcomeSubjectEu' => 'owners_welcome_subject_eu',
+                'ownersWelcomeSubjectEs' => 'owners_welcome_subject_es',
+                'ownersWelcomeTextEu' => 'owners_welcome_text_eu',
+                'ownersWelcomeTextEs' => 'owners_welcome_text_es',
+            ],
         ];
     }
 
@@ -144,6 +158,10 @@ class AdminSettings extends Component
         $this->smtpEncryption = $settings['smtp_encryption'] ?? '';
         $this->emailLegalTextEu = $settings['legal_text_eu'] ?? '';
         $this->emailLegalTextEs = $settings['legal_text_es'] ?? '';
+        $this->ownersWelcomeSubjectEu = $settings['owners_welcome_subject_eu'] ?? '';
+        $this->ownersWelcomeSubjectEs = $settings['owners_welcome_subject_es'] ?? '';
+        $this->ownersWelcomeTextEu = $settings['owners_welcome_text_eu'] ?? '';
+        $this->ownersWelcomeTextEs = $settings['owners_welcome_text_es'] ?? '';
         $this->historyTextEu = $settings['home_history_text_eu'] ?? '';
         $this->historyTextEs = $settings['home_history_text_es'] ?? '';
         $this->privacyContentEu = $settings['legal_page_privacy_policy_eu'] ?? '';
@@ -202,9 +220,9 @@ class AdminSettings extends Component
     public function mount(): void
     {
         $allKeys = collect($this->sectionFieldMap())->flatten()->values()->all();
-        $settings = Setting::whereIn('key', $allKeys)->pluck('value', 'key');
+        $settings = Setting::stringValues($allKeys);
 
-        $this->assignSettingValues($settings->all());
+        $this->assignSettingValues($settings);
 
         $sections = $this->resolveAvailableSections();
 
@@ -268,7 +286,7 @@ class AdminSettings extends Component
         }
 
         try {
-            $emailSettings = Setting::whereIn('key', [
+            $emailSettings = Setting::stringValues([
                 'from_address',
                 'from_name',
                 'smtp_host',
@@ -276,9 +294,9 @@ class AdminSettings extends Component
                 'smtp_username',
                 'smtp_password',
                 'smtp_encryption',
-            ])->pluck('value', 'key');
+            ]);
 
-            $this->configuredMailSettings()->apply($emailSettings->all());
+            $this->configuredMailSettings()->apply($emailSettings);
 
             Mail::to($this->testEmailAddress)->send(
                 new TestEmail(
@@ -299,6 +317,6 @@ class AdminSettings extends Component
 
     public function render(): View
     {
-        return view('livewire.admin-settings');
+        return view('livewire.admin.settings');
     }
 }

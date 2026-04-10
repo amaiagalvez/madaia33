@@ -21,7 +21,7 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
             ->assertSee('Iragarkiak');
 
         // Create notice (draft, not public)
-        $browser->press('Sortu')
+        $browser->press('Sortu berria')
             ->waitFor('#titleEu')
             ->type('#titleEu', $title)
             ->type('#contentEu', 'Dusk test edukia.')

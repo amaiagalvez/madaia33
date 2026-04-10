@@ -11,3 +11,5 @@
     <hr>
     <div>{!! $legalText !!}</div>
 @endif
+
+<p>{{ __('contact.mail.confirmation_footer') }}</p>
