@@ -2,12 +2,16 @@
 
 namespace App\Providers;
 
+use Throwable;
 use App\Models\Owner;
+use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 use App\Observers\OwnerAuditObserver;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Schema;
+use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -27,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->applyConfiguredMailSettings();
         $this->registerLegacyBladeComponentAliases();
 
         Owner::observe(OwnerAuditObserver::class);
@@ -44,13 +49,13 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Password::defaults(
-            fn (): ?Password => app()->isProduction()
+            fn(): ?Password => app()->isProduction()
                 ? Password::min(12)
-                    ->mixedCase()
-                    ->letters()
-                    ->numbers()
-                    ->symbols()
-                    ->uncompromised()
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised()
                 : null,
         );
     }
@@ -65,5 +70,28 @@ class AppServiceProvider extends ServiceProvider
         Blade::component('front.notice-card', 'notice-card');
         Blade::component('front.public-brand-link', 'public-brand-link');
         Blade::component('front.public-page-header', 'public-page-header');
+    }
+
+    protected function applyConfiguredMailSettings(): void
+    {
+        try {
+            if (! Schema::hasTable('settings')) {
+                return;
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return;
+        }
+
+        app(ConfiguredMailSettings::class)->apply(Setting::stringValues([
+            'from_address',
+            'from_name',
+            'smtp_host',
+            'smtp_port',
+            'smtp_username',
+            'smtp_password',
+            'smtp_encryption',
+        ]));
     }
 }

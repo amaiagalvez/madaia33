@@ -95,7 +95,7 @@
 
                     @if (\Illuminate\Support\Facades\Route::has('password.request'))
                         <div class="pt-1 text-center">
-                            <a href="{{ route('password.request') }}"
+                            <a href="{{ route(\App\SupportedLocales::routeName('password.request')) }}"
                                 class="text-sm font-medium text-[#793d3d] underline decoration-[#d9755b]/50 underline-offset-4 transition-colors hover:text-[#d9755b] focus:outline-none focus:ring-2 focus:ring-[#d9755b]/40">
                                 {{ __('general.private.change_password_option') }}
                             </a>

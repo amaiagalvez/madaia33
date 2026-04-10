@@ -68,6 +68,9 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] settings email principal en section front Reemplazar por este todo los info@madaia33.eus
 - [ ] settigns nombre web en section front. Reemplazar donde se utilice APP_NAME por este nuevo campo
 - [ ] settings cookien testu legala n section front, crea otra ruta como con lege-oharrra y añadela en eel footer junto con las otas dos.
+- [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
+- [ ] erabiltzaileen zerrenda loginAs botoiarekin
+- [ ] añadir al menu un enlace debajo del menu aginte-panela para ir a la web publica
 
 # Egiten ...
 

@@ -63,9 +63,25 @@ si el user no tiene un owner asignado solo podrá logearse con el email siempre 
  - `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality` exekutatu da, baina ez da osorik pasa repoan aurrez zeuden style arazoengatik ukitu gabeko fitxategi askotan.
 
 # Zuzenketak 1
-- [ ] adapta también el formato de todas las vistas que tengan que ver con el cambio de contraseña
-- [ ] los emails se debeen enviar desde el email configurado en settings en el section "email_configurration"
-- [ ] quita el blade login actual, no lo uso
-- [ ] quita el dashboard de laravel /dashboard, no lo uso
-- [ ] /settings/profile muevelo al menu superior al pinchar en el nombre del usuario logeado
-- [ ] no se pueden crear usuarios nuevos desde fuera, quita las vistas correspondientes
+- [x] arregla la ruta /settings/profile
+- [x] adapta el formato de todas las vistas que tengan que ver con el cambio de contraseña para quee usen el mismo formato que la vista pribatua
+- [x] los emails se debeen enviar desde el email configurado en settings en el section "email_configurration"
+- [x] quita el blade login actual, no lo uso
+- [x] quita el dashboard de laravel /dashboard, no lo uso
+- [x] /settings/profile muevelo al menu superior al pinchar en el nombre del usuario logeado
+- [x] no se pueden crear usuarios nuevos desde fuera, quita las vistas correspondientes
+
+# Zuzenketak 2
+- [x] en las pantallas para recuperar contraseña, en vez del logo de laravel usa el de madaia33.png, añade las traducciones a EU y ES que faltan, añade también los idiomas a las rutass necesarias
+- [x] el email que se manda para reecupera contraseña tienee que estar en el lenguaje en el que se está navegando
+- [x] los input de las pantallass para recuperar contraseñas casi no se ven, dale a los botones y los links de estas pantallas el estilo del proyecto
+- [x] cuando voy a la ruta pribatua, si ya estoy logeada que me lleve directamente al aginte-panela
+
+# Zuzenketa osagarria
+- [x] el asunto del email para recuperar contraseña también tiene que ser en función del idioma
+
+### Plan zehatza
+
+- Laravel-ek reset emailaren subject-erako erabiltzen duen gakoa `Reset your password` dela aprobetxatu, eta ez dagoen EU/ES itzulpena gehitu.
+- [tests/Feature/Auth/PasswordResetTest.php](tests/Feature/Auth/PasswordResetTest.php) eguneratu, locale bakoitzean notifikazioaren `subject` zuzena dela egiaztatzeko.
+- Ukitutako itzulpen-fitxategiak eta Feature test fokalizatua Docker bidez exekutatu.

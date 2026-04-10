@@ -1,7 +1,6 @@
 services:
     madaia33:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
-        user: "${DC_UID:-1000}:${DC_GID:-1000}"
         volumes:
             - ./:/docker
         extra_hosts:

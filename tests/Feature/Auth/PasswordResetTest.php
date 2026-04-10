@@ -1,10 +1,15 @@
 <?php
 
 use App\Models\User;
+use App\SupportedLocales;
 use Laravel\Fortify\Features;
+use App\Providers\AppServiceProvider;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+
+dataset('supported_locales', SupportedLocales::all());
 
 beforeEach(function () {
     test()->skipUnlessFortifyFeature(Features::resetPasswords());
@@ -14,9 +19,18 @@ test('reset password link screen can be rendered', function () {
     $response = test()->get(route('password.request'));
 
     $response->assertOk()
+        ->assertSee('data-auth-shell', false)
         ->assertSee(__('admin.password_reset.request_title'))
         ->assertSee(__('admin.password_reset.request_description'));
 });
+
+test('localized password request routes can be rendered', function (string $locale) {
+    $response = test()->get(route(SupportedLocales::routeName('password.request', $locale)));
+
+    $response->assertOk()
+        ->assertSee('data-auth-shell', false)
+        ->assertSee(__('admin.password_reset.request_title'));
+})->with('supported_locales');
 
 test('reset password link can be requested', function () {
     Notification::fake();
@@ -27,6 +41,16 @@ test('reset password link can be requested', function () {
         ->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('password reset flow applies sender configuration from settings', function () {
+    createSetting('from_address', 'noreply@madaia33.test');
+    createSetting('from_name', 'Madaia 33 Test');
+
+    (new AppServiceProvider(app()))->boot();
+
+    expect(config('mail.from.address'))->toBe('noreply@madaia33.test')
+        ->and(config('mail.from.name'))->toBe('Madaia 33 Test');
 });
 
 test('reset password screen can be rendered', function () {
@@ -41,12 +65,49 @@ test('reset password screen can be rendered', function () {
         $response = test()->get(route('password.reset', $notification->token));
 
         $response->assertOk()
+            ->assertSee('data-auth-shell', false)
             ->assertSee(__('admin.password_reset.reset_title'))
             ->assertSee(__('admin.password_reset.reset_description'));
 
         return true;
     });
 });
+
+test('password reset notification keeps the visitor locale and localized reset link', function (string $locale) {
+    Notification::fake();
+
+    $user = User::factory()->create();
+
+    test()->get(route(SupportedLocales::routeName('password.request', $locale)));
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification, array $channels, User $notifiable, ?string $sentLocale) use ($locale, $user) {
+        $expectedPath = parse_url(
+            route(SupportedLocales::routeName('password.reset', $locale), [
+                'token' => $notification->token,
+                'email' => $user->email,
+            ]),
+            PHP_URL_PATH,
+        );
+
+        $originalLocale = app()->getLocale();
+        app()->setLocale($sentLocale ?? $originalLocale);
+
+        $mailMessage = $notification->toMail($user);
+
+        app()->setLocale($originalLocale);
+
+        expect($notifiable->is($user))->toBeTrue()
+            ->and($channels)->toContain('mail')
+            ->and($sentLocale)->toBe($locale)
+            ->and($mailMessage->subject)->toBe(Lang::get('Reset your password', [], $locale))
+            ->and($mailMessage->actionUrl)->toContain((string) $expectedPath);
+
+        return true;
+    });
+})->with('supported_locales');
 
 test('password can be reset with valid token', function () {
     Notification::fake();

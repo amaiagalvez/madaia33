@@ -93,3 +93,4 @@
 - For large Mermaid schema diagrams, split documentation into domain-focused diagrams plus a small overview graph; a single monolithic ERD becomes unreadable in chat/UI even if syntax is valid.
 - For large Mermaid view-architecture diagrams, split into focused maps (public, admin, auth/settings, shared partials) plus one high-level overview to keep labels readable at normal zoom.
 - Fortify with `lowercase_usernames=true` lowercases the login identifier before `authenticateUsing`; if DNI login is allowed, normalize email and DNI separately (`Str::lower` for email, `Str::upper` for DNI) or owner-based DNI auth will fail silently in tests and production.
+- Password reset email subject localization in Laravel 13 uses the exact JSON key `Reset your password` (not `Reset Password Notification`); add that key per locale and assert `MailMessage->subject` in Feature tests to avoid partially localized mails.

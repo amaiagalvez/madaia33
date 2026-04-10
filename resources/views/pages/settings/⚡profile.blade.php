@@ -1,17 +1,18 @@
 <?php
 
-use App\Concerns\ProfileValidationRules;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Livewire\Component;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Title;
-use Livewire\Component;
+use App\Concerns\ProfileValidationRules;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 new #[Title('Profile settings')] class extends Component {
     use ProfileValidationRules;
 
     public string $name = '';
+
     public string $email = '';
 
     /**
@@ -51,7 +52,7 @@ new #[Title('Profile settings')] class extends Component {
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('dashboard', absolute: false));
+            $this->redirectIntended(default: route('admin.dashboard', absolute: false));
 
             return;
         }
