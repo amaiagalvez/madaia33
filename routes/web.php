@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\PublicHomeController;
+use App\Http\Controllers\PublicVotingController;
 
 $privatePageHandler = static function () {
     if (Auth::check()) {
@@ -41,6 +42,7 @@ Route::prefix('eu')->group(function () use ($privatePageHandler) {
     })->name('password.reset.eu');
     Route::get('/pribatutasun-politika', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy.eu');
     Route::get('/ohar-legala', [LegalPageController::class, 'legalNotice'])->name('legal-notice.eu');
+    Route::get('/bozketak', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.eu');
 });
 
 Route::prefix('es')->group(function () use ($privatePageHandler) {
@@ -58,6 +60,7 @@ Route::prefix('es')->group(function () use ($privatePageHandler) {
     })->name('password.reset.es');
     Route::get('/politica-de-privacidad', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy.es');
     Route::get('/aviso-legal', [LegalPageController::class, 'legalNotice'])->name('legal-notice.es');
+    Route::get('/votaciones', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.es');
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -93,6 +96,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/ubicaciones/{location}', fn(Location $location) => view('admin.locations.show', ['location' => $location]))->name('locations.show');
     Route::get('/propietarias', fn() => view('admin.owners.index'))->name('owners.index');
     Route::get('/propietarias/{owner}', fn(Owner $owner) => view('admin.owners.show', ['owner' => $owner]))->name('owners.show');
+    Route::get('/votaciones', fn() => view('admin.votings'))->name('votings');
 });
+
+Route::middleware('auth')->post('/votings/delegated/clear', [PublicVotingController::class, 'clearDelegatedVoting'])
+    ->name('votings.delegated.clear');
 
 require __DIR__ . '/settings.php';

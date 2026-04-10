@@ -71,6 +71,7 @@ cambia el subtitulo del formulario de contacto del front, algo asi como Envia tu
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
 - [ ] erabiltzaileen zerrenda loginAs botoiarekin
 - [ ] añadir al menu un enlace debajo del menu aginte-panela para ir a la web publica
+- [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
 
 # Egiten ...
 

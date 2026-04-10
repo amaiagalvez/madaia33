@@ -203,4 +203,7 @@ return [
             'reset_action' => 'Pasahitza ezarri',
         ],
     ],
+    'votings' => [
+        'menu' => 'Bozketak',
+    ],
 ];

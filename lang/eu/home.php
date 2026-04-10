@@ -23,6 +23,10 @@ return [
     'history_image_alt' => 'Komunitatearen historiaren irudi adierazgarria',
     'history_photos_title' => 'Komunitateko argazki zaharrak dituzu?',
     'history_photos_summary' => 'Partekatu nahi badituzu, idatzi :email helbidera eta memoria kolektiboan txertatuko ditugu.',
+    'votings_badge' => 'Bozketak irekita',
+    'votings_title' => 'Komunitateko bozketa aktiboak dituzu zain',
+    'votings_summary' => 'Sartu bozketa gunera eta eman zure botoa epea amaitu aurretik.',
+    'votings_cta' => 'Bozketetara joan',
     'promises' => [
         'informed_title' => 'Eguneratuta egoteko',
         'informed_body' => 'Iragarki berriak eta informazio erabilgarria lehen planoan ikusten dira.',

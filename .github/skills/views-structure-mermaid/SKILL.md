@@ -47,6 +47,7 @@ flowchart TD
     R1 --> VPC[public.contact]
     R1 --> VPP[public.private]
     R1 --> VPL[public.legal-page]
+    R1 --> VPV[public.votings]
     R1 --> VE404[errors.404]
     R1 --> VE500[errors.500]
 
@@ -56,6 +57,7 @@ flowchart TD
     VPC --> LF
     VPP --> LF
     VPL --> LF
+    VPV --> LF
     VE404 --> LF
     VE500 --> LF
 
@@ -63,6 +65,7 @@ flowchart TD
     VPN --> LWN[livewire public-notices]
     VPG --> LWG[livewire image-gallery]
     VPC --> LWC[livewire contact-form]
+    VPV --> LWV[livewire public-votings]
     LF --> LWL[livewire language-switcher]
 
     VPH --> CFNC[x-front.notice-card]
@@ -88,6 +91,7 @@ flowchart TD
     R2 --> VALS[admin.locations.show]
     R2 --> VAOI[admin.owners.index]
     R2 --> VAOS[admin.owners.show]
+    R2 --> VAV[admin.votings]
 
     VAD --> LA[layouts.admin.main]
     VAN --> LA
@@ -98,6 +102,7 @@ flowchart TD
     VALS --> LA
     VAOI --> LA
     VAOS --> LA
+    VAV --> LA
 
     VAD --> CADM[x-admin.page-header]
     VAN --> CADM
@@ -105,6 +110,7 @@ flowchart TD
     VAM --> CADM
     VAS --> CADM
     VALI --> CADM
+    VAV --> CADM
 
     VAN --> LMAN[livewire admin-notice-manager]
     VAI --> LMAI[livewire admin-image-manager]
@@ -114,6 +120,7 @@ flowchart TD
     VALS --> LMLD[livewire admin.location-detail]
     VAOI --> LMOI[livewire admin.owners]
     VAOS --> LMOD[livewire admin.owner-detail]
+    VAV --> LMOV[livewire admin.votings]
     LMAS --> CATB[admin settings tab partials]
 ```
 

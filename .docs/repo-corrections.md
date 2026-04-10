@@ -94,3 +94,6 @@
 - For large Mermaid view-architecture diagrams, split into focused maps (public, admin, auth/settings, shared partials) plus one high-level overview to keep labels readable at normal zoom.
 - Fortify with `lowercase_usernames=true` lowercases the login identifier before `authenticateUsing`; if DNI login is allowed, normalize email and DNI separately (`Str::lower` for email, `Str::upper` for DNI) or owner-based DNI auth will fail silently in tests and production.
 - Password reset email subject localization in Laravel 13 uses the exact JSON key `Reset your password` (not `Reset Password Notification`); add that key per locale and assert `MailMessage->subject` in Feature tests to avoid partially localized mails.
+
+- In voting flows, enforce one-choice-per-ballot invariants at DB level (unique key on ballot identifier) in addition to service-level validation.
+- In Livewire admin listings, avoid per-row census/count queries; pre-aggregate with one query or a single in-memory map to prevent N+1 regressions.

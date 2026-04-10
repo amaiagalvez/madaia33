@@ -212,3 +212,5 @@ Aldaketa bat proposatu edo inplementatu aurretik, dagokion skill-a irakurri irte
 - **Settings batch access**: `whereIn` eta `upsert` erabiltzea hobetsi individual query-en ordez
 - **Clean Blade rule**: ez datu-base kontsultarik `resources/views/**` barruan
 - **Admin taula ekintzen koherentzia**: edit/delete botoietan notice taulako icon-button eredua mantendu (`rounded-full` + hover semantika bera), admin zerrendetan estilo-banaketa saihesteko
+- **Bozketen osotasun araua**: boto-paper bakoitzak aukera bakarra izan behar badu, aplikazio-mailako balidazioaz gain DB unique muga ere derrigorrez ezarri (`voting_ballot_id`)
+- **Admin agregazio araua**: Livewire zerrendetan per-row count/query patroia saihestu; query bakarreko agregazioa edo mapaketa in-memory bakarra lehenetsi N+1 minimizatzeko
