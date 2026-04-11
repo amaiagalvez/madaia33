@@ -142,12 +142,12 @@ class CreateOwnerAction
         $assignments = $data['assignments'] ?? [];
 
         if ($assignments === []) {
-            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
+            return '<p>'.e(__('admin.owners.email.no_properties')).'</p>';
         }
 
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
@@ -166,17 +166,17 @@ class CreateOwnerAction
                     return null;
                 }
 
-                $label = $property->location->code . ' ' . $property->name;
+                $label = $property->location->code.' '.$property->name;
 
-                return '<li>' . e($label) . '</li>';
+                return '<li>'.e($label).'</li>';
             })
             ->filter()
             ->values();
 
         if ($items->isEmpty()) {
-            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
+            return '<p>'.e(__('admin.owners.email.no_properties')).'</p>';
         }
 
-        return '<ul>' . $items->implode('') . '</ul>';
+        return '<ul>'.$items->implode('').'</ul>';
     }
 }

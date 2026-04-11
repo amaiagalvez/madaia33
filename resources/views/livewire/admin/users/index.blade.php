@@ -29,7 +29,8 @@
                             <div>
                                 <label for="user-name"
                                     class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.name') }}</label>
-                                <input id="user-name" type="text" wire:model="name" @disabled($editingUserId !== null) @readonly($editingUserId !== null)
+                                <input id="user-name" type="text" wire:model="name"
+                                    @disabled($editingUserId !== null) @readonly($editingUserId !== null)
                                     class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
                                 @error('name')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -39,7 +40,8 @@
                             <div>
                                 <label for="user-email"
                                     class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.email') }}</label>
-                                <input id="user-email" type="email" wire:model="email" @disabled($editingUserId !== null) @readonly($editingUserId !== null)
+                                <input id="user-email" type="email" wire:model="email"
+                                    @disabled($editingUserId !== null) @readonly($editingUserId !== null)
                                     class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
                                 @error('email')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -134,27 +136,39 @@
                         @if ($editingUserId !== null)
                             <div class="rounded-xl border border-stone-200">
                                 <div class="border-b border-stone-200 bg-stone-50 px-4 py-3">
-                                    <h3 class="text-sm font-semibold text-stone-800">{{ __('admin.users.sessions_title') }}</h3>
+                                    <h3 class="text-sm font-semibold text-stone-800">
+                                        {{ __('admin.users.sessions_title') }}</h3>
                                 </div>
                                 <div class="max-h-80 overflow-y-auto">
                                     <table class="min-w-full divide-y divide-stone-200">
                                         <thead class="bg-stone-50">
                                             <tr>
-                                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">{{ __('admin.users.sessions_login_at') }}</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">{{ __('admin.users.sessions_logout_at') }}</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">IP</th>
+                                                <th
+                                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">
+                                                    {{ __('admin.users.sessions_login_at') }}</th>
+                                                <th
+                                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">
+                                                    {{ __('admin.users.sessions_logout_at') }}</th>
+                                                <th
+                                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">
+                                                    IP</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-stone-100 bg-white">
                                             @forelse ($editingUserSessions as $session)
                                                 <tr>
-                                                    <td class="px-4 py-2 text-xs text-stone-700">{{ $session['logged_in_at'] ?? '—' }}</td>
-                                                    <td class="px-4 py-2 text-xs text-stone-700">{{ $session['logged_out_at'] ?? '—' }}</td>
-                                                    <td class="px-4 py-2 text-xs text-stone-700">{{ $session['ip_address'] ?? '—' }}</td>
+                                                    <td class="px-4 py-2 text-xs text-stone-700">
+                                                        {{ $session['logged_in_at'] ?? '—' }}</td>
+                                                    <td class="px-4 py-2 text-xs text-stone-700">
+                                                        {{ $session['logged_out_at'] ?? '—' }}</td>
+                                                    <td class="px-4 py-2 text-xs text-stone-700">
+                                                        {{ $session['ip_address'] ?? '—' }}</td>
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="3" class="px-4 py-4 text-center text-xs text-stone-500">{{ __('admin.users.sessions_empty') }}</td>
+                                                    <td colspan="3"
+                                                        class="px-4 py-4 text-center text-xs text-stone-500">
+                                                        {{ __('admin.users.sessions_empty') }}</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>
@@ -219,7 +233,8 @@
                             @forelse ($user->managedLocations as $managedLocation)
                                 <span
                                     class="inline-flex items-center rounded-full bg-[#edd2c7]/45 px-2 py-0.5 text-xs font-medium text-[#793d3d]">
-                                    {{ __('admin.locations.types.' . $managedLocation->type) }} {{ $managedLocation->code }}
+                                    {{ __('admin.locations.types.' . $managedLocation->type) }}
+                                    {{ $managedLocation->code }}
                                 </span>
                             @empty
                                 <span class="text-stone-400">—</span>

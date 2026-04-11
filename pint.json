@@ -8,6 +8,7 @@
     ],
     "rules": {
         "indentation_type": true,
+        "statement_indentation": true,
         "ordered_imports": {
             "sort_algorithm": "length"
         },

@@ -37,8 +37,8 @@ class UserLoginSessionFactory extends Factory
     {
         return $this->state(function (array $attributes): array {
             $loggedInAt = isset($attributes['logged_in_at'])
-                ? Carbon::parse((string) $attributes['logged_in_at'])
-                : now()->subHour();
+              ? Carbon::parse((string) $attributes['logged_in_at'])
+              : now()->subHour();
 
             return [
                 'logged_out_at' => $loggedInAt->copy()->addMinutes(45),

@@ -45,6 +45,29 @@ it('lists users excluding superadmin id 1', function () {
         ->assertDontSee('Super Admin');
 });
 
+it('shows assigned managed locations in users list', function () {
+    $manager = User::factory()->create([
+        'email' => 'manager-locations@example.com',
+    ]);
+    $manager->assignRole(Role::GENERAL_ADMIN);
+
+    $communityAdmin = User::factory()->create([
+        'name' => 'Community Locations User',
+    ]);
+    $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
+
+    $portal = Location::factory()->portal()->create(['code' => 'L-PORTAL-01']);
+    $garage = Location::factory()->garage()->create(['code' => 'L-GARAGE-01']);
+    $communityAdmin->managedLocations()->sync([$portal->id, $garage->id]);
+
+    test()->actingAs($manager)
+        ->get(route('admin.users.index'))
+        ->assertOk()
+        ->assertSee('Community Locations User')
+        ->assertSee('L-PORTAL-01')
+        ->assertSee('L-GARAGE-01');
+});
+
 it('allows admin general to create a community admin with multiple locations', function () {
     $manager = User::factory()->create();
     $manager->assignRole(Role::GENERAL_ADMIN);

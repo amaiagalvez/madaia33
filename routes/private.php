@@ -70,7 +70,6 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/usuarios', fn () => view('admin.users.index'))
         ->middleware('role:superadmin,admin_general')
         ->name('users.index');
-
 });
 
 Route::middleware('auth')->post('/impersonacion/volver-a-mi-usuario', function (Request $request) {
