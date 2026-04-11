@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property-read string|null $location_code
+ * @property-read string|null $location_type
+ */
 class NoticeLocation extends Model
 {
     use SoftDeletes;
@@ -37,28 +40,24 @@ class NoticeLocation extends Model
     /**
      * Virtual compatibility attribute used in views/tests.
      */
-    protected function locationCode(): Attribute
+    public function getLocationCodeAttribute(): ?string
     {
-        return Attribute::get(function (): ?string {
-            if ($this->relationLoaded('location') && $this->location !== null) {
-                return $this->location->code;
-            }
+        if ($this->relationLoaded('location') && $this->location !== null) {
+            return $this->location->code;
+        }
 
-            return $this->location?->code;
-        });
+        return $this->location?->code;
     }
 
     /**
      * Virtual compatibility attribute used in views/tests.
      */
-    protected function locationType(): Attribute
+    public function getLocationTypeAttribute(): ?string
     {
-        return Attribute::get(function (): ?string {
-            if ($this->relationLoaded('location') && $this->location !== null) {
-                return $this->location->type;
-            }
+        if ($this->relationLoaded('location') && $this->location !== null) {
+            return $this->location->type;
+        }
 
-            return $this->location?->type;
-        });
+        return $this->location?->type;
     }
 }

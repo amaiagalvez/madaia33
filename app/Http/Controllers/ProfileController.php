@@ -152,12 +152,12 @@ class ProfileController extends Controller
     }
 
     /**
-     * @return Collection<int, array{id: int, ip_address: string|null, logged_in_at: Carbon|null, logged_out_at: Carbon|null, duration: string|null}>
+     * @return array<int, array<string, mixed>>
      */
-    private function loginSessions(?int $userId): Collection
+    private function loginSessions(?int $userId): array
     {
         if ($userId === null) {
-            return collect();
+            return [];
         }
 
         return UserLoginSession::query()
@@ -165,9 +165,9 @@ class ProfileController extends Controller
             ->orderByDesc('logged_in_at')
             ->get(['id', 'logged_in_at', 'logged_out_at', 'ip_address'])
             ->map(static function (UserLoginSession $session): array {
-                $loggedInAt = $session->logged_in_at === null ? null : Carbon::parse((string) $session->logged_in_at);
-                $loggedOutAt = $session->logged_out_at === null ? null : Carbon::parse((string) $session->logged_out_at);
-                $seconds = $loggedInAt !== null && $loggedOutAt !== null
+                $loggedInAt = Carbon::parse($session->logged_in_at);
+                $loggedOutAt = $session->logged_out_at !== null ? Carbon::parse($session->logged_out_at) : null;
+                $seconds = $loggedOutAt !== null
                     ? $loggedOutAt->diffInSeconds($loggedInAt)
                     : null;
 
@@ -176,13 +176,15 @@ class ProfileController extends Controller
                     'ip_address' => $session->ip_address,
                     'logged_in_at' => $loggedInAt,
                     'logged_out_at' => $loggedOutAt,
-                    'duration' => $seconds === null ? null : gmdate('H:i:s', $seconds),
+                    'duration' => $seconds === null ? null : gmdate('H:i:s', (int) $seconds),
                 ];
-            });
+            })
+            ->values()
+            ->all();
     }
 
     /**
-     * @return Collection<int, array{id: int, voting_name: string, voted_at: Carbon|null}>
+     * @return Collection<int, array{id: int, voting_name: string, voted_at: Carbon}>
      */
     private function userBallots(?int $userId): Collection
     {
@@ -198,7 +200,7 @@ class ProfileController extends Controller
             ->map(static fn (VotingBallot $ballot): array => [
                 'id' => $ballot->id,
                 'voting_name' => $ballot->voting->name,
-                'voted_at' => $ballot->voted_at === null ? null : Carbon::parse((string) $ballot->voted_at),
+                'voted_at' => Carbon::parse($ballot->voted_at),
             ]);
     }
 }

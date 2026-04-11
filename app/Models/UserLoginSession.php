@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Database\Factories\UserLoginSessionFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -13,7 +14,7 @@ class UserLoginSession extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
@@ -24,6 +25,11 @@ class UserLoginSession extends Model
         'logged_in_at',
         'logged_out_at',
     ];
+
+    protected static function newFactory(): UserLoginSessionFactory
+    {
+        return UserLoginSessionFactory::new();
+    }
 
     /**
      * @return array<string, string>

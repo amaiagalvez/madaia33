@@ -246,7 +246,7 @@ class Owners extends Component
             'coprop2_dni' => $data['coprop2Dni'] ?: null,
             'coprop2_phone' => $data['coprop2Phone'] ?: null,
             'coprop2_email' => $data['coprop2Email'] ?: null,
-            'assignments' => collect($data['newAssignments'])->map(static function (array $assignment): array {
+            'assignments' => collect(is_array($data['newAssignments']) ? $data['newAssignments'] : [])->map(static function (array $assignment): array {
                 return [
                     'property_id' => (int) $assignment['property_id'],
                     'start_date' => $assignment['start_date'],

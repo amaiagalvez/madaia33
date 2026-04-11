@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\User;
 use Livewire\Component;
 use App\Models\Location;
 use Livewire\WithPagination;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class Locations extends Component
 {
@@ -24,12 +26,14 @@ class Locations extends Component
 
     public function render(): View
     {
-        abort_unless(auth()->user()?->canAccessAdminPanel(), 403);
+        $user = Auth::user();
+
+        abort_unless($user instanceof User && $user->canAccessAdminPanel(), 403);
 
         $query = Location::where('type', $this->type);
 
-        if (! auth()->user()?->canManageAllLocations()) {
-            $query->whereIn('id', auth()->user()?->managedLocations()->pluck('locations.id'));
+        if (! $user->canManageAllLocations()) {
+            $query->whereIn('id', $user->managedLocations()->pluck('locations.id'));
         }
 
         $locations = $query

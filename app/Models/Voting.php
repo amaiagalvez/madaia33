@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
 use Database\Factories\VotingFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +26,11 @@ class Voting extends Model
         'is_published',
         'is_anonymous',
     ];
+
+    protected static function newFactory(): VotingFactory
+    {
+        return VotingFactory::new();
+    }
 
     protected function casts(): array
     {
@@ -103,11 +109,10 @@ class Voting extends Model
     public function isOpen(): bool
     {
         $today = today();
+        $startsAtDate = Carbon::parse($this->starts_at);
+        $endsAtDate = Carbon::parse($this->ends_at);
 
-        return $this->starts_at !== null
-            && $this->ends_at !== null
-            && $this->starts_at->lte($today)
-            && $this->ends_at->gte($today);
+        return $startsAtDate->lte($today) && $endsAtDate->gte($today);
     }
 
     public function hasLocationRestrictions(): bool

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\SupportedLocales;
 use Illuminate\Support\Facades\Cache;
+use Database\Factories\SettingFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -34,6 +35,11 @@ class Setting extends Model
         'value',
         'section',
     ];
+
+    protected static function newFactory(): SettingFactory
+    {
+        return SettingFactory::new();
+    }
 
     protected static function booted(): void
     {

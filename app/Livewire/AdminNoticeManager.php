@@ -51,7 +51,7 @@ class AdminNoticeManager extends Component
     public bool $showForm = false;
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     protected function rules(): array
     {
@@ -110,11 +110,11 @@ class AdminNoticeManager extends Component
 
         $user = $this->currentUser();
 
-        if ($user?->hasRole(Role::GENERAL_ADMIN)) {
+        if ($user->hasRole(Role::GENERAL_ADMIN)) {
             $this->selectedLocations = [];
         }
 
-        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
@@ -133,11 +133,11 @@ class AdminNoticeManager extends Component
 
         $user = $this->currentUser();
 
-        if ($user?->hasRole(Role::GENERAL_ADMIN)) {
+        if ($user->hasRole(Role::GENERAL_ADMIN)) {
             $this->selectedLocations = [];
         }
 
-        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
@@ -368,7 +368,6 @@ class AdminNoticeManager extends Component
             'portal' => __('admin.locations.types.portal') . ' ',
             'local' => __('admin.locations.types.local') . ' ',
             'garage' => __('admin.locations.types.garage') . ' ',
-            'storage' => __('admin.locations.types.storage') . ' ',
             default => '',
         };
     }

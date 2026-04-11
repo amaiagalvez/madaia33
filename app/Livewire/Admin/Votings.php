@@ -149,8 +149,8 @@ class Votings extends Component
         $normalizedOptions = collect($this->options)
             ->map(static function (array $option): array {
                 return [
-                    'label_eu' => trim((string) ($option['labelEu'] ?? '')),
-                    'label_es' => trim((string) ($option['labelEs'] ?? '')),
+                    'label_eu' => trim((string) $option['labelEu']),
+                    'label_es' => trim((string) $option['labelEs']),
                 ];
             })
             ->filter(fn (array $option): bool => $option['label_eu'] !== '')
@@ -242,9 +242,9 @@ class Votings extends Component
 
         $this->ownersModalRows = $ballots
             ->map(fn (VotingBallot $ballot): array => [
-                'name' => $ballot->owner?->coprop1_name ?? '—',
+                'name' => $ballot->owner->coprop1_name,
                 'percentage' => $ballot->owner instanceof Owner ? $this->eligibilityService->percentageForOwner($voting, $ballot->owner) : 0.0,
-                'delegated_by' => $ballot->is_in_person ? __('votings.admin.in_person_vote') : ($ballot->castByUser?->name ?? '—'),
+                'delegated_by' => $ballot->is_in_person ? __('votings.admin.in_person_vote') : $ballot->castByUser->name,
                 'delegate_dni' => $ballot->cast_delegate_dni ?? '—',
             ])
             ->values()
@@ -394,6 +394,7 @@ class Votings extends Component
     }
 
     /**
+     * @param  LengthAwarePaginator<int, Voting>  $votings
      * @return array<int, int>
      */
     private function censusCounts(LengthAwarePaginator $votings): array

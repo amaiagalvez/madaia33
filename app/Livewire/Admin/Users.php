@@ -166,7 +166,7 @@ class Users extends Component
         $user = User::query()->where('id', '!=', 1)->findOrFail($userId);
 
         if (! session()->has('impersonator_user_id')) {
-            session()->put('impersonator_user_id', $this->currentUser()?->id);
+            session()->put('impersonator_user_id', $this->currentUser()->id);
         }
 
         Auth::login($user);
@@ -265,8 +265,8 @@ class Users extends Component
                 return [
                     'id' => (string) $session->id,
                     'ip_address' => $session->ip_address,
-                    'logged_in_at' => $session->logged_in_at?->format('Y-m-d H:i:s'),
-                    'logged_out_at' => $session->logged_out_at?->format('Y-m-d H:i:s'),
+                    'logged_in_at' => $session->logged_in_at,
+                    'logged_out_at' => $session->logged_out_at,
                 ];
             })
             ->all();

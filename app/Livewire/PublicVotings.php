@@ -337,8 +337,11 @@ class PublicVotings extends Component
         }
 
         $votings = $this->eligibilityService
-            ->openEligibleVotingsForOwner($this->activeOwner)
-            ->load('ballots');
+            ->openEligibleVotingsForOwner($this->activeOwner);
+
+        $votings->each(static function (Voting $voting): void {
+            $voting->load('ballots');
+        });
 
         abort_if($votings->isEmpty(), 404);
 
