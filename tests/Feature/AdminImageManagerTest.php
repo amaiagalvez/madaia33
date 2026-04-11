@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Tarea 10: Panel de administración — Gestión de imágenes
-// Valida: Requisitos 6.2, 6.3, 3.2, 3.3
+// Feature: community-web, Task 10: Admin panel — Image management
+// Validates: Requirements 6.2, 6.3, 3.2, 3.3
 
 use App\Models\User;
 use App\Models\Image;
@@ -14,11 +14,11 @@ beforeEach(function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Subir imagen → aparece en galería pública
-// Valida: Requisitos 6.2, 3.2
+// Upload image -> appears in public gallery
+// Validates: Requirements 6.2, 3.2
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('subir imagen la hace aparecer en la galería pública', function () {
+it('uploading an image makes it appear in public gallery', function () {
     $user = User::factory()->create();
     $file = UploadedFile::fake()->image('foto.jpg', 100, 100);
 
@@ -42,11 +42,11 @@ it('subir imagen la hace aparecer en la galería pública', function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Eliminar imagen → desaparece de galería pública
-// Valida: Requisitos 6.2, 3.3
+// Delete image -> disappears from public gallery
+// Validates: Requirements 6.2, 3.3
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('eliminar imagen la quita de la galería pública', function () {
+it('deleting an image removes it from public gallery', function () {
     $user = User::factory()->create();
     $file = UploadedFile::fake()->image('foto.png', 100, 100);
 
@@ -72,7 +72,7 @@ it('eliminar imagen la quita de la galería pública', function () {
     expect($gallery->images->pluck('id'))->not->toContain($image->id);
 });
 
-it('muestra alt texts en ambos idiomas y etiqueta en la lista admin de imágenes', function () {
+it('shows alt texts in both languages and tag in admin images list', function () {
     $user = User::factory()->create();
     $image = Image::factory()->create([
         'alt_text_eu' => 'Atari nagusia',

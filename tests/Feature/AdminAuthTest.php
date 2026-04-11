@@ -1,17 +1,17 @@
 <?php
 
-// Feature: community-web, Tarea 8: Autenticación del panel de administración
-// Valida: Requisitos 6.5, 6.6
+// Feature: community-web, Task 8: Admin panel authentication
+// Validates: Requirements 6.5, 6.6
 
 use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Login correcto → redirige al dashboard admin
-// Valida: Requisito 6.5
+// Validates: Requirement 6.5
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('login con credenciales correctas redirige al dashboard admin', function () {
+it('login with correct credentials redirects to admin dashboard', function () {
     $user = User::factory()->create();
 
     $this->withoutMiddleware(PreventRequestForgery::class)
@@ -25,11 +25,11 @@ it('login con credenciales correctas redirige al dashboard admin', function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Login incorrecto → muestra error y no concede acceso
-// Valida: Requisito 6.6
+// Invalid login -> shows error and denies access
+// Validates: Requirement 6.6
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('login con credenciales incorrectas muestra error y no concede acceso', function () {
+it('login with incorrect credentials shows error and denies access', function () {
     $user = User::factory()->create();
 
     $this->withoutMiddleware(PreventRequestForgery::class)
@@ -43,11 +43,11 @@ it('login con credenciales incorrectas muestra error y no concede acceso', funct
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Acceso a /admin sin autenticación → redirige al login
-// Valida: Requisito 6.5
+// Accessing /admin without authentication -> redirects to login
+// Validates: Requirement 6.5
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('acceder a /admin sin autenticación redirige al login', function () {
+it('accessing /admin without authentication redirects to login', function () {
     $this->get(route('admin.dashboard'))
         ->assertRedirect(route('login'));
 });

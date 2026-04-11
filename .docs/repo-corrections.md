@@ -115,3 +115,6 @@
 - In Dusk admin tests, avoid `User::factory()->create()` for authenticated admin flows; login with the seeded admin account (or explicitly assign `SUPER_ADMIN`) to prevent false failures from 403 responses before DOM assertions.
 - In `admin-message-inbox`, default `unread` filter can hide a message immediately after `openMessage()` marks it as read; in tests switch filter to `all` before asserting expanded detail content.
 - If inbox default filter changes (e.g., `unread` -> `all`), update both behavior assertions and test naming to avoid false regressions from stale expectations.
+- For broad test-comment translation tasks, first run an `rg` inventory, then apply controlled phrase replacements by file and finish with `php artisan test --compact` on touched files to guarantee behavior remains unchanged.
+- When adding agent-policy rules in `AGENTS.md`, encode the requirement with explicit agent scope + mandatory wording (e.g., `amalurra priority rule (mandatory)`) so the instruction is unambiguous and easy to enforce.
+- If the user asks to add rules in specific agent files, update `.github/agents/*.agent.md` directly (not only `AGENTS.md`) and keep the rule text symmetric across the requested agents.

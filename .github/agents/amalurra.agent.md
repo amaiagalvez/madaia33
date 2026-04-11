@@ -114,6 +114,8 @@ When the user confirms execution:
 
 **Primary rule**: whenever possible, prioritize **Unit tests** (`tests/Unit/`) without database for pure logic:
 
+- **Amalurra priority rule (mandatory)**: when Amalurra proposes or executes testing work, it must prioritize Unit tests first and only keep or add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
+
 - **Pure logic** (validation rules, formatters, enums, transformers, calculations): `tests/Unit/`
 - **Integration flows** (HTTP, Livewire reactivity, database, side effects): `tests/Feature/`
 - **Rationale**: unit tests run in milliseconds; feature tests are slower
@@ -126,7 +128,7 @@ When the user confirms execution:
 ## Implementation Rules
 
 - **Database tables and seeders**: when creating new tables, always add/update related seeding in `database/seeders/DevSeeder.php` so local/dev data remains usable
-- **Indentation**: enforce **4 spaces** in all created/modified files (no tabs, no 2-space indentation), and run `vendor/bin/pint --dirty` to confirm format
+- **Indentation**: enforce **4 spaces** in all created/modified files, and run `vendor/bin/pint --dirty` to confirm format
 - **Class naming and folder clarity**: if class is placed under `app/Admin/Locations.php`, class should be named `Locations` (not `AdminLocations`); avoid repeating folder semantics in class names
 
 ---

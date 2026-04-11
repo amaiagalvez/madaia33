@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Tarea 13: Páginas legales, SEO y seguridad
-// Valida: Requisitos 15.1–15.4
+// Feature: community-web, Task 13: Legal pages, SEO, and security
+// Validates: Requirements 15.1–15.4
 
 use App\Models\User;
 use Livewire\Livewire;
@@ -11,18 +11,18 @@ use App\SupportedLocales;
 dataset('supported_locales', SupportedLocales::all());
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Acceso público a páginas legales
+// Public access to legal pages
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('la página de política de privacidad es accesible públicamente', function (string $locale) {
+it('privacy policy page is publicly accessible', function (string $locale) {
     test()->get(route(SupportedLocales::routeName('privacy-policy', $locale)))->assertOk();
 })->with('supported_locales');
 
-it('la página de aviso legal es accesible públicamente', function (string $locale) {
+it('legal notice page is publicly accessible', function (string $locale) {
     test()->get(route(SupportedLocales::routeName('legal-notice', $locale)))->assertOk();
 })->with('supported_locales');
 
-it('las páginas legales reutilizan la misma vista pública con contenido diferenciado', function (string $locale) {
+it('legal pages reuse the same public view with different content', function (string $locale) {
     createSetting('legal_page_privacy_policy_eu', 'Pribatutasun eduki partekatua');
     createSetting('legal_page_legal_notice_eu', 'Lege ohar eduki partekatua');
 
@@ -42,10 +42,10 @@ it('las páginas legales reutilizan la misma vista pública con contenido difere
 })->with('supported_locales');
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Admin puede editar el contenido de páginas legales
+// Admin can edit legal pages content
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('el admin puede guardar el contenido de política de privacidad', function () {
+it('admin can save privacy policy content', function () {
     $user = User::factory()->create();
 
     Livewire::actingAs($user)
@@ -61,7 +61,7 @@ it('el admin puede guardar el contenido de política de privacidad', function ()
     expect(settingValue('legal_page_privacy_policy_es'))->toBe('Nueva política de privacidad');
 });
 
-it('el admin puede guardar el contenido de aviso legal', function () {
+it('admin can save legal notice content', function () {
     $user = User::factory()->create();
 
     Livewire::actingAs($user)
@@ -77,7 +77,7 @@ it('el admin puede guardar el contenido de aviso legal', function () {
     expect(settingValue('legal_page_legal_notice_es'))->toBe('Nuevo aviso legal');
 });
 
-it('el componente carga el contenido existente al montar', function () {
+it('component loads existing content on mount', function () {
     createSetting('legal_page_privacy_policy_eu', 'Eduki existentea');
     createSetting('legal_page_privacy_policy_es', 'Contenido existente');
 
@@ -89,6 +89,6 @@ it('el componente carga el contenido existente al montar', function () {
         ->assertSet('privacyContentEs', 'Contenido existente');
 });
 
-it('la antigua ruta admin de páginas legales ya no existe', function () {
+it('legacy admin route for legal pages no longer exists', function () {
     test()->get('/admin/paginas-legales')->assertNotFound();
 });

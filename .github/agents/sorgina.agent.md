@@ -123,6 +123,8 @@ When the user responds with approval ("yes", "go ahead", "ok", etc.):
 
 **Primary rule**: whenever possible, prioritize **Unit tests** in `tests/Unit/` (no database) for pure logic:
 
+- **Sorgina priority rule (mandatory)**: when Sorgina proposes or executes testing work, it must prioritize Unit tests first and only keep or add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
+
 - **Pure logic** (validation rules, formatters, enums, transformers, calculations): `tests/Unit/`
 - **Integration flows** (HTTP, Livewire reactivity, database, side effects): `tests/Feature/`
 - **Rationale**: unit tests run in milliseconds, feature tests are slower

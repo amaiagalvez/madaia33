@@ -6,11 +6,6 @@
 - [ ] traducciones repetidas
 - [ ] añadir el MCP para que consulte la documentación de laravel
 
-
-- [ ] dentro de la carpeta madaia33 buscar todos los ficheros y carpetas que sean del usuario root y ponerles amaia:amaia
-
-
-
 # Copilot
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario
@@ -19,7 +14,6 @@
 # Code
 - [ ] crear un componente, si todavía no lo hay, para que todas los listados tablas tengan la missma estructura
 - [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente si no lo hay
-- [ ] traducir todos los test al ingles, si hay explicaciones de código que sean en euskera
 - [ ] Ordena los ficheros dentro de la carpeta Livewire en subcarpetas Admin y Front
 - [ ] user hizkuntza, besdin du front-ekoa
 - [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
@@ -45,12 +39,19 @@
 
 - [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla "receivers" con el user_id de a quien se le ha enviado, el email al que se ha enviado, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje
 - [ ] Trackea los mensajes para que se pueda saber quien lo ha habierto y quien ha pinchado en los enlaces del mensaje si los hubiera
+
 - [ ] Hay que marcar quien es el jefe de portal o de planta de garaje
 - [ ] añadir locales a las localizations
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 
 
-# profila
+# nohizbehinka egiteko 2026-04-11
+- [ ] Repasa los feature test y los que se pueedan convertir en unit pasalos
+- [ ] Repasa la suit de test y completa los que falten
+- [ ] dentro de la carpeta madaia33 buscar todos los ficheros y carpetas que sean del usuario root y ponerles amaia:amaia
+- [ ] con el agente sorgina repasar el código y proponer mejoras
+
+ # profila
 - [ ] usa el mismo componente para mostrar en el menu del front y del aginte-panela el nombre de usuario y el logout, usa como referencia el del aginte panela que está mejor
 - [ ] 
 un usuario tiene que tener un perfil desde el que pueda ver:
@@ -78,7 +79,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación
 añadir una ruta al menú del panel 
 tiene que estar en dos idiomas eu y es
-añadir una regla al agente amalur para que lo mantenga actualizado 
+- [x] añadir una regla al agente amalur para que lo mantenga actualizado
 
 ## Txuletak
 /dusk-test pasar los dusk test

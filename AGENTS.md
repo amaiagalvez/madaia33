@@ -222,6 +222,8 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 ## Unit Tests Without Database (Preferred)
 
+- **amalurra priority rule (mandatory)**: When `amalurra` proposes or executes testing work, it must prioritize Unit tests first and only keep/add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
+- **sorgina priority rule (mandatory)**: When `sorgina` proposes or executes testing work, it must prioritize Unit tests first and only keep/add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
 - **amalurra** and **sorgina** agents: Always prefer **Unit tests** (`tests/Unit/`) over Feature tests when validating logic that does not require database access (pure functions, value objects, transformers, formatters, helpers, service methods without persistence).
 - Split test scenarios: keep pure logic unit tests fast (`tests/Unit/`), and use Feature tests only for database interaction, HTTP flows, or Livewire reactivity.
 - Rationale: Unit tests without database run in milliseconds and provide instant feedback, enabling faster iteration and reducing CI/CD overhead. Reserve Feature tests for integration scenarios only.

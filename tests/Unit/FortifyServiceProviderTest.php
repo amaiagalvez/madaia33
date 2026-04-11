@@ -5,7 +5,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use App\Providers\FortifyServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 
-it('configura el rate limiter de two-factor con la clave de sesión login.id', function () {
+it('configures two-factor rate limiter with login.id session key', function () {
     (new FortifyServiceProvider(app()))->boot();
 
     $limiter = RateLimiter::limiter('two-factor');

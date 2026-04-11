@@ -16,8 +16,8 @@ it('builds fallback chains starting from the requested locale', function () {
 
 it('builds localized setting keys for the fallback chain', function () {
     expect(SupportedLocales::localizedKeys('legal_checkbox_text', SupportedLocales::SPANISH))->toBe([
-        'legal_checkbox_text_'.SupportedLocales::SPANISH,
-        'legal_checkbox_text_'.SupportedLocales::BASQUE,
+        'legal_checkbox_text_' . SupportedLocales::SPANISH,
+        'legal_checkbox_text_' . SupportedLocales::BASQUE,
     ]);
 });
 
@@ -25,4 +25,16 @@ it('returns locale metadata values with fallback for unsupported locales', funct
     expect(SupportedLocales::adminTabTranslationKey(SupportedLocales::BASQUE))->toBe('EUS')
         ->and(SupportedLocales::propertySuffix(SupportedLocales::SPANISH))->toBe('Es')
         ->and(SupportedLocales::switcherLabel('fr'))->toBe('EU');
+});
+
+it('builds route names with the given locale suffix', function () {
+    expect(SupportedLocales::routeName('home', SupportedLocales::BASQUE))->toBe('home.eu')
+        ->and(SupportedLocales::routeName('notices', SupportedLocales::SPANISH))->toBe('notices.es')
+        ->and(SupportedLocales::routeName('privacy-policy', 'fr'))->toBe('privacy-policy.eu');
+});
+
+it('strips the locale suffix to recover the base route name', function () {
+    expect(SupportedLocales::baseRouteName('home.eu'))->toBe('home')
+        ->and(SupportedLocales::baseRouteName('notices.es'))->toBe('notices')
+        ->and(SupportedLocales::baseRouteName('no-suffix-route'))->toBe('no-suffix-route');
 });

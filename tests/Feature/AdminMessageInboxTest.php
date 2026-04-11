@@ -1,18 +1,18 @@
 <?php
 
-// Feature: community-web, Tarea 11: Panel de administración — Bandeja de mensajes
-// Valida: Requisitos 14.1–14.8
+// Feature: community-web, Task 11: Admin panel — Message inbox
+// Validates: Requirements 14.1–14.8
 
 use App\Models\User;
 use Livewire\Livewire;
 use App\Models\ContactMessage;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 14: Completitud de la bandeja de mensajes
-// Valida: Requisito 14.1
+// Property 14: Message inbox completeness
+// Validates: Requirement 14.1
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('todos los mensajes aparecen en la bandeja al activar el filtro de todos', function () {
+it('all messages appear in inbox when all filter is active', function () {
     $user = User::factory()->create();
     $read = ContactMessage::factory()->read()->create();
     $unread = ContactMessage::factory()->unread()->create();
@@ -27,11 +27,11 @@ it('todos los mensajes aparecen en la bandeja al activar el filtro de todos', fu
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 16: Toggle de estado de lectura es reversible con diferenciación visual
-// Valida: Requisitos 14.4, 14.5
+// Property 16: Read status toggle is reversible with visual differentiation
+// Validates: Requirements 14.4, 14.5
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('el toggle de lectura es reversible', function () {
+it('read toggle is reversible', function () {
     $user = User::factory()->create();
     $message = ContactMessage::factory()->unread()->create();
 
@@ -47,7 +47,7 @@ it('el toggle de lectura es reversible', function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tests de ejemplo
+// Example tests
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('abrir un mensaje lo marca automáticamente como leído', function () {
@@ -76,7 +76,7 @@ it('abrir un mensaje ya leído no cambia read_at', function () {
         ->toBe($readAt->timestamp);
 });
 
-it('abrir el mismo mensaje dos veces cierra el detalle', function () {
+it('opening the same message twice closes detail', function () {
     $user = User::factory()->create();
     $message = ContactMessage::factory()->unread()->create();
 
@@ -88,7 +88,7 @@ it('abrir el mismo mensaje dos veces cierra el detalle', function () {
         ->assertSet('openMessageId', null);
 });
 
-it('eliminar con confirmación borra el mensaje', function () {
+it('delete with confirmation removes message', function () {
     $user = User::factory()->create();
     $message = ContactMessage::factory()->create();
 
@@ -100,7 +100,7 @@ it('eliminar con confirmación borra el mensaje', function () {
     expect(ContactMessage::find($message->id))->toBeNull();
 });
 
-it('confirmar eliminación guarda el id y borrar limpia selección y detalle abierto', function () {
+it('confirm delete stores id and deleting clears selection and open detail', function () {
     $user = User::factory()->create();
     $message = ContactMessage::factory()->create();
 
@@ -116,7 +116,7 @@ it('confirmar eliminación guarda el id y borrar limpia selección y detalle abi
     expect(ContactMessage::find($message->id))->toBeNull();
 });
 
-it('cancelar eliminación no borra el mensaje', function () {
+it('cancel delete does not remove message', function () {
     $user = User::factory()->create();
     $message = ContactMessage::factory()->create();
 
@@ -142,7 +142,7 @@ it('ordenar por created_at desc produce orden correcto', function () {
     expect(array_search($new->id, $ids))->toBeLessThan(array_search($old->id, $ids));
 });
 
-it('usa created_at desc como fallback cuando el orden solicitado no es válido', function () {
+it('uses created_at desc as fallback when requested order is invalid', function () {
     $user = User::factory()->create();
     $old = ContactMessage::factory()->create(['created_at' => now()->subDays(2)]);
     $new = ContactMessage::factory()->create(['created_at' => now()]);
@@ -157,7 +157,7 @@ it('usa created_at desc como fallback cuando el orden solicitado no es válido',
     expect(array_search($new->id, $ids))->toBeLessThan(array_search($old->id, $ids));
 });
 
-it('los mensajes no leídos tienen clase de diferenciación visual en el HTML', function () {
+it('unread messages have visual differentiation class in HTML', function () {
     $user = User::factory()->create();
     ContactMessage::factory()->unread()->create(['subject' => 'Unread subject test']);
 
@@ -167,7 +167,7 @@ it('los mensajes no leídos tienen clase de diferenciación visual en el HTML', 
         ->assertSeeHtml('bg-[#edd2c7]/20');
 });
 
-it('alterna dirección al ordenar por la misma columna y reinicia al cambiar de columna', function () {
+it('toggles direction when sorting same column and resets when column changes', function () {
     $user = User::factory()->create();
 
     Livewire::actingAs($user)
@@ -183,7 +183,7 @@ it('alterna dirección al ordenar por la misma columna y reinicia al cambiar de 
         ->assertSet('sortDir', 'desc');
 });
 
-it('deleteMessage no hace nada si no hay confirmación activa', function () {
+it('deleteMessage does nothing if there is no active confirmation', function () {
     $user = User::factory()->create();
     $message = ContactMessage::factory()->create();
 
@@ -195,7 +195,7 @@ it('deleteMessage no hace nada si no hay confirmación activa', function () {
     expect(ContactMessage::find($message->id))->not->toBeNull();
 });
 
-it('por defecto la bandeja muestra todos los mensajes', function () {
+it('inbox shows all messages by default', function () {
     $user = User::factory()->create();
     ContactMessage::factory()->read()->create();
     $unreadMessage = ContactMessage::factory()->unread()->create();
@@ -207,7 +207,7 @@ it('por defecto la bandeja muestra todos los mensajes', function () {
         ->and($component->messages->pluck('id')->toArray())->toContain(ContactMessage::query()->where('is_read', true)->firstOrFail()->id);
 });
 
-it('permite buscar por cualquier campo textual del mensaje', function () {
+it('allows searching by any textual message field', function () {
     $user = User::factory()->create();
     ContactMessage::factory()->read()->create([
         'name' => 'Ane Iruretagoiena',

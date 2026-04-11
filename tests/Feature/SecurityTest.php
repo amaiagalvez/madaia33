@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Tarea 13: Páginas legales, SEO y seguridad
-// Valida: Requisitos 16.4, 16.5, 17.3
+// Feature: community-web, Task 13: Legal pages, SEO, and security
+// Validates: Requirements 16.4, 16.5, 17.3
 
 use App\Models\User;
 use App\SupportedLocales;
@@ -9,10 +9,10 @@ use App\SupportedLocales;
 dataset('supported_locales', SupportedLocales::all());
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Cabeceras de seguridad HTTP
+// HTTP security headers
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('las cabeceras de seguridad están presentes en rutas públicas', function () {
+it('security headers are present on public routes', function () {
     $response = $this->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)));
 
     $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
@@ -20,7 +20,7 @@ it('las cabeceras de seguridad están presentes en rutas públicas', function ()
     $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 });
 
-it('las cabeceras de seguridad están presentes en rutas admin', function () {
+it('security headers are present on admin routes', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get(route('admin.dashboard'));
@@ -31,10 +31,10 @@ it('las cabeceras de seguridad están presentes en rutas admin', function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Sitemap y robots.txt
+// Sitemap and robots.txt
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('el sitemap.xml es accesible y contiene las URLs públicas', function (string $locale) {
+it('sitemap.xml is accessible and contains public URLs', function (string $locale) {
     $response = $this->get(route('sitemap'));
 
     $response->assertOk()
@@ -43,7 +43,7 @@ it('el sitemap.xml es accesible y contiene las URLs públicas', function (string
         ->assertSee(route(SupportedLocales::routeName('home', $locale)), false);
 })->with('supported_locales');
 
-it('el robots.txt es accesible y contiene las directivas correctas', function () {
+it('robots.txt is accessible and contains correct directives', function () {
     $response = $this->get(route('robots'));
 
     $response->assertOk()
