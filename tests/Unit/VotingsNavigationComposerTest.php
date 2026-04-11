@@ -8,7 +8,7 @@ it('sets showVotingsLink in the view context', function () {
 
     $view->shouldReceive('with')
         ->once()
-        ->withArgs(static fn(string $key, bool $value): bool => $key === 'showVotingsLink');
+        ->withArgs(static fn (string $key, bool $value): bool => $key === 'showVotingsLink');
 
     (new VotingsNavigationComposer)->compose($view);
 });

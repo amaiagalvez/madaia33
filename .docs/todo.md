@@ -60,7 +60,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 - [ ] dentro de la carpeta madaia33 buscar todos los ficheros y carpetas que sean del usuario root y ponerles amaia:amaia
 sudo find /home/amaia/Dokumentuak/madaia33 -user root -exec chown amaia:amaia {} +
 - [ ] con el agente sorgina repasar el código y proponer mejoras
-- [ ] pint pasa guztira
+- [ ] reformat eta quality
 
 ## manual de usuaria
 crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación

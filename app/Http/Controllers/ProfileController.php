@@ -32,7 +32,7 @@ class ProfileController extends Controller
 
         $activeAssignments = $this->activeAssignments($owner);
         $pendingAssignments = $activeAssignments->filter(
-            static fn($assignment): bool => ! (bool) $assignment->owner_validated,
+            static fn ($assignment): bool => ! (bool) $assignment->owner_validated,
         );
 
         $requiresTermsAcceptance = $owner !== null && $owner->accepted_terms_at === null;
@@ -111,8 +111,8 @@ class ProfileController extends Controller
         abort_if($owner === null, 403);
 
         $assignmentIds = collect((array) $request->input('assignment_ids', []))
-            ->map(static fn(mixed $id): int => (int) $id)
-            ->filter(static fn(int $id): bool => $id > 0)
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
             ->values();
 
         if ($assignmentIds->isEmpty()) {
@@ -147,7 +147,7 @@ class ProfileController extends Controller
         }
 
         return $owner->assignments
-            ->filter(static fn($assignment): bool => $assignment->end_date === null)
+            ->filter(static fn ($assignment): bool => $assignment->end_date === null)
             ->values();
     }
 
@@ -195,7 +195,7 @@ class ProfileController extends Controller
             ->with('voting:id,name,start_date,end_date')
             ->orderByDesc('voted_at')
             ->get(['id', 'voting_id', 'voted_at'])
-            ->map(static fn(VotingBallot $ballot): array => [
+            ->map(static fn (VotingBallot $ballot): array => [
                 'id' => $ballot->id,
                 'voting_name' => $ballot->voting->name,
                 'voted_at' => $ballot->voted_at === null ? null : Carbon::parse((string) $ballot->voted_at),

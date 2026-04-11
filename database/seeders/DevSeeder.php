@@ -403,7 +403,7 @@ class DevSeeder extends Seeder
                 }
 
                 $delegatedOwner = $eligibleOwners->first(
-                    fn(Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
+                    fn (Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
                 );
 
                 if (! $delegatedOwner instanceof Owner || ! $delegatedUser instanceof User) {
