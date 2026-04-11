@@ -47,6 +47,21 @@ test('admin can access owner sensitive inline controls from index', function () 
     });
 });
 
+test('admin top user menu dropdown opens from the desktop header', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin) {
+        $browser->loginAs($admin)
+            ->visit('/admin')
+            ->waitFor('[data-test="sidebar-menu-button"]', 5)
+            ->click('[data-test="sidebar-menu-button"]')
+            ->waitFor('[data-test="logout-button"]', 5)
+            ->assertPresent('[data-test="logout-button"]')
+            ->assertSee($admin->email);
+    });
+});
+
 test('admin can access location detail sensitive view and sees editable property rows', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 

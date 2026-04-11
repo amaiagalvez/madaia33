@@ -37,8 +37,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-- [ ] Hay que marcar quien es la propietaria que es jefa de portal o de planta de garaje, en el formulario de locations, los que tengan alguna propiedad de ese location
-- [ ] Votaciones. En la pantalla bozketalk el front, si ya he votado, no mostrar las opciones, solo un aviso de que ya he votado.
+
 
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.

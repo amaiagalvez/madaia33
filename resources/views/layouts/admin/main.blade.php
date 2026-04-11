@@ -14,6 +14,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @fluxAppearance
 </head>
 
 <body class="min-h-screen bg-stone-100">
@@ -304,6 +305,7 @@
         </div>
     </div>
 
+    @fluxScripts
 </body>
 
 </html>

@@ -17,4 +17,4 @@ Puede ocurrir que un mismo user tenga varios roloes
 - [ ] Tiene permiso para todo menos para votar
 
 ### GENERAL_ADMIN (Idoia, Emilio)
-- [ ] Tiene permiso para publicar avisos para todos
+- [ ] Tiene permiso para publicar avisos para todas las propietarias 

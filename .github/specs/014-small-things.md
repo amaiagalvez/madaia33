@@ -1,0 +1,3 @@
+- [ ] Hay que marcar quien es la propietaria que es jefa de portal o de planta de garaje, en el formulario de locations, los que tengan alguna propiedad de ese location
+Cuando se marca como jefa de portalo de garaje, automáticamente se le asigna el rol COMMUNITY_ADMIN y cuando se cambia se le quita el rol de COMMUNITY_ADMIN a la anterior y se le pone a la nueva
+- [ ] Votaciones. En la pantalla bozketalk el front, si ya he votado, no mostrar las opciones, solo un aviso de que ya he votado.
