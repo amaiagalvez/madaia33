@@ -12,12 +12,14 @@ use App\Models\ContactMessage;
 // Valida: Requisito 14.1
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('todos los mensajes aparecen en la bandeja sin importar estado de lectura', function () {
+it('todos los mensajes aparecen en la bandeja al activar el filtro de todos', function () {
     $user = User::factory()->create();
     $read = ContactMessage::factory()->read()->create();
     $unread = ContactMessage::factory()->unread()->create();
 
-    $component = Livewire::actingAs($user)->test('admin-message-inbox');
+    $component = Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->call('setReadFilter', 'all');
 
     expect($component->messages->pluck('id'))
         ->toContain($read->id)
@@ -131,7 +133,9 @@ it('ordenar por created_at desc produce orden correcto', function () {
     $old = ContactMessage::factory()->create(['created_at' => now()->subDays(2)]);
     $new = ContactMessage::factory()->create(['created_at' => now()]);
 
-    $component = Livewire::actingAs($user)->test('admin-message-inbox');
+    $component = Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->call('setReadFilter', 'all');
 
     // default is created_at desc
     $ids = $component->messages->pluck('id')->toArray();
@@ -145,6 +149,7 @@ it('usa created_at desc como fallback cuando el orden solicitado no es válido',
 
     $component = Livewire::actingAs($user)
         ->test('admin-message-inbox')
+        ->call('setReadFilter', 'all')
         ->set('sortBy', 'invalid-column')
         ->set('sortDir', 'sideways');
 
@@ -158,6 +163,7 @@ it('los mensajes no leídos tienen clase de diferenciación visual en el HTML', 
 
     Livewire::actingAs($user)
         ->test('admin-message-inbox')
+        ->call('setReadFilter', 'unread')
         ->assertSeeHtml('bg-[#edd2c7]/20');
 });
 
@@ -187,4 +193,38 @@ it('deleteMessage no hace nada si no hay confirmación activa', function () {
         ->call('deleteMessage');
 
     expect(ContactMessage::find($message->id))->not->toBeNull();
+});
+
+it('por defecto la bandeja muestra solo mensajes leídos', function () {
+    $user = User::factory()->create();
+    $readMessage = ContactMessage::factory()->read()->create();
+    ContactMessage::factory()->unread()->create();
+
+    $component = Livewire::actingAs($user)->test('admin-message-inbox');
+
+    expect($component->get('readFilter'))->toBe('read')
+        ->and($component->messages->pluck('id')->toArray())->toContain($readMessage->id)
+        ->and($component->messages->pluck('id')->toArray())->not->toContain(ContactMessage::query()->where('is_read', false)->firstOrFail()->id);
+});
+
+it('permite buscar por cualquier campo textual del mensaje', function () {
+    $user = User::factory()->create();
+    ContactMessage::factory()->read()->create([
+        'name' => 'Ane Iruretagoiena',
+        'email' => 'ane-search@example.com',
+        'subject' => 'Consulta de trastero',
+        'message' => 'Necesito ayuda con la llave del trastero',
+    ]);
+    ContactMessage::factory()->read()->create([
+        'name' => 'Otro nombre',
+        'email' => 'otro@example.com',
+        'subject' => 'Sin coincidencia',
+        'message' => 'Texto sin la palabra buscada',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->set('search', 'trastero')
+        ->assertSee('Ane Iruretagoiena')
+        ->assertDontSee('Otro nombre');
 });

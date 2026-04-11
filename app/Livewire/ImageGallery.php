@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Image;
+use App\Models\Setting;
 use Livewire\Component;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -34,8 +35,13 @@ class ImageGallery extends Component
 
     public function render(): View
     {
+        $frontPrimaryEmail = Setting::stringValue('front_primary_email', 'info@madaia33.eus');
+        $photoRequestText = Setting::localizedString('front_photo_request_text', __('home.history_photos_summary', ['email' => $frontPrimaryEmail]));
+
         return view('livewire.front.image-gallery', [
             'images' => $this->getImagesProperty(),
+            'frontPrimaryEmail' => $frontPrimaryEmail,
+            'photoRequestText' => $photoRequestText,
         ]);
     }
 }

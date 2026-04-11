@@ -20,6 +20,13 @@ it('privacy and legal pages use readable responsive layout', function () {
     $legal->assertSee('data-page-hero="legal"', false);
     $legal->assertSee('text-base leading-relaxed', false);
     $legal->assertSee('text-2xl md:text-3xl font-bold text-gray-900 tracking-tight', false);
+
+    $cookies = test()->get(route(SupportedLocales::routeName('cookie-policy', SupportedLocales::DEFAULT)));
+    $cookies->assertOk();
+    $cookies->assertSee('max-w-prose mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14', false);
+    $cookies->assertSee('data-page-hero="legal"', false);
+    $cookies->assertSee('text-base leading-relaxed', false);
+    $cookies->assertSee('text-2xl md:text-3xl font-bold text-gray-900 tracking-tight', false);
 });
 
 it('private page shows centered responsive placeholder', function (string $locale) {

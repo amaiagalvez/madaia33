@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use App\Http\Composers\BrandingSettingsComposer;
 use App\Http\Composers\VotingsNavigationComposer;
 
 class AppServiceProvider extends ServiceProvider
@@ -107,5 +108,18 @@ class AppServiceProvider extends ServiceProvider
             'layouts.front.main',
             'layouts::front.main',
         ], VotingsNavigationComposer::class);
+
+        View::composer([
+            'components.front.public-brand-link',
+            'front.public-brand-link',
+            'layouts.front.main',
+            'layouts::front.main',
+            'layouts.admin.main',
+            'layouts::admin.main',
+            'layouts.shared.auth.simple',
+            'layouts.shared.auth.split',
+            'layouts.shared.auth.card',
+            'partials.shared.head',
+        ], BrandingSettingsComposer::class);
     }
 }

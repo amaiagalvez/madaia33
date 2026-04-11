@@ -17,7 +17,7 @@
                 <span class="flex h-10 w-10 items-center justify-center rounded-md">
                     <x-shared.app-logo-icon class="me-2 h-7 fill-current text-white" />
                 </span>
-                {{ config('app.name', 'Laravel') }}
+                {{ $publicSiteName ?? config('app.name', 'Laravel') }}
             </a>
 
             @php
@@ -44,7 +44,7 @@
                         <x-shared.app-logo-icon class="size-9 fill-current text-black dark:text-white" />
                     </span>
 
-                    <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+                    <span class="sr-only">{{ $publicSiteName ?? config('app.name', 'Laravel') }}</span>
                 </a>
                 {{ $slot }}
             </div>

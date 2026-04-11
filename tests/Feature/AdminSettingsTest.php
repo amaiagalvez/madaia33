@@ -59,6 +59,8 @@ it('guarda el contenido de las páginas legales dentro de la sección front', fu
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_FRONT)
+        ->set('frontSiteName', 'Madaia 33')
+        ->set('frontPrimaryEmail', 'front@example.com')
         ->set('historyTextEu', '<p>Historia EU</p>')
         ->set('historyTextEs', '<p>Historia ES</p>')
         ->set('privacyContentEu', '<p>Privacidad EU</p>')
@@ -75,6 +77,30 @@ it('guarda el contenido de las páginas legales dentro de la sección front', fu
         ->and(settingValue('legal_page_legal_notice_es'))->toBe('<p>Aviso ES</p>');
 });
 
+it('guarda los nuevos campos front de marca, email, texto de fotos y cookies', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_FRONT)
+        ->set('frontSiteName', 'Comunidad Madaia')
+        ->set('frontPrimaryEmail', 'front@example.com')
+        ->set('frontLogoImagePath', 'branding/logo.png')
+        ->set('frontPhotoRequestTextEu', 'Bidali argazkiak helbide honetara: :email')
+        ->set('frontPhotoRequestTextEs', 'Envia fotos a este email: :email')
+        ->set('cookiePolicyContentEu', '<p>Cookie politika EU</p>')
+        ->set('cookiePolicyContentEs', '<p>Politica de cookies ES</p>')
+        ->call('save');
+
+    expect(settingValue('front_site_name'))->toBe('Comunidad Madaia')
+        ->and(settingValue('front_primary_email'))->toBe('front@example.com')
+        ->and(settingValue('front_logo_image_path'))->toBe('branding/logo.png')
+        ->and(settingValue('front_photo_request_text_eu'))->toBe('Bidali argazkiak helbide honetara: :email')
+        ->and(settingValue('front_photo_request_text_es'))->toBe('Envia fotos a este email: :email')
+        ->and(settingValue('legal_page_cookie_policy_eu'))->toBe('<p>Cookie politika EU</p>')
+        ->and(settingValue('legal_page_cookie_policy_es'))->toBe('<p>Politica de cookies ES</p>');
+});
+
 it('guarda el texto legal en la tabla settings', function () {
     $user = adminUser();
 
@@ -88,6 +114,21 @@ it('guarda el texto legal en la tabla settings', function () {
 
     expect(settingValue('legal_checkbox_text_eu'))->toBe('Pribatutasun-politika onartzen dut');
     expect(settingValue('legal_checkbox_text_es'))->toBe('Acepto la política de privacidad');
+});
+
+it('guarda los asuntos de contacto por idioma en contact_form', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_CONTACT_FORM)
+        ->set('adminEmail', ADMIN_SETTINGS_EMAIL)
+        ->set('contactFormSubjectEu', 'Gaia pertsonalizatua EU')
+        ->set('contactFormSubjectEs', 'Asunto personalizado ES')
+        ->call('save');
+
+    expect(settingValue('contact_form_subject_eu'))->toBe('Gaia pertsonalizatua EU')
+        ->and(settingValue('contact_form_subject_es'))->toBe('Asunto personalizado ES');
 });
 
 it('guarda la configuración de correo en la tabla settings', function () {
@@ -326,7 +367,7 @@ it('los tabs renderizan etiquetas de sección con wire:click', function () {
 
     Livewire::actingAs($user)
         ->test('admin-settings')
-        ->assertSeeHtml('wire:click')
+        ->assertSeeHtml('@click.prevent')
         ->assertSeeHtml('bg-[#edd2c7] text-[#793d3d]')
         ->assertSeeHtml('text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]');
 });

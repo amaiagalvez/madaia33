@@ -5,9 +5,18 @@
     focusFirstField() {
         this.$refs.firstField?.focus();
     },
+    autoResizeTextarea(el) {
+        if (!el) {
+            return;
+        }
+
+        el.style.height = 'auto';
+        el.style.height = `${el.scrollHeight}px`;
+    },
     syncCounters() {
         this.subjectCount = this.$refs.subjectField?.value.length ?? 0;
         this.messageCount = this.$refs.messageField?.value.length ?? 0;
+        this.autoResizeTextarea(this.$refs.messageField);
     }
 }" x-init="$nextTick(() => {
     focusFirstField();
@@ -138,8 +147,8 @@
                         {{ __('contact.message') }} <span aria-hidden="true"
                             class="text-red-500">*</span>
                     </label>
-                    <textarea id="contact-message" wire:model="message" rows="6" maxlength="5000"
-                        x-ref="messageField" @input="messageCount = $event.target.value.length"
+                    <textarea id="contact-message" wire:model="message" rows="3" maxlength="5000"
+                        x-ref="messageField" @input="messageCount = $event.target.value.length; autoResizeTextarea($event.target)"
                         class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
                     {{ $errors->has('message') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
                         aria-describedby="{{ $errors->has('message') ? 'contact-message-error' : '' }}"
@@ -165,7 +174,7 @@
                         <label for="contact-legal" class="text-sm text-gray-700">
                             <button type="button" @click="showLegalModal = true"
                                 class="underline decoration-[#d9755b]/40 underline-offset-4 hover:text-[#793d3d]">
-                                He leído y acepto la política de privacidad
+                                {{ strip_tags($legalText) }}
                             </button>
                             <span aria-hidden="true" class="text-red-500">*</span>
                         </label>
@@ -201,7 +210,7 @@
                 <dialog x-cloak x-show="showLegalModal"
                     x-on:keydown.escape.window="showLegalModal = false" x-transition.opacity
                     class="fixed inset-0 z-50 m-0 h-full w-full max-h-none max-w-none border-0 bg-transparent p-4 sm:p-6"
-                    aria-modal="true" aria-label="Política de privacidad">
+                    aria-modal="true" aria-label="{{ __('general.footer.privacy_policy') }}">
                     <div class="absolute inset-0 bg-black/50" @click="showLegalModal = false">
                     </div>
 
@@ -209,7 +218,7 @@
                         @click.stop>
                         <div
                             class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-                            <h2 class="text-lg font-semibold text-gray-900">Política de privacidad
+                            <h2 class="text-lg font-semibold text-gray-900">{{ __('general.footer.privacy_policy') }}
                             </h2>
                             <button type="button" @click="showLegalModal = false"
                                 class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"

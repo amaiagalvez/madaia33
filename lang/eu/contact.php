@@ -3,7 +3,7 @@
 return [
     'title' => 'Kontaktua',
     'seo_description' => 'Jarri komunitatearekin harremanetan formulario seguru baten bidez, zure kontsulta edo iradokizunetarako.',
-    'subtitle' => 'Bidali zure mezua argi, erraz eta segurtasunez komunitatearekin harremanetan jartzeko.',
+    'subtitle' => 'Bidali zure ekarpena, galdera edo zalantza. Ahalik eta azkarren erantzungo dizugu.',
     'required_hint' => '* Ikurra duten eremuak derrigorrezkoak dira.',
     'support_badge' => 'Laguntza zuzena',
     'support_title' => 'Komunitatearekin hitz egiteko bide argia',
@@ -51,6 +51,7 @@ return [
         'unread' => 'Irakurri gabe',
         'mark_read' => 'Irakurrita markatu',
         'mark_unread' => 'Irakurri gabe markatu',
+        'search' => 'Bilatu mezuaren edozein eremutan',
         'confirm_delete' => 'Ziur zaude mezu hau ezabatu nahi duzula?',
     ],
 ];

@@ -24,6 +24,7 @@ return [
         'send' => 'Bidali',
         'create' => 'Sortu',
         'create_new' => 'Sortu berria',
+        'all' => 'Guztiak',
         'confirm' => 'Baieztatu',
     ],
     'messages' => [
@@ -34,6 +35,7 @@ return [
     'footer' => [
         'privacy_policy' => 'Pribatutasun-politika',
         'legal_notice' => 'Lege-oharra',
+        'cookie_policy' => 'Cookie politika',
     ],
     'pagination' => [
         'previous' => 'Aurrekoa',

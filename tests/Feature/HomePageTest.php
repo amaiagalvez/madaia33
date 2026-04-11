@@ -161,12 +161,12 @@ test('home page keeps mobile order general notices then location notices then hi
     expect($generalPos < $locationPos && $locationPos < $historyPos)->toBeTrue();
 });
 
-test('home page footer uses shared menu brand on left and keeps amaia email logo on right', function () {
+test('home page footer uses shared menu brand on left and keeps configured contact email on right', function () {
     test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)))
         ->assertSuccessful()
         ->assertSee(asset('storage/madaia33/madaia33.png'), false)
         ->assertSee(config('app.name', 'Madaia'))
-        ->assertSee('mailto:info@amaia.eus', false)
+        ->assertSee('mailto:info@madaia33.eus', false)
         ->assertSee(asset('amaia-footer.png'), false)
         ->assertDontSee('&copy;', false);
 });

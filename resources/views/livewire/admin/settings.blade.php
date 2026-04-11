@@ -34,11 +34,13 @@
             this.$wire.set(field, html === '<br>' ? '' : html);
         },
 }">
+    <div x-data="{ dirty: @entangle('hasUnsavedChanges') }">
     {{-- Section tabs --}}
     <div class="mb-6 rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
         <nav class="flex flex-wrap gap-2" aria-label="{{ __('admin.settings') }}">
             @foreach ($availableSections as $section)
-                <button type="button" wire:click="setSection('{{ $section }}')"
+                <button type="button"
+                    @click.prevent="if (!dirty || window.confirm('{{ __('admin.settings_form.unsaved_changes_confirm') }}')) { $wire.setSection('{{ $section }}') }"
                     data-settings-section="{{ $section }}"
                     class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors {{ $activeSection === $section ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
                     aria-current="{{ $activeSection === $section ? 'page' : 'false' }}">
@@ -133,4 +135,5 @@
             </div>
         </dialog>
     @endif
+    </div>
 </div>

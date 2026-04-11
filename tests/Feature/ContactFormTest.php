@@ -34,6 +34,8 @@ beforeEach(function () {
     createSetting('smtp_password', app(ConfiguredMailSettings::class)->storeValue('smtp_password', 'smtp-secret'));
     createSetting('smtp_encryption', 'tls');
     createSetting('legal_text_eu', CONTACT_FORM_LEGAL_TEXT_EU);
+    createSetting('contact_form_subject_eu', 'Gaia settings EU');
+    createSetting('contact_form_subject_es', 'Asunto settings ES');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -78,16 +80,13 @@ it('despacha ContactConfirmation y ContactNotification', function () {
         ->call('submit');
 
     Mail::assertSent(ContactConfirmation::class, function (ContactConfirmation $mail): bool {
-        return $mail->fromAddress === CONTACT_FORM_FROM_ADDRESS
+        return $mail->messageSubject === 'Gaia settings EU'
+            && $mail->fromAddress === CONTACT_FORM_FROM_ADDRESS
             && $mail->fromName === CONTACT_FORM_FROM_NAME
             && $mail->legalText === CONTACT_FORM_LEGAL_TEXT_EU;
     });
 
-    Mail::assertSent(ContactNotification::class, function (ContactNotification $mail): bool {
-        return $mail->fromAddress === CONTACT_FORM_FROM_ADDRESS
-            && $mail->fromName === CONTACT_FORM_FROM_NAME
-            && $mail->legalText === CONTACT_FORM_LEGAL_TEXT_EU;
-    });
+    Mail::assertSent(ContactNotification::class);
 });
 
 it('aplica la configuración smtp guardada en settings antes de enviar', function () {

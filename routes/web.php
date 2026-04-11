@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Models\Image;
 use App\Models\Owner;
 use App\Models\Notice;
+use App\Models\Voting;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use App\Models\ContactMessage;
@@ -45,6 +46,7 @@ Route::prefix('eu')->group(function () use ($privatePageHandler) {
     })->name('password.reset.eu');
     Route::get('/pribatutasun-politika', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy.eu');
     Route::get('/ohar-legala', [LegalPageController::class, 'legalNotice'])->name('legal-notice.eu');
+    Route::get('/cookie-politika', [LegalPageController::class, 'cookiePolicy'])->name('cookie-policy.eu');
     Route::get('/bozketak', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.eu');
 });
 
@@ -63,6 +65,7 @@ Route::prefix('es')->group(function () use ($privatePageHandler) {
     })->name('password.reset.es');
     Route::get('/politica-de-privacidad', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy.es');
     Route::get('/aviso-legal', [LegalPageController::class, 'legalNotice'])->name('legal-notice.es');
+    Route::get('/politica-de-cookies', [LegalPageController::class, 'cookiePolicy'])->name('cookie-policy.es');
     Route::get('/votaciones', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.es');
 });
 
@@ -87,6 +90,10 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
             'totalNoticesCount' => Notice::count(),
             'imagesCount' => Image::count(),
             'unreadMessagesCount' => ContactMessage::where('is_read', false)->count(),
+            'usersCount' => User::query()->count(),
+            'ownersCount' => Owner::query()->count(),
+            'locationsCount' => Location::query()->count(),
+            'votingsCount' => Voting::query()->count(),
         ]);
     })->name('dashboard');
     Route::get('/avisos', fn () => view('admin.notices'))

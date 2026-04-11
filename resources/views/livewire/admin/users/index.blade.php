@@ -23,12 +23,9 @@
 
             <div
                 class="admin-slideover-panel absolute inset-y-0 right-0 z-50 h-full w-full max-w-3xl overflow-y-auto bg-white p-6 shadow-2xl">
-                <h3 class="mb-4 text-lg font-semibold text-stone-900">
-                    {{ $editingUserId ? __('general.buttons.edit') : __('admin.users.create') }}
-                </h3>
-
-                <form wire:submit="saveUser" class="space-y-4">
-                    <div class="grid gap-4 md:grid-cols-2">
+                <x-admin.form-shell :title="$editingUserId ? __('general.buttons.edit') : __('admin.users.create')">
+                    <form wire:submit="saveUser" class="space-y-4">
+                        <div class="grid gap-4 md:grid-cols-2">
                         <div>
                             <label for="user-name"
                                 class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.name') }}</label>
@@ -124,18 +121,19 @@
                         </div>
                     @endif
 
-                    <div
-                        class="mt-6 flex items-center justify-end gap-2 border-t border-stone-200 pt-4">
-                        <button type="button" wire:click="cancelForm"
-                            class="inline-flex items-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm hover:bg-stone-50">
-                            {{ __('general.buttons.cancel') }}
-                        </button>
-                        <button type="submit"
-                            class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                            {{ __('general.buttons.save') }}
-                        </button>
-                    </div>
-                </form>
+                        <div
+                            class="mt-6 flex items-center justify-end gap-2 border-t border-stone-200 pt-4">
+                            <button type="button" wire:click="cancelForm"
+                                class="inline-flex items-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm hover:bg-stone-50">
+                                {{ __('general.buttons.cancel') }}
+                            </button>
+                            <button type="submit"
+                                class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                                {{ __('general.buttons.save') }}
+                            </button>
+                        </div>
+                    </form>
+                </x-admin.form-shell>
             </div>
         </div>
     @endif

@@ -24,6 +24,7 @@ return [
         'send' => 'Enviar',
         'create' => 'Crear',
         'create_new' => 'Crear nuevo',
+        'all' => 'Todos',
         'confirm' => 'Confirmar',
     ],
     'messages' => [
@@ -34,6 +35,7 @@ return [
     'footer' => [
         'privacy_policy' => 'Política de privacidad',
         'legal_notice' => 'Aviso legal',
+        'cookie_policy' => 'Política de cookies',
     ],
     'pagination' => [
         'previous' => 'Anterior',

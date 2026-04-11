@@ -22,6 +22,10 @@ class AdminMessageInbox extends Component
 
     public string $sortDir = 'desc';
 
+    public string $search = '';
+
+    public string $readFilter = 'read';
+
     public function openMessage(int $id): void
     {
         $this->openMessageId = ($this->openMessageId === $id) ? null : $id;
@@ -60,6 +64,21 @@ class AdminMessageInbox extends Component
         $this->resetPage();
     }
 
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function setReadFilter(string $filter): void
+    {
+        if (! in_array($filter, ['all', 'read', 'unread'], true)) {
+            return;
+        }
+
+        $this->readFilter = $filter;
+        $this->resetPage();
+    }
+
     public function confirmDelete(int $id): void
     {
         $this->confirmingDeleteId = $id;
@@ -95,7 +114,22 @@ class AdminMessageInbox extends Component
         $sortBy = in_array($this->sortBy, $allowedSortColumns) ? $this->sortBy : 'created_at';
         $sortDir = in_array($this->sortDir, ['asc', 'desc']) ? $this->sortDir : 'desc';
 
-        return ContactMessage::orderBy($sortBy, $sortDir)->paginate(15);
+        return ContactMessage::query()
+            ->when($this->readFilter === 'read', fn ($query) => $query->where('is_read', true))
+            ->when($this->readFilter === 'unread', fn ($query) => $query->where('is_read', false))
+            ->when(trim($this->search) !== '', function ($query): void {
+                $term = '%'.trim($this->search).'%';
+
+                $query->where(function ($innerQuery) use ($term): void {
+                    $innerQuery
+                        ->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term)
+                        ->orWhere('subject', 'like', $term)
+                        ->orWhere('message', 'like', $term);
+                });
+            })
+            ->orderBy($sortBy, $sortDir)
+            ->paginate(15);
     }
 
     public function render(): View

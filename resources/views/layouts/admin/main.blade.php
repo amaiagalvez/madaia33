@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>
-        {{ filled($title ?? null) ? $title . ' - ' . config('app.name', 'Laravel') : config('app.name', 'Laravel') }}
+        {{ filled($title ?? null) ? $title . ' - ' . ($publicSiteName ?? config('app.name', 'Laravel')) : ($publicSiteName ?? config('app.name', 'Laravel')) }}
     </title>
 
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -27,10 +27,10 @@
             <div class="flex items-center h-16 px-6 border-b border-stone-200">
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center gap-3 text-base font-semibold text-stone-900 hover:text-stone-700 transition-colors">
-                    <img src="{{ asset('storage/madaia33/madaia33.webp') }}"
-                        alt="{{ config('app.name', 'Laravel') }} logo"
+                    <img src="{{ $publicLogoUrl ?? asset('storage/madaia33/madaia33.png') }}"
+                        alt="{{ $publicSiteName ?? config('app.name', 'Laravel') }} logo"
                         class="h-8 w-8 rounded-xl object-cover" />
-                    {{ config('app.name', 'Laravel') }}
+                    {{ $publicSiteName ?? config('app.name', 'Laravel') }}
                 </a>
             </div>
 
@@ -45,6 +45,16 @@
                             d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                     </svg>
                     {{ __('admin.dashboard') }}
+                </a>
+
+                <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
+                    class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-4.5-4.5L21 3m0 0v7.5M21 3l-9 9" />
+                    </svg>
+                    {{ __('admin.sidebar.public_site') }}
                 </a>
 
                 <p class="px-3 pt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
@@ -114,18 +124,6 @@
                     </a>
                 @endif
 
-                @if (auth()->user()?->canManageUsers())
-                    <a href="{{ route('admin.users.index') }}"
-                        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
-                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
-                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M18 18.72a8.964 8.964 0 0 0 3-6.72A9 9 0 1 0 3 12a8.964 8.964 0 0 0 3 6.72m12 0a8.966 8.966 0 0 1-12 0m12 0A10.953 10.953 0 0 1 12 21c-2.331 0-4.496-.727-6-1.968m12 0a5.95 5.95 0 0 0-12 0m12 0a5.952 5.952 0 0 1-12 0m6-10.5a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
-                        </svg>
-                        {{ __('admin.users.menu') }}
-                    </a>
-                @endif
-
                 @if (auth()->user()?->isSuperadmin())
                     <a href="{{ route('admin.votings') }}"
                         class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.votings') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
@@ -155,6 +153,18 @@
                         {{ __('admin.settings') }}
                     </a>
                 @endif
+
+                @if (auth()->user()?->canManageUsers())
+                    <a href="{{ route('admin.users.index') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M18 18.72a8.964 8.964 0 0 0 3-6.72A9 9 0 1 0 3 12a8.964 8.964 0 0 0 3 6.72m12 0a8.966 8.966 0 0 1-12 0m12 0A10.953 10.953 0 0 1 12 21c-2.331 0-4.496-.727-6-1.968m12 0a5.95 5.95 0 0 0-12 0m12 0a5.952 5.952 0 0 1-12 0m6-10.5a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
+                        </svg>
+                        {{ __('admin.users.menu') }}
+                    </a>
+                @endif
             </nav>
 
         </aside>
@@ -172,8 +182,8 @@
                 </svg>
             </button>
             <div class="flex items-center gap-2">
-                <img src="{{ asset('storage/madaia33/madaia33.webp') }}"
-                    alt="{{ config('app.name', 'Madaia') }} logo"
+                <img src="{{ $publicLogoUrl ?? asset('storage/madaia33/madaia33.png') }}"
+                    alt="{{ $publicSiteName ?? config('app.name', 'Madaia') }} logo"
                     class="h-8 w-8 rounded-xl object-cover" />
                 <span
                     class="text-base font-semibold text-stone-900">{{ __('admin.dashboard') }}</span>
@@ -189,8 +199,8 @@
                         class="flex items-center justify-between h-16 px-6 border-b border-stone-200">
                         <span
                             class="flex items-center gap-2 text-base font-semibold text-gray-900">
-                            <img src="{{ asset('storage/madaia33/madaia33.webp') }}"
-                                alt="{{ config('app.name', 'Madaia') }} logo"
+                            <img src="{{ $publicLogoUrl ?? asset('storage/madaia33/madaia33.png') }}"
+                                alt="{{ $publicSiteName ?? config('app.name', 'Madaia') }} logo"
                                 class="h-8 w-8 rounded-xl object-cover" />
                             {{ __('admin.dashboard') }}
                         </span>
@@ -207,6 +217,8 @@
                         aria-label="{{ __('admin.dashboard') }}">
                         <a href="{{ route('admin.dashboard') }}"
                             class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.dashboard') }}</a>
+                        <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
+                            class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.sidebar.public_site') }}</a>
                         <p
                             class="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-stone-400">
                             {{ __('admin.sidebar.web') }}
@@ -234,10 +246,6 @@
                             <a href="{{ route('admin.owners.index') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.owners.menu') }}</a>
                         @endif
-                        @if (auth()->user()?->canManageUsers())
-                            <a href="{{ route('admin.users.index') }}"
-                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.users.menu') }}</a>
-                        @endif
                         @if (auth()->user()?->isSuperadmin())
                             <a href="{{ route('admin.votings') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.votings.menu') }}</a>
@@ -249,6 +257,10 @@
                         @if (auth()->user()?->isSuperadmin())
                             <a href="{{ route('admin.settings') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.settings') }}</a>
+                        @endif
+                        @if (auth()->user()?->canManageUsers())
+                            <a href="{{ route('admin.users.index') }}"
+                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.users.menu') }}</a>
                         @endif
                     </nav>
                     <div class="border-t border-stone-200 p-4">

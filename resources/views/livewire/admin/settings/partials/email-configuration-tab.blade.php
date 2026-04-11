@@ -29,9 +29,12 @@
 </div>
 
 <div class="mt-6">
-    <flux:button wire:click="openTestEmailModal" variant="primary" icon="paper-airplane">
+    <flux:button wire:click="openTestEmailModal" variant="primary" icon="paper-airplane" :disabled="$hasUnsavedChanges" wire:loading.attr="disabled" wire:target="save">
         {{ __('admin.test_email.button') }}
     </flux:button>
+    @if ($hasUnsavedChanges)
+        <p class="mt-2 text-xs text-stone-500">{{ __('admin.settings_form.save_before_test_email') }}</p>
+    @endif
 </div>
 
 <x-admin.bilingual-rich-text-tabs :title="__('admin.settings_form.email_legal_text')" :locale-configs="$this->localeConfigsFor('emailLegalText', 'admin.settings_form.email_legal_text')" />
