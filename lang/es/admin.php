@@ -79,6 +79,9 @@ return [
         'owners_welcome_text' => 'Texto del email de nueva propietaria',
         'owners_welcome_text_eu' => 'Texto (EU)',
         'owners_welcome_text_es' => 'Texto (ES)',
+        'owners_terms_text' => 'Condiciones de uso (propietarias)',
+        'owners_terms_text_eu' => 'Condiciones (EU)',
+        'owners_terms_text_es' => 'Condiciones (ES)',
     ],
     'stats' => [
         'published_notices' => 'Avisos publicados',

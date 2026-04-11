@@ -11,10 +11,10 @@ test('profile page is displayed', function () {
     test()->get(route('profile.edit'))->assertOk();
 });
 
-test('profile alias redirects to the settings profile page', function () {
+test('profile alias redirects to the localized profile page', function () {
     test()->actingAs(User::factory()->create());
 
-    test()->get(route('profile'))->assertRedirect(route('profile.edit', absolute: false));
+    test()->get(route('profile'))->assertRedirect(route('profile.eu', absolute: false));
 });
 
 test('profile information can be updated', function () {

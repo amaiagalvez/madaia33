@@ -91,6 +91,10 @@ class AdminSettings extends Component
 
     public string $ownersWelcomeTextEs = '';
 
+    public string $ownersTermsTextEu = '';
+
+    public string $ownersTermsTextEs = '';
+
     public bool $saved = false;
 
     public bool $showTestEmailModal = false;
@@ -153,6 +157,8 @@ class AdminSettings extends Component
                 'ownersWelcomeSubjectEs' => 'owners_welcome_subject_es',
                 'ownersWelcomeTextEu' => 'owners_welcome_text_eu',
                 'ownersWelcomeTextEs' => 'owners_welcome_text_es',
+                'ownersTermsTextEu' => 'owners_terms_text_eu',
+                'ownersTermsTextEs' => 'owners_terms_text_es',
             ],
         ];
     }
@@ -196,6 +202,8 @@ class AdminSettings extends Component
         $this->emailLegalTextEs = $settings['legal_text_es'] ?? '';
         $this->ownersWelcomeSubjectEu = $settings['owners_welcome_subject_eu'] ?? '';
         $this->ownersWelcomeSubjectEs = $settings['owners_welcome_subject_es'] ?? '';
+        $this->ownersTermsTextEu = $settings['owners_terms_text_eu'] ?? '';
+        $this->ownersTermsTextEs = $settings['owners_terms_text_es'] ?? '';
         $this->ownersWelcomeTextEu = $settings['owners_welcome_text_eu'] ?? '';
         $this->ownersWelcomeTextEs = $settings['owners_welcome_text_es'] ?? '';
         $this->historyTextEu = $settings['home_history_text_eu'] ?? '';

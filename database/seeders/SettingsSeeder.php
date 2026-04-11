@@ -160,6 +160,16 @@ class SettingsSeeder extends Seeder
                 'value' => '<p>El contenido de la política de cookies aparecerá aquí.</p>',
                 'section' => Setting::SECTION_FRONT,
             ],
+            [
+                'key' => 'owners_terms_text_eu',
+                'value' => '<p>Komunitateko arauak eta jabetzen erabilera baldintzak onartzen ditut.</p>',
+                'section' => Setting::SECTION_OWNERS,
+            ],
+            [
+                'key' => 'owners_terms_text_es',
+                'value' => '<p>Acepto las normas de la comunidad y las condiciones de uso de las propiedades.</p>',
+                'section' => Setting::SECTION_OWNERS,
+            ],
         ];
 
         foreach ($defaults as $data) {

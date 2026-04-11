@@ -1,11 +1,14 @@
 <?php
 
+use App\SupportedLocales;
 use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
-    Route::redirect('profile', 'settings/profile')->name('profile');
+    Route::get('profile', function () {
+        return redirect()->route(SupportedLocales::routeName('profile'));
+    })->name('profile');
 
     Route::livewire('settings/profile', 'pages::settings.profile')->name('profile.edit');
 });

@@ -90,6 +90,8 @@ class AdminSettingsValidation
                 'ownersWelcomeSubjectEs' => ['nullable', 'string', 'max:255'],
                 'ownersWelcomeTextEu' => ['nullable', 'string', 'max:5000', new NoScriptTags],
                 'ownersWelcomeTextEs' => ['nullable', 'string', 'max:5000', new NoScriptTags],
+                'ownersTermsTextEu' => ['nullable', 'string', 'max:5000', new NoScriptTags],
+                'ownersTermsTextEs' => ['nullable', 'string', 'max:5000', new NoScriptTags],
             ],
             default => [],
         };

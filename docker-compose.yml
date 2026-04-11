@@ -54,6 +54,19 @@ services:
         networks:
             - frontend
 
+    madaia33-quality:
+        image: webdevops/php-apache-dev:${DC_PHP:-8.4}
+        user: "${DC_UID:-1000}:${DC_GID:-1000}"
+        profiles: ["quality"]
+        volumes:
+            - ./:/docker
+        working_dir: /docker
+        environment:
+            WEB_DOCUMENT_ROOT: /docker/public
+        command: bash -c "
+            composer quality"
+        networks:
+            - frontend
     madaia33-npm-all:
         image: node:${DC_NODE:-24-bullseye}
         user: "${DC_UID:-1000}:${DC_GID:-1000}"
@@ -127,10 +140,10 @@ services:
         networks:
             - frontend
 
-    madaia33-phpunit:
+    madaia33-pentest:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
         user: "${DC_UID:-1000}:${DC_GID:-1000}"
-        profiles: ["phpunit"]
+        profiles: ["pentest"]
         volumes:
             - ./:/docker
         working_dir: /docker

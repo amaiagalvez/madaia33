@@ -5,3 +5,5 @@
     rows="1" />
 
 <x-admin.bilingual-rich-text-tabs :title="__('admin.settings_form.owners_welcome_text')" :locale-configs="$this->localeConfigsFor('ownersWelcomeText', 'admin.settings_form.owners_welcome_text')" />
+
+<x-admin.bilingual-rich-text-tabs :title="__('admin.settings_form.owners_terms_text')" :locale-configs="$this->localeConfigsFor('ownersTermsText', 'admin.settings_form.owners_terms_text')" />

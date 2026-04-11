@@ -37,6 +37,9 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
+- [ ] Hay que marcar quien es la persona jefa de portal o de planta de garaje (puede haber una o varias)
+
+- [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
 - [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak (aldatu dezakezu migrazioa, ez dago indarrean)
@@ -48,7 +51,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 - [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla "receivers" con el user_id de a quien se le ha enviado, el email al que se ha enviado, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje
 - [ ] Trackea los mensajes para que se pueda saber quien lo ha habierto y quien ha pinchado en los enlaces del mensaje si los hubiera
 
-- [ ] Hay que marcar quien es el jefe de portal o de planta de garaje
+
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 
 # nohizbehinka egiteko 2026-04-11
@@ -56,20 +59,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 - [ ] Repasa la suit de test y completa los que falten
 - [ ] dentro de la carpeta madaia33 buscar todos los ficheros y carpetas que sean del usuario root y ponerles amaia:amaia
 - [ ] con el agente sorgina repasar el código y proponer mejoras
-
- # profila
-- [ ] usa el mismo componente para mostrar en el menu del front y del aginte-panela el nombre de usuario y el logout, usa como referencia el del aginte panela que está mejor
-- [ ] 
-un usuario tiene que tener un perfil desde el que pueda ver:
-
-organizar la información en diferentes pestañas
-- las votaciones en las que ha tomado parte y cuando
-- las sesiones que ha abierto, su inicio y su fin y el tiempo de conexión
-- un enlace a cambiar contraseña que vaya al de cambiar la contraseña
-- su ficha de propietaria y sus propiedades para poder validarlas (asegurate de que no puede la ficha de ningua otra propietaria)
-- la primera vez que un usuario se loguee, pidele que acepte las condiciones de uso (texto que se almacenará en settings en el section owners en dos idiomas) y luego muestrale una pantalla con sus propiedades asignadas para que las valide, si no las tiene validadas ya (oweer validation)
-
-- añadir el icono para accedeer al perfil junto al nombre del usuario, tanto en el menú del front como en el menu del aginte-panaela
+- [ ] pint pasa guztira
 
 ## manual de usuaria
 crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación

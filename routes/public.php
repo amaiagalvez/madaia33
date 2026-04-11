@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\PublicHomeController;
 use App\Http\Controllers\PublicVotingController;
@@ -35,6 +36,9 @@ Route::prefix('eu')->group(function () use ($privatePageHandler) {
     Route::get('/ohar-legala', [LegalPageController::class, 'legalNotice'])->name('legal-notice.eu');
     Route::get('/cookie-politika', [LegalPageController::class, 'cookiePolicy'])->name('cookie-policy.eu');
     Route::get('/bozketak', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.eu');
+    Route::get('/profila', [ProfileController::class, 'show'])->middleware('auth')->name('profile.eu');
+    Route::post('/profila/baldintzak-onartu', [ProfileController::class, 'acceptTerms'])->middleware('auth')->name('profile.terms.accept.eu');
+    Route::post('/profila/jabetzak-balidatu', [ProfileController::class, 'validateAssignments'])->middleware('auth')->name('profile.properties.validate.eu');
 });
 
 Route::prefix('es')->group(function () use ($privatePageHandler) {
@@ -54,6 +58,9 @@ Route::prefix('es')->group(function () use ($privatePageHandler) {
     Route::get('/aviso-legal', [LegalPageController::class, 'legalNotice'])->name('legal-notice.es');
     Route::get('/politica-de-cookies', [LegalPageController::class, 'cookiePolicy'])->name('cookie-policy.es');
     Route::get('/votaciones', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.es');
+    Route::get('/perfil', [ProfileController::class, 'show'])->middleware('auth')->name('profile.es');
+    Route::post('/perfil/aceptar-condiciones', [ProfileController::class, 'acceptTerms'])->middleware('auth')->name('profile.terms.accept.es');
+    Route::post('/perfil/validar-propiedades', [ProfileController::class, 'validateAssignments'])->middleware('auth')->name('profile.properties.validate.es');
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

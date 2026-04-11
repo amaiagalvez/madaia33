@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\VotingBallotFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class VotingBallot extends Model
 {
+    /** @use HasFactory<VotingBallotFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [

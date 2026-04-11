@@ -1,3 +1,5 @@
+@php($isImpersonating = session()->has('impersonator_user_id'))
+
 <flux:dropdown position="bottom" align="start">
     <flux:sidebar.profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
         icon:trailing="chevrons-up-down" data-test="sidebar-menu-button" />
@@ -12,14 +14,14 @@
         </div>
         <flux:menu.separator />
         <flux:menu.radio.group>
-            <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
-                {{ __('Profile') }}
+            <flux:menu.item :href="route(\App\SupportedLocales::routeName('profile'))" icon="user-circle">
+                {{ __('profile.title') }}
             </flux:menu.item>
-            <form method="POST" action="{{ route('logout') }}" class="w-full">
+            <form method="POST" action="{{ $isImpersonating ? route('admin.users.stop_impersonation') : route('logout') }}" class="w-full">
                 @csrf
                 <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
                     class="w-full cursor-pointer" data-test="logout-button">
-                    {{ __('Log out') }}
+                    {{ $isImpersonating ? __('admin.users.back_to_my_user') : __('admin.logout') }}
                 </flux:menu.item>
             </form>
         </flux:menu.radio.group>

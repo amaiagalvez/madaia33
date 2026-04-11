@@ -264,7 +264,11 @@
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.users.menu') }}</a>
                         @endif
                     </nav>
-                    <div class="border-t border-stone-200 p-4">
+                    <div class="border-t border-stone-200 p-4 space-y-2">
+                        <a href="{{ route(\App\SupportedLocales::routeName('profile')) }}"
+                            class="block w-full rounded-md px-3 py-2 text-sm font-medium text-stone-700 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">
+                            {{ __('profile.title') }}
+                        </a>
                         <form method="POST"
                             action="{{ $isImpersonating ? route('admin.users.stop_impersonation') : route('logout') }}">
                             @csrf
@@ -283,26 +287,7 @@
             <header
                 class="hidden lg:flex h-16 items-center justify-end border-b border-stone-200 bg-stone-50 px-6">
                 <nav class="flex items-center gap-4" aria-label="{{ __('admin.dashboard') }}">
-                    <div class="text-right min-w-0">
-                        <p class="text-sm font-medium text-stone-900 truncate">
-                            {{ auth()->user()?->name }}</p>
-                        <p class="text-xs text-stone-500 truncate">{{ auth()->user()?->email }}
-                        </p>
-                    </div>
-
-                    <form method="POST"
-                        action="{{ $isImpersonating ? route('admin.users.stop_impersonation') : route('logout') }}">
-                        @csrf
-                        <button type="submit"
-                            class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors {{ $isImpersonating ? 'border border-red-700 bg-red-600 text-white hover:bg-red-700' : 'border border-stone-200 bg-white text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
-                            <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                            </svg>
-                            {{ $isImpersonating ? __('admin.users.back_to_my_user') : __('admin.logout') }}
-                        </button>
-                    </form>
+                    <x-shared.desktop-user-menu />
                 </nav>
             </header>
 

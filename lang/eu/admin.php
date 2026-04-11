@@ -79,6 +79,9 @@ return [
         'owners_welcome_text' => 'Jabe berriaren emailaren testua',
         'owners_welcome_text_eu' => 'Testua (EU)',
         'owners_welcome_text_es' => 'Testua (ES)',
+        'owners_terms_text' => 'Erabilera baldintzak (jabeak)',
+        'owners_terms_text_eu' => 'Baldintzak (EU)',
+        'owners_terms_text_es' => 'Baldintzak (ES)',
     ],
     'stats' => [
         'published_notices' => 'Argitaratutako iragarkiak',

@@ -78,7 +78,7 @@ test('users can authenticate with dni as login identifier', function () {
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/admin');
+        ->assertRedirect(route('profile.eu', absolute: false));
 
     test()->assertAuthenticated();
 });
@@ -98,7 +98,7 @@ test('property owner users can authenticate with coproprietary emails', function
             'password' => 'password',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/admin');
+        ->assertRedirect(route('profile.eu', absolute: false));
 
     test()->assertAuthenticated();
 
@@ -110,7 +110,7 @@ test('property owner users can authenticate with coproprietary emails', function
             'password' => 'password',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/admin');
+        ->assertRedirect(route('profile.eu', absolute: false));
 
     test()->assertAuthenticatedAs($user);
 });
