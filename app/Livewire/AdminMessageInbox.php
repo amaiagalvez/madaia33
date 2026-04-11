@@ -24,7 +24,7 @@ class AdminMessageInbox extends Component
 
     public bool $showReadModal = false;
 
-    public string $sortBy = 'created_at';
+    public string $sortColumn = 'created_at';
 
     public string $sortDir = 'desc';
 
@@ -84,10 +84,10 @@ class AdminMessageInbox extends Component
 
     public function sortBy(string $column): void
     {
-        if ($this->sortBy === $column) {
+        if ($this->sortColumn === $column) {
             $this->sortDir = $this->sortDir === 'asc' ? 'desc' : 'asc';
         } else {
-            $this->sortBy = $column;
+            $this->sortColumn = $column;
             $this->sortDir = 'desc';
         }
 
@@ -141,7 +141,7 @@ class AdminMessageInbox extends Component
     public function getMessagesProperty(): LengthAwarePaginator
     {
         $allowedSortColumns = ['created_at', 'is_read'];
-        $sortBy = in_array($this->sortBy, $allowedSortColumns) ? $this->sortBy : 'created_at';
+        $sortBy = in_array($this->sortColumn, $allowedSortColumns) ? $this->sortColumn : 'created_at';
         $sortDir = in_array($this->sortDir, ['asc', 'desc']) ? $this->sortDir : 'desc';
 
         return ContactMessage::query()

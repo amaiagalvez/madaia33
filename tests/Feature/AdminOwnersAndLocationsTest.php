@@ -16,21 +16,115 @@ use App\Livewire\Admin\LocationDetail;
 it('renders admin locations list for selected type', function () {
     $user = adminUser();
 
-    Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    Location::factory()->create(['type' => 'portal', 'code' => '99-A', 'name' => 'Portal 99-A']);
+    Location::factory()->create(['type' => 'portal', 'code' => '11-A', 'name' => 'Portal 11-A']);
     Location::factory()->create(['type' => 'local', 'code' => 'L-1', 'name' => 'Local L-1']);
     Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
 
     Livewire::actingAs($user)
         ->test(Locations::class)
-        ->assertSee('Portal 33-A')
+        ->assertSeeHtml('data-admin-filter-group')
+        ->assertSeeHtml('data-admin-filter-button="portal"')
+        ->assertSeeHtml('data-admin-table-header')
+        ->assertSeeHtml('data-admin-action="edit"')
+        ->assertSeeInOrder(['11-A', '99-A'])
         ->assertDontSee('Local L-1')
         ->assertDontSee('Garaje P-1')
         ->call('setType', 'local')
         ->assertSee('Local L-1')
-        ->assertDontSee('Portal 33-A')
+        ->assertDontSee('Portal 11-A')
         ->call('setType', 'garage')
         ->assertSee('Garaje P-1')
-        ->assertDontSee('Portal 33-A');
+        ->assertDontSee('Portal 11-A');
+});
+
+it('opens and saves location edit form from locations list without navigating', function () {
+    $user = adminUser();
+    $location = Location::factory()->create([
+        'type' => 'portal',
+        'code' => '55-A',
+        'name' => 'Portal 55-A',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->call('openEditForm', $location->id)
+        ->assertSet('showEditForm', true)
+        ->assertSet('editingLocationId', $location->id)
+        ->assertSet('editCode', '55-A')
+        ->set('editCode', '55-B')
+        ->set('editName', 'Portal 55-B')
+        ->call('saveEditForm')
+        ->assertSet('showEditForm', false)
+        ->assertSet('editingLocationId', null);
+
+    $location->refresh();
+
+    expect($location->code)->toBe('55-B')
+        ->and($location->name)->toBe('Portal 55-B');
+});
+
+it('creates a new location from the locations list side panel', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->set('type', 'local')
+        ->call('createLocation')
+        ->assertSet('showCreateForm', true)
+        ->set('newCode', 'L-99')
+        ->set('newName', 'Local 99')
+        ->call('saveCreateForm')
+        ->assertSet('showCreateForm', false);
+
+    expect(Location::query()
+        ->where('type', 'local')
+        ->where('code', 'L-99')
+        ->where('name', 'Local 99')
+        ->exists())->toBeTrue();
+});
+
+it('opens delete confirmation and deletes location from locations list', function () {
+    $user = adminUser();
+    $location = Location::factory()->create([
+        'type' => 'portal',
+        'code' => '66-A',
+        'name' => 'Portal 66-A',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->call('confirmDelete', $location->id)
+        ->assertSet('showDeleteModal', true)
+        ->assertSet('confirmingDeleteId', $location->id)
+        ->call('deleteLocation')
+        ->assertSet('showDeleteModal', false)
+        ->assertSet('confirmingDeleteId', null);
+
+    expect(Location::query()->whereKey($location->id)->exists())->toBeFalse();
+});
+
+it('does not delete location when it still has linked properties', function () {
+    $user = adminUser();
+
+    $location = Location::factory()->create([
+        'type' => 'portal',
+        'code' => '77-A',
+        'name' => 'Portal 77-A',
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1A',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->call('confirmDelete', $location->id)
+        ->call('deleteLocation')
+        ->assertSee(__('admin.locations.delete_blocked_has_properties'));
+
+    expect(Location::query()->whereKey($location->id)->exists())->toBeTrue();
 });
 
 it('renders location detail with assignment badges', function () {
@@ -152,6 +246,41 @@ it('accepts comma decimals for location percentages and stores them normalized w
     expect($refreshedProperty->name)->toBe('7D')
         ->and((float) $refreshedProperty->community_pct)->toBe(3.5)
         ->and((float) $refreshedProperty->location_pct)->toBe(4.75);
+});
+
+it('opens add-property form and saves property for the currently opened location', function () {
+    $user = adminUser();
+
+    $openedLocation = Location::factory()->create([
+        'type' => 'portal',
+        'code' => '33-OPEN',
+        'name' => 'Portal Open',
+    ]);
+    $otherLocation = Location::factory()->create([
+        'type' => 'portal',
+        'code' => '33-OTHER',
+        'name' => 'Portal Other',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(LocationDetail::class, ['location' => $openedLocation])
+        ->assertSet('showAddForm', false)
+        ->call('openAddForm')
+        ->assertSet('showAddForm', true)
+        ->set('newPropertyName', 'OPEN-1')
+        ->set('newCommunityPct', '10')
+        ->set('newLocationPct', '20')
+        ->call('addProperty')
+        ->assertSet('showAddForm', false);
+
+    expect(Property::query()
+        ->where('location_id', $openedLocation->id)
+        ->where('name', 'OPEN-1')
+        ->exists())->toBeTrue()
+        ->and(Property::query()
+            ->where('location_id', $otherLocation->id)
+            ->where('name', 'OPEN-1')
+            ->exists())->toBeFalse();
 });
 
 it('requires and persists percentages for storage locations too', function () {
@@ -485,6 +614,49 @@ it('displays aggregated community and location percentages in locations listing'
         ->assertSee('5.50');
 });
 
+it('shows chief property column value and fallback in locations listing', function () {
+    $user = adminUser();
+
+    $locationWithChief = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    $locationWithoutChief = Location::factory()->create(['type' => 'portal', 'code' => '33-B', 'name' => 'Portal 33-B']);
+
+    $chiefProperty = Property::factory()->create([
+        'location_id' => $locationWithChief->id,
+        'name' => '2B',
+    ]);
+
+    $chiefUser = User::factory()->create();
+    $chiefOwner = Owner::factory()->create([
+        'user_id' => $chiefUser->id,
+        'coprop1_name' => 'Jefa 33-A',
+    ]);
+
+    Role::query()->firstOrCreate([
+        'name' => Role::COMMUNITY_ADMIN,
+    ]);
+
+    $chiefUser->assignRole(Role::COMMUNITY_ADMIN);
+    $chiefUser->managedLocations()->syncWithoutDetaching([$locationWithChief->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $chiefOwner->id,
+        'property_id' => $chiefProperty->id,
+        'end_date' => null,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertSee(__('admin.locations.chief_property'))
+        ->assertSee(__('admin.locations.community_admin_name'))
+        ->assertSeeHtml('data-chief-property-for="' . $locationWithChief->id . '"')
+        ->assertSeeHtml('data-chief-property-for="' . $locationWithoutChief->id . '"')
+        ->assertSeeHtml('data-community-admin-for="' . $locationWithChief->id . '"')
+        ->assertSeeHtml('data-community-admin-for="' . $locationWithoutChief->id . '"')
+        ->assertSee('2B')
+        ->assertSee('Jefa 33-A')
+        ->assertSee('—');
+});
+
 it('shows red warning in locations listing when community percentages do not sum to 100%', function () {
     $user = adminUser();
 
@@ -507,7 +679,8 @@ it('shows red warning in locations listing when community percentages do not sum
 
     Livewire::actingAs($user)
         ->test(Locations::class)
-        ->assertSeeHtml('data-flux-callout');
+        ->assertSee(__('admin.locations.community_pct_must_be_100'))
+        ->assertSeeHtml('text-red-700');
 });
 
 it('does not show warning in locations listing when all community percentages sum to 100%', function () {
@@ -532,7 +705,7 @@ it('does not show warning in locations listing when all community percentages su
 
     Livewire::actingAs($user)
         ->test(Locations::class)
-        ->assertDontSeeHtml('data-flux-callout');
+        ->assertDontSee(__('admin.locations.community_pct_must_be_100'));
 });
 
 it('shows invalid location percentage total in listing when not equal to 100%', function () {
@@ -557,7 +730,7 @@ it('shows invalid location percentage total in listing when not equal to 100%', 
         ->assertSee('60.00');
 });
 
-it('shows only owners with active properties in the same portal or garage as chief candidates', function () {
+it('shows only properties with active owners in the same portal or garage as chief candidates', function () {
     $user = adminUser();
 
     $portal = Location::factory()->portal()->create(['code' => '33-H']);
@@ -604,10 +777,11 @@ it('shows only owners with active properties in the same portal or garage as chi
 
     Livewire::actingAs($user)
         ->test(LocationDetail::class, ['location' => $portal])
-        ->assertSee('Kandidata A')
-        ->assertSee('Kandidata B')
+        ->assertSee('H-1')
+        ->assertSee('H-2')
         ->assertDontSee('Inaktiboa')
-        ->assertDontSee('Beste Kokalekua');
+        ->assertDontSee('Beste Kokalekua')
+        ->assertDontSee('Z-1');
 });
 
 it('transfers chief and COMMUNITY_ADMIN role from previous owner to new owner in the same location', function () {
@@ -645,7 +819,7 @@ it('transfers chief and COMMUNITY_ADMIN role from previous owner to new owner in
 
     Livewire::actingAs($user)
         ->test(LocationDetail::class, ['location' => $portal])
-        ->set('chiefOwnerId', (string) $newChief->id)
+        ->set('chiefPropertyId', (string) $propertyB->id)
         ->call('saveChiefOwner')
         ->assertHasNoErrors();
 
@@ -704,7 +878,7 @@ it('keeps COMMUNITY_ADMIN role for previous chief when she still manages another
 
     Livewire::actingAs($user)
         ->test(LocationDetail::class, ['location' => $portal])
-        ->set('chiefOwnerId', (string) $newChief->id)
+        ->set('chiefPropertyId', (string) $portalPropertyB->id)
         ->call('saveChiefOwner')
         ->assertHasNoErrors();
 

@@ -101,17 +101,8 @@ new class extends Component {
 
         <form wire:submit="uploadImage" class="space-y-4">
             {{-- File input --}}
-            <div>
-                <label for="photo" class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ __('gallery.admin.file') }}
-                </label>
-                <input id="photo" type="file" wire:model="photo" accept=".jpg,.jpeg,.png,.webp"
-                    class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-[#edd2c7] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#793d3d] hover:file:bg-[#f1bd4d]/60" />
-                <p class="mt-1 text-xs text-gray-500">{{ __('gallery.admin.formats') }}</p>
-                @error('photo')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-admin.form-file-input id="photo" model="photo" :label="__('gallery.admin.file')"
+                accept=".jpg,.jpeg,.png,.webp" :hint="__('gallery.admin.formats')" />
 
             {{-- Preview --}}
             @if ($photo)
@@ -123,61 +114,24 @@ new class extends Component {
 
             {{-- Bilingual alt text --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label for="altEu" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ __('gallery.admin.alt_eu') }}
-                    </label>
-                    <input id="altEu" type="text" wire:model="altEu"
-                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
-                    @error('altEu')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div>
-                    <label for="altEs" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ __('gallery.admin.alt_es') }}
-                    </label>
-                    <input id="altEs" type="text" wire:model="altEs"
-                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
-                    @error('altEs')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-admin.form-input name="altEu" model="altEu" :label="__('gallery.admin.alt_eu')" />
+                <x-admin.form-input name="altEs" model="altEs" :label="__('gallery.admin.alt_es')" />
             </div>
 
-            <div class="mb-2">
-                <label class="text-sm font-semibold text-stone-800">
-                    {{ __('gallery.admin.tag') }}
-                </label>
-                <div class="mt-3 flex flex-wrap gap-2" data-gallery-tag-selector>
-                    <label class="cursor-pointer select-none">
-                        <input type="radio" wire:model="tag" value="historia"
-                            class="sr-only peer" />
-                        <span
-                            class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
-                            {{ __('gallery.filter.history') }}
-                        </span>
-                    </label>
-                    <label class="cursor-pointer select-none">
-                        <input type="radio" wire:model="tag" value="madaia"
-                            class="sr-only peer" />
-                        <span
-                            class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
-                            {{ __('gallery.filter.madaia') }}
-                        </span>
-                    </label>
-                </div>
-                @error('tag')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-admin.form-single-radio-pills :legend="__('gallery.admin.tag')" model="tag"
+                data-gallery-tag-selector :options="[
+                    [
+                        'value' => \App\Models\Image::TAG_HISTORY,
+                        'label' => __('gallery.filter.history'),
+                    ],
+                    [
+                        'value' => \App\Models\Image::TAG_MADAIA,
+                        'label' => __('gallery.filter.madaia'),
+                    ],
+                ]" />
 
-            <div class="pt-2">
-                <button type="submit"
-                    class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                    {{ __('gallery.admin.upload') }}
-                </button>
-            </div>
+            <x-admin.form-footer-actions class="pt-2 mt-0" show-default-buttons :show-cancel-button="false"
+                :save-label="__('gallery.admin.upload')" />
         </form>
     </div>
 
@@ -223,15 +177,11 @@ new class extends Component {
                             {{-- Action overlay --}}
                             <div
                                 class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-200 group-hover:bg-black/40">
-                                <button wire:click="confirmDelete({{ $image->id }})"
-                                    class="rounded-full bg-[#d9755b] p-2 text-white opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-[#793d3d] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
-                                    aria-label="{{ __('general.buttons.delete') }}">
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="2" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                    </svg>
-                                </button>
+                                <x-admin.icon-button-delete
+                                    wire:click="confirmDelete({{ $image->id }})"
+                                    :title="__('general.buttons.delete')"
+                                    aria-label="{{ __('general.buttons.delete') }}"
+                                    class="bg-[#d9755b] text-white opacity-0! transition-all duration-200 group-hover:opacity-100 hover:bg-[#793d3d] focus:opacity-100" />
                             </div>
                         </div>
 

@@ -132,3 +132,7 @@
 - For admin table links that mutate state (`wire:click`), add `wire:confirm` with locale-aware copy so style-guide requirements ('confirm before change') are enforced in behavior, not only visuals.
 - When matching an admin table action to an existing pattern (e.g., notices published status), mirror both utility classes and confirmation tone/text so interaction parity is complete.
 - If a table action must match notices' published-column UX, replace `wire:confirm` with a dedicated modal flow (`confirmX`, `doX`, `cancelX`) to keep behavior and visuals identical.
+- In admin locations listing, when showing COMMUNITY_ADMIN label, source the display name from the linked owner profile (owners.coprop1_name) tied to active assignment + managed location; this avoids mismatches where users.name is not the expected business-facing label.
+- To centralize repeated bars row-actions in admin tables, keep x-admin.table-row-actions slot-compatible and add optional props (barsHref/barsTitle) so existing usages remain unchanged while removing inline duplicate markup.
+- For location delete actions, block deletion when linked properties exist and return a user-facing flash error; this avoids FK constraint failures and matches a safe admin UX.
+- Before adding tests for edge cases on assignment flows, verify DB unique constraints first; avoid writing impossible scenarios (e.g., two active assignments for the same property) and align tests with real invariants.

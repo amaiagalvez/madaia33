@@ -8,6 +8,7 @@ use App\Models\Owner;
 use Livewire\Component;
 use App\Models\Location;
 use App\Models\Property;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\View\View;
 use App\Actions\Locations\AssignLocationChiefAction;
@@ -19,7 +20,7 @@ class LocationDetail extends Component
 
     public Location $location;
 
-    public string $chiefOwnerId = '';
+    public string $chiefPropertyId = '';
 
     public string $newPropertyName = '';
 
@@ -130,6 +131,34 @@ class LocationDetail extends Component
         $this->editingPropertyId = null;
     }
 
+    public function openAddForm(): void
+    {
+        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
+
+        $this->showAddForm = true;
+        $this->newPropertyName = '';
+        $this->newCommunityPct = '';
+        $this->newLocationPct = '';
+        $this->resetValidation([
+            'newPropertyName',
+            'newCommunityPct',
+            'newLocationPct',
+        ]);
+    }
+
+    public function cancelAddForm(): void
+    {
+        $this->showAddForm = false;
+        $this->newPropertyName = '';
+        $this->newCommunityPct = '';
+        $this->newLocationPct = '';
+        $this->resetValidation([
+            'newPropertyName',
+            'newCommunityPct',
+            'newLocationPct',
+        ]);
+    }
+
     public function saveChiefOwner(): void
     {
         abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
@@ -138,20 +167,40 @@ class LocationDetail extends Component
             return;
         }
 
-        $candidateIds = $this->chiefCandidatesQuery()
-            ->pluck('owners.id')
+        $candidateIds = $this->chiefPropertiesQuery()
+            ->pluck('id')
             ->all();
 
         $validated = $this->validate([
-            'chiefOwnerId' => ['required', 'integer', Rule::in($candidateIds)],
+            'chiefPropertyId' => ['required', 'integer', Rule::in($candidateIds)],
         ], [], [
-            'chiefOwnerId' => __('admin.locations.chief_owner'),
+            'chiefPropertyId' => __('admin.locations.chief_property'),
         ]);
 
-        $owner = Owner::query()->findOrFail((int) $validated['chiefOwnerId']);
+        $property = $this->chiefPropertiesQuery()
+            ->with([
+                'activeAssignments.owner',
+            ])
+            ->findOrFail((int) $validated['chiefPropertyId']);
+
+        $activeAssignment = $property->activeAssignments->first();
+
+        if ($activeAssignment === null) {
+            $this->addError('chiefPropertyId', __('admin.locations.chief_owner_must_belong_to_location'));
+
+            return;
+        }
+
+        $owner = $activeAssignment->owner;
+
+        if (! $owner instanceof Owner || $owner->user_id === null) {
+            $this->addError('chiefPropertyId', __('admin.locations.chief_owner_without_user'));
+
+            return;
+        }
 
         $this->assignLocationChiefAction->execute($this->location, $owner);
-        $this->chiefOwnerId = (string) $owner->id;
+        $this->chiefPropertyId = (string) $property->id;
     }
 
     public function render(): View
@@ -160,24 +209,28 @@ class LocationDetail extends Component
 
         $isChiefSelectable = $this->supportsChiefOwnerSelection();
         $currentChiefOwnerId = $isChiefSelectable ? $this->currentChiefOwnerId() : null;
-        $chiefCandidates = $isChiefSelectable
-            ? $this->chiefCandidatesQuery()->get()
+        $chiefProperties = $isChiefSelectable
+            ? $this->chiefPropertiesQuery()->get()
             : collect();
 
-        if ($this->chiefOwnerId === '' && $currentChiefOwnerId !== null) {
-            $this->chiefOwnerId = (string) $currentChiefOwnerId;
+        if ($this->chiefPropertyId === '' && $currentChiefOwnerId !== null) {
+            $currentChiefPropertyId = $this->currentChiefPropertyId($currentChiefOwnerId);
+
+            if ($currentChiefPropertyId !== null) {
+                $this->chiefPropertyId = (string) $currentChiefPropertyId;
+            }
         }
 
         $properties = $this->location->properties()
             ->with(['activeAssignments'])
             ->withCount(['activeAssignments'])
-            ->orderBy('name')
+            ->orderBy('name', 'asc')
             ->get();
 
         return view('livewire.admin.locations.detail', [
             'isChiefSelectable' => $isChiefSelectable,
             'currentChiefOwnerId' => $currentChiefOwnerId,
-            'chiefCandidates' => $chiefCandidates,
+            'chiefProperties' => $chiefProperties,
             'properties' => $properties,
         ]);
     }
@@ -200,14 +253,33 @@ class LocationDetail extends Component
             ->value('owners.id');
     }
 
-    private function chiefCandidatesQuery()
+    private function currentChiefPropertyId(int $currentChiefOwnerId): ?int
     {
-        return Owner::query()
-            ->whereNotNull('user_id')
-            ->whereHas('activeAssignments.property', function ($query): void {
-                $query->where('location_id', $this->location->id);
+        return Property::query()
+            ->where('location_id', $this->location->id)
+            ->whereHas('activeAssignments', function ($query) use ($currentChiefOwnerId): void {
+                $query->where('owner_id', $currentChiefOwnerId);
             })
-            ->orderBy('coprop1_name');
+            ->orderBy('name')
+            ->value('id');
+    }
+
+    /**
+     * @return Builder<Property>
+     */
+    private function chiefPropertiesQuery(): Builder
+    {
+        return Property::query()
+            ->where('location_id', $this->location->id)
+            ->whereHas('activeAssignments.owner', function ($query): void {
+                $query->whereNotNull('user_id');
+            })
+            ->with([
+                'activeAssignments' => function ($query): void {
+                    $query->with('owner')->orderBy('id');
+                },
+            ])
+            ->orderBy('name');
     }
 
     private function currentUser(): ?User
