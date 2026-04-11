@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use App\Support\ContactMailData;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
@@ -14,14 +15,30 @@ abstract class AbstractContactMail extends Mailable
     use BuildsFromAddress;
     use Queueable, SerializesModels;
 
+    public readonly string $visitorName;
+
+    public readonly string $messageSubject;
+
+    public readonly string $messageBody;
+
+    public readonly ?string $legalText;
+
+    public readonly ?string $fromAddress;
+
+    public readonly ?string $fromName;
+
     public function __construct(
-        public readonly string $visitorName,
-        public readonly string $messageSubject,
-        public readonly string $messageBody,
-        public readonly ?string $legalText = null,
-        public readonly ?string $fromAddress = null,
-        public readonly ?string $fromName = null,
-    ) {}
+        ContactMailData $mailData,
+        ?string $fromAddress = null,
+        ?string $fromName = null,
+    ) {
+        $this->visitorName = $mailData->visitorName;
+        $this->messageSubject = $mailData->messageSubject;
+        $this->messageBody = $mailData->messageBody;
+        $this->legalText = $mailData->legalText;
+        $this->fromAddress = $fromAddress;
+        $this->fromName = $fromName;
+    }
 
     public function envelope(): Envelope
     {

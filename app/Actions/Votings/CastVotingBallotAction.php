@@ -30,23 +30,19 @@ class CastVotingBallotAction
         Owner $owner,
         int $optionId,
         User $authenticatedUser,
-        ?string $castIpAddress = null,
-        ?float $castLatitude = null,
-        ?float $castLongitude = null,
-        ?string $castDelegateDni = null,
-        bool $isInPerson = false,
+        ?CastVotingData $castData = null,
     ): VotingBallot {
         $this->validateUserPermissions($authenticatedUser);
-        $castIpAddress = $castIpAddress ?? request()->ip();
+        $castData ??= CastVotingData::fromInputs();
 
-        $ballot = DB::transaction(function () use ($voting, $owner, $optionId, $authenticatedUser, $castIpAddress, $castLatitude, $castLongitude, $castDelegateDni, $isInPerson): VotingBallot {
+        $ballot = DB::transaction(function () use ($voting, $owner, $optionId, $authenticatedUser, $castData): VotingBallot {
             $lockedVoting = $this->lockAndValidateVoting($voting, $owner, $optionId);
             $option = $lockedVoting->options->firstWhere('id', $optionId);
 
             $this->validateOption($option);
             $this->validateNotAlreadyVoted($lockedVoting, $owner);
 
-            $ballot = $this->createBallot($lockedVoting, $owner, $authenticatedUser, $castIpAddress, $castLatitude, $castLongitude, $castDelegateDni, $isInPerson, $option);
+            $ballot = $this->createBallot($lockedVoting, $owner, $authenticatedUser, $option, $castData);
 
             return $ballot;
         });
@@ -115,22 +111,18 @@ class CastVotingBallotAction
         Voting $voting,
         Owner $owner,
         User $authenticatedUser,
-        string $castIpAddress,
-        ?float $castLatitude,
-        ?float $castLongitude,
-        ?string $castDelegateDni,
-        bool $isInPerson,
         VotingOption $option,
+        CastVotingData $castData,
     ): VotingBallot {
         $ballot = VotingBallot::create([
             'voting_id' => $voting->id,
             'owner_id' => $owner->id,
             'cast_by_user_id' => $authenticatedUser->id === $owner->user_id ? null : $authenticatedUser->id,
-            'cast_ip_address' => $castIpAddress,
-            'cast_latitude' => $castLatitude,
-            'cast_longitude' => $castLongitude,
-            'cast_delegate_dni' => $isInPerson ? null : $castDelegateDni,
-            'is_in_person' => $isInPerson,
+            'cast_ip_address' => $castData->ipAddress,
+            'cast_latitude' => $castData->latitude,
+            'cast_longitude' => $castData->longitude,
+            'cast_delegate_dni' => $castData->isInPerson ? null : $castData->delegateDni,
+            'is_in_person' => $castData->isInPerson,
             'voted_at' => now(),
         ]);
 

@@ -480,8 +480,8 @@ it('displays aggregated community and location percentages in locations listing'
 
     Livewire::actingAs($user)
         ->test(Locations::class)
-        ->assertSee('4.0000')
-        ->assertSee('5.5000');
+        ->assertSee('4.00')
+        ->assertSee('5.50');
 });
 
 it('shows red warning in locations listing when community percentages do not sum to 100%', function () {

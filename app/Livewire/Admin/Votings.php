@@ -9,6 +9,7 @@ use App\Models\Voting;
 use Livewire\Component;
 use App\Models\Location;
 use App\SupportedLocales;
+use Carbon\CarbonInterface;
 use App\Models\VotingBallot;
 use App\Models\VotingOption;
 use Livewire\WithPagination;
@@ -133,6 +134,25 @@ class Votings extends Component
 
     public function saveVoting(): void
     {
+        $this->validateVotingForm();
+
+        $normalizedOptions = $this->normalizedOptions();
+
+        if ($normalizedOptions === []) {
+            $this->addError('options.0.labelEu', __('votings.admin.validations.option_required'));
+
+            return;
+        }
+
+        DB::transaction(fn () => $this->persistVoting($normalizedOptions));
+
+        $this->resetForm();
+        $this->showCreateForm = false;
+        session()->flash('message', __('general.messages.saved'));
+    }
+
+    private function validateVotingForm(): void
+    {
         $this->validate([
             'nameEu' => ['required', 'string', 'max:255'],
             'nameEs' => ['nullable', 'string', 'max:255'],
@@ -148,8 +168,14 @@ class Votings extends Component
             'options.*.labelEu' => ['nullable', 'string', 'max:255'],
             'options.*.labelEs' => ['nullable', 'string', 'max:255'],
         ]);
+    }
 
-        $normalizedOptions = collect($this->options)
+    /**
+     * @return array<int, array{label_eu: string, label_es: string}>
+     */
+    private function normalizedOptions(): array
+    {
+        return collect($this->options)
             ->map(static function (array $option): array {
                 return [
                     'label_eu' => trim((string) $option['labelEu']),
@@ -157,61 +183,71 @@ class Votings extends Component
                 ];
             })
             ->filter(fn (array $option): bool => $option['label_eu'] !== '')
-            ->values();
+            ->values()
+            ->all();
+    }
 
-        if ($normalizedOptions->isEmpty()) {
-            $this->addError('options.0.labelEu', __('votings.admin.validations.option_required'));
+    /**
+     * @param  array<int, array{label_eu: string, label_es: string}>  $normalizedOptions
+     */
+    private function persistVoting(array $normalizedOptions): void
+    {
+        $voting = Voting::create([
+            'name_eu' => $this->nameEu,
+            'name_es' => $this->nameEs !== '' ? $this->nameEs : null,
+            'question_eu' => $this->questionEu,
+            'question_es' => $this->questionEs !== '' ? $this->questionEs : null,
+            'starts_at' => $this->startsAt,
+            'ends_at' => $this->endsAt,
+            'is_published' => $this->isPublished,
+            'is_anonymous' => $this->isAnonymous,
+        ]);
 
-            return;
+        VotingOption::insert($this->votingOptionRows($voting, $normalizedOptions));
+
+        $locationRows = $this->votingLocationRows($voting);
+
+        if ($locationRows !== []) {
+            VotingLocation::insert($locationRows);
         }
+    }
 
-        DB::transaction(function () use ($normalizedOptions): void {
-            $voting = Voting::create([
-                'name_eu' => $this->nameEu,
-                'name_es' => $this->nameEs !== '' ? $this->nameEs : null,
-                'question_eu' => $this->questionEu,
-                'question_es' => $this->questionEs !== '' ? $this->questionEs : null,
-                'starts_at' => $this->startsAt,
-                'ends_at' => $this->endsAt,
-                'is_published' => $this->isPublished,
-                'is_anonymous' => $this->isAnonymous,
-            ]);
+    /**
+     * @param  array<int, array{label_eu: string, label_es: string}>  $normalizedOptions
+     * @return array<int, array{voting_id: int, label_eu: string, label_es: ?string, position: int, created_at: CarbonInterface, updated_at: CarbonInterface}>
+     */
+    private function votingOptionRows(Voting $voting, array $normalizedOptions): array
+    {
+        return collect($normalizedOptions)
+            ->values()
+            ->map(static function (array $option, int $index) use ($voting): array {
+                return [
+                    'voting_id' => $voting->id,
+                    'label_eu' => $option['label_eu'],
+                    'label_es' => $option['label_es'] !== '' ? $option['label_es'] : null,
+                    'position' => $index + 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            })
+            ->all();
+    }
 
-            $rows = $normalizedOptions
-                ->values()
-                ->map(static function (array $option, int $index) use ($voting): array {
-                    return [
-                        'voting_id' => $voting->id,
-                        'label_eu' => $option['label_eu'],
-                        'label_es' => $option['label_es'] !== '' ? $option['label_es'] : null,
-                        'position' => $index + 1,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                })
-                ->all();
-
-            VotingOption::insert($rows);
-
-            $locationRows = collect(array_unique($this->selectedLocations))
-                ->map(static function (string $locationId) use ($voting): array {
-                    return [
-                        'voting_id' => $voting->id,
-                        'location_id' => (int) $locationId,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                })
-                ->all();
-
-            if ($locationRows !== []) {
-                VotingLocation::insert($locationRows);
-            }
-        });
-
-        $this->resetForm();
-        $this->showCreateForm = false;
-        session()->flash('message', __('general.messages.saved'));
+    /**
+     * @return array<int, array{voting_id: int, location_id: int, created_at: CarbonInterface, updated_at: CarbonInterface}>
+     */
+    private function votingLocationRows(Voting $voting): array
+    {
+        return collect(array_unique($this->selectedLocations))
+            ->map(static function (string $locationId) use ($voting): array {
+                return [
+                    'voting_id' => $voting->id,
+                    'location_id' => (int) $locationId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            })
+            ->all();
     }
 
     public function openCensus(int $votingId): void

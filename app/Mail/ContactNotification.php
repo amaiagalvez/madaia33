@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\ContactMessage;
+use App\Support\ContactMailData;
 
 class ContactNotification extends AbstractContactMail
 {
@@ -17,12 +18,14 @@ class ContactNotification extends AbstractContactMail
         $this->visitorEmail = $contactMessage->email;
 
         parent::__construct(
-            visitorName: $contactMessage->name,
-            messageSubject: $contactMessage->subject,
-            messageBody: $contactMessage->message,
-            legalText: $legalText,
-            fromAddress: $fromAddress,
-            fromName: $fromName,
+            new ContactMailData(
+                visitorName: $contactMessage->name,
+                messageSubject: $contactMessage->subject,
+                messageBody: $contactMessage->message,
+                legalText: $legalText,
+            ),
+            $fromAddress,
+            $fromName,
         );
     }
 
