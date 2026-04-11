@@ -7,8 +7,8 @@ use Livewire\Component;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
 use Illuminate\Contracts\View\View;
-use App\Actions\AssignPropertyAction;
-use App\Actions\UnassignPropertyAction;
+use App\Actions\Properties\AssignPropertyAction;
+use App\Actions\Properties\UnassignPropertyAction;
 use Illuminate\Validation\ValidationException;
 
 class OwnerDetail extends Component

@@ -2,6 +2,7 @@
 
 use App\Models\Setting;
 use App\Support\ConfiguredMailSettings;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 use App\Validations\AdminSettingsValidation;
 
@@ -190,6 +191,7 @@ it('accepts valid front section payload including home history text', function (
         [
             'frontSiteName' => 'Madaia 33',
             'frontPrimaryEmail' => 'info@example.com',
+            'frontLogoImage' => UploadedFile::fake()->image('logo.png'),
             'frontLogoImagePath' => 'branding/logo.png',
             'frontPhotoRequestTextEu' => 'Bidali argazkiak',
             'frontPhotoRequestTextEs' => 'Envia fotos',

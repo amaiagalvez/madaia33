@@ -195,16 +195,16 @@ it('deleteMessage no hace nada si no hay confirmación activa', function () {
     expect(ContactMessage::find($message->id))->not->toBeNull();
 });
 
-it('por defecto la bandeja muestra solo mensajes leídos', function () {
+it('por defecto la bandeja muestra solo mensajes no leídos', function () {
     $user = User::factory()->create();
-    $readMessage = ContactMessage::factory()->read()->create();
-    ContactMessage::factory()->unread()->create();
+    ContactMessage::factory()->read()->create();
+    $unreadMessage = ContactMessage::factory()->unread()->create();
 
     $component = Livewire::actingAs($user)->test('admin-message-inbox');
 
-    expect($component->get('readFilter'))->toBe('read')
-        ->and($component->messages->pluck('id')->toArray())->toContain($readMessage->id)
-        ->and($component->messages->pluck('id')->toArray())->not->toContain(ContactMessage::query()->where('is_read', false)->firstOrFail()->id);
+    expect($component->get('readFilter'))->toBe('unread')
+        ->and($component->messages->pluck('id')->toArray())->toContain($unreadMessage->id)
+        ->and($component->messages->pluck('id')->toArray())->not->toContain(ContactMessage::query()->where('is_read', true)->firstOrFail()->id);
 });
 
 it('permite buscar por cualquier campo textual del mensaje', function () {
@@ -224,6 +224,7 @@ it('permite buscar por cualquier campo textual del mensaje', function () {
 
     Livewire::actingAs($user)
         ->test('admin-message-inbox')
+        ->call('setReadFilter', 'all')
         ->set('search', 'trastero')
         ->assertSee('Ane Iruretagoiena')
         ->assertDontSee('Otro nombre');

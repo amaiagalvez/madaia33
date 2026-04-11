@@ -19,7 +19,8 @@
 # Code
 - [ ] crear un componente, si todavía no lo hay, para que todas los listados tablas tengan la missma estructura
 - [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente si no lo hay
-
+- [ ] traducir todos los test al ingles, si hay explicaciones de código que sean en euskera
+- [ ] Ordena los ficheros dentro de la carpeta Livewire en subcarpetas Admin y Front
 - [ ] user hizkuntza, besdin du front-ekoa
 - [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
 - [ ] configurar el sentry
@@ -44,7 +45,8 @@
 
 - [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla "receivers" con el user_id de a quien se le ha enviado, el email al que se ha enviado, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje
 - [ ] Trackea los mensajes para que se pueda saber quien lo ha habierto y quien ha pinchado en los enlaces del mensaje si los hubiera
-
+- [ ] Hay que marcar quien es el jefe de portal o de planta de garaje
+- [ ] añadir locales a las localizations
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 
 

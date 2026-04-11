@@ -10,7 +10,7 @@ use App\SupportedLocales;
 use App\Models\VotingBallot;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
-use App\Actions\CastVotingBallotAction;
+use App\Actions\Votings\CastVotingBallotAction;
 use App\Support\VotingEligibilityService;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\PublicVotingController;
@@ -162,7 +162,7 @@ class PublicVotings extends Component
         abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn (array $row): int => $row['owner']->id)
+            ->map(static fn(array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -215,7 +215,7 @@ class PublicVotings extends Component
         abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn (array $row): int => $row['owner']->id)
+            ->map(static fn(array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -438,7 +438,7 @@ class PublicVotings extends Component
 
         $this->filteredDelegatedRows = array_values(array_filter(
             $this->delegatedRows,
-            static fn (array $row): bool => str_contains($row['search_index'], $search)
+            static fn(array $row): bool => str_contains($row['search_index'], $search)
         ));
     }
 
@@ -454,7 +454,7 @@ class PublicVotings extends Component
 
         $this->filteredInPersonRows = array_values(array_filter(
             $this->inPersonRows,
-            static fn (array $row): bool => str_contains($row['search_index'], $search)
+            static fn(array $row): bool => str_contains($row['search_index'], $search)
         ));
     }
 }

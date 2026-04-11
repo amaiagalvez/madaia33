@@ -15,25 +15,25 @@ dataset('supported_locales', SupportedLocales::all());
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('la página de política de privacidad es accesible públicamente', function (string $locale) {
-    $this->get(route(SupportedLocales::routeName('privacy-policy', $locale)))->assertOk();
+    test()->get(route(SupportedLocales::routeName('privacy-policy', $locale)))->assertOk();
 })->with('supported_locales');
 
 it('la página de aviso legal es accesible públicamente', function (string $locale) {
-    $this->get(route(SupportedLocales::routeName('legal-notice', $locale)))->assertOk();
+    test()->get(route(SupportedLocales::routeName('legal-notice', $locale)))->assertOk();
 })->with('supported_locales');
 
 it('las páginas legales reutilizan la misma vista pública con contenido diferenciado', function (string $locale) {
     createSetting('legal_page_privacy_policy_eu', 'Pribatutasun eduki partekatua');
     createSetting('legal_page_legal_notice_eu', 'Lege ohar eduki partekatua');
 
-    $privacy = $this->get(route(SupportedLocales::routeName('privacy-policy', $locale)));
+    $privacy = test()->get(route(SupportedLocales::routeName('privacy-policy', $locale)));
 
     $privacy->assertOk()
         ->assertViewIs('public.legal-page')
         ->assertSee('data-legal-page="privacy-policy"', false)
         ->assertSee('Pribatutasun eduki partekatua');
 
-    $legal = $this->get(route(SupportedLocales::routeName('legal-notice', $locale)));
+    $legal = test()->get(route(SupportedLocales::routeName('legal-notice', $locale)));
 
     $legal->assertOk()
         ->assertViewIs('public.legal-page')
@@ -51,7 +51,8 @@ it('el admin puede guardar el contenido de política de privacidad', function ()
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_FRONT)
-        ->set('adminEmail', 'admin@example.com')
+        ->set('frontSiteName', 'Madaia 33')
+        ->set('frontPrimaryEmail', 'info@example.com')
         ->set('privacyContentEu', 'Pribatutasun politika berria')
         ->set('privacyContentEs', 'Nueva política de privacidad')
         ->call('save');
@@ -66,7 +67,8 @@ it('el admin puede guardar el contenido de aviso legal', function () {
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_FRONT)
-        ->set('adminEmail', 'admin@example.com')
+        ->set('frontSiteName', 'Madaia 33')
+        ->set('frontPrimaryEmail', 'info@example.com')
         ->set('legalNoticeContentEu', 'Lege oharra berria')
         ->set('legalNoticeContentEs', 'Nuevo aviso legal')
         ->call('save');
@@ -88,5 +90,5 @@ it('el componente carga el contenido existente al montar', function () {
 });
 
 it('la antigua ruta admin de páginas legales ya no existe', function () {
-    $this->get('/admin/paginas-legales')->assertNotFound();
+    test()->get('/admin/paginas-legales')->assertNotFound();
 });

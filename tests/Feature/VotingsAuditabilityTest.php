@@ -11,7 +11,7 @@ use App\Livewire\PublicVotings;
 use App\Models\PropertyAssignment;
 use App\Mail\VotingConfirmationMail;
 use Illuminate\Support\Facades\Mail;
-use App\Actions\CastVotingBallotAction;
+use App\Actions\Votings\CastVotingBallotAction;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\PublicVotingController;
 
@@ -76,7 +76,7 @@ it('rejects vote attempts when owner does not belong to the allowed locations', 
 
     $action = app(CastVotingBallotAction::class);
 
-    expect(fn () => $action->execute($voting, $owner, $option->id, $owner->user))
+    expect(fn() => $action->execute($voting, $owner, $option->id, $owner->user))
         ->toThrow(ValidationException::class);
 
     expect(VotingBallot::query()

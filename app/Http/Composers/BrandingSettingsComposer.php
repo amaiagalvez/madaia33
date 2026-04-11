@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class BrandingSettingsComposer
 {
-    /**
-     * @var array<string, string>|null
-     */
-    private static ?array $cachedSettings = null;
-
     public function compose(View $view): void
     {
         $settings = self::settings();
@@ -32,17 +27,11 @@ class BrandingSettingsComposer
      */
     private static function settings(): array
     {
-        if (self::$cachedSettings !== null) {
-            return self::$cachedSettings;
-        }
-
-        self::$cachedSettings = Setting::stringValues([
+        return Setting::stringValues([
             'front_site_name',
             'front_primary_email',
             'front_logo_image_path',
         ]);
-
-        return self::$cachedSettings;
     }
 
     private function resolveLogoUrl(string $logoPath): string

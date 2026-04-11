@@ -72,10 +72,59 @@
 
 
 # Moldaketak
-- [ ] en settings / logo del front se tiene que poder subir una imagen y es la que se mostrará.
-- [ ] Separar las rutas, un fichero para las públicas y otro para las privadad
+- [x] en settings / logo del front se tiene que poder subir una imagen y es la que se mostrará.
+- [x] Separar las rutas, un fichero para las públicas y otro para las privadad
+- [x] dividir la carpeta Actions por features o modelos, lo que creas más conveniente
 - [ ] traducir todos los test al ingles, si hay explicaciones de código que sean en euskera
-- [ ] dividir la carpeta Actions por features o modelos, lo que creas más conveniente
 - [ ] Ordena los ficheros dentro de la carpeta Livewire en subcarpetas Admin y Front
-- [ ] cachear los settings para que reducir el número de consultas a la base de datos, cuando se modifica algun setting, borrar la cache y volver a crearla
-- [ ] En el panel Mezuak por defecto se tienen que mostrar los mensajes no leidos
+- [x] cachear los settings para que reducir el número de consultas a la base de datos, cuando se modifica algun setting, borrar la cache y volver a crearla
+- [x] En el panel Mezuak por defecto se tienen que mostrar los mensajes no leidos
+
+## Inplementazio plana (Moldaketak)
+
+### Helburua
+
+- [x] `Moldaketak` ataleko hobekuntza funtzionalak eta egitura-refaktore selektiboak modu seguruan ezarri: front logorako upload errealarekin, route publiko/pribatu banaketarekin, `Actions` karpetaren antolaketarekin, settings cache bateratuarekin, eta mezuen panelaren default egoera zuzendurik.
+
+### Erabaki teknikoak
+
+- [x] Front logorako dagoen `front_logo_image_path` gakoa berrerabili, baina string input soila ordezkatu Livewire fitxategi-upload bidez; fitxategia `public` diskoan gorde eta balioan path erlatiboa persistitu.
+- [x] Route banaketa `routes/web.php` guztiz ordezkatu gabe egin: fitxategi nagusiak bootstrap sarrera izaten jarraituko du, baina barrutik `routes/public.php` eta `routes/private.php` kargatuko ditu, `routes/settings.php` bereizita mantenduz edo private multzoan integratuz, bikoiztasunik gabe.
+- [x] Settings cachea `Setting` ereduaren mailan zentralizatu behar da (`stringValue`, `stringValues`, `localizedString`), ez composer bakoitzean cache independenteak sortuz; invalidazioa settings idazketaren puntuan egingo da.
+- [x] `Actions` karpeta domeinuka berrantolatuko da (adibidez, `Owners`, `Votings`, `Fortify`), baina `Livewire` karpetaren egungo antolaketa ez da ukituko, alias/mount erresoluzioan arriskurik ez sartzeko.
+- [x] Test guztiak ingelesera migratzea plan honetatik kanpo geratzen da, gero aparteko urrats mekaniko gisa egiteko.
+- [x] Admin Mezuen inboxean default filtroa `unread` izango da, eta bilaketa/markaketa portaerak horrekin koherente mantenduko dira.
+
+### Exekuzio urratsak
+
+- [x] 1. Settings cachearen diseinua ixtea eta gaur egun `Setting` kontsumitzen duten puntu guztiak identifikatzea (`AppServiceProvider`, composer-ak, kontrolagailuak, Livewire osagaiak).
+- [x] 2. Front logorako upload fluxua prestatzea: balidazioa, preview/oraingo balioaren bistaratzea, persistitutako path-a eta front/admin logo kontsumitzaileen egokitzapena.
+- [x] 3. Route egitura zatitzea `public` eta `private` fitxategietan, admin + auth/settings + voting endpoint babestuak private multzoan kontuan hartuta, baina `routes/settings.php` bere tokian utzita.
+- [x] 4. `Actions` karpeta domeinuka antolatzea eta namespace/import guztiak eguneratzea.
+- [x] 5. `AdminMessageInbox` default iragazkia `unread` gisa doitzea eta dagokion UI/test estaldura eguneratzea.
+- [x] 6. Pint, ukitutako test minimoak, eta beharrezko kasuetan Dusk/Feature egiaztapenak exekutatzea.
+
+### Egin beharreko lanak
+
+- [x] `app/Models/Setting.php` cache-aware bihurtzea eta invalidazio API txiki bat ematea.
+- [x] `app/Livewire/AdminSettings.php` egokitzea save ondoko cache flush/rebuild logikarekin eta front logo upload egoerarekin.
+- [x] Settings front tab-eko Blade zatia fitxategi-upload osagaiarekin ordezkatzea.
+- [x] `app/Http/Composers/BrandingSettingsComposer.php`, `app/Providers/AppServiceProvider.php`, kontrolagailu publikoak eta lotutako Livewire osagaiak settings cache zentralizatura eramatea.
+- [x] Route fitxategi berriak sortzea eta `routes/web.php`-tik kargatzea.
+- [x] `app/Actions/**` namespace berrietara mugitzea, erreferentzia guztiak eguneratuta.
+- [x] `app/Livewire/AdminMessageInbox.php` eta haren test/UI lotuak eguneratzea.
+
+### Arriskuak eta anbiguotasunak
+
+- [x] Front logorako upload-ean aurreko fitxategia ez da automatikoki ezabatuko; beraz, inplementazioak overwrite-rik gabe persistitu beharko du path berria, storage historikoa ukitu gabe.
+- [x] Route “pribatuak” plan honetan admin + auth/settings + voting endpoint babestuak dira; `routes/settings.php` bere horretan utziko da.
+- [x] Test guztiak ingelesera migratzea plan honetatik kanpo uzten da, gero aparteko urrats mekaniko gisa egiteko.
+- [x] `Livewire` fitxategien antolaketa ez da ukituko plan honetan, alias/mount erresoluzio arriskuak saihesteko.
+- [x] Settings cache berriak boot garaiko mail konfigurazioa eta view composer erabilerak sinkronizatuta mantentzen dira request berrietan; focused test eta integratutako settings kontsumitzaileek ez dute stale baliorik erakutsi.
+
+### Balidazioa
+
+- [x] TDD ahal den neurrian: Unit testak cache/setting helper logikarako eta Feature/Livewire testak upload, route eta inbox aldaketetarako.
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
+- [x] Ukitutako test multzo minimoa Docker barruan (`php artisan test --compact` fitxategi/filter zehatzekin).
+- [ ] Route banaketak frontend edo auth flow-ak ukitzen baditu, dagokion Browser/Dusk egiaztapena exekutatzea.

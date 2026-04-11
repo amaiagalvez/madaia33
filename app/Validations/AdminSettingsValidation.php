@@ -60,6 +60,7 @@ class AdminSettingsValidation
                 'frontPhotoRequestTextEs' => ['nullable', 'string', 'max:1000', new NoScriptTags],
                 'frontPrimaryEmail' => ['required', 'email', 'max:255'],
                 'frontSiteName' => ['required', 'string', 'max:255'],
+                'frontLogoImage' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
                 'frontLogoImagePath' => ['nullable', 'string', 'max:500'],
             ],
             Setting::SECTION_CONTACT_FORM => [

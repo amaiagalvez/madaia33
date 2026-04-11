@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\SupportedLocales;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -11,6 +12,8 @@ class Setting extends Model
 {
     /** @use HasFactory<SettingFactory> */
     use HasFactory, SoftDeletes;
+
+    private const STRING_VALUES_CACHE_KEY = 'settings:string-values';
 
     public const SECTION_CONTACT_FORM = 'contact_form';
 
@@ -31,6 +34,25 @@ class Setting extends Model
         'value',
         'section',
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(static function (): void {
+            self::flushStringValuesCache();
+        });
+
+        static::deleted(static function (): void {
+            self::flushStringValuesCache();
+        });
+
+        static::restored(static function (): void {
+            self::flushStringValuesCache();
+        });
+
+        static::forceDeleted(static function (): void {
+            self::flushStringValuesCache();
+        });
+    }
 
     /**
      * @return list<string>
@@ -57,7 +79,7 @@ class Setting extends Model
 
     public static function stringValue(string $key, string $default = ''): string
     {
-        return (string) (self::query()->where('key', $key)->value('value') ?? $default);
+        return (string) (self::allStringValues()[$key] ?? $default);
     }
 
     /**
@@ -70,11 +92,16 @@ class Setting extends Model
             return [];
         }
 
-        return self::query()
-            ->whereIn('key', $keys)
-            ->pluck('value', 'key')
-            ->map(static fn (mixed $value): string => (string) $value)
-            ->all();
+        $cachedSettings = self::allStringValues();
+        $values = [];
+
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $cachedSettings)) {
+                $values[$key] = $cachedSettings[$key];
+            }
+        }
+
+        return $values;
     }
 
     public static function localizedString(string $prefix, ?string $fallback = null, ?string $locale = null): ?string
@@ -87,6 +114,35 @@ class Setting extends Model
             $fallback,
             $locale,
         );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function allStringValues(): array
+    {
+        /** @var array<string, string> $values */
+        $values = Cache::rememberForever(self::STRING_VALUES_CACHE_KEY, static fn(): array => self::query()
+            ->pluck('value', 'key')
+            ->map(static fn(mixed $value): string => (string) $value)
+            ->all());
+
+        return $values;
+    }
+
+    public static function flushStringValuesCache(): void
+    {
+        Cache::forget(self::STRING_VALUES_CACHE_KEY);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function refreshStringValuesCache(): array
+    {
+        self::flushStringValuesCache();
+
+        return self::allStringValues();
     }
 
     /**

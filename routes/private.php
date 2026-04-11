@@ -1,0 +1,72 @@
+<?php
+
+use App\Models\User;
+use App\Models\Image;
+use App\Models\Owner;
+use App\Models\Notice;
+use App\Models\Voting;
+use App\Models\Location;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Models\ContactMessage;
+use App\Http\Controllers\PublicVotingController;
+
+Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->group(function () {
+  Route::get('/', function () {
+    return view('admin.dashboard.index', [
+      'publishedNoticesCount' => Notice::where('is_public', true)->count(),
+      'totalNoticesCount' => Notice::count(),
+      'imagesCount' => Image::count(),
+      'unreadMessagesCount' => ContactMessage::where('is_read', false)->count(),
+      'usersCount' => User::query()->count(),
+      'ownersCount' => Owner::query()->count(),
+      'locationsCount' => Location::query()->count(),
+      'votingsCount' => Voting::query()->count(),
+    ]);
+  })->name('dashboard');
+
+  Route::get('/avisos', fn() => view('admin.notices'))
+    ->middleware('role:superadmin,admin_general,admin_comunidad')
+    ->name('notices');
+  Route::get('/imagenes', fn() => view('admin.images'))
+    ->middleware('role:superadmin')
+    ->name('images');
+  Route::get('/mensajes', fn() => view('admin.messages'))
+    ->middleware('role:superadmin')
+    ->name('messages');
+  Route::get('/configuracion', fn() => view('admin.settings'))
+    ->middleware('role:superadmin')
+    ->name('settings');
+  Route::get('/portales', fn() => view('admin.locations.index', ['type' => 'portal']))
+    ->middleware('role:superadmin,admin_general,admin_comunidad')
+    ->name('locations.portals');
+  Route::get('/garajes', fn() => view('admin.locations.index', ['type' => 'garage']))
+    ->middleware('role:superadmin,admin_general,admin_comunidad')
+    ->name('locations.garages');
+  Route::get('/trasteros', fn() => view('admin.locations.index', ['type' => 'storage']))
+    ->middleware('role:superadmin,admin_general,admin_comunidad')
+    ->name('locations.storages');
+  Route::get('/ubicaciones/{location}', function (Location $location) {
+    /** @var User|null $user */
+    $user = Auth::user();
+
+    abort_unless($user?->canManageLocation($location), 403);
+
+    return view('admin.locations.show', ['location' => $location]);
+  })->name('locations.show');
+  Route::get('/propietarias', fn() => view('admin.owners.index'))
+    ->middleware('role:superadmin')
+    ->name('owners.index');
+  Route::get('/propietarias/{owner}', fn(Owner $owner) => view('admin.owners.show', ['owner' => $owner]))
+    ->middleware('role:superadmin')
+    ->name('owners.show');
+  Route::get('/votaciones', fn() => view('admin.votings'))
+    ->middleware('role:superadmin')
+    ->name('votings');
+  Route::get('/usuarios', fn() => view('admin.users.index'))
+    ->middleware('role:superadmin,admin_general')
+    ->name('users.index');
+});
+
+Route::middleware('auth')->post('/votings/delegated/clear', [PublicVotingController::class, 'clearDelegatedVoting'])
+  ->name('votings.delegated.clear');

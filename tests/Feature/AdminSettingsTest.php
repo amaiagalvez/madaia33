@@ -11,6 +11,8 @@ use App\Models\Setting;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 use App\Validations\AdminSettingsValidation;
@@ -99,6 +101,28 @@ it('guarda los nuevos campos front de marca, email, texto de fotos y cookies', f
         ->and(settingValue('front_photo_request_text_es'))->toBe('Envia fotos a este email: :email')
         ->and(settingValue('legal_page_cookie_policy_eu'))->toBe('<p>Cookie politika EU</p>')
         ->and(settingValue('legal_page_cookie_policy_es'))->toBe('<p>Politica de cookies ES</p>');
+});
+
+it('uploads and stores the front logo image in public storage', function () {
+    Storage::fake('public');
+
+    $user = adminUser();
+    $logo = UploadedFile::fake()->image('front-logo.png', 320, 120);
+
+    $component = Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_FRONT)
+        ->set('frontSiteName', 'Comunidad Madaia')
+        ->set('frontPrimaryEmail', 'front@example.com')
+        ->set('frontLogoImage', $logo)
+        ->call('save');
+
+    $storedPath = (string) settingValue('front_logo_image_path');
+
+    expect($storedPath)->toStartWith('branding/')
+        ->and(Storage::disk('public')->exists($storedPath))->toBeTrue();
+
+    $component->assertSet('frontLogoImage', null);
 });
 
 it('guarda el texto legal en la tabla settings', function () {

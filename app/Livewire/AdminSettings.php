@@ -5,7 +5,9 @@ namespace App\Livewire;
 use App\Mail\TestEmail;
 use App\Models\Setting;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 use App\Concerns\BuildsLocaleFieldConfigs;
@@ -14,6 +16,7 @@ use App\Validations\AdminSettingsValidation;
 class AdminSettings extends Component
 {
     use BuildsLocaleFieldConfigs;
+    use WithFileUploads;
 
     public string $activeSection = '';
 
@@ -59,6 +62,8 @@ class AdminSettings extends Component
     public string $frontSiteName = '';
 
     public string $frontLogoImagePath = '';
+
+    public mixed $frontLogoImage = null;
 
     public string $emailFromAddress = '';
 
@@ -293,6 +298,10 @@ class AdminSettings extends Component
     {
         $this->validate(AdminSettingsValidation::rulesBySection($this->activeSection));
 
+        if ($this->activeSection === Setting::SECTION_FRONT && $this->frontLogoImage !== null) {
+            $this->frontLogoImagePath = $this->frontLogoImage->store('branding', 'public');
+        }
+
         $map = $this->sectionFieldMap()[$this->activeSection] ?? [];
 
         if (empty($map)) {
@@ -302,9 +311,41 @@ class AdminSettings extends Component
         }
 
         Setting::upsert($this->buildUpsertRows($map), ['key'], ['value', 'updated_at']);
+        Setting::refreshStringValuesCache();
+
+        if ($this->frontLogoImage !== null) {
+            $this->frontLogoImage = null;
+        }
 
         $this->saved = true;
         $this->hasUnsavedChanges = false;
+    }
+
+    public function getFrontLogoPreviewUrlProperty(): ?string
+    {
+        if ($this->frontLogoImage !== null) {
+            return $this->frontLogoImage->temporaryUrl();
+        }
+
+        $logoPath = trim($this->frontLogoImagePath);
+
+        if ($logoPath === '') {
+            return null;
+        }
+
+        if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
+            return $logoPath;
+        }
+
+        if (str_starts_with($logoPath, '/')) {
+            return $logoPath;
+        }
+
+        if (Storage::disk('public')->exists($logoPath)) {
+            return Storage::url($logoPath);
+        }
+
+        return asset('storage/' . ltrim($logoPath, '/'));
     }
 
     public function openTestEmailModal(): void

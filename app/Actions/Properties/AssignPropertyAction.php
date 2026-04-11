@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Properties;
 
 use App\Models\Owner;
 use App\Models\Property;
