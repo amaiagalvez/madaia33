@@ -15,8 +15,6 @@
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario
 - [ ] agente auditor de ENS e 27001
-- [ ] añadir al agente amalurra la regla: para las partes de las views que sean sensibles, que tengan validaciones o algun tipo de comprobación, crear dusk-test
-- [ ] traducir los agentes sorgina, amalurra y lamia al ingles
 
 # Code
 - [ ] crear un componente, si todavía no lo hay, para que todas los listados tablas tengan la missma estructura
