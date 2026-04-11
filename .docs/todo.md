@@ -37,7 +37,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-- [ ] Hay que marcar quien es la persona jefa de portal o de planta de garaje (puede haber una o varias)
+- [ ] Hay que marcar quien es la propietaria que es jefa de portal o de planta de garaje, en el formulario de locations, los que tengan alguna propiedad de ese location
 - [ ] Votaciones. En la pantalla bozketalk el front, si ya he votado, no mostrar las opciones, solo un aviso de que ya he votado.
 
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje

@@ -37,7 +37,9 @@
         "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json --require-tasks --include-tasks 2>&1 \\| head -80$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "docker rm": true,
+        "true": true
     },
     "chat.promptFilesRecommendations": {
         "speckit.constitution": true,
