@@ -6,6 +6,13 @@ en el formulario de usuarias, en la parte de abajo enseñar una lista con todas 
 - [x] en la lista de usuarias, añadir una columna con los location asignados
 
 # owners zuzenketak
-- [ ] cambiar el icono del botón Editar por el de bars, y llamarle "Ver propiedades"
-- [ ] añadir en la lista un botón para abrir la ficha de la propietaria para poder editarla
-- [ ] añadir el campo hizkuntza al formulario
+- [x] cambiar el icono del botón Editar por el de bars, y llamarle "Ver propiedades"
+- [x] añadir en la lista un botón para abrir la ficha de la propietaria para poder editarla
+- [x] añadir el campo hizkuntza al formulario
+
+
+# zuzenketak
+- [x] faltan las traducciones del crud erabiltzaileak en la lista y en el formulario
+- [x] abrir el formulario de owners como en el resto de tablas
+- [x] eliminar lo que se utiliza en admin/propietarias/{id} no lo neecesito ya está todo en el listado de owners
+- [x] quitar el booton "Sin propiedades activas" del filtro del listado de propietarias

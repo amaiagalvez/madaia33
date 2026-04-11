@@ -3,6 +3,100 @@
         <x-admin.create-record-button wire:click="$set('showCreateForm', true)" />
     </div>
 
+    @if ($showEditOwnerForm)
+        <div class="fixed inset-0 z-40" data-section="owner-edit-form">
+            <button type="button" wire:click="cancelEditOwner"
+                class="admin-slideover-backdrop absolute inset-0 bg-black/30"
+                aria-label="{{ __('general.buttons.cancel') }}"></button>
+
+            <div
+                class="admin-slideover-panel absolute inset-y-0 right-0 z-50 h-full w-full max-w-4xl overflow-y-auto bg-white p-6 shadow-2xl">
+                <flux:heading size="lg" class="mb-4">{{ __('admin.owners.edit_owner') }}
+                </flux:heading>
+
+                <div class="grid gap-4 lg:grid-cols-2">
+                    <div class="rounded-lg border border-zinc-200 p-4">
+                        <flux:heading size="sm" class="mb-3 text-zinc-800">
+                            {{ __('admin.owners.columns.coprop1') }}
+                        </flux:heading>
+                        <div class="grid gap-3">
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop1_name') }}</flux:label>
+                                <flux:input wire:model="editCoprop1Name" />
+                                <flux:error name="editCoprop1Name" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop1_dni') }}</flux:label>
+                                <flux:input wire:model="editCoprop1Dni" />
+                                <flux:error name="editCoprop1Dni" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop1_phone') }}</flux:label>
+                                <flux:input wire:model="editCoprop1Phone" />
+                                <flux:error name="editCoprop1Phone" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop1_email') }}</flux:label>
+                                <flux:input wire:model="editCoprop1Email" type="email" />
+                                <flux:error name="editCoprop1Email" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.language') }}</flux:label>
+                                <flux:select wire:model="editLanguage">
+                                    <flux:select.option value="eu">
+                                        {{ __('general.language.eu') }}</flux:select.option>
+                                    <flux:select.option value="es">
+                                        {{ __('general.language.es') }}</flux:select.option>
+                                </flux:select>
+                                <flux:error name="editLanguage" />
+                            </flux:field>
+                        </div>
+                    </div>
+
+                    <div class="rounded-lg border border-zinc-200 p-4">
+                        <flux:heading size="sm" class="mb-3 text-zinc-800">
+                            {{ __('admin.owners.columns.coprop2') }}
+                        </flux:heading>
+                        <div class="grid gap-3">
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop2_name') }}</flux:label>
+                                <flux:input wire:model="editCoprop2Name" />
+                                <flux:error name="editCoprop2Name" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop2_dni') }}</flux:label>
+                                <flux:input wire:model="editCoprop2Dni" />
+                                <flux:error name="editCoprop2Dni" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop2_phone') }}
+                                </flux:label>
+                                <flux:input wire:model="editCoprop2Phone" />
+                                <flux:error name="editCoprop2Phone" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop2_email') }}
+                                </flux:label>
+                                <flux:input wire:model="editCoprop2Email" type="email" />
+                                <flux:error name="editCoprop2Email" />
+                            </flux:field>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex gap-2">
+                    <button type="button" wire:click="saveEditOwner"
+                        class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                        {{ __('admin.owners.edit_submit') }}
+                    </button>
+                    <flux:button variant="ghost" wire:click="cancelEditOwner">
+                        {{ __('general.buttons.cancel') }}
+                    </flux:button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if ($showCreateForm)
         <div class="fixed inset-0 z-40" data-section="owner-create-form">
             <button type="button" wire:click="cancelCreateOwner"
@@ -32,14 +126,26 @@
                                 <flux:error name="coprop1Dni" />
                             </flux:field>
                             <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop1_phone') }}</flux:label>
+                                <flux:label>{{ __('admin.owners.form.coprop1_phone') }}
+                                </flux:label>
                                 <flux:input wire:model="coprop1Phone" />
                                 <flux:error name="coprop1Phone" />
                             </flux:field>
                             <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop1_email') }}</flux:label>
+                                <flux:label>{{ __('admin.owners.form.coprop1_email') }}
+                                </flux:label>
                                 <flux:input wire:model="coprop1Email" type="email" />
                                 <flux:error name="coprop1Email" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.language') }}</flux:label>
+                                <flux:select wire:model="language">
+                                    <flux:select.option value="eu">
+                                        {{ __('general.language.eu') }}</flux:select.option>
+                                    <flux:select.option value="es">
+                                        {{ __('general.language.es') }}</flux:select.option>
+                                </flux:select>
+                                <flux:error name="language" />
                             </flux:field>
                         </div>
                     </div>
@@ -198,18 +304,6 @@
                     </flux:select.option>
                 @endforeach
             </flux:select>
-
-            @if ($ownershipView === 'without_properties')
-                <flux:button variant="ghost" wire:click="clearWithoutProperties"
-                    data-action="show-all-owners">
-                    {{ __('admin.owners.filters.back_to_default') }}
-                </flux:button>
-            @else
-                <flux:button variant="ghost" wire:click="showWithoutProperties"
-                    data-action="show-owners-without-properties">
-                    {{ __('admin.owners.filters.without_properties') }}
-                </flux:button>
-            @endif
         </div>
     </div>
 
@@ -299,11 +393,18 @@
                         @endforeach
                     </td>
                     <td class="px-6 py-4 text-right text-sm font-medium">
-                        <button type="button" wire:click="toggleOwnerRow({{ $owner->id }})"
-                            title="{{ __('general.buttons.edit') }}"
-                            data-action="toggle-owner-inline-{{ $owner->id }}"
+                        <button type="button"
+                            wire:click="openEditOwnerForm({{ $owner->id }})"
+                            title="{{ __('admin.owners.edit_owner') }}"
+                            data-action="edit-owner-{{ $owner->id }}"
                             class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
                             <flux:icon.pencil-square class="size-4" />
+                        </button>
+                        <button type="button" wire:click="toggleOwnerRow({{ $owner->id }})"
+                            title="{{ __('admin.owners.view_properties') }}"
+                            data-action="toggle-owner-inline-{{ $owner->id }}"
+                            class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
+                            <flux:icon.bars-3 class="size-4" />
                         </button>
                     </td>
                 </tr>

@@ -1,3 +1,20 @@
+# Copilot
+- [ ] repasar agente lamia
+- [ ] agente para crear manuales de usuario
+- [ ] agente auditor de ENS e 27001
+
+# Code Refactor
+- [ ] crear un componente, si todavía no lo hay, para que todas los listados tablas tengan la missma estructura
+- [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente si no lo hay
+- [ ] Ordena los ficheros dentro de la carpeta Livewire en subcarpetas Admin y Front
+- [ ] componente para inputs del formulario
+
+# Code
+- [ ] user hizkuntza, berdin du front-ekoa
+
+- [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
+- [ ] configurar el sentry
+- [ ] añadir debugbar y algo para ver los logs
 - [ ] components field text
 - [ ] components tables
 - [ ] datatables
@@ -6,25 +23,18 @@
 - [ ] traducciones repetidas
 - [ ] añadir el MCP para que consulte la documentación de laravel
 
-# Copilot
-- [ ] repasar agente lamia
-- [ ] agente para crear manuales de usuario
-- [ ] agente auditor de ENS e 27001
-
-# Code
-- [ ] crear un componente, si todavía no lo hay, para que todas los listados tablas tengan la missma estructura
-- [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente si no lo hay
-- [ ] Ordena los ficheros dentro de la carpeta Livewire en subcarpetas Admin y Front
-- [ ] componente para inputs del formulario
-
-- [ ] user hizkuntza, besdin du front-ekoa
-- [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
-- [ ] configurar el sentry
-- [ ] añadir debugbar y algo para ver los logs
-
 # Home
 - [ ] Osatu pribatutasun-politika eta lege-oharrak testuak
 - [ ] Cookies sartu
+- [ ] legeak.html begiratu
+
+https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
+
+Para que todo esto sea legal de verdad, asegúrate de:
+✔ Checkbox de privacidad en formularios
+✔ No mostrar datos de vecinos públicamente
+✔ Control de acceso a actas
+✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
@@ -40,8 +50,6 @@
 
 - [ ] Hay que marcar quien es el jefe de portal o de planta de garaje
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
-
-
 
 # nohizbehinka egiteko 2026-04-11
 - [ ] Repasa los feature test y los que se pueedan convertir en unit pasalos
@@ -62,16 +70,6 @@ organizar la información en diferentes pestañas
 - la primera vez que un usuario se loguee, pidele que acepte las condiciones de uso (texto que se almacenará en settings en el section owners en dos idiomas) y luego muestrale una pantalla con sus propiedades asignadas para que las valide, si no las tiene validadas ya (oweer validation)
 
 - añadir el icono para accedeer al perfil junto al nombre del usuario, tanto en el menú del front como en el menu del aginte-panaela
-
-## Comprobar
-
-https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
-
-Para que todo esto sea legal de verdad, asegúrate de:
-✔ Checkbox de privacidad en formularios
-✔ No mostrar datos de vecinos públicamente
-✔ Control de acceso a actas
-✔ Logs de acceso (recomendado para votaciones)
 
 ## manual de usuaria
 crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación

@@ -28,7 +28,7 @@
                         <div class="grid gap-4 md:grid-cols-2">
                             <div>
                                 <label for="user-name"
-                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.name') }}</label>
+                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('admin.users.name') }}</label>
                                 <input id="user-name" type="text" wire:model="name"
                                     @disabled($editingUserId !== null) @readonly($editingUserId !== null)
                                     class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
@@ -39,7 +39,7 @@
 
                             <div>
                                 <label for="user-email"
-                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.email') }}</label>
+                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('admin.users.email') }}</label>
                                 <input id="user-email" type="email" wire:model="email"
                                     @disabled($editingUserId !== null) @readonly($editingUserId !== null)
                                     class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
@@ -64,7 +64,7 @@
 
                         @if ($editingUserId !== null && $editingOwnerId !== null)
                             <div class="rounded-md border border-[#edd2c7] bg-[#edd2c7]/20 p-3">
-                                <a href="{{ route('admin.owners.show', ['owner' => $editingOwnerId]) }}"
+                                <a href="{{ route('admin.owners.index') }}"
                                     class="inline-flex items-center rounded-md bg-[#793d3d] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5f2f2f]">
                                     {{ __('admin.users.open_owner_profile') }}
                                 </a>
@@ -151,7 +151,7 @@
                                                     {{ __('admin.users.sessions_logout_at') }}</th>
                                                 <th
                                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">
-                                                    IP</th>
+                                                    {{ __('admin.users.sessions_ip') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-stone-100 bg-white">
@@ -187,11 +187,11 @@
             <tr>
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('validation.attributes.name') }}
+                    {{ __('admin.users.name') }}
                 </th>
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('validation.attributes.email') }}
+                    {{ __('admin.users.email') }}
                 </th>
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">

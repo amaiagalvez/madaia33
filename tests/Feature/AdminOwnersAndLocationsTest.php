@@ -9,7 +9,6 @@ use App\Livewire\Admin\Owners;
 use App\Mail\OwnerWelcomeMail;
 use App\Livewire\Admin\Locations;
 use App\Models\PropertyAssignment;
-use App\Livewire\Admin\OwnerDetail;
 use Illuminate\Support\Facades\Mail;
 use App\Livewire\Admin\LocationDetail;
 
@@ -96,15 +95,27 @@ it('toggles assignment validations one by one and blocks closed assignments', fu
         'owner_validated' => false,
     ]);
 
-    Livewire::actingAs($user)
-        ->test(OwnerDetail::class, ['owner' => $owner])
-        ->call('toggleAssignmentValidation', $activeAssignment->id, 'admin_validated')
-        ->call('toggleAssignmentValidation', $activeAssignment->id, 'owner_validated')
-        ->call('toggleAssignmentValidation', $closedAssignment->id, 'admin_validated');
+    $component = Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('toggleOwnerRow', $owner->id);
 
-    expect($activeAssignment->refresh()->admin_validated)->toBeTrue()
-        ->and($activeAssignment->owner_validated)->toBeTrue()
-        ->and($closedAssignment->refresh()->admin_validated)->toBeFalse();
+    $component
+        ->set("assignmentEdits.{$activeAssignment->id}.admin_validated", true)
+        ->call('saveAssignment', $activeAssignment->id);
+
+    expect($activeAssignment->refresh()->admin_validated)->toBeTrue();
+
+    $component
+        ->set("assignmentEdits.{$activeAssignment->id}.owner_validated", true)
+        ->call('saveAssignment', $activeAssignment->id);
+
+    expect($activeAssignment->refresh()->owner_validated)->toBeTrue();
+
+    $component
+        ->set("assignmentEdits.{$closedAssignment->id}.admin_validated", true)
+        ->call('saveAssignment', $closedAssignment->id);
+
+    expect($closedAssignment->refresh()->admin_validated)->toBeFalse();
 });
 
 it('accepts comma decimals for location percentages and stores them normalized with dot', function () {
@@ -255,10 +266,6 @@ it('renders new admin pages for locations and owners', function () {
 
     test()->actingAs($user)
         ->get(route('admin.owners.index'))
-        ->assertOk();
-
-    test()->actingAs($user)
-        ->get(route('admin.owners.show', $owner))
         ->assertOk();
 });
 

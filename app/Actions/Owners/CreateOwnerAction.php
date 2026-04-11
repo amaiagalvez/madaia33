@@ -34,7 +34,7 @@ class CreateOwnerAction
                 'email' => $data['coprop1_email'],
                 'password' => Hash::make($password),
                 'is_active' => true,
-                'language' => SupportedLocales::default(),
+                'language' => $data['language'] ?? SupportedLocales::default(),
             ]);
 
             $owner = Owner::create([
@@ -43,7 +43,7 @@ class CreateOwnerAction
                 'coprop1_dni' => $data['coprop1_dni'],
                 'coprop1_phone' => $data['coprop1_phone'] ?? null,
                 'coprop1_email' => $data['coprop1_email'],
-                'language' => SupportedLocales::default(),
+                'language' => $data['language'] ?? SupportedLocales::default(),
                 'coprop2_name' => $data['coprop2_name'] ?? null,
                 'coprop2_dni' => $data['coprop2_dni'] ?? null,
                 'coprop2_phone' => $data['coprop2_phone'] ?? null,
@@ -142,12 +142,12 @@ class CreateOwnerAction
         $assignments = $data['assignments'] ?? [];
 
         if ($assignments === []) {
-            return '<p>'.e(__('admin.owners.email.no_properties')).'</p>';
+            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
         }
 
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
@@ -166,17 +166,17 @@ class CreateOwnerAction
                     return null;
                 }
 
-                $label = $property->location->code.' '.$property->name;
+                $label = $property->location->code . ' ' . $property->name;
 
-                return '<li>'.e($label).'</li>';
+                return '<li>' . e($label) . '</li>';
             })
             ->filter()
             ->values();
 
         if ($items->isEmpty()) {
-            return '<p>'.e(__('admin.owners.email.no_properties')).'</p>';
+            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
         }
 
-        return '<ul>'.$items->implode('').'</ul>';
+        return '<ul>' . $items->implode('') . '</ul>';
     }
 }
