@@ -338,7 +338,7 @@ class AdminNoticeManager extends Component
     {
         $user = $this->currentUser();
 
-        $query = Location::query()->whereIn('type', ['portal', 'garage']);
+        $query = Location::query()->whereIn('type', ['portal', 'local', 'garage']);
 
         if ($user?->hasRole(Role::GENERAL_ADMIN)) {
             return [];
@@ -349,7 +349,7 @@ class AdminNoticeManager extends Component
         }
 
         $locations = $query
-            ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
+            ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 WHEN type = 'garage' THEN 3 ELSE 4 END")
             ->orderBy('code')
             ->get();
 
@@ -366,6 +366,7 @@ class AdminNoticeManager extends Component
     {
         return match ($location->type) {
             'portal' => __('admin.locations.types.portal').' ',
+            'local' => __('admin.locations.types.local').' ',
             'garage' => __('admin.locations.types.garage').' ',
             'storage' => __('admin.locations.types.storage').' ',
             default => '',

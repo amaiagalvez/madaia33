@@ -9,6 +9,19 @@
         @endforeach
     </div>
 
+    @php
+        $hasCommunityPctWarning = $locations->some(function ($location) {
+            $total = (float) ($location->properties_sum_community_pct ?? 0);
+            return abs($total - 100.0) > 0.01;
+        });
+    @endphp
+
+    @if ($hasCommunityPctWarning)
+        <flux:callout color="red" class="mb-6">
+            {{ __('admin.locations.community_pct_must_be_100') }}
+        </flux:callout>
+    @endif
+
     <x-admin.panel-table>
         <thead class="bg-gray-50">
             <tr>
@@ -21,6 +34,12 @@
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     {{ __('admin.locations.properties_count') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.locations.total_community_pct') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.locations.total_location_pct') }}</th>
                 <th scope="col" class="relative px-6 py-3">
                     <span class="sr-only">{{ __('admin.locations.view') }}</span>
                 </th>
@@ -34,6 +53,16 @@
                     <td class="px-6 py-4 text-sm text-gray-900">{{ $location->name }}</td>
                     <td class="px-6 py-4 text-sm text-gray-500">{{ $location->properties_count }}
                     </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        %{{ number_format((float) ($location->properties_sum_community_pct ?? 0), 2, '.', '') }}
+                    </td>
+                    @php
+                        $totalLocationPct = (float) ($location->properties_sum_location_pct ?? 0);
+                        $isInvalid = abs($totalLocationPct - 100.0) > 0.01;
+                    @endphp
+                    <td class="px-6 py-4 text-sm {{ $isInvalid ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
+                        %{{ number_format($totalLocationPct, 2, '.', '') }}
+                    </td>
                     <td class="px-6 py-4 text-right text-sm font-medium">
                         <a href="{{ route('admin.locations.show', $location) }}"
                             title="{{ __('admin.locations.view') }}"
@@ -45,7 +74,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('admin.locations.no_records') }}
                     </td>
                 </tr>

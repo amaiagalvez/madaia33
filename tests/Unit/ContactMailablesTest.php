@@ -1,8 +1,11 @@
 <?php
 
+use App\Models\Owner;
+use App\Models\Voting;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
+use App\Mail\VotingConfirmationMail;
 
 const CONTACT_MAIL_VISITOR_NAME = 'Ane Etxebarria';
 const CONTACT_MAIL_SUBJECT = 'Proba gaia';
@@ -53,4 +56,16 @@ it('builds ContactNotification with expected payload, envelope, and view', funct
         ->and($mailable->envelope()->from?->address)->toBe(CONTACT_MAIL_FROM_ADDRESS)
         ->and($mailable->envelope()->from?->name)->toBe(CONTACT_MAIL_FROM_NAME)
         ->and($mailable->content()->view)->toBe('mail.contact-notification');
+});
+
+it('builds VotingConfirmationMail with expected envelope and view', function () {
+    $owner = new Owner(['coprop1_name' => 'Miren Etxeberria', 'coprop1_email' => 'miren@example.com']);
+    $voting = new Voting(['name_eu' => 'Boto-ematea', 'name_es' => 'Votación']);
+
+    $mailable = new VotingConfirmationMail($owner, $voting);
+
+    expect($mailable->owner)->toBe($owner)
+        ->and($mailable->voting)->toBe($voting)
+        ->and($mailable->envelope()->subject)->toBe(__('votings.mail.subject'))
+        ->and($mailable->content()->view)->toBe('mail.voting-confirmation');
 });

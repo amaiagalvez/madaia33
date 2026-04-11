@@ -3,9 +3,9 @@
 use App\Models\Owner;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
-use App\Actions\AssignPropertyAction;
-use App\Actions\UnassignPropertyAction;
 use Illuminate\Validation\ValidationException;
+use App\Actions\Properties\AssignPropertyAction;
+use App\Actions\Properties\UnassignPropertyAction;
 
 describe('AssignPropertyAction', function () {
     it('creates an active assignment for an unassigned property and activates owner user', function () {

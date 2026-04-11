@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Properties;
 
 use Carbon\CarbonImmutable;
 use App\Models\PropertyAssignment;

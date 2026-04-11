@@ -57,7 +57,7 @@
 }" @keydown="handleKeydown"
     @touchstart.passive="handleTouchStart($event)" @touchend="handleTouchEnd($event)"
     @autoplay-reset.window="resetAutoplay()" @start-autoplay.window="startAutoplay()" data-hero-slider
-    class="relative left-1/2 right-1/2 -mx-[50vw] h-56 w-screen overflow-hidden bg-gray-900 sm:h-72 md:h-88 lg:h-120"
+    class="relative left-1/2 right-1/2 -mx-[50vw] h-44 w-screen overflow-hidden bg-gray-900 sm:h-56 md:h-72 lg:h-88"
     aria-roledescription="carousel" aria-label="{{ __('hero_slider.gallery_title') }}">
     @if (empty($images))
         <div

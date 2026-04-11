@@ -41,10 +41,14 @@ class PublicHomeController extends Controller
             ->values();
 
         $historySummary = Setting::localizedString('home_history_text', __('home.history_summary'));
+        $frontPrimaryEmail = Setting::stringValue('front_primary_email', 'info@madaia33.eus');
+        $photoRequestText = Setting::localizedString('front_photo_request_text', __('home.history_photos_summary', ['email' => $frontPrimaryEmail]));
 
         return view('public.home', [
             'historyImageUrls' => $historyImageUrls,
             'historySummary' => $historySummary,
+            'frontPrimaryEmail' => $frontPrimaryEmail,
+            'photoRequestText' => $photoRequestText,
             'generalNotices' => $generalNotices,
             'locationNotices' => $locationNotices,
             'showViewAllButton' => $latestNotices->count() > 6,

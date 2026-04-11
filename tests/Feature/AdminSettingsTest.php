@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Tarea 12: Panel de administración — Configuración
-// Valida: Requisitos 11.6, 12.4, 13.4
+// Feature: community-web, Task 12: Admin panel — Settings
+// Validates: Requirements 11.6, 12.4, 13.4
 
 use App\Models\Image;
 use App\Models\Notice;
@@ -11,17 +11,19 @@ use App\Models\Setting;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
+use Illuminate\Support\Facades\Storage;
 use App\Validations\AdminSettingsValidation;
 
 const ADMIN_SETTINGS_EMAIL = 'admin@example.com';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AdminSettings — guardar configuración
+// AdminSettings — save configuration
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('guarda el email de admin en la tabla settings', function () {
+it('stores admin email in settings table', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -33,7 +35,7 @@ it('guarda el email de admin en la tabla settings', function () {
     expect(settingValue('admin_email'))->toBe(ADMIN_SETTINGS_EMAIL);
 });
 
-it('guarda las claves reCAPTCHA en la tabla settings', function () {
+it('stores reCAPTCHA keys in settings table', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -53,12 +55,14 @@ it('guarda las claves reCAPTCHA en la tabla settings', function () {
     expect(settingValue('recaptcha_secret_key'))->toBe('secret-key-456');
 });
 
-it('guarda el contenido de las páginas legales dentro de la sección front', function () {
+it('stores legal pages content inside front section', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
         ->call('setSection', Setting::SECTION_FRONT)
+        ->set('frontSiteName', 'Madaia 33')
+        ->set('frontPrimaryEmail', 'front@example.com')
         ->set('historyTextEu', '<p>Historia EU</p>')
         ->set('historyTextEs', '<p>Historia ES</p>')
         ->set('privacyContentEu', '<p>Privacidad EU</p>')
@@ -75,7 +79,53 @@ it('guarda el contenido de las páginas legales dentro de la sección front', fu
         ->and(settingValue('legal_page_legal_notice_es'))->toBe('<p>Aviso ES</p>');
 });
 
-it('guarda el texto legal en la tabla settings', function () {
+it('stores new front fields for brand, email, photos text, and cookies', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_FRONT)
+        ->set('frontSiteName', 'Comunidad Madaia')
+        ->set('frontPrimaryEmail', 'front@example.com')
+        ->set('frontLogoImagePath', 'branding/logo.png')
+        ->set('frontPhotoRequestTextEu', 'Bidali argazkiak helbide honetara: :email')
+        ->set('frontPhotoRequestTextEs', 'Envia fotos a este email: :email')
+        ->set('cookiePolicyContentEu', '<p>Cookie politika EU</p>')
+        ->set('cookiePolicyContentEs', '<p>Politica de cookies ES</p>')
+        ->call('save');
+
+    expect(settingValue('front_site_name'))->toBe('Comunidad Madaia')
+        ->and(settingValue('front_primary_email'))->toBe('front@example.com')
+        ->and(settingValue('front_logo_image_path'))->toBe('branding/logo.png')
+        ->and(settingValue('front_photo_request_text_eu'))->toBe('Bidali argazkiak helbide honetara: :email')
+        ->and(settingValue('front_photo_request_text_es'))->toBe('Envia fotos a este email: :email')
+        ->and(settingValue('legal_page_cookie_policy_eu'))->toBe('<p>Cookie politika EU</p>')
+        ->and(settingValue('legal_page_cookie_policy_es'))->toBe('<p>Politica de cookies ES</p>');
+});
+
+it('uploads and stores the front logo image in public storage', function () {
+    Storage::fake('public');
+
+    $user = adminUser();
+    $logo = UploadedFile::fake()->image('front-logo.png', 320, 120);
+
+    $component = Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_FRONT)
+        ->set('frontSiteName', 'Comunidad Madaia')
+        ->set('frontPrimaryEmail', 'front@example.com')
+        ->set('frontLogoImage', $logo)
+        ->call('save');
+
+    $storedPath = (string) settingValue('front_logo_image_path');
+
+    expect($storedPath)->toStartWith('branding/')
+        ->and(Storage::disk('public')->exists($storedPath))->toBeTrue();
+
+    $component->assertSet('frontLogoImage', null);
+});
+
+it('stores legal text in settings table', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -90,7 +140,22 @@ it('guarda el texto legal en la tabla settings', function () {
     expect(settingValue('legal_checkbox_text_es'))->toBe('Acepto la política de privacidad');
 });
 
-it('guarda la configuración de correo en la tabla settings', function () {
+it('stores contact subjects by language in contact_form', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_CONTACT_FORM)
+        ->set('adminEmail', ADMIN_SETTINGS_EMAIL)
+        ->set('contactFormSubjectEu', 'Gaia pertsonalizatua EU')
+        ->set('contactFormSubjectEs', 'Asunto personalizado ES')
+        ->call('save');
+
+    expect(settingValue('contact_form_subject_eu'))->toBe('Gaia pertsonalizatua EU')
+        ->and(settingValue('contact_form_subject_es'))->toBe('Asunto personalizado ES');
+});
+
+it('stores mail configuration in settings table', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -121,7 +186,7 @@ it('guarda la configuración de correo en la tabla settings', function () {
         ->and(settingValue('legal_text_es'))->toBe('<p>Aviso legal</p>');
 });
 
-it('guarda la configuración del email de nuevas propietarias en settings', function () {
+it('stores new owners email configuration in settings', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -139,7 +204,7 @@ it('guarda la configuración del email de nuevas propietarias en settings', func
         ->and(settingValue('owners_welcome_text_es'))->toBe('<p>Texto ES</p>##info##');
 });
 
-it('el campo recaptcha_secret_key se renderiza como type=password', function () {
+it('recaptcha_secret_key field renders as type password', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -148,7 +213,7 @@ it('el campo recaptcha_secret_key se renderiza como type=password', function () 
         ->assertSeeHtml('type="password"');
 });
 
-it('renderiza un editor enriquecido para los textos legales', function () {
+it('renders a rich editor for legal texts', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -157,7 +222,7 @@ it('renderiza un editor enriquecido para los textos legales', function () {
         ->assertSeeHtml('role="toolbar"');
 });
 
-it('no carga flux ni fuentes externas en la vista admin de configuracion', function () {
+it('does not load flux or external fonts in admin settings view', function () {
     $user = adminUser();
 
     test()->actingAs($user)
@@ -167,7 +232,7 @@ it('no carga flux ni fuentes externas en la vista admin de configuracion', funct
         ->assertDontSee('/flux/flux.js', false);
 });
 
-it('renderiza también los editores ricos de política de privacidad y aviso legal en front', function () {
+it('also renders rich editors for privacy policy and legal notice in front', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -181,7 +246,7 @@ it('renderiza también los editores ricos de política de privacidad y aviso leg
         ->assertSeeHtml('legalNoticeContentEs');
 });
 
-it('renderiza tabs de idioma EUS/CAS en los bloques bilingües de settings', function () {
+it('renders EUS CAS language tabs in bilingual settings blocks', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -201,7 +266,7 @@ it('renderiza tabs de idioma EUS/CAS en los bloques bilingües de settings', fun
         ->assertSeeHtml('data-bilingual-field="legalCheckboxTextEu"');
 });
 
-it('renderiza los campos recaptcha dentro de su propia sección', function () {
+it('renders recaptcha fields inside their own section', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -211,7 +276,7 @@ it('renderiza los campos recaptcha dentro de su propia sección', function () {
         ->assertSeeHtml('id="recaptchaSecretKey"');
 });
 
-it('renderiza los campos de configuración de correo dentro de su sección', function () {
+it('renders mail configuration fields inside their section', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -227,7 +292,7 @@ it('renderiza los campos de configuración de correo dentro de su sección', fun
         ->assertSeeHtml('data-bilingual-field="emailLegalTextEu"');
 });
 
-it('renderiza los campos del email de nuevas propietarias dentro de su sección', function () {
+it('renders new owners email fields inside their section', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -237,7 +302,7 @@ it('renderiza los campos del email de nuevas propietarias dentro de su sección'
         ->assertSeeHtml('data-bilingual-field="ownersWelcomeTextEu"');
 });
 
-it('mantiene visible el botón guardar en la sección front', function () {
+it('keeps save button visible in front section', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -247,7 +312,7 @@ it('mantiene visible el botón guardar en la sección front', function () {
         ->assertSeeHtml('type="submit"');
 });
 
-it('rechaza scripts en los textos legales de settings', function () {
+it('rejects scripts in settings legal texts', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -263,7 +328,7 @@ it('rechaza scripts en los textos legales de settings', function () {
 // Dashboard — estadísticas reales
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('el dashboard muestra estadísticas reales', function () {
+it('dashboard shows real statistics', function () {
     $user = adminUser();
 
     Notice::factory()->create(['is_public' => true]);
@@ -284,7 +349,7 @@ it('el dashboard muestra estadísticas reales', function () {
 // T009 — Section integrity
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('los settings creados con factory tienen sección válida', function () {
+it('factory-created settings have valid section', function () {
     $settings = Setting::factory()->count(4)->create();
 
     $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
@@ -294,7 +359,7 @@ it('los settings creados con factory tienen sección válida', function () {
 // T010 — Tab rendering and alphabetical ordering
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('los tabs de secciones se muestran en orden alfabético', function () {
+it('section tabs are shown in alphabetical order', function () {
     $user = adminUser();
     Setting::factory()->create(['key' => 'front_img', 'section' => Setting::SECTION_FRONT]);
 
@@ -310,7 +375,7 @@ it('los tabs de secciones se muestran en orden alfabético', function () {
         ->and($sections)->toBe(collect($sections)->sort()->values()->all());
 });
 
-it('la sección activa inicial es la primera sección en orden alfabético', function () {
+it('initial active section is the first section in alphabetical order', function () {
     $user = adminUser();
 
     $component = Livewire::actingAs($user)->test('admin-settings');
@@ -321,17 +386,17 @@ it('la sección activa inicial es la primera sección en orden alfabético', fun
     expect($activeSection)->toBe($sections[0]);
 });
 
-it('los tabs renderizan etiquetas de sección con wire:click', function () {
+it('tabs render section labels with wire click', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
-        ->assertSeeHtml('wire:click')
+        ->assertSeeHtml('@click.prevent')
         ->assertSeeHtml('bg-[#edd2c7] text-[#793d3d]')
         ->assertSeeHtml('text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]');
 });
 
-it('los campos del formulario fuerzan contraste legible en fondo blanco', function () {
+it('form fields enforce readable contrast on white background', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -344,7 +409,7 @@ it('los campos del formulario fuerzan contraste legible en fondo blanco', functi
 // T011 — Section-scoped save
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('save solo escribe los settings de la sección activa sin afectar otras secciones', function () {
+it('save only writes settings for active section without affecting others', function () {
     $user = adminUser();
 
     createSetting('admin_email', 'original@example.com');
@@ -359,7 +424,7 @@ it('save solo escribe los settings de la sección activa sin afectar otras secci
         ->and(settingValue('recaptcha_site_key'))->toBe('site-key-original');
 });
 
-it('save de recaptcha solo escribe sus claves sin afectar contact_form', function () {
+it('recaptcha save only writes its keys without affecting contact_form', function () {
     $user = adminUser();
 
     createSetting('admin_email', 'contact@example.com');
@@ -374,7 +439,7 @@ it('save de recaptcha solo escribe sus claves sin afectar contact_form', functio
         ->and(settingValue('admin_email'))->toBe('contact@example.com');
 });
 
-it('expone reglas y mensajes de validación de AdminSettingsValidation', function () {
+it('exposes validation rules and messages from AdminSettingsValidation', function () {
     $component = new class extends AdminSettings {
         /**
          * @return array<string, mixed>
@@ -401,7 +466,7 @@ it('expone reglas y mensajes de validación de AdminSettingsValidation', functio
 // T017 — Backfill completeness
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('los keys del seeder se pueden asignar a contact_form sin conflicto', function () {
+it('seeder keys can be assigned to contact_form without conflict', function () {
     $knownKeys = [
         'legal_checkbox_text_eu',
         'legal_checkbox_text_es',
@@ -417,7 +482,7 @@ it('los keys del seeder se pueden asignar a contact_form sin conflicto', functio
     expect($sections)->toBe([Setting::SECTION_CONTACT_FORM]);
 });
 
-it('los keys de páginas legales se pueden asignar a la sección front sin conflicto', function () {
+it('legal pages keys can be assigned to front section without conflict', function () {
     $knownKeys = [
         'home_history_text_eu',
         'home_history_text_es',
@@ -436,7 +501,7 @@ it('los keys de páginas legales se pueden asignar a la sección front sin confl
     expect($sections)->toBe([Setting::SECTION_FRONT]);
 });
 
-it('los keys de recaptcha se pueden asignar a la sección recaptcha sin conflicto', function () {
+it('recaptcha keys can be assigned to recaptcha section without conflict', function () {
     $knownKeys = [
         'recaptcha_site_key',
         'recaptcha_secret_key',
@@ -455,7 +520,7 @@ it('los keys de recaptcha se pueden asignar a la sección recaptcha sin conflict
 // T018 — Fallback to general
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('Setting::normalizeSection devuelve general para secciones desconocidas', function () {
+it('Setting::normalizeSection returns general for unknown sections', function () {
     expect(Setting::normalizeSection('unknown'))->toBe(Setting::SECTION_GENERAL)
         ->and(Setting::normalizeSection(null))->toBe(Setting::SECTION_GENERAL)
         ->and(Setting::normalizeSection(''))->toBe(Setting::SECTION_GENERAL);
@@ -480,7 +545,7 @@ it('setSection ignora secciones no presentes en availableSections', function () 
 // T033 — SC-004: New section tab renders without structural UI changes
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('añadir datos en una nueva sección renderiza su tab sin cambios estructurales en el componente', function () {
+it('adding data in a new section renders its tab without structural component changes', function () {
     $user = adminUser();
     Setting::factory()->create(['key' => 'gallery_columns', 'section' => Setting::SECTION_GALLERY]);
 
@@ -498,7 +563,7 @@ it('añadir datos en una nueva sección renderiza su tab sin cambios estructural
 // Test Email Features
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('openTestEmailModal abre el modal y resetea el formulario', function () {
+it('openTestEmailModal opens modal and resets form', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -509,7 +574,7 @@ it('openTestEmailModal abre el modal y resetea el formulario', function () {
         ->assertSet('testEmailStatus', '');
 });
 
-it('closeTestEmailModal cierra el modal y resetea el estado', function () {
+it('closeTestEmailModal closes modal and resets state', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -544,7 +609,7 @@ it('sendTestEmail requiere SMTP configurado (smtp_host no vacío)', function () 
         ->assertSet('testEmailStatus', 'error');
 });
 
-it('sendTestEmail envía un email de prueba con la configuración SMTP', function () {
+it('sendTestEmail sends a test email with SMTP configuration', function () {
     $user = adminUser();
 
     createSetting('from_address', 'sender@example.com');

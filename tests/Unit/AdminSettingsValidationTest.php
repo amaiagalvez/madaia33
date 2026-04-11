@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use Illuminate\Http\UploadedFile;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\Facades\Validator;
 use App\Validations\AdminSettingsValidation;
@@ -188,12 +189,20 @@ it('rejects invalid smtp encryption option in email configuration section rules'
 it('accepts valid front section payload including home history text', function () {
     $validator = Validator::make(
         [
+            'frontSiteName' => 'Madaia 33',
+            'frontPrimaryEmail' => 'info@example.com',
+            'frontLogoImage' => UploadedFile::fake()->image('logo.png'),
+            'frontLogoImagePath' => 'branding/logo.png',
+            'frontPhotoRequestTextEu' => 'Bidali argazkiak',
+            'frontPhotoRequestTextEs' => 'Envia fotos',
             'historyTextEu' => '<p>Historia EU</p>',
             'historyTextEs' => '<p>Historia ES</p>',
             'privacyContentEu' => '<p>Privacidad EU</p>',
             'privacyContentEs' => '<p>Privacidad ES</p>',
             'legalNoticeContentEu' => '<p>Aviso EU</p>',
             'legalNoticeContentEs' => '<p>Aviso ES</p>',
+            'cookiePolicyContentEu' => '<p>Cookie EU</p>',
+            'cookiePolicyContentEs' => '<p>Cookie ES</p>',
         ],
         AdminSettingsValidation::rulesBySection(Setting::SECTION_FRONT),
     );

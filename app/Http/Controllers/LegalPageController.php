@@ -17,6 +17,11 @@ class LegalPageController extends Controller
         return $this->renderLegalPage('legal_notice', 'general.footer.legal_notice', 'legal-notice');
     }
 
+    public function cookiePolicy(): View
+    {
+        return $this->renderLegalPage('cookie_policy', 'general.footer.cookie_policy', 'cookie-policy');
+    }
+
     private function renderLegalPage(string $pageKey, string $titleKey, string $pageSlug): View
     {
         $content = Setting::localizedString("legal_page_{$pageKey}", '') ?? '';

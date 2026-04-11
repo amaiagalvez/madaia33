@@ -17,12 +17,17 @@ it('renders admin locations list for selected type', function () {
     $user = adminUser();
 
     Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    Location::factory()->create(['type' => 'local', 'code' => 'L-1', 'name' => 'Local L-1']);
     Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
 
     Livewire::actingAs($user)
         ->test(Locations::class)
         ->assertSee('Portal 33-A')
+        ->assertDontSee('Local L-1')
         ->assertDontSee('Garaje P-1')
+        ->call('setType', 'local')
+        ->assertSee('Local L-1')
+        ->assertDontSee('Portal 33-A')
         ->call('setType', 'garage')
         ->assertSee('Garaje P-1')
         ->assertDontSee('Portal 33-A');
@@ -137,6 +142,37 @@ it('accepts comma decimals for location percentages and stores them normalized w
         ->and((float) $refreshedProperty->location_pct)->toBe(4.75);
 });
 
+it('requires and persists percentages for storage locations too', function () {
+    $user = adminUser();
+
+    $storageLocation = Location::factory()->create([
+        'type' => 'storage',
+        'code' => 'TR-A',
+        'name' => 'Trastero A',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(LocationDetail::class, ['location' => $storageLocation])
+        ->set('newPropertyName', 'S-1')
+        ->set('newCommunityPct', '')
+        ->set('newLocationPct', '')
+        ->call('addProperty')
+        ->assertHasErrors(['newCommunityPct' => 'required', 'newLocationPct' => 'required'])
+        ->set('newCommunityPct', '1,5000')
+        ->set('newLocationPct', '2,2500')
+        ->call('addProperty')
+        ->assertHasNoErrors();
+
+    $createdStorageProperty = Property::query()
+        ->where('location_id', $storageLocation->id)
+        ->where('name', 'S-1')
+        ->first();
+
+    expect($createdStorageProperty)->not->toBeNull()
+        ->and((float) $createdStorageProperty->community_pct)->toBe(1.5)
+        ->and((float) $createdStorageProperty->location_pct)->toBe(2.25);
+});
+
 it('filters owners by active portal assignment', function () {
     $user = adminUser();
 
@@ -168,6 +204,37 @@ it('filters owners by active portal assignment', function () {
         ->assertDontSee('Bea B');
 });
 
+it('filters owners by active local assignment', function () {
+    $user = adminUser();
+
+    $localA = Location::factory()->create(['type' => 'local', 'code' => 'L-1', 'name' => 'Local L-1']);
+    $localB = Location::factory()->create(['type' => 'local', 'code' => 'L-2', 'name' => 'Local L-2']);
+
+    $propertyA = Property::factory()->create(['location_id' => $localA->id, 'name' => '1A']);
+    $propertyB = Property::factory()->create(['location_id' => $localB->id, 'name' => '2B']);
+
+    $ownerA = Owner::factory()->create(['coprop1_name' => 'Local Ane']);
+    $ownerB = Owner::factory()->create(['coprop1_name' => 'Local Bea']);
+
+    PropertyAssignment::factory()->create([
+        'property_id' => $propertyA->id,
+        'owner_id' => $ownerA->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'property_id' => $propertyB->id,
+        'owner_id' => $ownerB->id,
+        'end_date' => null,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('filterLocal', (string) $localA->id)
+        ->assertSee('Local Ane')
+        ->assertDontSee('Local Bea');
+});
+
 it('renders new admin pages for locations and owners', function () {
     $user = adminUser();
 
@@ -176,6 +243,10 @@ it('renders new admin pages for locations and owners', function () {
 
     test()->actingAs($user)
         ->get(route('admin.locations.portals'))
+        ->assertOk();
+
+    test()->actingAs($user)
+        ->get(route('admin.locations.locals'))
         ->assertOk();
 
     test()->actingAs($user)
@@ -338,4 +409,101 @@ it('allows creating and editing owner assignments inline from owners list', func
         ->and($assignment->admin_validated)->toBeTrue()
         ->and($assignment->owner_validated)->toBeTrue()
         ->and($owner->user->fresh()->is_active)->toBeFalse();
+});
+
+it('displays aggregated community and location percentages in locations listing', function () {
+    $user = adminUser();
+
+    $portal = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+
+    // Create properties with known percentages
+    Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => '1A',
+        'community_pct' => 1.5,
+        'location_pct' => 2.0,
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => '1B',
+        'community_pct' => 2.5,
+        'location_pct' => 3.5,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertSee('4.0000')
+        ->assertSee('5.5000');
+});
+
+it('shows red warning in locations listing when community percentages do not sum to 100%', function () {
+    $user = adminUser();
+
+    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A']);
+
+    // Properties that don't sum to 100%
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1A',
+        'community_pct' => 30.0,
+        'location_pct' => 50.0,
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1B',
+        'community_pct' => 40.0,
+        'location_pct' => 50.0,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertSeeHtml('data-flux-callout');
+});
+
+it('does not show warning in locations listing when all community percentages sum to 100%', function () {
+    $user = adminUser();
+
+    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A']);
+
+    // Properties that sum exactly to 100%
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1A',
+        'community_pct' => 50.0,
+        'location_pct' => 50.0,
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1B',
+        'community_pct' => 50.0,
+        'location_pct' => 50.0,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertDontSeeHtml('data-flux-callout');
+});
+
+it('shows red text for location percentage total in listing when not equal to 100%', function () {
+    $user = adminUser();
+
+    $portalInvalid = Location::factory()->create([
+        'type' => 'portal',
+        'code' => 'P-INVALID',
+        'name' => 'Portal Invalid',
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $portalInvalid->id,
+        'name' => '1A',
+        'community_pct' => 40.0,
+        'location_pct' => 60.0, // Should be 100%
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertSeeHtml('text-red-600');
 });

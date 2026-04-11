@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Propiedad 4: Accessor bilingüe con fallback correcto
-// Valida: Requisitos 2.4, 2.5
+// Feature: community-web, Property 4: Bilingual accessor with correct fallback
+// Validates: Requirements 2.4, 2.5
 
 use App\Models\Image;
 use App\Models\Notice;
@@ -9,16 +9,16 @@ use App\SupportedLocales;
 use Illuminate\Support\Facades\App;
 
 /**
- * Propiedad 4: Accessor bilingüe con fallback correcto
+ * Property 4: Bilingual accessor with correct fallback
  *
- * Para cualquier aviso con contenido en uno o ambos idiomas y cualquier locale
- * activo válido, el accessor del modelo debe devolver el campo del locale activo
- * si existe, o el campo del otro idioma si el del locale activo está vacío o nulo,
- * nunca devolviendo null cuando al menos un idioma tiene contenido.
+ * For any notice with content in one or both languages and any valid locale
+ * the model accessor must return the active locale field
+ * when it exists, or the other language field if the active locale field is empty or null,
+ * never returning null when at least one language has content.
  *
- * Valida: Requisitos 2.4, 2.5
+ * Validates: Requirements 2.4, 2.5
  */
-it('devuelve el título en el locale activo cuando ambos idiomas existen', function () {
+it('returns title in active locale when both languages exist', function () {
     $notice = new Notice([
         'title_eu' => 'Izenburua euskaraz',
         'title_es' => 'Título en castellano',
@@ -31,7 +31,7 @@ it('devuelve el título en el locale activo cuando ambos idiomas existen', funct
     expect($notice->title)->toBe('Título en castellano');
 });
 
-it('hace fallback al otro idioma cuando el locale activo no tiene título', function () {
+it('falls back to the other language when active locale has no title', function () {
     // Solo tiene EU
     $noticeEuOnly = new Notice([
         'title_eu' => 'Izenburua euskaraz',
@@ -51,7 +51,7 @@ it('hace fallback al otro idioma cuando el locale activo no tiene título', func
     expect($noticeEsOnly->title)->toBe('Título en castellano');
 });
 
-it('nunca devuelve null cuando al menos un idioma tiene título', function () {
+it('never returns null when at least one language has title', function () {
     $locales = SupportedLocales::all();
 
     foreach ($locales as $locale) {
@@ -65,7 +65,7 @@ it('nunca devuelve null cuando al menos un idioma tiene título', function () {
     }
 });
 
-it('devuelve el contenido en el locale activo con fallback correcto', function () {
+it('returns content in active locale with correct fallback', function () {
     $notice = new Notice([
         'content_eu' => 'Edukia euskaraz',
         'content_es' => 'Contenido en castellano',
@@ -83,7 +83,7 @@ it('devuelve el contenido en el locale activo con fallback correcto', function (
     expect($noticeEuOnly->content)->toBe('Edukia');
 });
 
-it('devuelve el alt_text de imagen en el locale activo con fallback correcto', function () {
+it('returns image alt_text in active locale with correct fallback', function () {
     $image = new Image([
         'alt_text_eu' => 'Irudiaren deskribapena',
         'alt_text_es' => 'Descripción de la imagen',

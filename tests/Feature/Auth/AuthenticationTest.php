@@ -3,6 +3,7 @@
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
+use App\SupportedLocales;
 use Laravel\Fortify\Features;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
@@ -42,6 +43,23 @@ test('users can authenticate using the login screen', function () {
         ->assertRedirect('/admin');
 
     test()->assertAuthenticated();
+});
+
+test('users load persisted language into session on authentication', function () {
+    $user = User::factory()->create([
+        'language' => SupportedLocales::SPANISH,
+    ]);
+
+    $response = test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertSessionHas('locale', SupportedLocales::SPANISH)
+        ->assertRedirect('/admin');
 });
 
 test('users can authenticate with dni as login identifier', function () {
@@ -102,7 +120,7 @@ test('users without propietaria role can not authenticate with dni or copropriet
 
     Owner::factory()->for($user)->create([
         'coprop1_dni' => '12345678Z',
-        'coprop1_email' => 'owner1@example.com',
+        'coprop2_email' => 'owner2@example.com',
     ]);
 
     test()->withoutMiddleware(PreventRequestForgery::class)
@@ -114,7 +132,7 @@ test('users without propietaria role can not authenticate with dni or copropriet
 
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('login.store'), [
-            'email' => 'owner1@example.com',
+            'email' => 'owner2@example.com',
             'password' => 'password',
         ])
         ->assertSessionHasErrorsIn('email');

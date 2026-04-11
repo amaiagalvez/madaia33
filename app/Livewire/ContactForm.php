@@ -21,6 +21,8 @@ class ContactForm extends Component
 
     private const EMAIL_SETTING_KEYS = [
         'admin_email',
+        'contact_form_subject_eu',
+        'contact_form_subject_es',
         'from_address',
         'from_name',
         'smtp_host',
@@ -130,10 +132,11 @@ class ContactForm extends Component
             $fromAddress = $emailSettings['from_address'] ?: (string) config('mail.from.address');
             $fromName = ($emailSettings['from_name'] ?? '') !== '' ? $emailSettings['from_name'] : (string) config('mail.from.name');
             $legalText = Setting::localizedStringFrom($emailSettings, 'legal_text');
+            $mailSubject = Setting::localizedStringFrom($emailSettings, 'contact_form_subject', $this->subject);
 
             Mail::to($this->email)->send(new ContactConfirmation(
                 visitorName: $this->name,
-                messageSubject: $this->subject,
+                messageSubject: (string) $mailSubject,
                 messageBody: $this->message,
                 legalText: $legalText,
                 fromAddress: $fromAddress,

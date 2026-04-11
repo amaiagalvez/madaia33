@@ -95,7 +95,7 @@
                     {!! $historySummary !!}
                 </p>
 
-                <a href="mailto:admin@madaia.eus"
+                <a href="mailto:{{ $frontPrimaryEmail }}"
                     class="elevated-card mt-4 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 lg:mt-auto"
                     data-home-history-photos-callout>
                     <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
@@ -111,7 +111,7 @@
                             {{ __('home.history_photos_title') }}
                         </p>
                         <p class="mt-0.5 text-xs text-gray-500 leading-relaxed">
-                            {{ __('home.history_photos_summary', ['email' => 'info@madaia.eus']) }}
+                            {{ $photoRequestText }}
                         </p>
                     </div>
                     <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"

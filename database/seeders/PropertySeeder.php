@@ -11,7 +11,7 @@ class PropertySeeder extends Seeder
     public function run(): void
     {
         Location::query()
-            ->whereIn('type', ['portal', 'garage'])
+            ->whereIn('type', ['portal', 'local', 'garage'])
             ->get(['id', 'type'])
             ->each(function (Location $location): void {
                 $propertyNames = $this->propertyNamesForType($location->type);

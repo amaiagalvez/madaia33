@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Tarea 9: Panel de administración — Gestión de avisos
-// Valida: Requisitos 6.1, 6.3, 6.4
+// Feature: community-web, Task 9: Admin panel — Notice management
+// Validates: Requirements 6.1, 6.3, 6.4
 
 use App\Models\Notice;
 use Livewire\Livewire;
@@ -9,11 +9,11 @@ use App\Models\Location;
 use App\Models\Property;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 8: Toggle de publicación de avisos es reversible
-// Valida: Requisito 6.4
+// Property 8: Notice publish toggle is reversible
+// Validates: Requirement 6.4
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('el toggle de publicación es reversible y nunca elimina el aviso', function () {
+it('publish toggle is reversible and never deletes notice', function () {
     $user = adminUser();
     $notice = Notice::factory()->private()->create();
 
@@ -36,11 +36,11 @@ it('el toggle de publicación es reversible y nunca elimina el aviso', function 
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tests de ejemplo — CRUD de avisos
-// Valida: Requisitos 6.1, 6.4
+// Example tests — Notice CRUD
+// Validates: Requirements 6.1, 6.4
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('crear aviso aparece en la lista admin', function () {
+it('creating notice appears in admin list', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -55,7 +55,7 @@ it('crear aviso aparece en la lista admin', function () {
     expect(Notice::where('title_eu', 'Iragarki berria')->exists())->toBeTrue();
 });
 
-it('publicar aviso lo hace visible en la parte pública', function () {
+it('publishing notice makes it visible in public area', function () {
     $user = adminUser();
     $notice = Notice::factory()->private()->create();
 
@@ -69,7 +69,7 @@ it('publicar aviso lo hace visible en la parte pública', function () {
     expect($publicComponent->notices->pluck('id'))->toContain($notice->id);
 });
 
-it('despublicar aviso lo oculta de la parte pública', function () {
+it('unpublishing notice hides it from public area', function () {
     $user = adminUser();
     $notice = Notice::factory()->public()->create();
 
@@ -83,7 +83,7 @@ it('despublicar aviso lo oculta de la parte pública', function () {
     expect($publicComponent->notices->pluck('id'))->not->toContain($notice->id);
 });
 
-it('eliminar aviso lo quita de la lista admin', function () {
+it('deleting notice removes it from admin list', function () {
     $user = adminUser();
     $notice = Notice::factory()->create();
 
@@ -95,7 +95,7 @@ it('eliminar aviso lo quita de la lista admin', function () {
     expect(Notice::find($notice->id))->toBeNull();
 });
 
-it('abre y cierra la confirmación de borrado', function () {
+it('opens and closes delete confirmation', function () {
     $user = adminUser();
     $notice = Notice::factory()->create();
 
@@ -107,7 +107,7 @@ it('abre y cierra la confirmación de borrado', function () {
         ->assertSet('confirmingDeleteId', null);
 });
 
-it('abre la confirmación de publicación con la acción correcta', function () {
+it('opens publish confirmation with correct action', function () {
     $user = adminUser();
     $notice = Notice::factory()->private()->create();
 
@@ -121,7 +121,7 @@ it('abre la confirmación de publicación con la acción correcta', function () 
         ->assertSet('publishAction', '');
 });
 
-it('editar aviso dispara evento de foco al formulario', function () {
+it('editing notice dispatches focus event to form', function () {
     $user = adminUser();
     $notice = Notice::factory()->create();
 
@@ -131,7 +131,7 @@ it('editar aviso dispara evento de foco al formulario', function () {
         ->assertDispatched('admin-notice-form-focus');
 });
 
-it('la asociación de ubicaciones persiste correctamente', function () {
+it('location association persists correctly', function () {
     $user = adminUser();
     Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
     Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
@@ -151,7 +151,7 @@ it('la asociación de ubicaciones persiste correctamente', function () {
         ->toBe(['33-A', 'P-1']);
 });
 
-it('createNotice muestra el formulario y cancelForm restablece el estado', function () {
+it('createNotice shows form and cancelForm resets state', function () {
     $user = adminUser();
 
     $component = Livewire::actingAs($user)
@@ -180,7 +180,7 @@ it('createNotice muestra el formulario y cancelForm restablece el estado', funct
         ->assertSet('selectedLocations', []);
 });
 
-it('renderiza los campos multiidioma de avisos con pestañas por idioma', function () {
+it('renders multilingual notice fields with language tabs', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -196,7 +196,7 @@ it('renderiza los campos multiidioma de avisos con pestañas por idioma', functi
         ->assertSeeHtml('id="contentEs"');
 });
 
-it('muestra solo locations en el selector de ubicaciones del formulario', function () {
+it('shows only locations in form location selector', function () {
     $user = adminUser();
 
     $location = Location::factory()->create([
@@ -224,7 +224,7 @@ it('muestra solo locations en el selector de ubicaciones del formulario', functi
         ->assertDontSee('TR-99');
 });
 
-it('edita un aviso existente y reemplaza sus ubicaciones al guardar', function () {
+it('edits an existing notice and replaces locations on save', function () {
     $user = adminUser();
     Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
     Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
@@ -267,7 +267,7 @@ it('edita un aviso existente y reemplaza sus ubicaciones al guardar', function (
         ->and($notice->locations->pluck('location_code')->values()->toArray())->toBe(['P-1']);
 });
 
-it('crea slug UUID cuando el título no produce slug válido', function () {
+it('creates UUID slug when title does not produce valid slug', function () {
     $user = adminUser();
 
     Livewire::actingAs($user)
@@ -283,7 +283,7 @@ it('crea slug UUID cuando el título no produce slug válido', function () {
         ->and($notice->published_at)->toBeNull();
 });
 
-it('al editar y mantener privado conserva published_at existente', function () {
+it('when editing and keeping private, it preserves existing published_at', function () {
     $user = adminUser();
     $notice = Notice::factory()->public()->create([
         'published_at' => now()->subHour(),

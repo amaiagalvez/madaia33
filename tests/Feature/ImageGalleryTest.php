@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Tarea 5: Parte pública — Galería de imágenes
-// Valida: Requisitos 3.1, 3.2, 3.3, 3.4, 3.7, 4.1, 4.2, 4.4, 4.5, 4.6
+// Feature: community-web, Task 5: Public area — Image gallery
+// Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.7, 4.1, 4.2, 4.4, 4.5, 4.6
 
 use App\Models\Image;
 use Livewire\Livewire;
@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\App;
 dataset('supported_locales', SupportedLocales::all());
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 5: Round-trip de imagen (subir / eliminar)
-// Valida: Requisitos 3.2, 3.3
+// Property 5: Image round trip (upload / delete)
+// Validates: Requirements 3.2, 3.3
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('muestra las imágenes creadas en la galería pública', function () {
+it('shows created images in public gallery', function () {
     $count = 3;
     Image::factory()->count($count)->create();
 
@@ -24,7 +24,7 @@ it('muestra las imágenes creadas en la galería pública', function () {
     expect($component->images)->toHaveCount($count);
 });
 
-it('no muestra imágenes eliminadas en la galería', function () {
+it('does not show deleted images in gallery', function () {
     $image = Image::factory()->create(['alt_text_eu' => 'Argazkia']);
     $image->delete();
 
@@ -34,11 +34,11 @@ it('no muestra imágenes eliminadas en la galería', function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 6: Alt text presente en todas las imágenes de la galería
-// Valida: Requisito 3.4
+// Property 6: Alt text present in all gallery images
+// Validates: Requirement 3.4
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('todas las imágenes tienen alt text en el locale activo', function () {
+it('all images have alt text in active locale', function () {
     App::setLocale(SupportedLocales::BASQUE);
 
     Image::factory()->count(3)->create();
@@ -50,7 +50,7 @@ it('todas las imágenes tienen alt text en el locale activo', function () {
     }
 });
 
-it('muestra todas las imágenes cuando no hay filtro activo', function () {
+it('shows all images when no filter is active', function () {
     $count = 3;
     Image::factory()->count($count)->create();
 
@@ -60,24 +60,24 @@ it('muestra todas las imágenes cuando no hay filtro activo', function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tests de ejemplo
-// Valida: Requisitos 3.1, 3.7, 4.4
+// Example tests
+// Validates: Requirements 3.1, 3.7, 4.4
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('muestra mensaje de vacío cuando no hay imágenes', function () {
+it('shows empty-state message when there are no images', function () {
     $component = Livewire::test('image-gallery');
 
     $component->assertSee(__('gallery.empty'));
 });
 
-it('la galería pública es accesible', function (string $locale) {
+it('public gallery is accessible', function (string $locale) {
     $response = test()->get(route(SupportedLocales::routeName('gallery', $locale)));
 
     $response->assertOk();
     $response->assertSee('data-page-hero="gallery"', false);
 })->with('supported_locales');
 
-it('las imágenes se ordenan por created_at descendente', function () {
+it('images are ordered by created_at descending', function () {
     Image::factory()->count(3)->create();
 
     $component = Livewire::test('image-gallery');
@@ -88,7 +88,7 @@ it('las imágenes se ordenan por created_at descendente', function () {
     }
 });
 
-it('renderiza la galería con grid responsive esperado', function (string $locale) {
+it('renders gallery with expected responsive grid', function (string $locale) {
     Image::factory()->count(2)->create();
 
     $response = test()->get(route(SupportedLocales::routeName('gallery', $locale)));
@@ -98,7 +98,7 @@ it('renderiza la galería con grid responsive esperado', function (string $local
     $response->assertSee('data-gallery-grid', false);
 })->with('supported_locales');
 
-it('incluye controles avanzados del lightbox responsive', function (string $locale) {
+it('includes advanced responsive lightbox controls', function (string $locale) {
     Image::factory()->count(1)->create();
 
     $response = test()->get(route(SupportedLocales::routeName('gallery', $locale)));
@@ -112,7 +112,7 @@ it('incluye controles avanzados del lightbox responsive', function (string $loca
     $response->assertSee('@touchmove="handleTouchMove($event)"', false);
 })->with('supported_locales');
 
-it('filtra la galería por etiqueta historia', function () {
+it('filters gallery by historia tag', function () {
     $historyImage = Image::factory()->history()->create();
     Image::factory()->madaia()->create();
 
@@ -123,7 +123,7 @@ it('filtra la galería por etiqueta historia', function () {
         ->and($component->images->first()->id)->toBe($historyImage->id);
 });
 
-it('filtra la galería por etiqueta madaia', function () {
+it('filters gallery by madaia tag', function () {
     Image::factory()->history()->create();
     $madaiaImage = Image::factory()->madaia()->create();
 
@@ -134,7 +134,7 @@ it('filtra la galería por etiqueta madaia', function () {
         ->and($component->images->first()->id)->toBe($madaiaImage->id);
 });
 
-it('resetea el filtro cuando la etiqueta es inválida', function () {
+it('resets filter when tag is invalid', function () {
     Image::factory()->history()->create();
     Image::factory()->madaia()->create();
 

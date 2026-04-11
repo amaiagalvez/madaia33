@@ -14,7 +14,7 @@ class Locations extends Component
     public string $type = 'portal';
 
     /** @var string[] */
-    public array $types = ['portal', 'garage', 'storage'];
+    public array $types = ['portal', 'local', 'garage', 'storage'];
 
     public function setType(string $type): void
     {
@@ -34,6 +34,8 @@ class Locations extends Component
 
         $locations = $query
             ->withCount(['properties'])
+            ->withSum('properties', 'community_pct')
+            ->withSum('properties', 'location_pct')
             ->orderBy('code')
             ->paginate(20);
 

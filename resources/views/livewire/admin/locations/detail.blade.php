@@ -24,21 +24,19 @@
                         <flux:error name="newPropertyName" />
                     </flux:field>
 
-                    @if ($location->type !== 'storage')
-                        <flux:field>
-                            <flux:label>{{ __('admin.locations.community_pct') }}</flux:label>
-                            <flux:input wire:model="newCommunityPct" type="text"
-                                inputmode="decimal" />
-                            <flux:error name="newCommunityPct" />
-                        </flux:field>
+                    <flux:field>
+                        <flux:label>{{ __('admin.locations.community_pct') }}</flux:label>
+                        <flux:input wire:model="newCommunityPct" type="text"
+                            inputmode="decimal" />
+                        <flux:error name="newCommunityPct" />
+                    </flux:field>
 
-                        <flux:field class="md:col-span-2">
-                            <flux:label>{{ __('admin.locations.location_pct') }}</flux:label>
-                            <flux:input wire:model="newLocationPct" type="text"
-                                inputmode="decimal" />
-                            <flux:error name="newLocationPct" />
-                        </flux:field>
-                    @endif
+                    <flux:field class="md:col-span-2">
+                        <flux:label>{{ __('admin.locations.location_pct') }}</flux:label>
+                        <flux:input wire:model="newLocationPct" type="text"
+                            inputmode="decimal" />
+                        <flux:error name="newLocationPct" />
+                    </flux:field>
                 </div>
 
                 <div
@@ -60,14 +58,12 @@
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     {{ __('admin.locations.property') }}</th>
-                @if ($location->type !== 'storage')
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                        {{ __('admin.locations.community_pct') }}</th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                        {{ __('admin.locations.location_pct') }}</th>
-                @endif
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.locations.community_pct') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.locations.location_pct') }}</th>
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     {{ __('admin.locations.assigned') }}</th>
@@ -90,18 +86,16 @@
                                 data-field="edit-name" />
                             <flux:error name="editName" />
                         </td>
-                        @if ($location->type !== 'storage')
-                            <td class="px-6 py-4 text-sm">
-                                <flux:input wire:model="editCommunityPct" type="text"
-                                    inputmode="decimal" size="sm" />
-                                <flux:error name="editCommunityPct" />
-                            </td>
-                            <td class="px-6 py-4 text-sm">
-                                <flux:input wire:model="editLocationPct" type="text"
-                                    inputmode="decimal" size="sm" />
-                                <flux:error name="editLocationPct" />
-                            </td>
-                        @endif
+                        <td class="px-6 py-4 text-sm">
+                            <flux:input wire:model="editCommunityPct" type="text"
+                                inputmode="decimal" size="sm" />
+                            <flux:error name="editCommunityPct" />
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <flux:input wire:model="editLocationPct" type="text"
+                                inputmode="decimal" size="sm" />
+                            <flux:error name="editLocationPct" />
+                        </td>
                         <td class="px-6 py-4 text-sm" colspan="2">
                             <div class="flex gap-2">
                                 <button type="button" wire:click="saveProperty"
@@ -117,12 +111,10 @@
                     @else
                         <td class="px-6 py-4 text-sm font-medium text-gray-900">
                             {{ $property->name }}</td>
-                        @if ($location->type !== 'storage')
-                            <td class="px-6 py-4 text-sm text-gray-500">
-                                {{ $property->community_pct ?? '—' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
-                                {{ $property->location_pct ?? '—' }}</td>
-                        @endif
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            %{{ number_format($property->community_pct ?? 0, 2, ',', '.') }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            %{{ number_format($property->location_pct ?? 0, 2, ',', '.') }}</td>
                         <td class="px-6 py-4 text-sm">
                             <flux:badge :color="$isAssigned ? 'green' : 'zinc'"
                                 data-assigned="{{ $isAssigned ? 'yes' : 'no' }}">

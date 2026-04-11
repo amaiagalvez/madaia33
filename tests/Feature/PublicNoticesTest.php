@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Tarea 4: Parte pública — Avisos
-// Valida: Requisitos 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 4.1, 4.2, 4.3, 4.5, 4.6
+// Feature: community-web, Task 4: Public area — Notices
+// Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 4.1, 4.2, 4.3, 4.5, 4.6
 
 use App\Models\Notice;
 use Livewire\Livewire;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\App;
 
 dataset('supported_locales', SupportedLocales::all());
 
-it('no muestra avisos privados en la ruta pública de avisos', function (string $locale) {
+it('does not show private notices on the public notices route', function (string $locale) {
     $privateTitle = $locale === SupportedLocales::SPANISH ? 'Aviso privado ES' : 'Aviso privado EU';
     $publicTitle = $locale === SupportedLocales::SPANISH ? 'Aviso público ES' : 'Aviso público EU';
 
@@ -31,11 +31,11 @@ it('no muestra avisos privados en la ruta pública de avisos', function (string 
 })->with('supported_locales');
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 18: Paginación de avisos
-// Valida: Requisitos 2.6, 2.7
+// Property 18: Notices pagination
+// Validates: Requirements 2.6, 2.7
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('pagina los avisos a 10 por página ordenados por published_at desc', function () {
+it('paginates notices at 10 per page ordered by published_at desc', function () {
     $total = 12;
     Notice::factory()->count($total)->public()->create();
 
@@ -48,11 +48,11 @@ it('pagina los avisos a 10 por página ordenados por published_at desc', functio
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 19: Filtrado por ubicación
-// Valida: Requisitos 4.5, 4.6
+// Property 19: Location filtering
+// Validates: Requirements 4.5, 4.6
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('filtra avisos por portal mostrando también los de ámbito general', function () {
+it('filters notices by portal while also showing general scope notices', function () {
     // Notice for portal 33-A only
     $portalA = Notice::factory()->public()->create();
     attachNoticeToLocationCode($portalA, '33-A');
@@ -74,7 +74,7 @@ it('filtra avisos por portal mostrando también los de ámbito general', functio
     expect($ids)->not->toContain($portalB->id);
 });
 
-it('muestra todos los avisos cuando no hay filtro activo', function () {
+it('shows all notices when no filter is active', function () {
     $count = 4;
     Notice::factory()->count($count)->public()->create();
 
@@ -85,17 +85,17 @@ it('muestra todos los avisos cuando no hay filtro activo', function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tests de ejemplo
-// Valida: Requisitos 2.3, 2.5, 2.8
+// Example tests
+// Validates: Requirements 2.3, 2.5, 2.8
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('muestra mensaje de vacío cuando no hay avisos públicos', function () {
+it('shows empty-state message when there are no public notices', function () {
     $component = Livewire::test('public-notices');
 
     $component->assertSee(__('notices.empty'));
 });
 
-it('muestra el indicador de sin traducción cuando el aviso no tiene traducción al locale activo', function () {
+it('shows missing-translation indicator when notice has no translation for active locale', function () {
     App::setLocale(SupportedLocales::SPANISH);
 
     // Notice with only EU translation
@@ -108,7 +108,7 @@ it('muestra el indicador de sin traducción cuando el aviso no tiene traducción
     $component->assertSuccessful();
 });
 
-it('no muestra el indicador de sin traducción cuando el aviso tiene traducción al locale activo', function () {
+it('does not show missing-translation indicator when notice has translation for active locale', function () {
     App::setLocale(SupportedLocales::SPANISH);
 
     Notice::factory()->public()->create([
@@ -123,7 +123,7 @@ it('no muestra el indicador de sin traducción cuando el aviso tiene traducción
     $component->assertDontSee(__('notices.no_translation'));
 });
 
-it('muestra las etiquetas de ubicación junto al aviso', function () {
+it('shows location tags next to the notice', function () {
     $notice = Notice::factory()->public()->create(['title_eu' => 'Aviso con portal']);
     attachNoticeToLocationCode($notice, '33-C');
 
@@ -132,7 +132,7 @@ it('muestra las etiquetas de ubicación junto al aviso', function () {
     $component->assertSee('C');
 });
 
-it('resetea la paginación al cambiar el filtro de ubicación', function () {
+it('resets pagination when changing location filter', function () {
     Notice::factory()->count(15)->public()->create();
 
     $component = Livewire::test('public-notices');

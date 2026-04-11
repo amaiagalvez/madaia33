@@ -24,6 +24,7 @@ return [
         'send' => 'Enviar',
         'create' => 'Crear',
         'create_new' => 'Crear nuevo',
+        'all' => 'Todos',
         'confirm' => 'Confirmar',
     ],
     'messages' => [
@@ -34,6 +35,7 @@ return [
     'footer' => [
         'privacy_policy' => 'Política de privacidad',
         'legal_notice' => 'Aviso legal',
+        'cookie_policy' => 'Política de cookies',
     ],
     'pagination' => [
         'previous' => 'Anterior',
@@ -53,7 +55,7 @@ return [
         'login_cta' => 'Iniciar sesión',
         'seo_description' => 'Accede a la zona privada de la comunidad para iniciar sesion y gestionar tu area personal.',
         'form_title' => 'Acceso a la zona privada',
-        'username' => 'Usuario',
+        'username' => 'Usuaria',
         'username_placeholder' => 'Por ejemplo: vecino01',
         'password' => 'Contraseña',
         'change_password_option' => 'Cambiar contraseña',

@@ -3,7 +3,7 @@
 return [
     'title' => 'Contacto',
     'seo_description' => 'Contacta con la comunidad mediante un formulario seguro para consultas, incidencias o sugerencias.',
-    'subtitle' => 'Envía tu mensaje de forma clara, sencilla y segura para contactar con la comunidad.',
+    'subtitle' => 'Envía tu aportación, consulta o duda. Te responderemos lo antes posible.',
     'required_hint' => '* Los campos marcados son obligatorios.',
     'support_badge' => 'Atención directa',
     'support_title' => 'Una vía clara para hablar con la comunidad',
@@ -51,6 +51,7 @@ return [
         'unread' => 'No leído',
         'mark_read' => 'Marcar como leído',
         'mark_unread' => 'Marcar como no leído',
+        'search' => 'Buscar en cualquier campo del mensaje',
         'confirm_delete' => '¿Estás seguro de que quieres eliminar este mensaje?',
     ],
 ];

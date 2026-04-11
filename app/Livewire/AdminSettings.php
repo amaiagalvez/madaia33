@@ -5,15 +5,18 @@ namespace App\Livewire;
 use App\Mail\TestEmail;
 use App\Models\Setting;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
+use Illuminate\Support\Facades\Storage;
 use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Validations\AdminSettingsValidation;
 
 class AdminSettings extends Component
 {
     use BuildsLocaleFieldConfigs;
+    use WithFileUploads;
 
     public string $activeSection = '';
 
@@ -30,6 +33,10 @@ class AdminSettings extends Component
 
     public string $legalCheckboxTextEs = '';
 
+    public string $contactFormSubjectEu = '';
+
+    public string $contactFormSubjectEs = '';
+
     public string $privacyContentEu = '';
 
     public string $privacyContentEs = '';
@@ -41,6 +48,22 @@ class AdminSettings extends Component
     public string $legalNoticeContentEu = '';
 
     public string $legalNoticeContentEs = '';
+
+    public string $cookiePolicyContentEu = '';
+
+    public string $cookiePolicyContentEs = '';
+
+    public string $frontPhotoRequestTextEu = '';
+
+    public string $frontPhotoRequestTextEs = '';
+
+    public string $frontPrimaryEmail = '';
+
+    public string $frontSiteName = '';
+
+    public string $frontLogoImagePath = '';
+
+    public mixed $frontLogoImage = null;
 
     public string $emailFromAddress = '';
 
@@ -78,6 +101,8 @@ class AdminSettings extends Component
 
     public string $testEmailError = '';
 
+    public bool $hasUnsavedChanges = false;
+
     /**
      * Maps section identifier → [Livewire property name => DB key].
      *
@@ -90,6 +115,8 @@ class AdminSettings extends Component
                 'adminEmail' => 'admin_email',
                 'legalCheckboxTextEu' => 'legal_checkbox_text_eu',
                 'legalCheckboxTextEs' => 'legal_checkbox_text_es',
+                'contactFormSubjectEu' => 'contact_form_subject_eu',
+                'contactFormSubjectEs' => 'contact_form_subject_es',
             ],
             Setting::SECTION_EMAIL_CONFIGURATION => [
                 'emailFromAddress' => 'from_address',
@@ -109,6 +136,13 @@ class AdminSettings extends Component
                 'privacyContentEs' => 'legal_page_privacy_policy_es',
                 'legalNoticeContentEu' => 'legal_page_legal_notice_eu',
                 'legalNoticeContentEs' => 'legal_page_legal_notice_es',
+                'cookiePolicyContentEu' => 'legal_page_cookie_policy_eu',
+                'cookiePolicyContentEs' => 'legal_page_cookie_policy_es',
+                'frontPhotoRequestTextEu' => 'front_photo_request_text_eu',
+                'frontPhotoRequestTextEs' => 'front_photo_request_text_es',
+                'frontPrimaryEmail' => 'front_primary_email',
+                'frontSiteName' => 'front_site_name',
+                'frontLogoImagePath' => 'front_logo_image_path',
             ],
             Setting::SECTION_RECAPTCHA => [
                 'recaptchaSiteKey' => 'recaptcha_site_key',
@@ -149,6 +183,8 @@ class AdminSettings extends Component
         $this->recaptchaSecretKey = $settings['recaptcha_secret_key'] ?? '';
         $this->legalCheckboxTextEu = $settings['legal_checkbox_text_eu'] ?? '';
         $this->legalCheckboxTextEs = $settings['legal_checkbox_text_es'] ?? '';
+        $this->contactFormSubjectEu = $settings['contact_form_subject_eu'] ?? '';
+        $this->contactFormSubjectEs = $settings['contact_form_subject_es'] ?? '';
         $this->emailFromAddress = $settings['from_address'] ?? '';
         $this->emailFromName = $settings['from_name'] ?? '';
         $this->smtpHost = $settings['smtp_host'] ?? '';
@@ -168,6 +204,13 @@ class AdminSettings extends Component
         $this->privacyContentEs = $settings['legal_page_privacy_policy_es'] ?? '';
         $this->legalNoticeContentEu = $settings['legal_page_legal_notice_eu'] ?? '';
         $this->legalNoticeContentEs = $settings['legal_page_legal_notice_es'] ?? '';
+        $this->cookiePolicyContentEu = $settings['legal_page_cookie_policy_eu'] ?? '';
+        $this->cookiePolicyContentEs = $settings['legal_page_cookie_policy_es'] ?? '';
+        $this->frontPhotoRequestTextEu = $settings['front_photo_request_text_eu'] ?? '';
+        $this->frontPhotoRequestTextEs = $settings['front_photo_request_text_es'] ?? '';
+        $this->frontPrimaryEmail = $settings['front_primary_email'] ?? '';
+        $this->frontSiteName = $settings['front_site_name'] ?? '';
+        $this->frontLogoImagePath = $settings['front_logo_image_path'] ?? '';
     }
 
     /**
@@ -237,12 +280,27 @@ class AdminSettings extends Component
         if (in_array($normalized, $this->availableSections, true)) {
             $this->activeSection = $normalized;
             $this->saved = false;
+            $this->hasUnsavedChanges = false;
         }
+    }
+
+    public function updated(string $property): void
+    {
+        if ($property === 'activeSection' || str_starts_with($property, 'testEmail') || $property === 'showTestEmailModal') {
+            return;
+        }
+
+        $this->saved = false;
+        $this->hasUnsavedChanges = true;
     }
 
     public function save(): void
     {
         $this->validate(AdminSettingsValidation::rulesBySection($this->activeSection));
+
+        if ($this->activeSection === Setting::SECTION_FRONT && $this->frontLogoImage !== null) {
+            $this->frontLogoImagePath = $this->frontLogoImage->store('branding', 'public');
+        }
 
         $map = $this->sectionFieldMap()[$this->activeSection] ?? [];
 
@@ -253,8 +311,41 @@ class AdminSettings extends Component
         }
 
         Setting::upsert($this->buildUpsertRows($map), ['key'], ['value', 'updated_at']);
+        Setting::refreshStringValuesCache();
+
+        if ($this->frontLogoImage !== null) {
+            $this->frontLogoImage = null;
+        }
 
         $this->saved = true;
+        $this->hasUnsavedChanges = false;
+    }
+
+    public function getFrontLogoPreviewUrlProperty(): ?string
+    {
+        if ($this->frontLogoImage !== null) {
+            return $this->frontLogoImage->temporaryUrl();
+        }
+
+        $logoPath = trim($this->frontLogoImagePath);
+
+        if ($logoPath === '') {
+            return null;
+        }
+
+        if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
+            return $logoPath;
+        }
+
+        if (str_starts_with($logoPath, '/')) {
+            return $logoPath;
+        }
+
+        if (Storage::disk('public')->exists($logoPath)) {
+            return Storage::url($logoPath);
+        }
+
+        return asset('storage/'.ltrim($logoPath, '/'));
     }
 
     public function openTestEmailModal(): void

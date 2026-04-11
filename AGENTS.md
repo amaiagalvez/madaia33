@@ -207,8 +207,8 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 # Laravel Pint Code Formatter
 
-- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
-- Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
+- If you have modified any PHP files, you must run `vendor/bin/pint --dirty` before finalizing changes to ensure your code matches the project's expected style.
+- Do not run `vendor/bin/pint --test`, simply run `vendor/bin/pint` to fix any formatting issues.
 
 === pest/core rules ===
 
@@ -222,6 +222,8 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 ## Unit Tests Without Database (Preferred)
 
+- **amalurra priority rule (mandatory)**: When `amalurra` proposes or executes testing work, it must prioritize Unit tests first and only keep/add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
+- **sorgina priority rule (mandatory)**: When `sorgina` proposes or executes testing work, it must prioritize Unit tests first and only keep/add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
 - **amalurra** and **sorgina** agents: Always prefer **Unit tests** (`tests/Unit/`) over Feature tests when validating logic that does not require database access (pure functions, value objects, transformers, formatters, helpers, service methods without persistence).
 - Split test scenarios: keep pure logic unit tests fast (`tests/Unit/`), and use Feature tests only for database interaction, HTTP flows, or Livewire reactivity.
 - Rationale: Unit tests without database run in milliseconds and provide instant feedback, enabling faster iteration and reducing CI/CD overhead. Reserve Feature tests for integration scenarios only.

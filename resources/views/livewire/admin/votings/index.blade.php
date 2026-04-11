@@ -262,7 +262,7 @@
                                 <tr>
                                     <td class="px-4 py-2 text-gray-800">{{ $row['name'] }}</td>
                                     <td class="px-4 py-2 text-gray-600">
-                                        {{ number_format($row['percentage'], 4, ',', '.') }}%</td>
+                                        %{{ number_format($row['percentage'], 2, ',', '.') }}%</td>
                                     <td class="px-4 py-2 text-gray-600">{{ $row['delegated_by'] }}
                                     </td>
                                     <td class="px-4 py-2 text-gray-600">{{ $row['delegate_dni'] }}
@@ -314,6 +314,9 @@
                                     {{ __('votings.admin.portal_codes') }}</th>
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.local_codes') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                     {{ __('votings.admin.garage_codes') }}</th>
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
@@ -337,6 +340,9 @@
                                         {{ $row['portal_codes'] !== '' ? $row['portal_codes'] : '—' }}
                                     </td>
                                     <td class="px-4 py-2 text-gray-600">
+                                        {{ $row['local_codes'] !== '' ? $row['local_codes'] : '—' }}
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">
                                         {{ $row['garage_codes'] !== '' ? $row['garage_codes'] : '—' }}
                                     </td>
                                     <td class="px-4 py-2 text-gray-600">
@@ -351,7 +357,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5"
+                                    <td colspan="6"
                                         class="px-4 py-6 text-center text-gray-500">
                                         {{ __('votings.admin.no_pending_delegations') }}</td>
                                 </tr>
@@ -395,6 +401,9 @@
                                     {{ __('votings.admin.portal_codes') }}</th>
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.local_codes') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                     {{ __('votings.admin.garage_codes') }}</th>
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
@@ -418,6 +427,9 @@
                                         {{ $row['portal_codes'] !== '' ? $row['portal_codes'] : '—' }}
                                     </td>
                                     <td class="px-4 py-2 text-gray-600">
+                                        {{ $row['local_codes'] !== '' ? $row['local_codes'] : '—' }}
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">
                                         {{ $row['garage_codes'] !== '' ? $row['garage_codes'] : '—' }}
                                     </td>
                                     <td class="px-4 py-2 text-gray-600">
@@ -432,7 +444,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5"
+                                    <td colspan="6"
                                         class="px-4 py-6 text-center text-gray-500">
                                         {{ __('votings.admin.no_pending_delegations') }}</td>
                                 </tr>

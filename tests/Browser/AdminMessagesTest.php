@@ -23,8 +23,13 @@ test('admin can read a message and it gets marked as read', function () {
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $message, $messageBody) {
+        $escapedSubject = json_encode($message->subject, JSON_THROW_ON_ERROR);
+        $escapedBody = json_encode($messageBody, JSON_THROW_ON_ERROR);
+
         $browser->loginAs($admin)
             ->visit('/admin/mensajes')
+            ->click('[data-messages-filter-btn="all"]')
+            ->pause(300)
             ->assertSee('Dusk Sender')
             ->assertSee('Dusk Test Subject');
 
@@ -32,14 +37,18 @@ test('admin can read a message and it gets marked as read', function () {
         $browser->script("
             const rows = document.querySelectorAll('tbody tr');
             for (const row of rows) {
-                if (row.textContent.includes('Dusk Test Subject')) {
-                    row.click();
+                if (row.textContent.includes({$escapedSubject})) {
+                    row.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
                     break;
                 }
             }
         ");
 
-        $browser->waitForText($messageBody, 5)
+        $browser->waitUsing(10, 200, function () use ($browser, $escapedBody): bool {
+            $result = $browser->script("return document.body.innerText.includes({$escapedBody});");
+
+            return (bool) ($result[0] ?? false);
+        }, 'Message body was not rendered in admin inbox detail view.')
             ->assertSee($messageBody);
 
         // Verify marked as read in DB

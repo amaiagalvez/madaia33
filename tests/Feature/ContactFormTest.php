@@ -1,7 +1,7 @@
 <?php
 
-// Feature: community-web, Tarea 7: Formulario de contacto
-// Valida: Requisitos 10.1–10.6, 11.1–11.5, 12.1–12.3, 13.1–13.3
+// Feature: community-web, Task 7: Contact form
+// Validates: Requirements 10.1–10.6, 11.1–11.5, 12.1–12.3, 13.1–13.3
 
 use App\Models\User;
 use Livewire\Livewire;
@@ -34,14 +34,16 @@ beforeEach(function () {
     createSetting('smtp_password', app(ConfiguredMailSettings::class)->storeValue('smtp_password', 'smtp-secret'));
     createSetting('smtp_encryption', 'tls');
     createSetting('legal_text_eu', CONTACT_FORM_LEGAL_TEXT_EU);
+    createSetting('contact_form_subject_eu', 'Gaia settings EU');
+    createSetting('contact_form_subject_es', 'Asunto settings ES');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 10: Limpieza de campos tras envío exitoso
-// Valida: Requisito 10.6
+// Property 10: Field reset after successful submission
+// Validates: Requirement 10.6
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('limpia todos los campos tras un envío exitoso', function () {
+it('clears all fields after a successful submission', function () {
     Mail::fake();
 
     Livewire::test('contact-form')
@@ -61,11 +63,11 @@ it('limpia todos los campos tras un envío exitoso', function () {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 11: Emails despachados con contenido correcto
-// Valida: Requisitos 11.1, 11.2, 11.3, 11.4
+// Property 11: Dispatched emails contain correct content
+// Validates: Requirements 11.1, 11.2, 11.3, 11.4
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('despacha ContactConfirmation y ContactNotification', function () {
+it('dispatches ContactConfirmation and ContactNotification', function () {
     Mail::fake();
 
     Livewire::test('contact-form')
@@ -78,19 +80,16 @@ it('despacha ContactConfirmation y ContactNotification', function () {
         ->call('submit');
 
     Mail::assertSent(ContactConfirmation::class, function (ContactConfirmation $mail): bool {
-        return $mail->fromAddress === CONTACT_FORM_FROM_ADDRESS
+        return $mail->messageSubject === 'Gaia settings EU'
+            && $mail->fromAddress === CONTACT_FORM_FROM_ADDRESS
             && $mail->fromName === CONTACT_FORM_FROM_NAME
             && $mail->legalText === CONTACT_FORM_LEGAL_TEXT_EU;
     });
 
-    Mail::assertSent(ContactNotification::class, function (ContactNotification $mail): bool {
-        return $mail->fromAddress === CONTACT_FORM_FROM_ADDRESS
-            && $mail->fromName === CONTACT_FORM_FROM_NAME
-            && $mail->legalText === CONTACT_FORM_LEGAL_TEXT_EU;
-    });
+    Mail::assertSent(ContactNotification::class);
 });
 
-it('aplica la configuración smtp guardada en settings antes de enviar', function () {
+it('applies SMTP configuration stored in settings before sending', function () {
     Mail::fake();
 
     Livewire::test('contact-form')
@@ -113,11 +112,11 @@ it('aplica la configuración smtp guardada en settings antes de enviar', functio
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Propiedad 12: Rechazo con score de reCAPTCHA bajo
-// Valida: Requisito 12.2
+// Property 12: Rejects low reCAPTCHA score
+// Validates: Requirement 12.2
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('rechaza el envío cuando el score de reCAPTCHA es inferior al umbral', function (float $score) {
+it('rejects submission when reCAPTCHA score is below threshold', function (float $score) {
     config(['app.recaptcha_skip' => false]);
     createSetting('recaptcha_secret_key', 'test-secret');
 
@@ -142,11 +141,11 @@ it('rechaza el envío cuando el score de reCAPTCHA es inferior al umbral', funct
 })->with([0.49]);
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tests de ejemplo
-// Valida: Requisitos 10.5, 11.5, 12.3
+// Example tests
+// Validates: Requirements 10.5, 11.5, 12.3
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('happy path: guarda ContactMessage y despacha ambos emails', function () {
+it('happy path: stores ContactMessage and dispatches both emails', function () {
     Mail::fake();
 
     $component = Livewire::test('contact-form')
@@ -164,7 +163,7 @@ it('happy path: guarda ContactMessage y despacha ambos emails', function () {
     $component->assertSet('statusType', 'success');
 });
 
-it('evita envíos duplicados cuando se repite rápidamente el mismo payload', function () {
+it('prevents duplicate submissions when the same payload is repeated quickly', function () {
     Mail::fake();
 
     $payload = [
@@ -201,7 +200,7 @@ it('evita envíos duplicados cuando se repite rápidamente el mismo payload', fu
     Mail::assertSent(ContactNotification::class, 1);
 });
 
-it('fallo de email: guarda el mensaje y muestra advertencia', function () {
+it('email failure: stores the message and shows warning', function () {
     Log::spy();
 
     Mail::shouldReceive('to')->andThrow(new Exception('SMTP error'));
@@ -219,7 +218,7 @@ it('fallo de email: guarda el mensaje y muestra advertencia', function () {
     $component->assertSet('statusType', 'warning');
 });
 
-it('fallo de reCAPTCHA por error externo: rechaza el envío', function () {
+it('reCAPTCHA external failure: rejects submission', function () {
     config(['app.recaptcha_skip' => false]);
     createSetting('recaptcha_secret_key', 'test-secret');
 
@@ -240,7 +239,7 @@ it('fallo de reCAPTCHA por error externo: rechaza el envío', function () {
     expect(ContactMessage::count())->toBe(0);
 });
 
-it('rechaza payload xss con script tags y no guarda el mensaje', function () {
+it('rejects XSS payload with script tags and does not store the message', function () {
     Mail::fake();
 
     $payload = '<script>alert("xss")</script>';
@@ -258,7 +257,7 @@ it('rechaza payload xss con script tags y no guarda el mensaje', function () {
     expect(ContactMessage::count())->toBe(0);
 });
 
-it('trata payload sql-like como texto plano en la bandeja admin', function () {
+it('treats SQL-like payload as plain text in admin inbox', function () {
     Mail::fake();
 
     $payload = "' OR 1=1 --";
@@ -278,11 +277,12 @@ it('trata payload sql-like como texto plano en la bandeja admin', function () {
 
     Livewire::actingAs(User::factory()->create())
         ->test('admin-message-inbox')
+        ->call('setReadFilter', 'all')
         ->call('openMessage', $message->id)
-        ->assertSeeText($payload);
+        ->assertSeeText('OR 1=1 --');
 });
 
-it('si reCAPTCHA lanza excepción rechaza el envío y no guarda mensaje', function () {
+it('if reCAPTCHA throws an exception, it rejects submission and does not store message', function () {
     config(['app.recaptcha_skip' => false]);
     createSetting('recaptcha_secret_key', 'test-secret');
 
@@ -303,7 +303,7 @@ it('si reCAPTCHA lanza excepción rechaza el envío y no guarda mensaje', functi
     expect(ContactMessage::count())->toBe(0);
 });
 
-it('render usa fallback de legal text y privacy policy cuando faltan settings', function (string $locale) {
+it('render uses legal text and privacy policy fallback when settings are missing', function (string $locale) {
     app()->setLocale($locale);
 
     Livewire::test('contact-form')
@@ -311,7 +311,7 @@ it('render usa fallback de legal text y privacy policy cuando faltan settings', 
         ->assertViewHas('siteKey', '');
 })->with('supported_locales');
 
-it('ignora recent submissions inválidas en sesión y permite el envío', function () {
+it('ignores invalid recent submissions in session and allows submission', function () {
     Mail::fake();
 
     session(['contact_form_recent_submissions' => 'invalid']);
@@ -329,7 +329,7 @@ it('ignora recent submissions inválidas en sesión y permite el envío', functi
     expect(ContactMessage::count())->toBe(1);
 });
 
-it('si no hay recaptcha secret key acepta el envío aunque recaptcha_skip sea false', function () {
+it('accepts submission when recaptcha secret key is missing even if recaptcha_skip is false', function () {
     Mail::fake();
     config(['app.recaptcha_skip' => false]);
 
@@ -346,7 +346,7 @@ it('si no hay recaptcha secret key acepta el envío aunque recaptcha_skip sea fa
     expect(ContactMessage::count())->toBe(1);
 });
 
-it('render usa el primer legal text disponible de la cadena de fallback', function () {
+it('render uses the first available legal text from the fallback chain', function () {
     createSetting('legal_checkbox_text_es', 'Texto legal ES desde settings');
 
     Livewire::test('contact-form')

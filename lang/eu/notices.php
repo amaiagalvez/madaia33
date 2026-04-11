@@ -12,6 +12,7 @@ return [
     'no_translation' => 'Iragarki hau ez dago euskaraz itzulita.',
     'published_at' => 'Argitaratze-data',
     'portal' => 'Portala',
+    'local' => 'Lokala',
     'garage' => 'Garaje-solairua',
     'filter' => [
         'label' => 'Iragazi kokapenaren arabera',

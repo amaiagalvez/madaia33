@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('notice_locations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('notice_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('notice_id')->constrained();
             $table->string('location_type'); // portal | garage
             $table->string('location_code'); // 33-A to 33-J, P-1 to P-3
             $table->softDeletes();

@@ -11,8 +11,8 @@ use App\Livewire\PublicVotings;
 use App\Models\PropertyAssignment;
 use App\Mail\VotingConfirmationMail;
 use Illuminate\Support\Facades\Mail;
-use App\Actions\CastVotingBallotAction;
 use Illuminate\Validation\ValidationException;
+use App\Actions\Votings\CastVotingBallotAction;
 use App\Http\Controllers\PublicVotingController;
 
 it('sends a confirmation email after a successful vote', function () {

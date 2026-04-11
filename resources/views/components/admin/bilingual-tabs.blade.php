@@ -115,7 +115,10 @@
 
                 @if ($type === 'textarea')
                     <textarea id="{{ $tabConfig['field'] }}" wire:model="{{ $tabConfig['field'] }}"
-                        rows="{{ $rows }}" @class([
+                        rows="{{ $rows }}" x-init="$nextTick(() => { $el.style.height = 'auto';
+                            $el.style.height = `${$el.scrollHeight}px`; })"
+                        @input="$event.target.style.height = 'auto'; $event.target.style.height = `${$event.target.scrollHeight}px`;"
+                        @class([
                             'mt-1 block w-full rounded-md border bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]',
                             'border-red-500' => $validationErrors->has($tabConfig['field']),
                             'border-gray-300' => !$validationErrors->has($tabConfig['field']),

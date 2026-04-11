@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Owners;
 
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
 use App\Models\Setting;
 use App\Models\Property;
+use App\SupportedLocales;
 use Illuminate\Support\Str;
 use App\Mail\OwnerWelcomeMail;
 use App\Models\PropertyAssignment;
@@ -29,10 +30,11 @@ class CreateOwnerAction
 
         $result = DB::transaction(function () use ($data, $password): array {
             $user = User::create([
-                'name' => $data['coprop1_dni'],
+                'name' => $data['coprop1_name'],
                 'email' => $data['coprop1_email'],
                 'password' => Hash::make($password),
                 'is_active' => true,
+                'language' => SupportedLocales::default(),
             ]);
 
             $owner = Owner::create([
@@ -41,6 +43,7 @@ class CreateOwnerAction
                 'coprop1_dni' => $data['coprop1_dni'],
                 'coprop1_phone' => $data['coprop1_phone'] ?? null,
                 'coprop1_email' => $data['coprop1_email'],
+                'language' => SupportedLocales::default(),
                 'coprop2_name' => $data['coprop2_name'] ?? null,
                 'coprop2_dni' => $data['coprop2_dni'] ?? null,
                 'coprop2_phone' => $data['coprop2_phone'] ?? null,
@@ -139,12 +142,12 @@ class CreateOwnerAction
         $assignments = $data['assignments'] ?? [];
 
         if ($assignments === []) {
-            return '<p>'.e(__('admin.owners.email.no_properties')).'</p>';
+            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
         }
 
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
@@ -163,17 +166,17 @@ class CreateOwnerAction
                     return null;
                 }
 
-                $label = $property->location->code.' '.$property->name;
+                $label = $property->location->code . ' ' . $property->name;
 
-                return '<li>'.e($label).'</li>';
+                return '<li>' . e($label) . '</li>';
             })
             ->filter()
             ->values();
 
         if ($items->isEmpty()) {
-            return '<p>'.e(__('admin.owners.email.no_properties')).'</p>';
+            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
         }
 
-        return '<ul>'.$items->implode('').'</ul>';
+        return '<ul>' . $items->implode('') . '</ul>';
     }
 }

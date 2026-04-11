@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>
-        {{ filled($title ?? null) ? $title . ' - ' . config('app.name', 'Laravel') : config('app.name', 'Laravel') }}
+        {{ filled($title ?? null) ? $title . ' - ' . ($publicSiteName ?? config('app.name', 'Laravel')) : $publicSiteName ?? config('app.name', 'Laravel') }}
     </title>
 
     @stack('meta')
@@ -223,8 +223,13 @@
                         <p class="text-sm font-semibold text-gray-800">
                             {{ __('general.footer.legal_notice') }}</p>
                     </a>
+                    <a href="{{ route(\App\SupportedLocales::routeName('cookie-policy')) }}"
+                        class="hero-frame px-4 py-3 transition-colors hover:border-[#d9755b]/60 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 sm:col-span-2">
+                        <p class="text-sm font-semibold text-gray-800">
+                            {{ __('general.footer.cookie_policy') }}</p>
+                    </a>
                 </nav>
-                <a href="mailto:info@amaia.eus"
+                <a href="mailto:{{ $publicPrimaryEmail ?? 'info@madaia33.eus' }}"
                     class="inline-flex items-center self-end lg:self-center focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
                     aria-label="Contact with Amaia">
                     <img src="{{ asset('amaia-footer.png') }}" alt="Amaia logo"

@@ -16,7 +16,7 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => fake()->randomElement(['portal', 'garage', 'storage']),
+            'type' => fake()->randomElement(['portal', 'local', 'garage', 'storage']),
             'code' => fake()->unique()->bothify('##-?'),
             'name' => fake()->bothify('Location ##'),
         ];
@@ -30,6 +30,11 @@ class LocationFactory extends Factory
     public function garage(): static
     {
         return $this->state(['type' => 'garage']);
+    }
+
+    public function local(): static
+    {
+        return $this->state(['type' => 'local']);
     }
 
     public function storage(): static

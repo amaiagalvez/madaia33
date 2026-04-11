@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\SupportedLocales;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
@@ -34,4 +35,20 @@ it('falls back to eu when the session locale is invalid', function () {
         ->get('/__test-set-locale-invalid')
         ->assertSuccessful()
         ->assertJsonPath('locale', SupportedLocales::default());
+});
+
+it('uses authenticated user language when route locale is not provided', function () {
+    Route::middleware(['web', SetLocale::class])->get('/__test-set-locale-auth-user', function () {
+        return response()->json(['locale' => app()->getLocale()]);
+    });
+
+    $user = User::factory()->create([
+        'language' => SupportedLocales::SPANISH,
+    ]);
+
+    test()->actingAs($user)
+        ->withSession(['locale' => SupportedLocales::BASQUE])
+        ->get('/__test-set-locale-auth-user')
+        ->assertSuccessful()
+        ->assertJsonPath('locale', SupportedLocales::SPANISH);
 });

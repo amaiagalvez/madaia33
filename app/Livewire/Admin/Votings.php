@@ -68,12 +68,12 @@ class Votings extends Component
     public bool $showDelegatedModal = false;
 
     /**
-     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}>
      */
     public array $delegatedRows = [];
 
     /**
-     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}>
      */
     public array $filteredDelegatedRows = [];
 
@@ -82,12 +82,12 @@ class Votings extends Component
     public bool $showInPersonModal = false;
 
     /**
-     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}>
      */
     public array $inPersonRows = [];
 
     /**
-     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}>
      */
     public array $filteredInPersonRows = [];
 
@@ -274,6 +274,7 @@ class Votings extends Component
                     'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
+                    'local_codes' => $row['local_codes'],
                     'garage_codes' => $row['garage_codes'],
                     'search_index' => $row['search_index'],
                 ];
@@ -328,6 +329,7 @@ class Votings extends Component
                     'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
+                    'local_codes' => $row['local_codes'],
                     'garage_codes' => $row['garage_codes'],
                     'search_index' => $row['search_index'],
                 ];
@@ -384,8 +386,8 @@ class Votings extends Component
             'votings' => $votings,
             'censusCounts' => $censusCounts,
             'locations' => Location::query()
-                ->whereIn('type', ['portal', 'garage'])
-                ->orderByRaw("CASE WHEN type = 'portal' THEN 1 ELSE 2 END")
+                ->whereIn('type', ['portal', 'local', 'garage'])
+                ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 ELSE 3 END")
                 ->orderBy('code')
                 ->get(),
         ]);
@@ -400,7 +402,7 @@ class Votings extends Component
             ->join('properties as properties', 'properties.id', '=', 'assignments.property_id')
             ->join('locations as locations', 'locations.id', '=', 'properties.location_id')
             ->whereNull('assignments.end_date')
-            ->whereIn('locations.type', ['portal', 'garage'])
+            ->whereIn('locations.type', ['portal', 'local', 'garage'])
             ->select([
                 'assignments.owner_id as owner_id',
                 'locations.id as location_id',
@@ -413,8 +415,8 @@ class Votings extends Component
             ->groupBy('owner_id')
             ->map(static function ($rows): array {
                 return [
-                    'portal_ids' => $rows
-                        ->where('location_type', 'portal')
+                    'residential_ids' => $rows
+                        ->filter(static fn ($row): bool => in_array($row->location_type, ['portal', 'local'], true))
                         ->pluck('location_id')
                         ->map(static fn ($id): int => (int) $id)
                         ->values()
@@ -430,16 +432,16 @@ class Votings extends Component
 
         return $votings->getCollection()
             ->mapWithKeys(function (Voting $voting) use ($ownerLocations): array {
-                [$portalIds, $garageIds] = $this->eligibilityService->allowedLocationIds($voting);
-                $portalIds = array_map('intval', $portalIds);
+                [$residentialIds, $garageIds] = $this->eligibilityService->allowedLocationIds($voting);
+                $residentialIds = array_map('intval', $residentialIds);
                 $garageIds = array_map('intval', $garageIds);
 
-                $eligibleOwnersCount = $ownerLocations->filter(static function (array $locations) use ($portalIds, $garageIds): bool {
-                    if ($portalIds === [] && $garageIds === []) {
+                $eligibleOwnersCount = $ownerLocations->filter(static function (array $locations) use ($residentialIds, $garageIds): bool {
+                    if ($residentialIds === [] && $garageIds === []) {
                         return true;
                     }
 
-                    if ($portalIds !== [] && array_intersect($locations['portal_ids'], $portalIds) !== []) {
+                    if ($residentialIds !== [] && array_intersect($locations['residential_ids'], $residentialIds) !== []) {
                         return true;
                     }
 

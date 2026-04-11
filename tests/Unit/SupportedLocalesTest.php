@@ -26,3 +26,15 @@ it('returns locale metadata values with fallback for unsupported locales', funct
         ->and(SupportedLocales::propertySuffix(SupportedLocales::SPANISH))->toBe('Es')
         ->and(SupportedLocales::switcherLabel('fr'))->toBe('EU');
 });
+
+it('builds route names with the given locale suffix', function () {
+    expect(SupportedLocales::routeName('home', SupportedLocales::BASQUE))->toBe('home.eu')
+        ->and(SupportedLocales::routeName('notices', SupportedLocales::SPANISH))->toBe('notices.es')
+        ->and(SupportedLocales::routeName('privacy-policy', 'fr'))->toBe('privacy-policy.eu');
+});
+
+it('strips the locale suffix to recover the base route name', function () {
+    expect(SupportedLocales::baseRouteName('home.eu'))->toBe('home')
+        ->and(SupportedLocales::baseRouteName('notices.es'))->toBe('notices')
+        ->and(SupportedLocales::baseRouteName('no-suffix-route'))->toBe('no-suffix-route');
+});

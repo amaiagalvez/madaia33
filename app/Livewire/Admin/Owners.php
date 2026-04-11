@@ -7,13 +7,13 @@ use Livewire\Component;
 use App\Models\Location;
 use App\Models\Property;
 use Livewire\WithPagination;
-use App\Actions\CreateOwnerAction;
 use App\Models\PropertyAssignment;
 use Illuminate\Contracts\View\View;
-use App\Actions\AssignPropertyAction;
-use App\Actions\UnassignPropertyAction;
+use App\Actions\Owners\CreateOwnerAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
+use App\Actions\Properties\AssignPropertyAction;
+use App\Actions\Properties\UnassignPropertyAction;
 
 class Owners extends Component
 {
@@ -46,6 +46,8 @@ class Owners extends Component
     public string $filterStatus = 'active';
 
     public string $filterPortal = '';
+
+    public string $filterLocal = '';
 
     public string $filterGarage = '';
 
@@ -90,6 +92,11 @@ class Owners extends Component
     }
 
     public function updatedFilterPortal(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterLocal(): void
     {
         $this->resetPage();
     }
@@ -408,6 +415,12 @@ class Owners extends Component
             });
         }
 
+        if ($this->filterLocal !== '') {
+            $query->whereHas('activeAssignments.property.location', function (Builder $q) {
+                $q->where('type', 'local')->where('id', $this->filterLocal);
+            });
+        }
+
         if ($this->filterGarage !== '') {
             $query->whereHas('activeAssignments.property.location', function (Builder $q) {
                 $q->where('type', 'garage')->where('id', $this->filterGarage);
@@ -423,6 +436,7 @@ class Owners extends Component
         $owners = $query->orderBy('coprop1_name')->paginate(20);
 
         $portals = Location::portals()->orderBy('code')->get();
+        $locals = Location::locals()->orderBy('code')->get();
         $garages = Location::garages()->orderBy('code')->get();
         $storages = Location::storage()->orderBy('code')->get();
         $assignableProperties = Property::query()
@@ -445,6 +459,7 @@ class Owners extends Component
         return view('livewire.admin.owners.index', [
             'owners' => $owners,
             'portals' => $portals,
+            'locals' => $locals,
             'garages' => $garages,
             'storages' => $storages,
             'assignableProperties' => $assignableProperties,

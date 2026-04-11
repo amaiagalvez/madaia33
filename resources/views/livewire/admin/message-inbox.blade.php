@@ -1,4 +1,43 @@
 <div>
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div class="w-full max-w-sm">
+            <label for="messages-search" class="sr-only">{{ __('contact.admin.search') }}</label>
+            <input id="messages-search" type="text" wire:model.live.debounce.300ms="search"
+                placeholder="{{ __('contact.admin.search') }}"
+                class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
+        </div>
+
+        <div class="flex items-center gap-2" data-messages-filter>
+            <button type="button" wire:click="setReadFilter('read')"
+                data-messages-filter-btn="read" @class([
+                    'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                    'border-[#d9755b] bg-[#d9755b] text-white' => $readFilter === 'read',
+                    'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                        $readFilter !== 'read',
+                ])>
+                {{ __('contact.admin.read') }}
+            </button>
+            <button type="button" wire:click="setReadFilter('unread')"
+                data-messages-filter-btn="unread" @class([
+                    'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                    'border-[#d9755b] bg-[#d9755b] text-white' => $readFilter === 'unread',
+                    'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                        $readFilter !== 'unread',
+                ])>
+                {{ __('contact.admin.unread') }}
+            </button>
+            <button type="button" wire:click="setReadFilter('all')" data-messages-filter-btn="all"
+                @class([
+                    'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                    'border-[#d9755b] bg-[#d9755b] text-white' => $readFilter === 'all',
+                    'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                        $readFilter !== 'all',
+                ])>
+                {{ __('general.buttons.all') }}
+            </button>
+        </div>
+    </div>
+
     {{-- Messages table --}}
     <x-admin.panel-table table-class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
