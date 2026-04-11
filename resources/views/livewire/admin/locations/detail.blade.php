@@ -1,4 +1,49 @@
 <div>
+    @if ($isChiefSelectable)
+        @php
+            $currentChief = $chiefCandidates->firstWhere('id', $currentChiefOwnerId);
+        @endphp
+
+        <div id="location-chief-form"
+            class="mb-6 rounded-lg border border-[#edd2c7] bg-[#edd2c7]/20 p-4"
+            data-section="location-chief-form">
+            <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+                <div>
+                    <label for="chief-owner-id" class="mb-1 block text-sm font-medium text-stone-700">
+                        {{ __('admin.locations.chief_owner') }}
+                    </label>
+                    <select id="chief-owner-id" wire:model="chiefOwnerId"
+                        class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
+                        data-field="chief-owner-id">
+                        <option value="">{{ __('admin.locations.chief_owner_placeholder') }}
+                        </option>
+                        @foreach ($chiefCandidates as $candidate)
+                            <option value="{{ $candidate->id }}">{{ $candidate->coprop1_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('chiefOwnerId')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-2 text-xs text-stone-600">
+                        {{ __('admin.locations.chief_owner_help') }}</p>
+                </div>
+
+                <button type="button" wire:click="saveChiefOwner"
+                    class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                    {{ __('admin.locations.chief_owner_save') }}
+                </button>
+            </div>
+
+            @if ($currentChief !== null)
+                <p class="mt-3 text-sm text-stone-700"
+                    data-chief-owner-current="{{ $currentChief->id }}">
+                    {{ __('admin.locations.chief_owner_current', ['name' => $currentChief->coprop1_name]) }}
+                </p>
+            @endif
+        </div>
+    @endif
+
     <div class="mb-6 flex items-center justify-end">
         <flux:button variant="primary" wire:click="$set('showAddForm', true)" icon="plus">
             {{ __('admin.locations.add_property') }}
@@ -13,7 +58,8 @@
 
             <div
                 class="admin-slideover-panel absolute inset-y-0 right-0 z-50 h-full w-full max-w-2xl overflow-y-auto bg-white p-6 shadow-2xl">
-                <flux:heading size="lg" class="mb-4">{{ __('admin.locations.new_property') }}
+                <flux:heading size="lg" class="mb-4">
+                    {{ __('admin.locations.new_property') }}
                 </flux:heading>
                 <div class="grid gap-4 md:grid-cols-2">
                     <flux:field>
@@ -122,10 +168,12 @@
                             </flux:badge>
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            <flux:button variant="ghost" size="sm"
-                                wire:click="startEditing({{ $property->id }})" icon="pencil">
-                                {{ __('general.buttons.edit') }}
-                            </flux:button>
+                            <button type="button" wire:click="startEditing({{ $property->id }})"
+                                title="{{ __('general.buttons.edit') }}"
+                                class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
+                                <flux:icon.pencil-square class="size-4" />
+                                <span class="sr-only">{{ __('general.buttons.edit') }}</span>
+                            </button>
                         </td>
                     @endif
                 </tr>

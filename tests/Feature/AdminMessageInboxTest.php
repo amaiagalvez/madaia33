@@ -167,6 +167,23 @@ it('unread messages have visual differentiation class in HTML', function () {
         ->assertSeeHtml('bg-[#edd2c7]/20');
 });
 
+it('read status action uses modal confirmation flow', function () {
+    $user = User::factory()->create();
+    $message = ContactMessage::factory()->unread()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->call('setReadFilter', 'all')
+        ->call('confirmReadToggle', $message->id, true)
+        ->assertSet('showReadModal', true)
+        ->assertSet('readAction', 'read')
+        ->call('doReadToggle')
+        ->assertSet('showReadModal', false)
+        ->assertSet('readAction', '');
+
+    expect(ContactMessage::find($message->id)?->is_read)->toBeTrue();
+});
+
 it('toggles direction when sorting same column and resets when column changes', function () {
     $user = User::factory()->create();
 

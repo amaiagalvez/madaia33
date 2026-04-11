@@ -18,6 +18,12 @@ class AdminMessageInbox extends Component
 
     public bool $showDeleteModal = false;
 
+    public ?int $confirmingReadId = null;
+
+    public string $readAction = '';
+
+    public bool $showReadModal = false;
+
     public string $sortBy = 'created_at';
 
     public string $sortDir = 'desc';
@@ -50,6 +56,30 @@ class AdminMessageInbox extends Component
         } else {
             $message->update(['is_read' => true, 'read_at' => now()]);
         }
+    }
+
+    public function confirmReadToggle(int $id, bool $markRead): void
+    {
+        $this->confirmingReadId = $id;
+        $this->readAction = $markRead ? 'read' : 'unread';
+        $this->showReadModal = true;
+    }
+
+    public function doReadToggle(): void
+    {
+        if ($this->confirmingReadId === null) {
+            return;
+        }
+
+        $this->toggleRead($this->confirmingReadId);
+        $this->cancelReadToggle();
+    }
+
+    public function cancelReadToggle(): void
+    {
+        $this->confirmingReadId = null;
+        $this->readAction = '';
+        $this->showReadModal = false;
     }
 
     public function sortBy(string $column): void
@@ -115,8 +145,8 @@ class AdminMessageInbox extends Component
         $sortDir = in_array($this->sortDir, ['asc', 'desc']) ? $this->sortDir : 'desc';
 
         return ContactMessage::query()
-            ->when($this->readFilter === 'read', fn ($query) => $query->where('is_read', true))
-            ->when($this->readFilter === 'unread', fn ($query) => $query->where('is_read', false))
+            ->when($this->readFilter === 'read', fn($query) => $query->where('is_read', true))
+            ->when($this->readFilter === 'unread', fn($query) => $query->where('is_read', false))
             ->when(trim($this->search) !== '', function ($query): void {
                 $term = '%' . trim($this->search) . '%';
 

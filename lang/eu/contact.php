@@ -51,6 +51,8 @@ return [
         'unread' => 'Irakurri gabe',
         'mark_read' => 'Irakurrita markatu',
         'mark_unread' => 'Irakurri gabe markatu',
+        'confirm_mark_read' => 'Ziur al zaude mezu hau irakurrita markatu nahi duzula?',
+        'confirm_mark_unread' => 'Ziur al zaude mezu hau irakurri gabe markatu nahi duzula?',
         'search' => 'Bilatu mezuaren edozein eremutan',
         'confirm_delete' => 'Ziur zaude mezu hau ezabatu nahi duzula?',
     ],

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Role;
 use App\Models\Owner;
 use Livewire\Livewire;
 use App\Models\Location;
@@ -534,7 +535,7 @@ it('does not show warning in locations listing when all community percentages su
         ->assertDontSeeHtml('data-flux-callout');
 });
 
-it('shows red text for location percentage total in listing when not equal to 100%', function () {
+it('shows invalid location percentage total in listing when not equal to 100%', function () {
     $user = adminUser();
 
     $portalInvalid = Location::factory()->create([
@@ -552,5 +553,164 @@ it('shows red text for location percentage total in listing when not equal to 10
 
     Livewire::actingAs($user)
         ->test(Locations::class)
-        ->assertSeeHtml('text-red-600');
+        ->assertSee('P-INVALID')
+        ->assertSee('60.00');
+});
+
+it('shows only owners with active properties in the same portal or garage as chief candidates', function () {
+    $user = adminUser();
+
+    $portal = Location::factory()->portal()->create(['code' => '33-H']);
+    $otherPortal = Location::factory()->portal()->create(['code' => '33-Z']);
+
+    $portalPropertyA = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'H-1',
+    ]);
+    $portalPropertyB = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'H-2',
+    ]);
+    $otherPortalProperty = Property::factory()->create([
+        'location_id' => $otherPortal->id,
+        'name' => 'Z-1',
+    ]);
+
+    $candidateA = Owner::factory()->create(['coprop1_name' => 'Kandidata A']);
+    $candidateB = Owner::factory()->create(['coprop1_name' => 'Kandidata B']);
+    $inactiveOwner = Owner::factory()->create(['coprop1_name' => 'Inaktiboa']);
+    $otherLocationOwner = Owner::factory()->create(['coprop1_name' => 'Beste Kokalekua']);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $candidateA->id,
+        'property_id' => $portalPropertyA->id,
+        'end_date' => null,
+    ]);
+    PropertyAssignment::factory()->create([
+        'owner_id' => $candidateB->id,
+        'property_id' => $portalPropertyB->id,
+        'end_date' => null,
+    ]);
+    PropertyAssignment::factory()->create([
+        'owner_id' => $inactiveOwner->id,
+        'property_id' => $portalPropertyA->id,
+        'end_date' => now()->subDay(),
+    ]);
+    PropertyAssignment::factory()->create([
+        'owner_id' => $otherLocationOwner->id,
+        'property_id' => $otherPortalProperty->id,
+        'end_date' => null,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(LocationDetail::class, ['location' => $portal])
+        ->assertSee('Kandidata A')
+        ->assertSee('Kandidata B')
+        ->assertDontSee('Inaktiboa')
+        ->assertDontSee('Beste Kokalekua');
+});
+
+it('transfers chief and COMMUNITY_ADMIN role from previous owner to new owner in the same location', function () {
+    $user = adminUser();
+
+    Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
+
+    $portal = Location::factory()->portal()->create(['code' => '33-R']);
+    $propertyA = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'R-1',
+    ]);
+    $propertyB = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'R-2',
+    ]);
+
+    $previousChief = Owner::factory()->create(['coprop1_name' => 'Aurreko Jefa']);
+    $newChief = Owner::factory()->create(['coprop1_name' => 'Jefa Berria']);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $previousChief->id,
+        'property_id' => $propertyA->id,
+        'end_date' => null,
+    ]);
+    PropertyAssignment::factory()->create([
+        'owner_id' => $newChief->id,
+        'property_id' => $propertyB->id,
+        'end_date' => null,
+    ]);
+
+    $previousChiefUser = $previousChief->user()->firstOrFail();
+    $previousChiefUser->assignRole(Role::COMMUNITY_ADMIN);
+    $previousChiefUser->managedLocations()->sync([$portal->id]);
+
+    Livewire::actingAs($user)
+        ->test(LocationDetail::class, ['location' => $portal])
+        ->set('chiefOwnerId', (string) $newChief->id)
+        ->call('saveChiefOwner')
+        ->assertHasNoErrors();
+
+    $newChiefUser = $newChief->user()->firstOrFail()->fresh(['roles', 'managedLocations']);
+    $previousChiefUser = $previousChiefUser->fresh(['roles', 'managedLocations']);
+
+    expect($newChiefUser->hasRole(Role::COMMUNITY_ADMIN))->toBeTrue()
+        ->and($newChiefUser->managedLocations()->whereKey($portal->id)->exists())->toBeTrue()
+        ->and($previousChiefUser->managedLocations()->whereKey($portal->id)->exists())->toBeFalse()
+        ->and($previousChiefUser->hasRole(Role::COMMUNITY_ADMIN))->toBeFalse();
+});
+
+it('keeps COMMUNITY_ADMIN role for previous chief when she still manages another location', function () {
+    $user = adminUser();
+
+    Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
+
+    $portal = Location::factory()->portal()->create(['code' => '33-K']);
+    $garage = Location::factory()->garage()->create(['code' => 'P-K']);
+
+    $portalPropertyA = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'K-1',
+    ]);
+    $portalPropertyB = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'K-2',
+    ]);
+    $garageProperty = Property::factory()->create([
+        'location_id' => $garage->id,
+        'name' => 'PK-1',
+    ]);
+
+    $previousChief = Owner::factory()->create(['coprop1_name' => 'Jefa Mantendu']);
+    $newChief = Owner::factory()->create(['coprop1_name' => 'Jefa Berria K']);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $previousChief->id,
+        'property_id' => $portalPropertyA->id,
+        'end_date' => null,
+    ]);
+    PropertyAssignment::factory()->create([
+        'owner_id' => $previousChief->id,
+        'property_id' => $garageProperty->id,
+        'end_date' => null,
+    ]);
+    PropertyAssignment::factory()->create([
+        'owner_id' => $newChief->id,
+        'property_id' => $portalPropertyB->id,
+        'end_date' => null,
+    ]);
+
+    $previousChiefUser = $previousChief->user()->firstOrFail();
+    $previousChiefUser->assignRole(Role::COMMUNITY_ADMIN);
+    $previousChiefUser->managedLocations()->sync([$portal->id, $garage->id]);
+
+    Livewire::actingAs($user)
+        ->test(LocationDetail::class, ['location' => $portal])
+        ->set('chiefOwnerId', (string) $newChief->id)
+        ->call('saveChiefOwner')
+        ->assertHasNoErrors();
+
+    $previousChiefUser = $previousChiefUser->fresh(['roles', 'managedLocations']);
+
+    expect($previousChiefUser->managedLocations()->whereKey($portal->id)->exists())->toBeFalse()
+        ->and($previousChiefUser->managedLocations()->whereKey($garage->id)->exists())->toBeTrue()
+        ->and($previousChiefUser->hasRole(Role::COMMUNITY_ADMIN))->toBeTrue();
 });

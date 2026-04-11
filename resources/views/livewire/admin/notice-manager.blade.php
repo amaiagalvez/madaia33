@@ -78,12 +78,12 @@
 
                         {{-- Locations --}}
                         @if ($allLocations !== [])
-                            <div>
+                            <div class="mb-2">
                                 <fieldset>
-                                    <legend class="block text-sm font-medium text-gray-700">
+                                    <legend class="text-sm font-semibold text-stone-800">
                                         {{ __('notices.admin.locations') }}
                                     </legend>
-                                    <div class="mt-2 flex flex-wrap gap-2">
+                                    <div class="mt-3 flex flex-wrap gap-2">
                                         @foreach ($allLocations as $loc)
                                             <label class="cursor-pointer select-none">
                                                 <input type="checkbox"
@@ -108,27 +108,28 @@
 
                         {{-- Is public toggle --}}
                         <div>
-                            <label for="isPublic"
-                                class="mb-2 block text-sm font-semibold text-stone-800">
+                            <label class="mb-2 block text-sm font-semibold text-stone-800">
                                 {{ __('notices.admin.is_public') }}
                             </label>
-                            <label for="isPublic"
-                                class="flex cursor-pointer items-center justify-between rounded-2xl border border-brand-300/50 bg-brand-100/30 px-4 py-3 transition-colors hover:border-brand-600/50 hover:bg-brand-100/50">
-                                <div>
-                                    <p class="text-sm font-semibold text-brand-900">
-                                        {{ __('notices.admin.is_public') }}</p>
-                                    <p class="text-xs text-stone-600">
-                                        {{ $isPublic ? __('notices.admin.publish') : __('notices.admin.unpublish') }}
-                                    </p>
-                                </div>
-                                <span
-                                    class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors {{ $isPublic ? 'bg-brand-600' : 'bg-stone-300' }}">
-                                    <span
-                                        class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform {{ $isPublic ? 'translate-x-6' : 'translate-x-1' }}"></span>
-                                </span>
-                                <input id="isPublic" type="checkbox" wire:model.live="isPublic"
-                                    class="sr-only" />
-                            </label>
+                            <div
+                                class="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white p-1">
+                                <button type="button" wire:click="$set('isPublic', true)"
+                                    @class([
+                                        'rounded-full px-3 py-1 text-xs font-semibold transition-colors',
+                                        'bg-[#d9755b] text-white' => $isPublic,
+                                        'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' => !$isPublic,
+                                    ])>
+                                    {{ __('admin.common.yes') }}
+                                </button>
+                                <button type="button" wire:click="$set('isPublic', false)"
+                                    @class([
+                                        'rounded-full px-3 py-1 text-xs font-semibold transition-colors',
+                                        'bg-[#d9755b] text-white' => !$isPublic,
+                                        'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' => $isPublic,
+                                    ])>
+                                    {{ __('admin.common.no') }}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -196,13 +197,12 @@
                         <button type="button"
                             wire:click="confirmPublish({{ $notice->id }}, {{ $notice->is_public ? 'false' : 'true' }})"
                             title="{{ $notice->is_public ? __('notices.admin.unpublish') : __('notices.admin.publish') }}"
-                            class="inline-flex min-w-28 items-center justify-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors {{ $notice->is_public ? 'border-green-200 bg-green-50 text-green-700 hover:border-green-300 hover:bg-green-100' : 'border-red-200 bg-red-50 text-red-600 hover:border-red-300 hover:bg-red-100' }}">
+                            class="inline-flex min-w-16 items-center justify-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors {{ $notice->is_public ? 'text-green-700 hover:border-green-300 hover:bg-green-100' : 'text-red-600 hover:border-red-300 hover:bg-red-100' }}">
                             @if ($notice->is_public)
                                 <flux:icon.check-circle class="size-4" />
                             @else
                                 <flux:icon.x-circle class="size-4" />
                             @endif
-                            <span>{{ $notice->is_public ? __('notices.admin.published_status') : __('notices.admin.is_public') }}</span>
                         </button>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
@@ -213,14 +213,14 @@
                             {{-- Edit --}}
                             <button type="button" wire:click="editNotice({{ $notice->id }})"
                                 title="{{ __('general.buttons.edit') }}"
-                                class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
+                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
                                 <flux:icon.pencil-square class="size-4" />
                             </button>
 
                             {{-- Delete --}}
                             <button type="button" wire:click="confirmDelete({{ $notice->id }})"
                                 title="{{ __('general.buttons.delete') }}"
-                                class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-500">
+                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-[#d9755b]">
                                 <flux:icon.trash class="size-4" />
                             </button>
                         </div>

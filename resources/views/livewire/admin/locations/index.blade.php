@@ -1,11 +1,16 @@
 <div>
     {{-- Type tabs --}}
-    <div class="mb-6 flex gap-2">
+    <div class="mb-6 flex flex-wrap items-center gap-2" data-locations-type-filters>
         @foreach ($types as $typeKey)
-            <flux:button :variant="$type === $typeKey ? 'primary' : 'ghost'"
-                wire:click="setType('{{ $typeKey }}')" data-type="{{ $typeKey }}">
+            <button type="button" wire:click="setType('{{ $typeKey }}')"
+                data-type="{{ $typeKey }}" @class([
+                    'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
+                    'border-[#d9755b] bg-[#d9755b] text-white' => $type === $typeKey,
+                    'border-[#d9755b]/40 bg-[#edd2c7]/20 text-[#793d3d] hover:border-[#d9755b] hover:bg-[#edd2c7]/45' =>
+                        $type !== $typeKey,
+                ])>
                 {{ __('admin.locations.types.' . $typeKey) }}
-            </flux:button>
+            </button>
         @endforeach
     </div>
 
@@ -47,7 +52,8 @@
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
             @forelse($locations as $location)
-                <tr wire:key="location-{{ $location->id }}" data-location-id="{{ $location->id }}">
+                <tr wire:key="location-{{ $location->id }}"
+                    data-location-id="{{ $location->id }}">
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $location->code }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900">{{ $location->name }}</td>
@@ -60,15 +66,23 @@
                         $totalLocationPct = (float) ($location->properties_sum_location_pct ?? 0);
                         $isInvalid = abs($totalLocationPct - 100.0) > 0.01;
                     @endphp
-                    <td class="px-6 py-4 text-sm {{ $isInvalid ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
+                    <td
+                        class="px-6 py-4 text-sm {{ $isInvalid ? 'text-red-900 font-semibold' : 'text-gray-500' }}">
                         %{{ number_format($totalLocationPct, 2, '.', '') }}
                     </td>
                     <td class="px-6 py-4 text-right text-sm font-medium">
-                        <a href="{{ route('admin.locations.show', $location) }}"
-                            title="{{ __('admin.locations.view') }}"
+                        <a href="{{ route('admin.locations.show', $location) }}#location-chief-form"
+                            title="{{ __('admin.locations.edit_location') }}"
                             class="inline-flex items-center rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
-                            <flux:icon.eye class="size-4" />
-                            <span class="sr-only">{{ __('admin.locations.view') }}</span>
+                            <flux:icon.pencil-square class="size-4" />
+                            <span class="sr-only">{{ __('admin.locations.edit_location') }}</span>
+                        </a>
+                        <a href="{{ route('admin.locations.show', $location) }}"
+                            title="{{ __('admin.locations.view_properties') }}"
+                            class="inline-flex items-center rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
+                            <flux:icon.bars-3 class="size-4" />
+                            <span
+                                class="sr-only">{{ __('admin.locations.view_properties') }}</span>
                         </a>
                     </td>
                 </tr>

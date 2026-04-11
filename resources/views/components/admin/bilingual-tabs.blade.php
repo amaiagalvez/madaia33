@@ -87,8 +87,13 @@
             data-bilingual-pane="{{ $tabConfig['key'] }}"
             class="{{ $mode === 'rich-text' ? 'grid h-64 grid-rows-[1fr_auto] gap-1 overflow-hidden' : 'space-y-2' }}">
             @if ($mode === 'rich-text')
-                <p id="{{ $tabConfig['field'] }}Label" class="sr-only">
-                    {{ $tabConfig['fieldLabel'] }}</p>
+                <p id="{{ $tabConfig['field'] }}Label"
+                    class="mb-1 block text-sm font-medium text-gray-700">
+                    {{ $tabConfig['fieldLabel'] }}
+                    @if ($requiredPrimary && $loop->first)
+                        <span class="text-red-500" aria-hidden="true">*</span>
+                    @endif
+                </p>
                 <div class="rounded-md border border-gray-300 bg-white shadow-sm">
                     <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 px-2 py-2"
                         role="toolbar" aria-label="{{ __('admin.settings_form.editor_toolbar') }}">
@@ -115,8 +120,10 @@
 
                 @if ($type === 'textarea')
                     <textarea id="{{ $tabConfig['field'] }}" wire:model="{{ $tabConfig['field'] }}"
-                        rows="{{ $rows }}" x-init="$nextTick(() => { $el.style.height = 'auto';
-                            $el.style.height = `${$el.scrollHeight}px`; })"
+                        rows="{{ $rows }}" x-init="$nextTick(() => {
+                            $el.style.height = 'auto';
+                            $el.style.height = `${$el.scrollHeight}px`;
+                        })"
                         @input="$event.target.style.height = 'auto'; $event.target.style.height = `${$event.target.scrollHeight}px`;"
                         @class([
                             'mt-1 block w-full rounded-md border bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]',

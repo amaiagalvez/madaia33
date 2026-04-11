@@ -3,15 +3,23 @@
 namespace App\Livewire\Admin;
 
 use App\Models\User;
+use App\Models\Role;
+use App\Models\Owner;
 use Livewire\Component;
 use App\Models\Location;
 use App\Models\Property;
+use Illuminate\Validation\Rule;
 use Illuminate\Contracts\View\View;
+use App\Actions\Locations\AssignLocationChiefAction;
 use Illuminate\Support\Facades\Auth;
 
 class LocationDetail extends Component
 {
+    private AssignLocationChiefAction $assignLocationChiefAction;
+
     public Location $location;
+
+    public string $chiefOwnerId = '';
 
     public string $newPropertyName = '';
 
@@ -28,6 +36,11 @@ class LocationDetail extends Component
     public string $editCommunityPct = '';
 
     public string $editLocationPct = '';
+
+    public function boot(AssignLocationChiefAction $assignLocationChiefAction): void
+    {
+        $this->assignLocationChiefAction = $assignLocationChiefAction;
+    }
 
     /**
      * @return array<string, string>
@@ -117,9 +130,43 @@ class LocationDetail extends Component
         $this->editingPropertyId = null;
     }
 
+    public function saveChiefOwner(): void
+    {
+        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
+
+        if (! $this->supportsChiefOwnerSelection()) {
+            return;
+        }
+
+        $candidateIds = $this->chiefCandidatesQuery()
+            ->pluck('owners.id')
+            ->all();
+
+        $validated = $this->validate([
+            'chiefOwnerId' => ['required', 'integer', Rule::in($candidateIds)],
+        ], [], [
+            'chiefOwnerId' => __('admin.locations.chief_owner'),
+        ]);
+
+        $owner = Owner::query()->findOrFail((int) $validated['chiefOwnerId']);
+
+        $this->assignLocationChiefAction->execute($this->location, $owner);
+        $this->chiefOwnerId = (string) $owner->id;
+    }
+
     public function render(): View
     {
         abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
+
+        $isChiefSelectable = $this->supportsChiefOwnerSelection();
+        $currentChiefOwnerId = $isChiefSelectable ? $this->currentChiefOwnerId() : null;
+        $chiefCandidates = $isChiefSelectable
+            ? $this->chiefCandidatesQuery()->get()
+            : collect();
+
+        if ($this->chiefOwnerId === '' && $currentChiefOwnerId !== null) {
+            $this->chiefOwnerId = (string) $currentChiefOwnerId;
+        }
 
         $properties = $this->location->properties()
             ->with(['activeAssignments'])
@@ -128,8 +175,39 @@ class LocationDetail extends Component
             ->get();
 
         return view('livewire.admin.locations.detail', [
+            'isChiefSelectable' => $isChiefSelectable,
+            'currentChiefOwnerId' => $currentChiefOwnerId,
+            'chiefCandidates' => $chiefCandidates,
             'properties' => $properties,
         ]);
+    }
+
+    private function supportsChiefOwnerSelection(): bool
+    {
+        return in_array($this->location->type, ['portal', 'garage'], true);
+    }
+
+    private function currentChiefOwnerId(): ?int
+    {
+        return Owner::query()
+            ->whereHas('user.managedLocations', function ($query): void {
+                $query->whereKey($this->location->id);
+            })
+            ->whereHas('user.roles', function ($query): void {
+                $query->where('name', Role::COMMUNITY_ADMIN);
+            })
+            ->orderBy('owners.id')
+            ->value('owners.id');
+    }
+
+    private function chiefCandidatesQuery()
+    {
+        return Owner::query()
+            ->whereNotNull('user_id')
+            ->whereHas('activeAssignments.property', function ($query): void {
+                $query->where('location_id', $this->location->id);
+            })
+            ->orderBy('coprop1_name');
     }
 
     private function currentUser(): ?User

@@ -103,7 +103,7 @@ new class extends Component {
             {{-- File input --}}
             <div>
                 <label for="photo" class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ __('gallery.admin.upload') }}
+                    {{ __('gallery.admin.file') }}
                 </label>
                 <input id="photo" type="file" wire:model="photo" accept=".jpg,.jpeg,.png,.webp"
                     class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-[#edd2c7] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#793d3d] hover:file:bg-[#f1bd4d]/60" />
@@ -128,7 +128,7 @@ new class extends Component {
                         {{ __('gallery.admin.alt_eu') }}
                     </label>
                     <input id="altEu" type="text" wire:model="altEu"
-                        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500" />
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
                     @error('altEu')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
@@ -138,23 +138,35 @@ new class extends Component {
                         {{ __('gallery.admin.alt_es') }}
                     </label>
                     <input id="altEs" type="text" wire:model="altEs"
-                        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500" />
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
                     @error('altEs')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
 
-            <div>
-                <label for="tag" class="block text-sm font-medium text-gray-700 mb-1">
+            <div class="mb-2">
+                <label class="text-sm font-semibold text-stone-800">
                     {{ __('gallery.admin.tag') }}
                 </label>
-                <select id="tag" wire:model="tag"
-                    class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500">
-                    <option value="">{{ __('gallery.admin.tag_placeholder') }}</option>
-                    <option value="historia">{{ __('gallery.filter.history') }}</option>
-                    <option value="madaia">{{ __('gallery.filter.madaia') }}</option>
-                </select>
+                <div class="mt-3 flex flex-wrap gap-2" data-gallery-tag-selector>
+                    <label class="cursor-pointer select-none">
+                        <input type="radio" wire:model="tag" value="historia"
+                            class="sr-only peer" />
+                        <span
+                            class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
+                            {{ __('gallery.filter.history') }}
+                        </span>
+                    </label>
+                    <label class="cursor-pointer select-none">
+                        <input type="radio" wire:model="tag" value="madaia"
+                            class="sr-only peer" />
+                        <span
+                            class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
+                            {{ __('gallery.filter.madaia') }}
+                        </span>
+                    </label>
+                </div>
                 @error('tag')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror

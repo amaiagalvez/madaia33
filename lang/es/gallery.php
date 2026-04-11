@@ -19,8 +19,9 @@ return [
     'admin' => [
         'list' => 'Lista de imágenes',
         'upload' => 'Subir imagen',
-        'alt_eu' => 'Texto alternativo (EU)',
-        'alt_es' => 'Texto alternativo (ES)',
+        'file' => 'Imagen',
+        'alt_eu' => 'Texto alternativo',
+        'alt_es' => 'Texto alternativo',
         'tag' => 'Etiqueta',
         'tag_placeholder' => 'Selecciona una etiqueta',
         'locations' => 'Ubicación(es)',
