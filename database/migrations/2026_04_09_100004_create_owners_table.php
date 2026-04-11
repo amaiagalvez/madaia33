@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('coprop1_phone', 20)->nullable();
             $table->string('coprop1_email');
             $table->enum('language', SupportedLocales::all())->default(SupportedLocales::default());
+            $table->timestamp('accepted_terms_at')->nullable();
             $table->string('coprop2_name')->nullable();
             $table->string('coprop2_dni', 20)->nullable();
             $table->string('coprop2_phone', 20)->nullable();

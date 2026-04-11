@@ -140,6 +140,12 @@ class Owners extends Component
     public function mount(): void
     {
         $this->newAssignments = [$this->newAssignmentRow()];
+
+        $editOwnerId = (int) request()->integer('editOwner');
+
+        if ($editOwnerId > 0) {
+            $this->openEditOwnerForm($editOwnerId);
+        }
     }
 
     /**

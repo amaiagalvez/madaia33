@@ -51,6 +51,7 @@ return [
         'validate_selected' => 'Validar seleccionadas',
         'validation_selection_required' => 'Debes seleccionar al menos una propiedad.',
         'validation_done' => 'Se han validado :count propiedades.',
+        'profile_updated' => 'Se han actualizado los datos de la propietaria.',
     ],
     'terms' => [
         'title' => 'Debes aceptar las condiciones de uso',

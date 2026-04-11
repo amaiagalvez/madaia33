@@ -209,6 +209,7 @@ return [
             'locals' => 'Lokalak',
             'garages' => 'Garajeak',
             'storages' => 'Trastelekuak',
+            'terms_accepted' => 'Baldintzak',
         ],
         'view_properties' => 'Ikusi propietateak',
         'edit_owner' => 'Editatu jabea',

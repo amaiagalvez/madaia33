@@ -64,7 +64,7 @@
 
                         @if ($editingUserId !== null && $editingOwnerId !== null)
                             <div class="rounded-md border border-[#edd2c7] bg-[#edd2c7]/20 p-3">
-                                <a href="{{ route('admin.owners.index') }}"
+                                <a href="{{ route('admin.owners.index', ['editOwner' => $editingOwnerId]) }}"
                                     class="inline-flex items-center rounded-md bg-[#793d3d] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5f2f2f]">
                                     {{ __('admin.users.open_owner_profile') }}
                                 </a>

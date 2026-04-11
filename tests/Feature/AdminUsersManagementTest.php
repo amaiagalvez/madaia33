@@ -2,6 +2,7 @@
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
 use Livewire\Livewire;
 use App\Models\Location;
 use App\Livewire\Admin\Users;
@@ -159,4 +160,22 @@ it('returns from impersonated session back to original user', function () {
 
     test()->assertAuthenticatedAs($superadmin);
     expect(session()->has('impersonator_user_id'))->toBeFalse();
+});
+
+it('builds owner profile link with editOwner query param from users form', function () {
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::GENERAL_ADMIN);
+
+    $managedUser = User::factory()->create([
+        'email' => 'owner-link@example.com',
+    ]);
+
+    $owner = Owner::factory()->create([
+        'user_id' => $managedUser->id,
+    ]);
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('editUser', $managedUser->id)
+        ->assertSee(route('admin.owners.index', ['editOwner' => $owner->id], false), false);
 });

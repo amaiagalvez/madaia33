@@ -328,6 +328,9 @@
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     {{ __('admin.owners.columns.storages') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.columns.terms_accepted') }}</th>
                 <th scope="col" class="relative px-6 py-3">
                     <span class="sr-only">{{ __('general.buttons.edit') }}</span>
                 </th>
@@ -392,6 +395,16 @@
                             </span><br>
                         @endforeach
                     </td>
+                    <td class="px-6 py-4 text-sm text-gray-500"
+                        data-owner-terms-accepted="{{ $owner->id }}">
+                        @if ($owner->accepted_terms_at !== null)
+                            <span
+                                class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">✓</span>
+                        @else
+                            <span
+                                class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">✕</span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4 text-right text-sm font-medium">
                         <button type="button"
                             wire:click="openEditOwnerForm({{ $owner->id }})"
@@ -411,7 +424,7 @@
 
                 @if ($expandedOwnerId === $owner->id)
                     <tr wire:key="owner-inline-panel-{{ $owner->id }}" class="bg-gray-50">
-                        <td colspan="7" class="px-6 py-4">
+                        <td colspan="8" class="px-6 py-4">
                             <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4"
                                 data-owner-inline-panel="{{ $owner->id }}">
                                 @if ($rowErrorMessage !== '')

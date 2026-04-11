@@ -51,6 +51,7 @@ return [
         'validate_selected' => 'Hautatutakoak balidatu',
         'validation_selection_required' => 'Gutxienez jabetza bat hautatu behar duzu.',
         'validation_done' => ':count jabetza balidatu dira.',
+        'profile_updated' => 'Jabearen datuak eguneratu dira.',
     ],
     'terms' => [
         'title' => 'Erabilera baldintzak onartu behar dituzu',

@@ -209,6 +209,7 @@ return [
             'locals' => 'Locales',
             'garages' => 'Garajes',
             'storages' => 'Trasteros',
+            'terms_accepted' => 'Condiciones',
         ],
         'view_properties' => 'Ver propiedades',
         'edit_owner' => 'Editar propietaria',

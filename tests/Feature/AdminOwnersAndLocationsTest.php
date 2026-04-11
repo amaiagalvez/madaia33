@@ -368,6 +368,46 @@ it('renders owners list with inline expansion action instead of detail bars link
         ->assertSee('Inline Jabea');
 });
 
+it('shows accepted terms indicator in owners list', function () {
+    $user = adminUser();
+
+    $location = Location::factory()->portal()->create(['code' => '33-T']);
+    $propertyAccepted = Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => 'T-1',
+    ]);
+    $propertyPending = Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => 'T-2',
+    ]);
+
+    $acceptedOwner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $pendingOwner = Owner::factory()->create([
+        'accepted_terms_at' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $acceptedOwner->id,
+        'property_id' => $propertyAccepted->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $pendingOwner->id,
+        'property_id' => $propertyPending->id,
+        'end_date' => null,
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('admin.owners.index'))
+        ->assertOk()
+        ->assertSee('data-owner-terms-accepted="' . $acceptedOwner->id . '"', false)
+        ->assertSee('data-owner-terms-accepted="' . $pendingOwner->id . '"', false);
+});
+
 it('allows creating and editing owner assignments inline from owners list', function () {
     $user = adminUser();
 

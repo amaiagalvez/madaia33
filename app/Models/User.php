@@ -19,7 +19,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
-#[Fillable(['name', 'email', 'password', 'is_active', 'language', 'accepted_terms_at'])]
+#[Fillable(['name', 'email', 'password', 'is_active', 'language'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -42,7 +42,6 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'accepted_terms_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
             'language' => 'string',
@@ -57,7 +56,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 
@@ -226,14 +225,21 @@ class User extends Authenticatable
         return $this->hasRole(Role::PROPERTY_OWNER);
     }
 
+    public function hasOnlyOwnerRole(): bool
+    {
+        $roles = $this->roleNames();
+
+        return $roles->count() === 1 && $roles->contains(Role::PROPERTY_OWNER);
+    }
+
     /**
      * @param  array<int, string>  $roles
      */
     public function syncRoleNames(array $roles): void
     {
         $normalizedRoles = collect($roles)
-            ->filter(static fn (string $role): bool => in_array($role, Role::names(), true))
-            ->reject(fn (string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
+            ->filter(static fn(string $role): bool => in_array($role, Role::names(), true))
+            ->reject(fn(string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
             ->unique()
             ->values();
 
