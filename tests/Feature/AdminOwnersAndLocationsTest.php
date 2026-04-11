@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Owner;
+use App\Models\OwnerAuditLog;
 use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
@@ -211,6 +212,16 @@ it('toggles assignment validations one by one and blocks closed assignments', fu
         ->call('saveAssignment', $closedAssignment->id);
 
     expect($closedAssignment->refresh()->admin_validated)->toBeFalse();
+
+    $component
+        ->set("assignmentEdits.{$closedAssignment->id}.end_date", '')
+        ->set("assignmentEdits.{$closedAssignment->id}.admin_validated", true)
+        ->set("assignmentEdits.{$closedAssignment->id}.owner_validated", true)
+        ->call('saveAssignment', $closedAssignment->id);
+
+    expect($closedAssignment->refresh()->end_date)->toBeNull()
+        ->and($closedAssignment->admin_validated)->toBeFalse()
+        ->and($closedAssignment->owner_validated)->toBeFalse();
 });
 
 it('accepts comma decimals for location percentages and stores them normalized with dot', function () {
@@ -376,6 +387,151 @@ it('filters owners by active local assignment', function () {
         ->assertDontSee('Local Bea');
 });
 
+it('shows email and phone in owners coproprietary columns', function () {
+    $user = adminUser();
+
+    Owner::factory()->create([
+        'coprop1_name' => 'Leire Nagusi',
+        'coprop1_email' => 'leire@example.com',
+        'coprop1_phone' => '600111222',
+        'coprop2_name' => 'Mikel Bigarren',
+        'coprop2_email' => 'mikel@example.com',
+        'coprop2_phone' => '600333444',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->assertSee('Leire Nagusi')
+        ->assertSee('leire@example.com')
+        ->assertSee('600111222')
+        ->assertSee('Mikel Bigarren')
+        ->assertSee('mikel@example.com')
+        ->assertSee('600333444');
+});
+
+it('uses shared side-panel and footer pattern in owners forms', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Panel Owner',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('showCreateForm', true)
+        ->assertSeeHtml('data-section="owner-create-form"')
+        ->assertSeeHtml('data-admin-side-panel-form')
+        ->assertSeeHtml('data-admin-form-footer-actions')
+        ->set('showCreateForm', false)
+        ->call('openEditOwnerForm', $owner->id)
+        ->assertSeeHtml('data-section="owner-edit-form"')
+        ->assertSeeHtml('data-admin-side-panel-form')
+        ->assertSeeHtml('data-admin-form-footer-actions');
+});
+
+it('shows a compact owner audit log list in the edit form', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Audit Owner',
+    ]);
+
+    OwnerAuditLog::query()->create([
+        'owner_id' => $owner->id,
+        'changed_by_user_id' => $user->id,
+        'field' => 'coprop1_phone',
+        'old_value' => '600111222',
+        'new_value' => '699999999',
+        'created_at' => now()->subMinute(),
+        'updated_at' => now()->subMinute(),
+    ]);
+
+    OwnerAuditLog::query()->create([
+        'owner_id' => $owner->id,
+        'changed_by_user_id' => null,
+        'field' => 'language',
+        'old_value' => 'es',
+        'new_value' => 'eu',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('openEditOwnerForm', $owner->id)
+        ->assertSeeHtml('data-section="owner-audit-log"')
+        ->assertSeeHtml('data-owner-audit-log-scroll')
+        ->assertSee(__('admin.owners.audit.title'))
+        ->assertSee(__('admin.owners.form.coprop1_phone'))
+        ->assertSee('600111222')
+        ->assertSee('699999999')
+        ->assertSee(__('admin.owners.audit.system'));
+});
+
+it('uses shared styling components in owners inline assignments panel', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create(['coprop1_name' => 'Inline Styled Owner']);
+    $portal = Location::factory()->portal()->create(['code' => '33-Z']);
+    $property = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => '5A',
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('toggleOwnerRow', $owner->id)
+        ->assertSeeHtml('data-owner-inline-panel="' . $owner->id . '"')
+        ->assertSeeHtml('data-owner-inline-table="' . $owner->id . '"')
+        ->assertSeeHtml('data-admin-table-header')
+        ->assertSeeHtml('data-admin-date-input')
+        ->assertSee('5A');
+});
+
+it('filters owners by text search across owner record fields', function () {
+    $user = adminUser();
+
+    $matchingOwner = Owner::factory()->create([
+        'coprop1_name' => 'Nora Search',
+        'coprop1_dni' => '12345678A',
+        'coprop1_email' => 'nora.search@example.com',
+        'coprop2_name' => 'Bigarren Nora',
+    ]);
+
+    $nonMatchingOwner = Owner::factory()->create([
+        'coprop1_name' => 'Irati Normal',
+        'coprop1_dni' => '87654321B',
+        'coprop1_email' => 'irati.normal@example.com',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->set('filterSearch', '12345678A')
+        ->assertViewHas('owners', function ($owners) use ($matchingOwner): bool {
+            return $owners->getCollection()->pluck('id')->all() === [$matchingOwner->id];
+        })
+        ->set('filterSearch', 'Bigarren Nora')
+        ->assertViewHas('owners', function ($owners) use ($matchingOwner): bool {
+            return $owners->getCollection()->pluck('id')->all() === [$matchingOwner->id];
+        })
+        ->set('filterSearch', (string) $matchingOwner->id)
+        ->assertViewHas('owners', function ($owners) use ($matchingOwner): bool {
+            return $owners->getCollection()->pluck('id')->contains($matchingOwner->id);
+        })
+        ->set('filterSearch', (string) $nonMatchingOwner->id)
+        ->assertViewHas('owners', function ($owners) use ($nonMatchingOwner): bool {
+            return $owners->getCollection()->pluck('id')->contains($nonMatchingOwner->id);
+        });
+});
+
 it('renders new admin pages for locations and owners', function () {
     $user = adminUser();
 
@@ -475,6 +631,41 @@ it('shows owners without active properties when using without-properties filter'
         ->assertSee('Jabe Itxia')
         ->assertSee('Jabetzarik Gabe')
         ->assertDontSee('Jabe Aktiboa');
+});
+
+it('shows only properties without active owners in owner property selectors', function () {
+    $user = adminUser();
+
+    $portal = Location::factory()->portal()->create(['code' => '33-S']);
+
+    $availableProperty = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'FREE-1',
+    ]);
+
+    $assignedProperty = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'BLOCKED-1',
+    ]);
+
+    $assignedOwner = Owner::factory()->create(['coprop1_name' => 'Assigned Owner']);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $assignedOwner->id,
+        'property_id' => $assignedProperty->id,
+        'end_date' => null,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('showCreateForm', true)
+        ->assertViewHas('assignableProperties', function ($properties) use ($availableProperty, $assignedProperty): bool {
+            $ids = $properties->pluck('id');
+
+            return $ids->contains($availableProperty->id)
+                && ! $ids->contains($assignedProperty->id)
+                && $ids->count() === 1;
+        });
 });
 
 it('renders owners list with inline expansion action instead of detail bars link', function () {
@@ -586,6 +777,47 @@ it('allows creating and editing owner assignments inline from owners list', func
         ->and($assignment->admin_validated)->toBeTrue()
         ->and($assignment->owner_validated)->toBeTrue()
         ->and($owner->user->fresh()->is_active)->toBeFalse();
+});
+
+it('prevents reopening a closed assignment when the property already has another active owner', function () {
+    $user = adminUser();
+
+    $portal = Location::factory()->portal()->create(['code' => '33-R']);
+    $property = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => '4A',
+    ]);
+
+    $closedOwner = Owner::factory()->create();
+    $activeOwner = Owner::factory()->create();
+
+    $closedAssignment = PropertyAssignment::factory()->create([
+        'owner_id' => $closedOwner->id,
+        'property_id' => $property->id,
+        'start_date' => '2025-01-01',
+        'end_date' => '2025-12-31',
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $activeOwner->id,
+        'property_id' => $property->id,
+        'start_date' => '2026-01-01',
+        'end_date' => null,
+    ]);
+
+    $closedOwner->user()->update(['is_active' => false]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('toggleOwnerRow', $closedOwner->id)
+        ->set("assignmentEdits.$closedAssignment->id.end_date", '')
+        ->call('saveAssignment', $closedAssignment->id)
+        ->assertSet('rowErrorMessage', __('La propiedad ya tiene una propietaria activa. Cierra la asignación anterior antes de asignar una nueva.'));
+
+    $closedAssignment->refresh();
+
+    expect($closedAssignment->end_date?->format('Y-m-d'))->toBe('2025-12-31')
+        ->and($closedOwner->user->fresh()->is_active)->toBeFalse();
 });
 
 it('displays aggregated community and location percentages in locations listing', function () {

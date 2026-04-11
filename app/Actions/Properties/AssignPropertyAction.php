@@ -13,20 +13,34 @@ class AssignPropertyAction
     /**
      * @throws ValidationException
      */
+    public function assertNoActiveAssignment(int $propertyId, ?int $ignoreAssignmentId = null): void
+    {
+        $query = PropertyAssignment::query()
+            ->where('property_id', $propertyId)
+            ->whereNull('end_date');
+
+        if ($ignoreAssignmentId !== null) {
+            $query->whereKeyNot($ignoreAssignmentId);
+        }
+
+        $hasActiveAssignment = $query
+            ->lockForUpdate()
+            ->exists();
+
+        if ($hasActiveAssignment) {
+            throw ValidationException::withMessages([
+                'property' => __('La propiedad ya tiene una propietaria activa. Cierra la asignación anterior antes de asignar una nueva.'),
+            ]);
+        }
+    }
+
+    /**
+     * @throws ValidationException
+     */
     public function execute(Property $property, Owner $owner, string $startDate): PropertyAssignment
     {
         return DB::transaction(function () use ($property, $owner, $startDate): PropertyAssignment {
-            $hasActiveAssignment = PropertyAssignment::query()
-                ->where('property_id', $property->id)
-                ->whereNull('end_date')
-                ->lockForUpdate()
-                ->exists();
-
-            if ($hasActiveAssignment) {
-                throw ValidationException::withMessages([
-                    'property' => __('La propiedad ya tiene una propietaria activa. Cierra la asignación anterior antes de asignar una nueva.'),
-                ]);
-            }
+            $this->assertNoActiveAssignment((int) $property->id);
 
             $assignment = PropertyAssignment::create([
                 'property_id' => $property->id,

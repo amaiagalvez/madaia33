@@ -10,13 +10,11 @@
 - [ ] componente para inputs del formulario
 
 # Code
-- [ ] user hizkuntza, berdin du front-ekoa
+- [ ] reepasar estatistikak home
 
 - [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
 - [ ] configurar el sentry
 - [ ] añadir debugbar y algo para ver los logs
-- [ ] components field text
-- [ ] components tables
 - [ ] datatables
 - [ ] seo
 - [ ] acceesibilidad
@@ -37,6 +35,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
+- en el profil, añadir un formulario para que si alguien tiene propblmas con sus datos mande un mensaje.
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
@@ -48,7 +47,6 @@ Para que todo esto sea legal de verdad, asegúrate de:
 
 - [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla "receivers" con el user_id de a quien se le ha enviado, el email al que se ha enviado, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje
 - [ ] Trackea los mensajes para que se pueda saber quien lo ha habierto y quien ha pinchado en los enlaces del mensaje si los hubiera
-
 
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 

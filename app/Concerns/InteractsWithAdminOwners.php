@@ -6,7 +6,6 @@ use App\Models\Owner;
 use App\Models\Location;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
 trait InteractsWithAdminOwners
@@ -112,12 +111,13 @@ trait InteractsWithAdminOwners
         $this->applyLocationFilter($query, $this->filterLocal, 'local');
         $this->applyLocationFilter($query, $this->filterGarage, 'garage');
         $this->applyLocationFilter($query, $this->filterStorage, 'storage');
+        $this->applySearchFilter($query, $this->filterSearch);
 
         return $query;
     }
 
     /**
-     * @return array{portals: Collection<int, Location>, locals: Collection<int, Location>, garages: Collection<int, Location>, storages: Collection<int, Location>, assignableProperties: Collection<int, Property>}
+     * @return array{portals: \Illuminate\Support\Collection<int, Location>, locals: \Illuminate\Support\Collection<int, Location>, garages: \Illuminate\Support\Collection<int, Location>, storages: \Illuminate\Support\Collection<int, Location>, assignableProperties: \Illuminate\Support\Collection<int, Property>}
      */
     private function loadViewData(): array
     {
@@ -128,6 +128,7 @@ trait InteractsWithAdminOwners
             'storages' => Location::storage()->orderBy('code')->get(),
             'assignableProperties' => Property::query()
                 ->with('location')
+                ->whereDoesntHave('activeAssignments')
                 ->orderBy('location_id')
                 ->orderBy('name')
                 ->get(),
@@ -145,6 +146,39 @@ trait InteractsWithAdminOwners
 
         $query->whereHas('activeAssignments.property.location', function (Builder $locationQuery) use ($locationId, $type): void {
             $locationQuery->where('type', $type)->where('id', $locationId);
+        });
+    }
+
+    /**
+     * @param  Builder<Owner>  $query
+     */
+    private function applySearchFilter(Builder $query, string $search): void
+    {
+        $term = trim($search);
+
+        if ($term === '') {
+            return;
+        }
+
+        $escapedTerm = addcslashes($term, '%_');
+
+        $query->where(function (Builder $searchQuery) use ($escapedTerm, $term): void {
+            $like = '%' . $escapedTerm . '%';
+
+            $searchQuery
+                ->where('coprop1_name', 'like', $like)
+                ->orWhere('coprop1_dni', 'like', $like)
+                ->orWhere('coprop1_phone', 'like', $like)
+                ->orWhere('coprop1_email', 'like', $like)
+                ->orWhere('coprop2_name', 'like', $like)
+                ->orWhere('coprop2_dni', 'like', $like)
+                ->orWhere('coprop2_phone', 'like', $like)
+                ->orWhere('coprop2_email', 'like', $like)
+                ->orWhere('language', 'like', $like);
+
+            if (is_numeric($term)) {
+                $searchQuery->orWhere('id', (int) $term);
+            }
         });
     }
 

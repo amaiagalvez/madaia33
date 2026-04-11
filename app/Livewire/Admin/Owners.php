@@ -5,10 +5,12 @@ namespace App\Livewire\Admin;
 use App\Models\Owner;
 use Livewire\Component;
 use App\Models\Property;
+use App\Models\OwnerAuditLog;
 use App\SupportedLocales;
 use Livewire\WithPagination;
 use App\Models\PropertyAssignment;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\DB;
 use App\Services\CreateOwnerFormService;
 use App\Actions\Owners\CreateOwnerAction;
 use App\Concerns\InteractsWithAdminOwners;
@@ -59,6 +61,8 @@ class Owners extends Component
 
     public string $filterStorage = '';
 
+    public string $filterSearch = '';
+
     public string $ownershipView = 'default';
 
     // Edit owner slideover
@@ -83,6 +87,13 @@ class Owners extends Component
     public string $editCoprop2Phone = '';
 
     public string $editCoprop2Email = '';
+
+    public int $editOwnerAuditLogCount = 0;
+
+    /**
+     * @var array<int, array{field_label: string, old_value: string, new_value: string, changed_by: string, changed_at: string}>
+     */
+    public array $editOwnerAuditLogs = [];
 
     /**
      * @var array<int, array{property_id: string, start_date: string, end_date: string}>
@@ -142,6 +153,11 @@ class Owners extends Component
     }
 
     public function updatedFilterStorage(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterSearch(): void
     {
         $this->resetPage();
     }
@@ -269,7 +285,33 @@ class Owners extends Component
 
         $isClosingAssignment = $edit['end_date'] !== '';
         $isAlreadyClosed = $assignment->end_date !== null;
+        $isReopeningAssignment = $isAlreadyClosed && ! $isClosingAssignment;
         $willBeClosed = $isAlreadyClosed || $isClosingAssignment;
+
+        if ($isReopeningAssignment) {
+            try {
+                DB::transaction(function () use ($assignment, $edit): void {
+                    $this->assignPropertyAction->assertNoActiveAssignment((int) $assignment->property_id, (int) $assignment->id);
+
+                    $assignment->update([
+                        'start_date' => $edit['start_date'],
+                        'end_date' => null,
+                        'admin_validated' => (bool) $assignment->admin_validated,
+                        'owner_validated' => (bool) $assignment->owner_validated,
+                    ]);
+
+                    $assignment->owner()->first()?->user()->update(['is_active' => true]);
+                });
+            } catch (ValidationException $e) {
+                $this->rowErrorMessage = (string) collect($e->errors())->flatten()->first();
+
+                return;
+            }
+
+            $this->loadAssignmentEdits((int) $assignment->owner_id);
+
+            return;
+        }
 
         $assignment->update([
             'start_date' => $edit['start_date'],
@@ -372,6 +414,7 @@ class Owners extends Component
         $this->editCoprop2Dni = $owner->coprop2_dni ?? '';
         $this->editCoprop2Phone = $owner->coprop2_phone ?? '';
         $this->editCoprop2Email = $owner->coprop2_email ?? '';
+        $this->loadEditOwnerAuditLogs($owner);
         $this->resetValidation();
         $this->showEditOwnerForm = true;
     }
@@ -431,8 +474,52 @@ class Owners extends Component
             'editCoprop2Dni',
             'editCoprop2Phone',
             'editCoprop2Email',
+            'editOwnerAuditLogCount',
+            'editOwnerAuditLogs',
         ]);
         $this->resetValidation();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function ownerAuditFieldLabels(): array
+    {
+        return [
+            'coprop1_name' => __('admin.owners.form.coprop1_name'),
+            'coprop1_dni' => __('admin.owners.form.coprop1_dni'),
+            'coprop1_phone' => __('admin.owners.form.coprop1_phone'),
+            'coprop1_email' => __('admin.owners.form.coprop1_email'),
+            'language' => __('admin.owners.form.language'),
+            'coprop2_name' => __('admin.owners.form.coprop2_name'),
+            'coprop2_dni' => __('admin.owners.form.coprop2_dni'),
+            'coprop2_phone' => __('admin.owners.form.coprop2_phone'),
+            'coprop2_email' => __('admin.owners.form.coprop2_email'),
+        ];
+    }
+
+    private function loadEditOwnerAuditLogs(Owner $owner): void
+    {
+        $fieldLabels = $this->ownerAuditFieldLabels();
+
+        $logsQuery = $owner->auditLogs()->with('changedBy:id,name')->latest();
+
+        $this->editOwnerAuditLogCount = (clone $logsQuery)->count();
+
+        $this->editOwnerAuditLogs = $logsQuery
+            ->limit(25)
+            ->get()
+            ->map(function (OwnerAuditLog $log) use ($fieldLabels): array {
+                return [
+                    'field_label' => $fieldLabels[$log->field] ?? $log->field,
+                    'old_value' => $log->old_value !== '' ? $log->old_value : '—',
+                    'new_value' => $log->new_value !== '' ? $log->new_value : '—',
+                    'changed_by' => $log->changedBy?->name ?? __('admin.owners.audit.system'),
+                    'changed_at' => $log->created_at?->format('d/m/Y H:i') ?? '—',
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     public function cancelCreateOwner(): void

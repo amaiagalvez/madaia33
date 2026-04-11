@@ -157,15 +157,8 @@
                         <td class="px-6 py-4 text-sm text-gray-500">
                             %{{ number_format($property->location_pct ?? 0, 2, ',', '.') }}</td>
                         <td class="px-6 py-4 text-sm">
-                            <span
-                                class="inline-flex min-w-16 items-center justify-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold {{ $isAssigned ? 'text-green-700' : 'text-red-600' }}"
-                                data-assigned="{{ $isAssigned ? 'yes' : 'no' }}">
-                                @if ($isAssigned)
-                                    <flux:icon.check-circle class="size-4" />
-                                @else
-                                    <flux:icon.x-circle class="size-4" />
-                                @endif
-                            </span>
+                            <x-admin.status-indicator :active="$isAssigned"
+                                data-assigned="{{ $isAssigned ? 'yes' : 'no' }}" />
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
                             <x-admin.table-row-actions>
