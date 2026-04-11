@@ -3,11 +3,11 @@
 namespace App\Support;
 
 use App\Models\Owner;
-use App\Models\PropertyAssignment;
 use App\Models\Voting;
 use App\Models\VotingBallot;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\PropertyAssignment;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder;
 
 class VotingEligibilityService
 {
@@ -67,7 +67,7 @@ class VotingEligibilityService
     public function percentageForOwner(Voting $voting, Owner $owner): float
     {
         return (float) $this->eligibleAssignments($voting, $owner)
-            ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
     }
 
     /**
@@ -82,11 +82,11 @@ class VotingEligibilityService
             ->publishedOpen()
             ->orderBy('starts_at')
             ->get()
-            ->filter(fn(Voting $voting): bool => $this->ownerCanVote($voting, $owner));
+            ->filter(fn (Voting $voting): bool => $this->ownerCanVote($voting, $owner));
     }
 
     /**
-     * @return Collection<int, array{owner: Owner, pending_votings: int}>
+     * @return Collection<int, array{owner: Owner, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
      */
     public function ownersWithPendingDelegations(): Collection
     {
@@ -103,14 +103,14 @@ class VotingEligibilityService
             ->whereIn('voting_id', $openVotings->pluck('id'))
             ->get(['owner_id', 'voting_id'])
             ->groupBy('owner_id')
-            ->map(fn(Collection $ballots): Collection => $ballots->pluck('voting_id'));
+            ->map(fn (Collection $ballots): Collection => $ballots->pluck('voting_id'));
 
         $eligibleOwnerIdsByVoting = $openVotings
             ->mapWithKeys(function (Voting $voting): array {
                 return [
                     $voting->id => $this->eligibleOwnersQuery($voting)
                         ->pluck('owners.id')
-                        ->map(static fn($ownerId): int => (int) $ownerId)
+                        ->map(static fn ($ownerId): int => (int) $ownerId)
                         ->all(),
                 ];
             });
@@ -135,12 +135,47 @@ class VotingEligibilityService
 
         return Owner::query()
             ->whereIn('id', array_keys($pendingByOwner))
+            ->with('activeAssignments.property.location')
             ->orderBy('coprop1_name')
             ->get()
-            ->map(static function (Owner $owner) use ($pendingByOwner): array {
+            ->map(function (Owner $owner) use ($pendingByOwner): array {
+                $portalCodes = $owner->activeAssignments
+                    ->pluck('property.location')
+                    ->filter(static fn ($location): bool => $location !== null && $location->type === 'portal')
+                    ->pluck('code')
+                    ->map(static fn ($code): string => (string) $code)
+                    ->unique()
+                    ->sort()
+                    ->values();
+
+                $garageCodes = $owner->activeAssignments
+                    ->pluck('property.location')
+                    ->filter(static fn ($location): bool => $location !== null && $location->type === 'garage')
+                    ->pluck('code')
+                    ->map(static fn ($code): string => (string) $code)
+                    ->unique()
+                    ->sort()
+                    ->values();
+
+                $searchTerms = [
+                    $owner->coprop1_name,
+                    $owner->coprop1_dni,
+                    $owner->coprop1_email,
+                    $owner->coprop1_phone,
+                    $owner->coprop2_name,
+                    $owner->coprop2_dni,
+                    $owner->coprop2_email,
+                    $owner->coprop2_phone,
+                    $portalCodes->implode(' '),
+                    $garageCodes->implode(' '),
+                ];
+
                 return [
                     'owner' => $owner,
                     'pending_votings' => $pendingByOwner[$owner->id] ?? 0,
+                    'portal_codes' => $portalCodes->implode(', '),
+                    'garage_codes' => $garageCodes->implode(', '),
+                    'search_index' => mb_strtolower(implode(' ', array_filter($searchTerms))),
                 ];
             })
             ->values();
@@ -154,12 +189,12 @@ class VotingEligibilityService
         $voting->loadMissing('locations.location');
 
         $portalIds = $voting->locations
-            ->filter(fn($votingLocation): bool => $votingLocation->location?->type === 'portal')
+            ->filter(fn ($votingLocation): bool => $votingLocation->location?->type === 'portal')
             ->pluck('location_id')
             ->all();
 
         $garageIds = $voting->locations
-            ->filter(fn($votingLocation): bool => $votingLocation->location?->type === 'garage')
+            ->filter(fn ($votingLocation): bool => $votingLocation->location?->type === 'garage')
             ->pluck('location_id')
             ->all();
 

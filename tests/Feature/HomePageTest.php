@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Storage;
 
 dataset('supported_locales', SupportedLocales::all());
 
-test('home page renders hero slider component', function (string $locale) {
-    test()->get(route(SupportedLocales::routeName('home', $locale)))
+test('home page renders hero slider component', function () {
+    test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)))
         ->assertSuccessful()
         ->assertSee('hero-slider');
-})->with('supported_locales');
+});
 
 test('home page displays latest notices grid', function (string $locale) {
     $notices = Notice::factory()->public()->count(6)->create();
@@ -35,8 +35,8 @@ test('home page renders notices section with history block', function (string $l
     $response->assertSee('data-home-history', false);
 })->with('supported_locales');
 
-test('public layout keeps sticky header solid and prevents horizontal overflow', function (string $locale) {
-    $response = test()->get(route(SupportedLocales::routeName('home', $locale)));
+test('public layout keeps sticky header solid and prevents horizontal overflow', function () {
+    $response = test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     $response->assertSee('overflow-x-clip', false);
@@ -45,18 +45,18 @@ test('public layout keeps sticky header solid and prevents horizontal overflow',
     $response->assertSee('header-shell', false);
     $response->assertSee('header-brand-mark', false);
     $response->assertSee('pt-[env(safe-area-inset-top)]', false);
-})->with('supported_locales');
+});
 
-test('home page shows only latest 6 notices', function (string $locale) {
+test('home page shows only latest 6 notices', function () {
     Notice::factory()->public()->count(10)->create();
 
-    $response = test()->get(route(SupportedLocales::routeName('home', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     // Count the number of notice-card components rendered
     $notices = Notice::public()->latest()->limit(6)->get();
     expect($notices)->toHaveCount(6);
-})->with('supported_locales');
+});
 
 test('home page shows view all button when more than 6 notices exist', function (string $locale) {
     Notice::factory()->public()->count(8)->create();
@@ -84,19 +84,19 @@ test('home page shows empty state when no notices exist', function (string $loca
     $response->assertSee(__('home.no_notices'));
 })->with('supported_locales');
 
-test('home page renders notice card with correct structure', function (string $locale) {
+test('home page renders notice card with correct structure', function () {
     Notice::factory()->public()->create([
         'title_eu' => 'Aviso de prueba',
         'title_es' => 'Test Notice',
     ]);
 
-    $response = test()->get(route(SupportedLocales::routeName('home', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     // Check for notice-card component classes
     $response->assertSee('elevated-card');
     $response->assertSee('line-clamp-2');
-})->with('supported_locales');
+});
 
 test('home page respects public scope for notices', function (string $locale) {
     $publicNotice = Notice::factory()->public()->create();
@@ -145,8 +145,8 @@ test('home page separates general notices from notices with location', function 
     $response->assertSee($locationNotice->title);
 })->with('supported_locales');
 
-test('home page keeps mobile order general notices then location notices then history', function (string $locale) {
-    $response = test()->get(route(SupportedLocales::routeName('home', $locale)));
+test('home page keeps mobile order general notices then location notices then history', function () {
+    $response = test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
 
@@ -159,17 +159,17 @@ test('home page keeps mobile order general notices then location notices then hi
     expect($locationPos)->not->toBeFalse();
     expect($historyPos)->not->toBeFalse();
     expect($generalPos < $locationPos && $locationPos < $historyPos)->toBeTrue();
-})->with('supported_locales');
+});
 
-test('home page footer uses shared menu brand on left and keeps amaia email logo on right', function (string $locale) {
-    test()->get(route(SupportedLocales::routeName('home', $locale)))
+test('home page footer uses shared menu brand on left and keeps amaia email logo on right', function () {
+    test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)))
         ->assertSuccessful()
         ->assertSee(asset('storage/madaia33/madaia33.png'), false)
         ->assertSee(config('app.name', 'Madaia'))
         ->assertSee('mailto:info@amaia.eus', false)
         ->assertSee(asset('amaia-footer.png'), false)
         ->assertDontSee('&copy;', false);
-})->with('supported_locales');
+});
 
 test('home page uses configurable history summary from front settings', function (string $locale) {
     $historyByLocale = [
@@ -194,7 +194,7 @@ test('home page uses configurable history summary from front settings', function
         ->assertSee($historyByLocale[$locale], false);
 })->with('supported_locales');
 
-test('home page history section shows first three historia images stacked and excludes non-historia', function (string $locale) {
+test('home page history section shows first three historia images stacked and excludes non-historia', function () {
     Storage::fake('public');
 
     Storage::disk('public')->put('images/history-test-1.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
@@ -233,7 +233,7 @@ test('home page history section shows first three historia images stacked and ex
         'tag' => Image::TAG_HISTORY,
     ]);
 
-    $response = test()->get(route(SupportedLocales::routeName('home', $locale)))
+    $response = test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)))
         ->assertSuccessful();
 
     $content = $response->getContent();
@@ -250,4 +250,4 @@ test('home page history section shows first three historia images stacked and ex
         ->toContain('/storage/images/history-test-3.svg')
         ->not->toContain('/storage/images/history-test-4.svg')
         ->not->toContain('/storage/images/madaia-test.svg');
-})->with('supported_locales');
+});

@@ -172,6 +172,9 @@ erDiagram
         bigint voting_id
         bigint owner_id
         bigint cast_by_user_id
+        string cast_ip_address
+        decimal cast_latitude
+        decimal cast_longitude
         timestamp voted_at
         datetime deleted_at
     }

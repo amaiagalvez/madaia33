@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class VotingBallot extends Model
 {
@@ -16,6 +16,11 @@ class VotingBallot extends Model
         'voting_id',
         'owner_id',
         'cast_by_user_id',
+        'cast_ip_address',
+        'cast_latitude',
+        'cast_longitude',
+        'cast_delegate_dni',
+        'is_in_person',
         'voted_at',
     ];
 
@@ -23,6 +28,9 @@ class VotingBallot extends Model
     {
         return [
             'voted_at' => 'datetime',
+            'cast_latitude' => 'float',
+            'cast_longitude' => 'float',
+            'is_in_person' => 'bool',
         ];
     }
 

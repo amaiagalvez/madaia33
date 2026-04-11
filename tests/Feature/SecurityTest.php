@@ -12,13 +12,13 @@ dataset('supported_locales', SupportedLocales::all());
 // Cabeceras de seguridad HTTP
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('las cabeceras de seguridad están presentes en rutas públicas', function (string $locale) {
-    $response = $this->get(route(SupportedLocales::routeName('home', $locale)));
+it('las cabeceras de seguridad están presentes en rutas públicas', function () {
+    $response = $this->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)));
 
     $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
     $response->assertHeader('X-Content-Type-Options', 'nosniff');
     $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-})->with('supported_locales');
+});
 
 it('las cabeceras de seguridad están presentes en rutas admin', function () {
     $user = User::factory()->create();

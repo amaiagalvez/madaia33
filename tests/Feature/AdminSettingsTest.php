@@ -3,7 +3,6 @@
 // Feature: community-web, Tarea 12: Panel de administración — Configuración
 // Valida: Requisitos 11.6, 12.4, 13.4
 
-use App\Models\User;
 use App\Models\Image;
 use App\Models\Notice;
 use Livewire\Livewire;
@@ -23,7 +22,7 @@ const ADMIN_SETTINGS_EMAIL = 'admin@example.com';
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('guarda el email de admin en la tabla settings', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -35,7 +34,7 @@ it('guarda el email de admin en la tabla settings', function () {
 });
 
 it('guarda las claves reCAPTCHA en la tabla settings', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -55,7 +54,7 @@ it('guarda las claves reCAPTCHA en la tabla settings', function () {
 });
 
 it('guarda el contenido de las páginas legales dentro de la sección front', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -77,7 +76,7 @@ it('guarda el contenido de las páginas legales dentro de la sección front', fu
 });
 
 it('guarda el texto legal en la tabla settings', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -92,7 +91,7 @@ it('guarda el texto legal en la tabla settings', function () {
 });
 
 it('guarda la configuración de correo en la tabla settings', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -123,7 +122,7 @@ it('guarda la configuración de correo en la tabla settings', function () {
 });
 
 it('guarda la configuración del email de nuevas propietarias en settings', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -141,7 +140,7 @@ it('guarda la configuración del email de nuevas propietarias en settings', func
 });
 
 it('el campo recaptcha_secret_key se renderiza como type=password', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -150,7 +149,7 @@ it('el campo recaptcha_secret_key se renderiza como type=password', function () 
 });
 
 it('renderiza un editor enriquecido para los textos legales', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -159,7 +158,7 @@ it('renderiza un editor enriquecido para los textos legales', function () {
 });
 
 it('no carga flux ni fuentes externas en la vista admin de configuracion', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     test()->actingAs($user)
         ->get(route('admin.settings'))
@@ -169,7 +168,7 @@ it('no carga flux ni fuentes externas en la vista admin de configuracion', funct
 });
 
 it('renderiza también los editores ricos de política de privacidad y aviso legal en front', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -183,7 +182,7 @@ it('renderiza también los editores ricos de política de privacidad y aviso leg
 });
 
 it('renderiza tabs de idioma EUS/CAS en los bloques bilingües de settings', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -203,7 +202,7 @@ it('renderiza tabs de idioma EUS/CAS en los bloques bilingües de settings', fun
 });
 
 it('renderiza los campos recaptcha dentro de su propia sección', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -213,7 +212,7 @@ it('renderiza los campos recaptcha dentro de su propia sección', function () {
 });
 
 it('renderiza los campos de configuración de correo dentro de su sección', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -229,7 +228,7 @@ it('renderiza los campos de configuración de correo dentro de su sección', fun
 });
 
 it('renderiza los campos del email de nuevas propietarias dentro de su sección', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -239,7 +238,7 @@ it('renderiza los campos del email de nuevas propietarias dentro de su sección'
 });
 
 it('mantiene visible el botón guardar en la sección front', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -249,7 +248,7 @@ it('mantiene visible el botón guardar en la sección front', function () {
 });
 
 it('rechaza scripts en los textos legales de settings', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -265,7 +264,7 @@ it('rechaza scripts en los textos legales de settings', function () {
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('el dashboard muestra estadísticas reales', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Notice::factory()->create(['is_public' => true]);
     Notice::factory()->create(['is_public' => true]);
@@ -288,7 +287,7 @@ it('el dashboard muestra estadísticas reales', function () {
 it('los settings creados con factory tienen sección válida', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -296,7 +295,7 @@ it('los settings creados con factory tienen sección válida', function () {
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('los tabs de secciones se muestran en orden alfabético', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     Setting::factory()->create(['key' => 'front_img', 'section' => Setting::SECTION_FRONT]);
 
     $component = Livewire::actingAs($user)->test('admin-settings');
@@ -312,7 +311,7 @@ it('los tabs de secciones se muestran en orden alfabético', function () {
 });
 
 it('la sección activa inicial es la primera sección en orden alfabético', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $component = Livewire::actingAs($user)->test('admin-settings');
 
@@ -323,7 +322,7 @@ it('la sección activa inicial es la primera sección en orden alfabético', fun
 });
 
 it('los tabs renderizan etiquetas de sección con wire:click', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -333,7 +332,7 @@ it('los tabs renderizan etiquetas de sección con wire:click', function () {
 });
 
 it('los campos del formulario fuerzan contraste legible en fondo blanco', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -346,7 +345,7 @@ it('los campos del formulario fuerzan contraste legible en fondo blanco', functi
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('save solo escribe los settings de la sección activa sin afectar otras secciones', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     createSetting('admin_email', 'original@example.com');
     createSetting('recaptcha_site_key', 'site-key-original');
@@ -361,7 +360,7 @@ it('save solo escribe los settings de la sección activa sin afectar otras secci
 });
 
 it('save de recaptcha solo escribe sus claves sin afectar contact_form', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     createSetting('admin_email', 'contact@example.com');
 
@@ -467,7 +466,7 @@ it('Setting::normalizeSection devuelve general para secciones desconocidas', fun
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('setSection ignora secciones no presentes en availableSections', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $component = Livewire::actingAs($user)->test('admin-settings');
     $originalSection = $component->get('activeSection');
@@ -482,7 +481,7 @@ it('setSection ignora secciones no presentes en availableSections', function () 
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('añadir datos en una nueva sección renderiza su tab sin cambios estructurales en el componente', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     Setting::factory()->create(['key' => 'gallery_columns', 'section' => Setting::SECTION_GALLERY]);
 
     $component = Livewire::actingAs($user)->test('admin-settings');
@@ -500,7 +499,7 @@ it('añadir datos en una nueva sección renderiza su tab sin cambios estructural
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('openTestEmailModal abre el modal y resetea el formulario', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -511,7 +510,7 @@ it('openTestEmailModal abre el modal y resetea el formulario', function () {
 });
 
 it('closeTestEmailModal cierra el modal y resetea el estado', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -523,7 +522,7 @@ it('closeTestEmailModal cierra el modal y resetea el estado', function () {
 });
 
 it('sendTestEmail valida que testEmailAddress sea un email válido', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -534,7 +533,7 @@ it('sendTestEmail valida que testEmailAddress sea un email válido', function ()
 });
 
 it('sendTestEmail requiere SMTP configurado (smtp_host no vacío)', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-settings')
@@ -546,7 +545,7 @@ it('sendTestEmail requiere SMTP configurado (smtp_host no vacío)', function () 
 });
 
 it('sendTestEmail envía un email de prueba con la configuración SMTP', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     createSetting('from_address', 'sender@example.com');
     createSetting('from_name', 'Test Sender');

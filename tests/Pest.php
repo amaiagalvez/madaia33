@@ -1,11 +1,13 @@
 <?php
 
 use Tests\TestCase;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Notice;
-use App\Models\Location;
 use App\Models\Setting;
-use App\Models\NoticeLocation;
 use Tests\DuskTestCase;
+use App\Models\Location;
+use App\Models\NoticeLocation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 pest()->extend(DuskTestCase::class)
@@ -65,7 +67,7 @@ function attachNoticeToLocationCode(Notice $notice, string $code): NoticeLocatio
         $locationId = Location::factory()->create([
             'type' => str_starts_with($code, 'P-') ? 'garage' : 'portal',
             'code' => $code,
-            'name' => 'Location ' . $code,
+            'name' => 'Location '.$code,
         ])->id;
     }
 
@@ -73,4 +75,17 @@ function attachNoticeToLocationCode(Notice $notice, string $code): NoticeLocatio
         'notice_id' => $notice->id,
         'location_id' => $locationId,
     ]);
+}
+
+function adminUser(array $attributes = []): User
+{
+    $user = User::factory()->create($attributes);
+
+    Role::query()->firstOrCreate([
+        'name' => Role::SUPER_ADMIN,
+    ]);
+
+    $user->assignRole(Role::SUPER_ADMIN);
+
+    return $user;
 }

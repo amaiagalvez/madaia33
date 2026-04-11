@@ -8,12 +8,14 @@ use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\View;
 use App\Observers\OwnerAuditObserver;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use App\Http\Composers\VotingsNavigationComposer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->applyConfiguredMailSettings();
         $this->registerLegacyBladeComponentAliases();
+        $this->registerViewComposers();
 
         Owner::observe(OwnerAuditObserver::class);
     }
@@ -49,13 +52,13 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Password::defaults(
-            fn(): ?Password => app()->isProduction()
+            fn (): ?Password => app()->isProduction()
                 ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised()
                 : null,
         );
     }
@@ -93,5 +96,16 @@ class AppServiceProvider extends ServiceProvider
             'smtp_password',
             'smtp_encryption',
         ]));
+    }
+
+    /**
+     * Register view composers for front-end navigation and other shared components.
+     */
+    protected function registerViewComposers(): void
+    {
+        View::composer([
+            'layouts.front.main',
+            'layouts::front.main',
+        ], VotingsNavigationComposer::class);
     }
 }

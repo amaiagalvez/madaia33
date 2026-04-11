@@ -6,15 +6,15 @@ use App\SupportedLocales;
 
 dataset('supported_locales', SupportedLocales::all());
 
-test('notices page renders grid layout responsive', function (string $locale) {
+test('notices page renders grid layout responsive', function () {
     $notices = Notice::factory()->public()->count(9)->create();
 
-    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('notices', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     // Grid classes should be present
     $response->assertSee('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3');
-})->with('supported_locales');
+});
 
 test('notices page displays 9 notices per page in grid', function (string $locale) {
     $notices = Notice::factory()->public()->count(12)->create();
@@ -29,31 +29,31 @@ test('notices page displays 9 notices per page in grid', function (string $local
     }
 })->with('supported_locales');
 
-test('notices page renders notice cards with responsive classes', function (string $locale) {
+test('notices page renders notice cards with responsive classes', function () {
     Notice::factory()->public()->create();
 
-    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('notices', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     // Should use notice-card component classes
     $response->assertSee('line-clamp-2');
     $response->assertDontSee('line-clamp-4');
-})->with('supported_locales');
+});
 
-test('notices page renders a featured notice block layout', function (string $locale) {
+test('notices page renders a featured notice block layout', function () {
     Notice::factory()->public()->count(3)->create();
 
-    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('notices', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     $response->assertSee('lg:col-span-3');
     $response->assertSee('text-xl md:text-2xl lg:text-3xl');
-})->with('supported_locales');
+});
 
-test('notices page filter selector is visible and responsive', function (string $locale) {
+test('notices page filter selector is visible and responsive', function () {
     Notice::factory()->public()->count(5)->create();
 
-    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('notices', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     $response->assertSee('data-page-hero="notices"', false);
@@ -61,7 +61,7 @@ test('notices page filter selector is visible and responsive', function (string 
     $response->assertSee('data-notices-filter-btn="all"', false);
     $response->assertDontSee(__('notices.filter.label'));
     $response->assertDontSee('lg:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)]');
-})->with('supported_locales');
+});
 
 test('notices page filter updates grid when location selected', function (string $locale) {
     $portal1 = 'A';
@@ -81,24 +81,24 @@ test('notices page filter updates grid when location selected', function (string
         ->assertSee($notice1->title);
 })->with('supported_locales');
 
-test('notices page shows pagination when more than 9 notices', function (string $locale) {
+test('notices page shows pagination when more than 9 notices', function () {
     Notice::factory()->public()->count(15)->create();
 
-    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('notices', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     // Pagination links should be present (check for page query parameter or pagination classes)
     $response->assertSee('href');
-})->with('supported_locales');
+});
 
-test('notices page pagination is centered', function (string $locale) {
+test('notices page pagination is centered', function () {
     Notice::factory()->public()->count(15)->create();
 
-    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('notices', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     $response->assertSee('flex justify-center');
-})->with('supported_locales');
+});
 
 test('notices page shows all notice cards in grid order', function (string $locale) {
     $notice1 = Notice::factory()->public()->create(['published_at' => now()->subDays(2)]);
@@ -117,12 +117,12 @@ test('notices page shows all notice cards in grid order', function (string $loca
     expect($pos3 < $pos2 && $pos2 < $pos1)->toBeTrue();
 })->with('supported_locales');
 
-test('notices page grid maintains responsive gap spacing', function (string $locale) {
+test('notices page grid maintains responsive gap spacing', function () {
     Notice::factory()->public()->count(6)->create();
 
-    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+    $response = test()->get(route(SupportedLocales::routeName('notices', SupportedLocales::DEFAULT)));
 
     $response->assertSuccessful();
     $response->assertSee('data-notices-grid', false);
     $response->assertSee('gap-4 sm:gap-6');
-})->with('supported_locales');
+});

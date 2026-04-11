@@ -8,17 +8,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureAdminPanelAccess
 {
-  /**
-   * @param  Closure(Request): Response  $next
-   */
-  public function handle(Request $request, Closure $next): Response
-  {
-    $user = $request->user();
+    /**
+     * @param  Closure(Request): Response  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $user = $request->user();
 
-    if ($user === null || ! $user->canAccessAdminPanel()) {
-      abort(403);
+        if ($user === null || ! $user->canAccessAdminPanel()) {
+            abort(403);
+        }
+
+        return $next($request);
     }
-
-    return $next($request);
-  }
 }

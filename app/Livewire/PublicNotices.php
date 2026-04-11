@@ -2,9 +2,9 @@
 
 namespace App\Livewire;
 
-use App\Models\Location;
 use App\Models\Notice;
 use Livewire\Component;
+use App\Models\Location;
 use Livewire\WithPagination;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\App;
@@ -53,7 +53,7 @@ class PublicNotices extends Component
                 $query->where(function ($q) {
                     // Include notices with the selected location
                     $q->whereHas('locations', function ($locationQuery): void {
-                        $locationQuery->whereHas('location', fn($query) => $query->where('code', $this->locationFilter));
+                        $locationQuery->whereHas('location', fn ($query) => $query->where('code', $this->locationFilter));
                     });
                     // Also include general notices (no locations)
                     $q->orWhereDoesntHave('locations');
@@ -73,9 +73,9 @@ class PublicNotices extends Component
             ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
             ->orderBy('code')
             ->get(['type', 'code'])
-            ->map(fn(Location $location): array => [
+            ->map(fn (Location $location): array => [
                 'code' => $location->code,
-                'label' => ($location->type === 'portal' ? __('notices.portal') : __('notices.garage')) . ' ' . $location->code,
+                'label' => ($location->type === 'portal' ? __('notices.portal') : __('notices.garage')).' '.$location->code,
             ])
             ->all();
     }

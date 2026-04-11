@@ -3,11 +3,10 @@
 // Feature: community-web, Tarea 9: Panel de administración — Gestión de avisos
 // Valida: Requisitos 6.1, 6.3, 6.4
 
-use App\Models\User;
 use App\Models\Notice;
+use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
-use Livewire\Livewire;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Propiedad 8: Toggle de publicación de avisos es reversible
@@ -15,7 +14,7 @@ use Livewire\Livewire;
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('el toggle de publicación es reversible y nunca elimina el aviso', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $notice = Notice::factory()->private()->create();
 
     $component = Livewire::actingAs($user)->test('admin-notice-manager');
@@ -42,7 +41,7 @@ it('el toggle de publicación es reversible y nunca elimina el aviso', function 
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('crear aviso aparece en la lista admin', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-notice-manager')
@@ -57,7 +56,7 @@ it('crear aviso aparece en la lista admin', function () {
 });
 
 it('publicar aviso lo hace visible en la parte pública', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $notice = Notice::factory()->private()->create();
 
     Livewire::actingAs($user)
@@ -71,7 +70,7 @@ it('publicar aviso lo hace visible en la parte pública', function () {
 });
 
 it('despublicar aviso lo oculta de la parte pública', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $notice = Notice::factory()->public()->create();
 
     Livewire::actingAs($user)
@@ -85,7 +84,7 @@ it('despublicar aviso lo oculta de la parte pública', function () {
 });
 
 it('eliminar aviso lo quita de la lista admin', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $notice = Notice::factory()->create();
 
     Livewire::actingAs($user)
@@ -97,7 +96,7 @@ it('eliminar aviso lo quita de la lista admin', function () {
 });
 
 it('abre y cierra la confirmación de borrado', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $notice = Notice::factory()->create();
 
     Livewire::actingAs($user)
@@ -109,7 +108,7 @@ it('abre y cierra la confirmación de borrado', function () {
 });
 
 it('abre la confirmación de publicación con la acción correcta', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $notice = Notice::factory()->private()->create();
 
     Livewire::actingAs($user)
@@ -123,7 +122,7 @@ it('abre la confirmación de publicación con la acción correcta', function () 
 });
 
 it('editar aviso dispara evento de foco al formulario', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $notice = Notice::factory()->create();
 
     Livewire::actingAs($user)
@@ -133,7 +132,7 @@ it('editar aviso dispara evento de foco al formulario', function () {
 });
 
 it('la asociación de ubicaciones persiste correctamente', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
     Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
 
@@ -153,7 +152,7 @@ it('la asociación de ubicaciones persiste correctamente', function () {
 });
 
 it('createNotice muestra el formulario y cancelForm restablece el estado', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $component = Livewire::actingAs($user)
         ->test('admin-notice-manager')
@@ -182,7 +181,7 @@ it('createNotice muestra el formulario y cancelForm restablece el estado', funct
 });
 
 it('renderiza los campos multiidioma de avisos con pestañas por idioma', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-notice-manager')
@@ -198,7 +197,7 @@ it('renderiza los campos multiidioma de avisos con pestañas por idioma', functi
 });
 
 it('muestra solo locations en el selector de ubicaciones del formulario', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     $location = Location::factory()->create([
         'type' => 'portal',
@@ -226,7 +225,7 @@ it('muestra solo locations en el selector de ubicaciones del formulario', functi
 });
 
 it('edita un aviso existente y reemplaza sus ubicaciones al guardar', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
     Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
 
@@ -269,7 +268,7 @@ it('edita un aviso existente y reemplaza sus ubicaciones al guardar', function (
 });
 
 it('crea slug UUID cuando el título no produce slug válido', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-notice-manager')
@@ -285,7 +284,7 @@ it('crea slug UUID cuando el título no produce slug válido', function () {
 });
 
 it('al editar y mantener privado conserva published_at existente', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $notice = Notice::factory()->public()->create([
         'published_at' => now()->subHour(),
     ]);

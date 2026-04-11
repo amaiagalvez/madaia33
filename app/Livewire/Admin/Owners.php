@@ -2,16 +2,16 @@
 
 namespace App\Livewire\Admin;
 
-use App\Actions\CreateOwnerAction;
-use App\Actions\AssignPropertyAction;
-use App\Actions\UnassignPropertyAction;
 use App\Models\Owner;
 use Livewire\Component;
 use App\Models\Location;
 use App\Models\Property;
-use App\Models\PropertyAssignment;
 use Livewire\WithPagination;
+use App\Actions\CreateOwnerAction;
+use App\Models\PropertyAssignment;
 use Illuminate\Contracts\View\View;
+use App\Actions\AssignPropertyAction;
+use App\Actions\UnassignPropertyAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 

@@ -14,7 +14,7 @@ use App\Models\PropertyAssignment;
  * - Location detail (editable property/validation state)
  */
 test('admin can access owner detail sensitive view and sees assignment controls', function () {
-    $admin = User::factory()->create();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
     $owner = Owner::factory()->create([
         'coprop1_name' => 'Dusk Owner',
@@ -46,7 +46,7 @@ test('admin can access owner detail sensitive view and sees assignment controls'
 });
 
 test('admin can access location detail sensitive view and sees editable property rows', function () {
-    $admin = User::factory()->create();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
     $location = Location::factory()->portal()->create();
 

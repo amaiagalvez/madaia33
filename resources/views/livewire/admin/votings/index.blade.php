@@ -8,6 +8,12 @@
     <div class="mb-4 flex items-center justify-end gap-2">
         <x-admin.create-record-button wire:click="createVoting" />
 
+        <button type="button" wire:click="openInPersonVoteModal"
+            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+            data-action="open-in-person-vote">
+            {{ __('votings.admin.in_person_vote') }}
+        </button>
+
         <button type="button" wire:click="openDelegatedVoteModal"
             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
             data-action="open-delegated-vote">
@@ -246,6 +252,9 @@
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                     {{ __('votings.admin.delegated_by') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.delegate_dni') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
@@ -256,10 +265,12 @@
                                         {{ number_format($row['percentage'], 4, ',', '.') }}%</td>
                                     <td class="px-4 py-2 text-gray-600">{{ $row['delegated_by'] }}
                                     </td>
+                                    <td class="px-4 py-2 text-gray-600">{{ $row['delegate_dni'] }}
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3"
+                                    <td colspan="4"
                                         class="px-4 py-6 text-center text-gray-500">
                                         {{ __('votings.admin.empty') }}</td>
                                 </tr>
@@ -274,7 +285,7 @@
     @if ($showDelegatedModal)
         <dialog open
             class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4">
-            <div class="mx-4 w-full max-w-2xl space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+            <div class="mx-4 w-full max-w-6xl space-y-4 rounded-xl bg-white p-6 shadow-2xl">
                 <div class="flex items-start justify-between gap-3">
                     <h3 class="text-base font-semibold text-gray-900">
                         {{ __('votings.admin.delegated_modal_title') }}</h3>
@@ -282,13 +293,28 @@
                         class="text-sm text-gray-500 hover:text-gray-700">{{ __('general.close') }}</button>
                 </div>
 
-                <div class="max-h-96 overflow-auto rounded-lg border border-gray-200">
+                <div>
+                    <label for="delegatedSearch"
+                        class="sr-only">{{ __('votings.admin.delegated_search') }}</label>
+                    <input id="delegatedSearch" type="text"
+                        wire:model.live.debounce.300ms="delegatedSearch"
+                        placeholder="{{ __('votings.admin.delegated_search_placeholder') }}"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                </div>
+
+                <div class="max-h-[70vh] overflow-auto rounded-lg border border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                     {{ __('votings.admin.owner') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.portal_codes') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.garage_codes') }}</th>
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                     {{ __('votings.admin.pending_votings') }}</th>
@@ -298,9 +324,20 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
-                            @forelse ($delegatedRows as $row)
+                            @forelse ($filteredDelegatedRows as $row)
                                 <tr>
-                                    <td class="px-4 py-2 text-gray-800">{{ $row['owner_name'] }}
+                                    <td class="px-4 py-2 text-gray-800">
+                                        <p>{{ $row['owner_name'] }}</p>
+                                        @if ($row['owner_secondary_name'] !== '')
+                                            <p class="text-xs text-gray-500">
+                                                {{ $row['owner_secondary_name'] }}</p>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">
+                                        {{ $row['portal_codes'] !== '' ? $row['portal_codes'] : '—' }}
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">
+                                        {{ $row['garage_codes'] !== '' ? $row['garage_codes'] : '—' }}
                                     </td>
                                     <td class="px-4 py-2 text-gray-600">
                                         {{ $row['pending_votings'] }}</td>
@@ -314,7 +351,88 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3"
+                                    <td colspan="5"
+                                        class="px-4 py-6 text-center text-gray-500">
+                                        {{ __('votings.admin.no_pending_delegations') }}</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </dialog>
+    @endif
+
+    @if ($showInPersonModal)
+        <dialog open
+            class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4">
+            <div class="mx-4 w-full max-w-6xl space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+                <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-base font-semibold text-gray-900">
+                        {{ __('votings.admin.in_person_modal_title') }}</h3>
+                    <button type="button" wire:click="closeInPersonVoteModal"
+                        class="text-sm text-gray-500 hover:text-gray-700">{{ __('general.close') }}</button>
+                </div>
+
+                <div>
+                    <label for="inPersonSearch"
+                        class="sr-only">{{ __('votings.admin.in_person_search') }}</label>
+                    <input id="inPersonSearch" type="text"
+                        wire:model.live.debounce.300ms="inPersonSearch"
+                        placeholder="{{ __('votings.admin.in_person_search_placeholder') }}"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                </div>
+
+                <div class="max-h-[70vh] overflow-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.owner') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.portal_codes') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.garage_codes') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.pending_votings') }}</th>
+                                <th
+                                    class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.action') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            @forelse ($filteredInPersonRows as $row)
+                                <tr>
+                                    <td class="px-4 py-2 text-gray-800">
+                                        <p>{{ $row['owner_name'] }}</p>
+                                        @if ($row['owner_secondary_name'] !== '')
+                                            <p class="text-xs text-gray-500">
+                                                {{ $row['owner_secondary_name'] }}</p>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">
+                                        {{ $row['portal_codes'] !== '' ? $row['portal_codes'] : '—' }}
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">
+                                        {{ $row['garage_codes'] !== '' ? $row['garage_codes'] : '—' }}
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">
+                                        {{ $row['pending_votings'] }}</td>
+                                    <td class="px-4 py-2 text-right">
+                                        <button type="button"
+                                            wire:click="startInPersonVote({{ $row['owner_id'] }})"
+                                            class="inline-flex items-center rounded-md bg-[#d9755b] px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                                            {{ __('votings.admin.vote_as_owner') }}
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5"
                                         class="px-4 py-6 text-center text-gray-500">
                                         {{ __('votings.admin.no_pending_delegations') }}</td>
                                 </tr>
