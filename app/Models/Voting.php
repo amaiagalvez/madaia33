@@ -108,6 +108,10 @@ class Voting extends Model
 
     public function isOpen(): bool
     {
+        if (blank($this->starts_at) || blank($this->ends_at)) {
+            return false;
+        }
+
         $today = today();
         $startsAtDate = Carbon::parse($this->starts_at);
         $endsAtDate = Carbon::parse($this->ends_at);

@@ -198,6 +198,7 @@ it('renders multilingual notice fields with language tabs', function () {
 
 it('shows only locations in form location selector', function () {
     $user = adminUser();
+    $propertyName = 'Property Name Not In Location Selector';
 
     $location = Location::factory()->create([
         'type' => 'portal',
@@ -207,7 +208,7 @@ it('shows only locations in form location selector', function () {
 
     Property::factory()->create([
         'location_id' => $location->id,
-        'name' => '1A',
+        'name' => $propertyName,
     ]);
 
     Location::factory()->create([
@@ -220,7 +221,7 @@ it('shows only locations in form location selector', function () {
         ->test('admin-notice-manager')
         ->call('createNotice')
         ->assertSee('33-A')
-        ->assertDontSee('1A')
+        ->assertDontSee($propertyName)
         ->assertDontSee('TR-99');
 });
 

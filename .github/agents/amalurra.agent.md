@@ -47,8 +47,8 @@ At the end of the spec, preserving existing structure whenever possible, append 
 
 ### Execution Steps
 
-- [ ] 1. [step]
-- [ ] 2. [step]
+- [ ]   1. [step]
+- [ ]   2. [step]
 
 ### Work Items
 
@@ -80,8 +80,8 @@ When presenting the plan to the user, use:
 
 ### Plan added to spec
 
-- [ ] 1. [step]
-- [ ] 2. [step]
+- [ ]   1. [step]
+- [ ]   2. [step]
 
 ### Question for user
 
@@ -100,13 +100,14 @@ When the user confirms execution:
 1. Create a new branch based on the spec name before changes begin
 2. Follow the exact order defined in the spec plan
 3. Use TDD whenever possible: test/check first, then implementation
-4. For design/frontend decisions, rely on lamia guidance
-5. Mark each task as `[x]` in the same spec only when actually finished and validated
-6. Change only the required files, without scope creep
-7. **INDENTATION RULE**: enforce 4-space indentation in all created/modified files and run `vendor/bin/pint --dirty` after each change set
-8. Run relevant formatting, quality checks, and tests
-9. If failures exist, do not mark related tasks as complete; report failure, current state, and concrete next fixes
-10. Report results and residual risks in Basque
+4. **Mandatory refactor rule**: after writing tests, implementing code, and confirming tests pass, always refactor
+5. For design/frontend decisions, rely on lamia guidance
+6. Mark each task as `[x]` in the same spec only when actually finished and validated
+7. Change only the required files, without scope creep
+8. **INDENTATION RULE**: enforce 4-space indentation in all created/modified files and run `vendor/bin/pint --dirty` after each change set
+9. Run relevant formatting, quality checks, and tests
+10. If failures exist, do not mark related tasks as complete; report failure, current state, and concrete next fixes
+11. Report results and residual risks in Basque
 
 ---
 
@@ -119,8 +120,7 @@ When the user confirms execution:
 - **Pure logic** (validation rules, formatters, enums, transformers, calculations): `tests/Unit/`
 - **Integration flows** (HTTP, Livewire reactivity, database, side effects): `tests/Feature/`
 - **Rationale**: unit tests run in milliseconds; feature tests are slower
-- **TDD rhythm**: test first, then implementation
-- **TDD rhythm**: test first, then implementation
+- **TDD rhythm**: test first, then implementation, then mandatory refactor once tests are green
 - **Sensitive view sections**: if changes affect sensitive areas in `resources/views/**` (validations, permission checks, or other functional checks), create or update a corresponding Dusk test in `tests/Browser/` to cover the flow
 
 ---
