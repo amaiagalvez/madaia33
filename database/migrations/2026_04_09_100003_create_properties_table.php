@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('location_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('location_id')->constrained();
             $table->string('name', 20);
             $table->decimal('community_pct', 8, 4)->nullable();
             $table->decimal('location_pct', 8, 4)->nullable();

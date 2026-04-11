@@ -9,8 +9,8 @@ return new class extends Migration {
     {
         Schema::create('owner_audit_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('owner_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('changed_by_user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('owner_id')->constrained();
+            $table->foreignId('changed_by_user_id')->nullable()->constrained('users');
             $table->string('field');
             $table->text('old_value')->nullable();
             $table->text('new_value')->nullable();

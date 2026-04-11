@@ -9,7 +9,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('notice_locations', function (Blueprint $table): void {
-            $table->foreignId('location_id')->nullable()->after('notice_id')->constrained('locations')->nullOnDelete();
+            $table->foreignId('location_id')->nullable()->after('notice_id')->constrained('locations');
         });
 
         $codeToLocationId = DB::table('locations')

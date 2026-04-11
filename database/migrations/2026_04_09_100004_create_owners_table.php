@@ -10,7 +10,7 @@ return new class extends Migration {
     {
         Schema::create('owners', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained();
             $table->string('coprop1_name');
             $table->string('coprop1_dni', 20);
             $table->string('coprop1_phone', 20)->nullable();

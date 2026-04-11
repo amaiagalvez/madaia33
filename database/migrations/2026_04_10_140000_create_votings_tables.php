@@ -26,7 +26,7 @@ return new class extends Migration {
 
         Schema::create('voting_options', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('voting_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('voting_id')->constrained();
             $table->string('label_eu');
             $table->string('label_es')->nullable();
             $table->unsignedSmallInteger('position')->default(1);
@@ -38,8 +38,8 @@ return new class extends Migration {
 
         Schema::create('voting_locations', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('voting_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('location_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('voting_id')->constrained();
+            $table->foreignId('location_id')->constrained();
             $table->timestamps();
             $table->softDeletes();
 
@@ -48,9 +48,9 @@ return new class extends Migration {
 
         Schema::create('voting_ballots', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('voting_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('owner_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('cast_by_user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('voting_id')->constrained();
+            $table->foreignId('owner_id')->constrained();
+            $table->foreignId('cast_by_user_id')->nullable()->constrained('users');
             $table->ipAddress('cast_ip_address')->nullable();
             $table->decimal('cast_latitude', 10, 7)->nullable();
             $table->decimal('cast_longitude', 10, 7)->nullable();
@@ -66,10 +66,10 @@ return new class extends Migration {
 
         Schema::create('voting_selections', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('voting_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('voting_ballot_id')->constrained('voting_ballots')->cascadeOnDelete();
-            $table->foreignId('owner_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('voting_option_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('voting_id')->constrained();
+            $table->foreignId('voting_ballot_id')->constrained('voting_ballots');
+            $table->foreignId('owner_id')->constrained();
+            $table->foreignId('voting_option_id')->constrained();
             $table->timestamps();
             $table->softDeletes();
 
@@ -79,8 +79,8 @@ return new class extends Migration {
 
         Schema::create('voting_option_totals', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('voting_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('voting_option_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('voting_id')->constrained();
+            $table->foreignId('voting_option_id')->constrained();
             $table->unsignedInteger('votes_count')->default(0);
             $table->timestamps();
             $table->softDeletes();
