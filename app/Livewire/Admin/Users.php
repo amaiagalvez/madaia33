@@ -74,7 +74,7 @@ class Users extends Component
         $this->password = '';
         $this->isActive = (bool) $user->is_active;
         $this->selectedRoles = $user->roleNames()->all();
-        $this->selectedManagedLocations = $user->managedLocations()->pluck('locations.id')->map(static fn ($id): string => (string) $id)->all();
+        $this->selectedManagedLocations = $user->managedLocations()->pluck('locations.id')->map(static fn($id): string => (string) $id)->all();
         $this->showForm = true;
     }
 
@@ -95,8 +95,8 @@ class Users extends Component
         ]);
 
         $user = $this->editingUserId !== null
-          ? User::query()->findOrFail($this->editingUserId)
-          : new User;
+            ? User::query()->findOrFail($this->editingUserId)
+            : new User;
 
         abort_if($user->id === 1, 403);
 
@@ -177,7 +177,7 @@ class Users extends Component
             $emailRule = $emailRule->ignore($this->editingUserId);
         }
 
-        $roleRule = Rule::in(array_values(array_filter(Role::names(), static fn (string $name): bool => $name !== Role::SUPER_ADMIN)));
+        $roleRule = Rule::in(array_values(array_filter(Role::names(), static fn(string $name): bool => $name !== Role::SUPER_ADMIN)));
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
@@ -204,7 +204,7 @@ class Users extends Component
     private function syncUserRolesAndLocations(User $user): void
     {
         $roleNames = collect($this->selectedRoles)
-            ->filter(static fn (string $role): bool => $role !== Role::SUPER_ADMIN)
+            ->filter(static fn(string $role): bool => $role !== Role::SUPER_ADMIN)
             ->unique()
             ->values()
             ->all();
@@ -218,7 +218,7 @@ class Users extends Component
         }
 
         $locationIds = collect($this->selectedManagedLocations)
-            ->map(static fn (string $locationId): int => (int) $locationId)
+            ->map(static fn(string $locationId): int => (int) $locationId)
             ->unique()
             ->values()
             ->all();
@@ -249,8 +249,8 @@ class Users extends Component
             ->when($this->search !== '', function ($query): void {
                 $query->where(function ($innerQuery): void {
                     $innerQuery
-                        ->where('name', 'like', '%'.$this->search.'%')
-                        ->orWhere('email', 'like', '%'.$this->search.'%');
+                        ->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
                 });
             })
             ->orderBy('name')
@@ -259,12 +259,12 @@ class Users extends Component
         return view('livewire.admin.users.index', [
             'users' => $users,
             'roles' => collect(Role::names())
-                ->reject(static fn (string $name): bool => $name === Role::SUPER_ADMIN)
+                ->reject(static fn(string $name): bool => $name === Role::SUPER_ADMIN)
                 ->values()
                 ->all(),
             'communityLocations' => Location::query()
-                ->whereIn('type', ['portal', 'garage'])
-                ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
+                ->whereIn('type', ['portal', 'local', 'garage'])
+                ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 WHEN type = 'garage' THEN 3 ELSE 4 END")
                 ->orderBy('code')
                 ->get(['id', 'code', 'type']),
         ]);

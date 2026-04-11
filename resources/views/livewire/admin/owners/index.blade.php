@@ -172,6 +172,15 @@
                 @endforeach
             </flux:select>
 
+            <flux:select wire:model.live="filterLocal" data-filter="local">
+                <flux:select.option value="">{{ __('admin.owners.filters.all_locals') }}
+                </flux:select.option>
+                @foreach ($locals as $local)
+                    <flux:select.option :value="$local->id">{{ $local->name }}
+                    </flux:select.option>
+                @endforeach
+            </flux:select>
+
             <flux:select wire:model.live="filterGarage" data-filter="garage">
                 <flux:select.option value="">{{ __('admin.owners.filters.all_garages') }}
                 </flux:select.option>
@@ -218,6 +227,9 @@
                     {{ __('admin.owners.columns.portals') }}</th>
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.owners.columns.locals') }}</th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     {{ __('admin.owners.columns.garages') }}</th>
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
@@ -241,6 +253,19 @@
                             );
                         @endphp
                         @foreach ($portalAssignments as $a)
+                            <span
+                                class="{{ $a->isActive() ? 'text-green-600' : 'text-red-500' }}">
+                                {{ $a->property->location->code }} {{ $a->property->name }}
+                            </span><br>
+                        @endforeach
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        @php
+                            $localAssignments = $owner->assignments->filter(
+                                fn($a) => $a->property->location->type === 'local',
+                            );
+                        @endphp
+                        @foreach ($localAssignments as $a)
                             <span
                                 class="{{ $a->isActive() ? 'text-green-600' : 'text-red-500' }}">
                                 {{ $a->property->location->code }} {{ $a->property->name }}
@@ -285,7 +310,7 @@
 
                 @if ($expandedOwnerId === $owner->id)
                     <tr wire:key="owner-inline-panel-{{ $owner->id }}" class="bg-gray-50">
-                        <td colspan="6" class="px-6 py-4">
+                        <td colspan="7" class="px-6 py-4">
                             <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4"
                                 data-owner-inline-panel="{{ $owner->id }}">
                                 @if ($rowErrorMessage !== '')

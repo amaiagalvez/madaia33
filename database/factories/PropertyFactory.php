@@ -27,8 +27,8 @@ class PropertyFactory extends Factory
     public function forStorage(): static
     {
         return $this->state([
-            'community_pct' => null,
-            'location_pct' => null,
+            'community_pct' => fake()->randomFloat(4, 0.1, 5.0),
+            'location_pct' => fake()->randomFloat(4, 0.1, 10.0),
         ]);
     }
 }

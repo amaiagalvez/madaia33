@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
+use App\Models\User;
 use App\Models\Location;
 use App\Models\Property;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
 
 class LocationDetail extends Component
@@ -32,13 +34,11 @@ class LocationDetail extends Component
      */
     protected function rules(): array
     {
-        $isStorage = $this->location->type === 'storage';
-
         return [
             'newPropertyName' => 'required|string|max:20',
             'editName' => 'required|string|max:20',
-            'editCommunityPct' => $isStorage ? 'nullable' : 'required|numeric|min:0|max:100',
-            'editLocationPct' => $isStorage ? 'nullable' : 'required|numeric|min:0|max:100',
+            'editCommunityPct' => 'required|numeric|min:0|max:100',
+            'editLocationPct' => 'required|numeric|min:0|max:100',
         ];
     }
 
@@ -49,19 +49,15 @@ class LocationDetail extends Component
 
     public function addProperty(): void
     {
-        abort_unless(auth()->user()?->canManageLocation($this->location), 403);
+        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
 
-        $isStorage = $this->location->type === 'storage';
-
-        if (! $isStorage) {
-            $this->newCommunityPct = $this->normalizeDecimalInput($this->newCommunityPct);
-            $this->newLocationPct = $this->normalizeDecimalInput($this->newLocationPct);
-        }
+        $this->newCommunityPct = $this->normalizeDecimalInput($this->newCommunityPct);
+        $this->newLocationPct = $this->normalizeDecimalInput($this->newLocationPct);
 
         $this->validate([
             'newPropertyName' => 'required|string|max:20',
-            'newCommunityPct' => $isStorage ? 'nullable' : 'required|numeric|min:0|max:100',
-            'newLocationPct' => $isStorage ? 'nullable' : 'required|numeric|min:0|max:100',
+            'newCommunityPct' => 'required|numeric|min:0|max:100',
+            'newLocationPct' => 'required|numeric|min:0|max:100',
         ], [], [
             'newPropertyName' => __('admin.locations.property_name'),
             'newCommunityPct' => __('admin.locations.community_pct'),
@@ -71,8 +67,8 @@ class LocationDetail extends Component
         Property::create([
             'location_id' => $this->location->id,
             'name' => $this->newPropertyName,
-            'community_pct' => $isStorage ? null : $this->newCommunityPct,
-            'location_pct' => $isStorage ? null : $this->newLocationPct,
+            'community_pct' => $this->newCommunityPct,
+            'location_pct' => $this->newLocationPct,
         ]);
 
         $this->newPropertyName = '';
@@ -83,7 +79,7 @@ class LocationDetail extends Component
 
     public function startEditing(int $propertyId): void
     {
-        abort_unless(auth()->user()?->canManageLocation($this->location), 403);
+        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
 
         $property = Property::findOrFail($propertyId);
 
@@ -95,24 +91,22 @@ class LocationDetail extends Component
 
     public function saveProperty(): void
     {
-        abort_unless(auth()->user()?->canManageLocation($this->location), 403);
+        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
 
-        if ($this->location->type !== 'storage') {
-            $this->editCommunityPct = $this->normalizeDecimalInput($this->editCommunityPct);
-            $this->editLocationPct = $this->normalizeDecimalInput($this->editLocationPct);
-        }
+        $this->editCommunityPct = $this->normalizeDecimalInput($this->editCommunityPct);
+        $this->editLocationPct = $this->normalizeDecimalInput($this->editLocationPct);
 
         $this->validate([
             'editName' => 'required|string|max:20',
-            'editCommunityPct' => $this->location->type === 'storage' ? 'nullable' : 'required|numeric|min:0|max:100',
-            'editLocationPct' => $this->location->type === 'storage' ? 'nullable' : 'required|numeric|min:0|max:100',
+            'editCommunityPct' => 'required|numeric|min:0|max:100',
+            'editLocationPct' => 'required|numeric|min:0|max:100',
         ]);
 
         $property = Property::findOrFail($this->editingPropertyId);
         $property->update([
             'name' => $this->editName,
-            'community_pct' => $this->location->type === 'storage' ? null : $this->editCommunityPct,
-            'location_pct' => $this->location->type === 'storage' ? null : $this->editLocationPct,
+            'community_pct' => $this->editCommunityPct,
+            'location_pct' => $this->editLocationPct,
         ]);
 
         $this->editingPropertyId = null;
@@ -125,7 +119,7 @@ class LocationDetail extends Component
 
     public function render(): View
     {
-        abort_unless(auth()->user()?->canManageLocation($this->location), 403);
+        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
 
         $properties = $this->location->properties()
             ->with(['activeAssignments'])
@@ -136,5 +130,13 @@ class LocationDetail extends Component
         return view('livewire.admin.locations.detail', [
             'properties' => $properties,
         ]);
+    }
+
+    private function currentUser(): ?User
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        return $user;
     }
 }

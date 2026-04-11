@@ -138,6 +138,7 @@ return [
         'breadcrumb' => 'Kokalekuen ogi-apurrak',
         'types' => [
             'portal' => 'Atariak',
+            'local' => 'Lokalak',
             'garage' => 'Garajeak',
             'storage' => 'Trastelekuak',
         ],
@@ -189,6 +190,7 @@ return [
             'inactive' => 'Esleipen aktiborik gabe',
             'all' => 'Guztiak',
             'all_portals' => 'Atari guztiak',
+            'all_locals' => 'Lokal guztiak',
             'all_garages' => 'Garaje guztiak',
             'all_storages' => 'Trasteleku guztiak',
             'without_properties' => 'Jabetzarik gabekoak',
@@ -198,6 +200,7 @@ return [
             'coprop1' => 'Ko-jabea 1',
             'coprop2' => 'Ko-jabea 2',
             'portals' => 'Atariak',
+            'locals' => 'Lokalak',
             'garages' => 'Garajeak',
             'storages' => 'Trastelekuak',
         ],

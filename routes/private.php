@@ -40,6 +40,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
   Route::get('/portales', fn() => view('admin.locations.index', ['type' => 'portal']))
     ->middleware('role:superadmin,admin_general,admin_comunidad')
     ->name('locations.portals');
+  Route::get('/locales', fn() => view('admin.locations.index', ['type' => 'local']))
+    ->middleware('role:superadmin,admin_general,admin_comunidad')
+    ->name('locations.locals');
   Route::get('/garajes', fn() => view('admin.locations.index', ['type' => 'garage']))
     ->middleware('role:superadmin,admin_general,admin_comunidad')
     ->name('locations.garages');

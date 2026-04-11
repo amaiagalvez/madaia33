@@ -11,7 +11,7 @@ class PropertySeeder extends Seeder
     public function run(): void
     {
         Location::query()
-            ->whereIn('type', ['portal', 'garage'])
+            ->whereIn('type', ['portal', 'local', 'garage'])
             ->get(['id', 'type'])
             ->each(function (Location $location): void {
                 $propertyNames = $this->propertyNamesForType($location->type);
@@ -39,7 +39,7 @@ class PropertySeeder extends Seeder
     {
         if ($type === 'garage') {
             return array_map(
-                static fn (int $number): string => (string) $number,
+                static fn(int $number): string => (string) $number,
                 range(1, 180),
             );
         }
@@ -48,7 +48,7 @@ class PropertySeeder extends Seeder
 
         foreach (range(1, 6) as $floor) {
             foreach (['A', 'B', 'C'] as $letter) {
-                $portalProperties[] = $floor.'-'.$letter;
+                $portalProperties[] = $floor . '-' . $letter;
             }
         }
 

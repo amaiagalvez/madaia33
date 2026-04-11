@@ -125,15 +125,15 @@ class DevSeeder extends Seeder
 
         // 8 avisos aleatorios públicos para probar la paginación (>10 total)
         Notice::factory()->public()->count(8)->create()->each(function (Notice $notice) {
-            // Asignar aleatoriamente a un portal o sin ubicación
+            // Asignar aleatoriamente a un portal/local o sin ubicación
             if (fake()->boolean(60)) {
-                $portalCode = Location::query()
-                    ->where('type', 'portal')
+                $locationCode = Location::query()
+                    ->whereIn('type', ['portal', 'local'])
                     ->inRandomOrder()
                     ->value('code');
 
-                if ($portalCode !== null) {
-                    $this->attachNoticeToLocationCode($notice, $portalCode);
+                if ($locationCode !== null) {
+                    $this->attachNoticeToLocationCode($notice, $locationCode);
                 }
             }
         });
@@ -158,11 +158,12 @@ class DevSeeder extends Seeder
     private function seedOwnersAndProperties(): void
     {
         $locationIds = Location::query()
-            ->whereIn('type', ['portal', 'garage'])
+            ->whereIn('type', ['portal', 'local', 'garage'])
             ->pluck('id');
 
         if ($locationIds->isEmpty()) {
             $locationIds = Location::factory()->portal()->count(2)->create(['name' => 'Portal demo'])->pluck('id')
+                ->merge(Location::factory()->local()->count(1)->create(['name' => 'Local demo'])->pluck('id'))
                 ->merge(Location::factory()->garage()->count(1)->create(['name' => 'Garaje demo'])->pluck('id'));
         }
 
@@ -232,7 +233,7 @@ class DevSeeder extends Seeder
         );
 
         $managedLocationId = Location::query()
-            ->portals()
+            ->whereIn('type', ['portal', 'local'])
             ->orderBy('id')
             ->value('id');
 

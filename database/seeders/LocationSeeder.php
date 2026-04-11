@@ -10,20 +10,25 @@ class LocationSeeder extends Seeder
     public function run(): void
     {
         $portalCodes = ['33-A', '33-B', '33-C', '33-D', '33-E', '33-F', '33-G', '33-H', '33-I', '33-J'];
+        $localCodes = ['L-1', 'L-2', 'L-3', 'L-4'];
         $garageCodes = ['P-1', 'P-2', 'P-3'];
         $storageCodes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
         $locations = array_merge(
             array_map(
-                static fn (string $code): array => ['type' => 'portal', 'code' => $code, 'name' => 'Portal '.$code],
+                static fn(string $code): array => ['type' => 'portal', 'code' => $code, 'name' => 'Portal ' . $code],
                 $portalCodes,
             ),
             array_map(
-                static fn (string $code): array => ['type' => 'garage', 'code' => $code, 'name' => 'Garaje '.$code],
+                static fn(string $code): array => ['type' => 'local', 'code' => $code, 'name' => 'Local ' . $code],
+                $localCodes,
+            ),
+            array_map(
+                static fn(string $code): array => ['type' => 'garage', 'code' => $code, 'name' => 'Garaje ' . $code],
                 $garageCodes,
             ),
             array_map(
-                static fn (string $code): array => ['type' => 'storage', 'code' => $code, 'name' => 'Trastero '.$code],
+                static fn(string $code): array => ['type' => 'storage', 'code' => $code, 'name' => 'Trastero ' . $code],
                 $storageCodes,
             ),
         );

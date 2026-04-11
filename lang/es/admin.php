@@ -138,6 +138,7 @@ return [
         'breadcrumb' => 'Ruta de ubicaciones',
         'types' => [
             'portal' => 'Portales',
+            'local' => 'Locales',
             'garage' => 'Garajes',
             'storage' => 'Trasteros',
         ],
@@ -189,6 +190,7 @@ return [
             'inactive' => 'Sin asignación activa',
             'all' => 'Todas',
             'all_portals' => 'Todos los portales',
+            'all_locals' => 'Todos los locales',
             'all_garages' => 'Todos los garajes',
             'all_storages' => 'Todos los trasteros',
             'without_properties' => 'Sin propiedades activas',
@@ -198,6 +200,7 @@ return [
             'coprop1' => 'Copropietaria 1',
             'coprop2' => 'Copropietaria 2',
             'portals' => 'Portales',
+            'locals' => 'Locales',
             'garages' => 'Garajes',
             'storages' => 'Trasteros',
         ],

@@ -4,6 +4,7 @@
 
         @php
             $backRoute = match ($location->type) {
+                'local' => route('admin.locations.locals'),
                 'garage' => route('admin.locations.garages'),
                 'storage' => route('admin.locations.storages'),
                 default => route('admin.locations.portals'),

@@ -34,12 +34,12 @@ class PublicVotings extends Component
     public bool $showDelegatedModal = false;
 
     /**
-     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}>
      */
     public array $delegatedRows = [];
 
     /**
-     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}>
      */
     public array $filteredDelegatedRows = [];
 
@@ -50,12 +50,12 @@ class PublicVotings extends Component
     public bool $showInPersonModal = false;
 
     /**
-     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}>
      */
     public array $inPersonRows = [];
 
     /**
-     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, garage_codes: string, search_index: string}>
+     * @var array<int, array{owner_id: int, owner_name: string, owner_secondary_name: string, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}>
      */
     public array $filteredInPersonRows = [];
 
@@ -132,6 +132,7 @@ class PublicVotings extends Component
                     'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
+                    'local_codes' => $row['local_codes'],
                     'garage_codes' => $row['garage_codes'],
                     'search_index' => $row['search_index'],
                 ];
@@ -185,6 +186,7 @@ class PublicVotings extends Component
                     'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
+                    'local_codes' => $row['local_codes'],
                     'garage_codes' => $row['garage_codes'],
                     'search_index' => $row['search_index'],
                 ];

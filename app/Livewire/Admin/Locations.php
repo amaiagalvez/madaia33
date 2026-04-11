@@ -14,7 +14,7 @@ class Locations extends Component
     public string $type = 'portal';
 
     /** @var string[] */
-    public array $types = ['portal', 'garage', 'storage'];
+    public array $types = ['portal', 'local', 'garage', 'storage'];
 
     public function setType(string $type): void
     {

@@ -12,6 +12,7 @@ return [
     'no_translation' => 'Este aviso no está disponible en castellano.',
     'published_at' => 'Fecha de publicación',
     'portal' => 'Portal',
+    'local' => 'Local',
     'garage' => 'Planta de garaje',
     'filter' => [
         'label' => 'Filtrar por ubicación',

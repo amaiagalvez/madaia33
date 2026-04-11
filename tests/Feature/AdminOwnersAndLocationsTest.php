@@ -17,12 +17,17 @@ it('renders admin locations list for selected type', function () {
     $user = adminUser();
 
     Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    Location::factory()->create(['type' => 'local', 'code' => 'L-1', 'name' => 'Local L-1']);
     Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
 
     Livewire::actingAs($user)
         ->test(Locations::class)
         ->assertSee('Portal 33-A')
+        ->assertDontSee('Local L-1')
         ->assertDontSee('Garaje P-1')
+        ->call('setType', 'local')
+        ->assertSee('Local L-1')
+        ->assertDontSee('Portal 33-A')
         ->call('setType', 'garage')
         ->assertSee('Garaje P-1')
         ->assertDontSee('Portal 33-A');
@@ -137,6 +142,37 @@ it('accepts comma decimals for location percentages and stores them normalized w
         ->and((float) $refreshedProperty->location_pct)->toBe(4.75);
 });
 
+it('requires and persists percentages for storage locations too', function () {
+    $user = adminUser();
+
+    $storageLocation = Location::factory()->create([
+        'type' => 'storage',
+        'code' => 'TR-A',
+        'name' => 'Trastero A',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(LocationDetail::class, ['location' => $storageLocation])
+        ->set('newPropertyName', 'S-1')
+        ->set('newCommunityPct', '')
+        ->set('newLocationPct', '')
+        ->call('addProperty')
+        ->assertHasErrors(['newCommunityPct' => 'required', 'newLocationPct' => 'required'])
+        ->set('newCommunityPct', '1,5000')
+        ->set('newLocationPct', '2,2500')
+        ->call('addProperty')
+        ->assertHasNoErrors();
+
+    $createdStorageProperty = Property::query()
+        ->where('location_id', $storageLocation->id)
+        ->where('name', 'S-1')
+        ->first();
+
+    expect($createdStorageProperty)->not->toBeNull()
+        ->and((float) $createdStorageProperty->community_pct)->toBe(1.5)
+        ->and((float) $createdStorageProperty->location_pct)->toBe(2.25);
+});
+
 it('filters owners by active portal assignment', function () {
     $user = adminUser();
 
@@ -168,6 +204,37 @@ it('filters owners by active portal assignment', function () {
         ->assertDontSee('Bea B');
 });
 
+it('filters owners by active local assignment', function () {
+    $user = adminUser();
+
+    $localA = Location::factory()->create(['type' => 'local', 'code' => 'L-1', 'name' => 'Local L-1']);
+    $localB = Location::factory()->create(['type' => 'local', 'code' => 'L-2', 'name' => 'Local L-2']);
+
+    $propertyA = Property::factory()->create(['location_id' => $localA->id, 'name' => '1A']);
+    $propertyB = Property::factory()->create(['location_id' => $localB->id, 'name' => '2B']);
+
+    $ownerA = Owner::factory()->create(['coprop1_name' => 'Local Ane']);
+    $ownerB = Owner::factory()->create(['coprop1_name' => 'Local Bea']);
+
+    PropertyAssignment::factory()->create([
+        'property_id' => $propertyA->id,
+        'owner_id' => $ownerA->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'property_id' => $propertyB->id,
+        'owner_id' => $ownerB->id,
+        'end_date' => null,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('filterLocal', (string) $localA->id)
+        ->assertSee('Local Ane')
+        ->assertDontSee('Local Bea');
+});
+
 it('renders new admin pages for locations and owners', function () {
     $user = adminUser();
 
@@ -176,6 +243,10 @@ it('renders new admin pages for locations and owners', function () {
 
     test()->actingAs($user)
         ->get(route('admin.locations.portals'))
+        ->assertOk();
+
+    test()->actingAs($user)
+        ->get(route('admin.locations.locals'))
         ->assertOk();
 
     test()->actingAs($user)

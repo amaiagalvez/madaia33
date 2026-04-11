@@ -49,6 +49,17 @@ class Location extends Model
     }
 
     /**
+     * Scope to locals only.
+     *
+     * @param  Builder<Location>  $query
+     * @return Builder<Location>
+     */
+    public function scopeLocals(Builder $query): Builder
+    {
+        return $query->where('type', 'local');
+    }
+
+    /**
      * Scope to garages only.
      *
      * @param  Builder<Location>  $query
