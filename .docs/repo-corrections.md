@@ -123,3 +123,4 @@
 - In indentation normalization scripts, preserve PHPDoc/JSDoc block indentation (`/** ... */`) to avoid misaligned comment stars; skip those blocks while normalizing code indentation.
 - For `HasFactory` generic warnings, use `@use HasFactory<FactoryClass>` with a short imported factory class (never fully-qualified in PHPDoc), ensure the factory file exists, and then run Pint on touched files to satisfy both PHPStan and style rules.
 - If PHPStan reports non-covariant Collection return mismatches for mapped array-shapes, prefer returning plain arrays (`->values()->all()`) from private helpers instead of tightening Collection TValue shapes.
+- After large `apply_patch` refactors in long Livewire classes, re-run `php -l` on each touched file immediately; duplicate method fragments or stray braces can survive a partial patch and are faster to catch with syntax checks before Pint/test runs.

@@ -26,6 +26,7 @@ mapfile -d '' FILES < <(
         -not -path '*/public/build/*' \
         -not -path '*/dc-data/*' \
         -not -path '*/.git/*' \
+        -not -path '*/.github/workflows/*' \
         -print0
 )
 

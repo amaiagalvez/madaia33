@@ -64,6 +64,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 - [ ] bash scripts/enforce-indent-4.sh 
 - [ ] docker => reformat eta quality
 - [ ] docker => pentest
+- [ ] dusk-test
 
 ## manual de usuaria
 crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación
@@ -79,5 +80,4 @@ pasar los test con coverage
 - [ ] en settings en la seccion email_configuration, ocultar todos los campos menos el nombre (ponerlos como si fueran tipo password), añadir botón para modificarlos y que pida contraseña antes de modicarlos
 - [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
 - [ ] añadir espacio para comercios
-- [ ] en el aginte-panela añade estadísticas de las tablas que falta
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)

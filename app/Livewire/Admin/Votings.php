@@ -16,9 +16,9 @@ use App\Models\VotingLocation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Support\VotingCensusCalculator;
 use App\Support\VotingEligibilityService;
 use App\Concerns\BuildsLocaleFieldConfigs;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\PublicVotingController;
 
 class Votings extends Component
@@ -27,6 +27,8 @@ class Votings extends Component
     use WithPagination;
 
     private VotingEligibilityService $eligibilityService;
+
+    private VotingCensusCalculator $censusCalculator;
 
     public bool $showCreateForm = false;
 
@@ -96,6 +98,7 @@ class Votings extends Component
     public function boot(VotingEligibilityService $eligibilityService): void
     {
         $this->eligibilityService = $eligibilityService;
+        $this->censusCalculator = app(VotingCensusCalculator::class);
     }
 
     public function mount(): void
@@ -263,112 +266,42 @@ class Votings extends Component
 
     public function openDelegatedVoteModal(): void
     {
-        abort_unless($this->canManageAdminVotings(), 403);
-
-        $this->delegatedRows = $this->eligibilityService
-            ->ownersWithPendingDelegations()
-            ->map(static function (array $row): array {
-                return [
-                    'owner_id' => $row['owner']->id,
-                    'owner_name' => $row['owner']->coprop1_name,
-                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
-                    'pending_votings' => $row['pending_votings'],
-                    'portal_codes' => $row['portal_codes'],
-                    'local_codes' => $row['local_codes'],
-                    'garage_codes' => $row['garage_codes'],
-                    'search_index' => $row['search_index'],
-                ];
-            })
-            ->values()
-            ->all();
-
-        $this->delegatedSearch = '';
-        $this->applyDelegatedFilter();
-        $this->showDelegatedModal = true;
+        $this->openVoterModal('delegated');
     }
 
     public function updatedDelegatedSearch(): void
     {
-        $this->applyDelegatedFilter();
+        $this->applyVoterFilter('delegated');
     }
 
     public function closeDelegatedVoteModal(): void
     {
-        $this->showDelegatedModal = false;
-        $this->delegatedSearch = '';
-        $this->delegatedRows = [];
-        $this->filteredDelegatedRows = [];
+        $this->closeVoterModal('delegated');
     }
 
     public function startDelegatedVote(int $ownerId): void
     {
-        abort_unless($this->canManageAdminVotings(), 403);
-
-        $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn (array $row): int => $row['owner']->id)
-            ->all();
-
-        abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
-
-        session()->forget(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY);
-        session()->put(PublicVotingController::DELEGATED_OWNER_SESSION_KEY, $ownerId);
-
-        $this->redirectRoute(SupportedLocales::routeName('votings'));
+        $this->startVoterSession($ownerId, 'delegated');
     }
 
     public function openInPersonVoteModal(): void
     {
-        abort_unless($this->canManageAdminVotings(), 403);
-
-        $this->inPersonRows = $this->eligibilityService
-            ->ownersWithPendingDelegations()
-            ->map(static function (array $row): array {
-                return [
-                    'owner_id' => $row['owner']->id,
-                    'owner_name' => $row['owner']->coprop1_name,
-                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
-                    'pending_votings' => $row['pending_votings'],
-                    'portal_codes' => $row['portal_codes'],
-                    'local_codes' => $row['local_codes'],
-                    'garage_codes' => $row['garage_codes'],
-                    'search_index' => $row['search_index'],
-                ];
-            })
-            ->values()
-            ->all();
-
-        $this->inPersonSearch = '';
-        $this->applyInPersonFilter();
-        $this->showInPersonModal = true;
+        $this->openVoterModal('in_person');
     }
 
     public function updatedInPersonSearch(): void
     {
-        $this->applyInPersonFilter();
+        $this->applyVoterFilter('in_person');
     }
 
     public function closeInPersonVoteModal(): void
     {
-        $this->showInPersonModal = false;
-        $this->inPersonSearch = '';
-        $this->inPersonRows = [];
-        $this->filteredInPersonRows = [];
+        $this->closeVoterModal('in_person');
     }
 
     public function startInPersonVote(int $ownerId): void
     {
-        abort_unless($this->canManageAdminVotings(), 403);
-
-        $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn (array $row): int => $row['owner']->id)
-            ->all();
-
-        abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
-
-        session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
-        session()->put(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY, $ownerId);
-
-        $this->redirectRoute(SupportedLocales::routeName('votings'));
+        $this->startVoterSession($ownerId, 'in_person');
     }
 
     public function render(): View
@@ -380,7 +313,7 @@ class Votings extends Component
             ->orderByDesc('starts_at')
             ->paginate(10);
 
-        $censusCounts = $this->censusCounts($votings);
+        $censusCounts = $this->censusCalculator->calculate($votings);
 
         return view('livewire.admin.votings.index', [
             'votings' => $votings,
@@ -393,67 +326,101 @@ class Votings extends Component
         ]);
     }
 
-    /**
-     * @param  LengthAwarePaginator<int, Voting>  $votings
-     * @return array<int, int>
-     */
-    private function censusCounts(LengthAwarePaginator $votings): array
+    private function openVoterModal(string $type): void
     {
-        $assignmentRows = DB::table('property_assignments as assignments')
-            ->join('properties as properties', 'properties.id', '=', 'assignments.property_id')
-            ->join('locations as locations', 'locations.id', '=', 'properties.location_id')
-            ->whereNull('assignments.end_date')
-            ->whereIn('locations.type', ['portal', 'local', 'garage'])
-            ->select([
-                'assignments.owner_id as owner_id',
-                'locations.id as location_id',
-                'locations.type as location_type',
-            ])
-            ->distinct()
-            ->get();
+        abort_unless($this->canManageAdminVotings(), 403);
 
-        $ownerLocations = $assignmentRows
-            ->groupBy('owner_id')
-            ->map(static function ($rows): array {
+        $rows = $this->eligibilityService
+            ->ownersWithPendingDelegations()
+            ->map(static function (array $row): array {
                 return [
-                    'residential_ids' => $rows
-                        ->filter(static fn ($row): bool => in_array($row->location_type, ['portal', 'local'], true))
-                        ->pluck('location_id')
-                        ->map(static fn ($id): int => (int) $id)
-                        ->values()
-                        ->all(),
-                    'garage_ids' => $rows
-                        ->where('location_type', 'garage')
-                        ->pluck('location_id')
-                        ->map(static fn ($id): int => (int) $id)
-                        ->values()
-                        ->all(),
-                ];
-            });
-
-        return $votings->getCollection()
-            ->mapWithKeys(function (Voting $voting) use ($ownerLocations): array {
-                [$residentialIds, $garageIds] = $this->eligibilityService->allowedLocationIds($voting);
-                $residentialIds = array_map('intval', $residentialIds);
-                $garageIds = array_map('intval', $garageIds);
-
-                $eligibleOwnersCount = $ownerLocations->filter(static function (array $locations) use ($residentialIds, $garageIds): bool {
-                    if ($residentialIds === [] && $garageIds === []) {
-                        return true;
-                    }
-
-                    if ($residentialIds !== [] && array_intersect($locations['residential_ids'], $residentialIds) !== []) {
-                        return true;
-                    }
-
-                    return $garageIds !== [] && array_intersect($locations['garage_ids'], $garageIds) !== [];
-                })->count();
-
-                return [
-                    $voting->id => $eligibleOwnersCount,
+                    'owner_id' => $row['owner']->id,
+                    'owner_name' => $row['owner']->coprop1_name,
+                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
+                    'pending_votings' => $row['pending_votings'],
+                    'portal_codes' => $row['portal_codes'],
+                    'local_codes' => $row['local_codes'],
+                    'garage_codes' => $row['garage_codes'],
+                    'search_index' => $row['search_index'],
                 ];
             })
+            ->values()
             ->all();
+
+        if ($type === 'delegated') {
+            $this->delegatedRows = $rows;
+            $this->delegatedSearch = '';
+            $this->applyVoterFilter('delegated');
+            $this->showDelegatedModal = true;
+        } else {
+            $this->inPersonRows = $rows;
+            $this->inPersonSearch = '';
+            $this->applyVoterFilter('in_person');
+            $this->showInPersonModal = true;
+        }
+    }
+
+    private function closeVoterModal(string $type): void
+    {
+        if ($type === 'delegated') {
+            $this->showDelegatedModal = false;
+            $this->delegatedSearch = '';
+            $this->delegatedRows = [];
+            $this->filteredDelegatedRows = [];
+        } else {
+            $this->showInPersonModal = false;
+            $this->inPersonSearch = '';
+            $this->inPersonRows = [];
+            $this->filteredInPersonRows = [];
+        }
+    }
+
+    private function startVoterSession(int $ownerId, string $type): void
+    {
+        abort_unless($this->canManageAdminVotings(), 403);
+
+        $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
+            ->map(static fn (array $row): int => $row['owner']->id)
+            ->all();
+
+        abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
+
+        if ($type === 'delegated') {
+            session()->forget(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY);
+            session()->put(PublicVotingController::DELEGATED_OWNER_SESSION_KEY, $ownerId);
+        } else {
+            session()->forget(PublicVotingController::DELEGATED_OWNER_SESSION_KEY);
+            session()->put(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY, $ownerId);
+        }
+
+        $this->redirectRoute(SupportedLocales::routeName('votings'));
+    }
+
+    private function applyVoterFilter(string $type): void
+    {
+        $search = mb_strtolower(trim($type === 'delegated' ? $this->delegatedSearch : $this->inPersonSearch));
+        $rows = $type === 'delegated' ? $this->delegatedRows : $this->inPersonRows;
+
+        if ($search === '') {
+            if ($type === 'delegated') {
+                $this->filteredDelegatedRows = $rows;
+            } else {
+                $this->filteredInPersonRows = $rows;
+            }
+
+            return;
+        }
+
+        $filtered = array_values(array_filter(
+            $rows,
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
+        ));
+
+        if ($type === 'delegated') {
+            $this->filteredDelegatedRows = $filtered;
+        } else {
+            $this->filteredInPersonRows = $filtered;
+        }
     }
 
     /**
@@ -489,37 +456,5 @@ class Votings extends Component
         $user = Auth::user();
 
         return $user?->hasAnyRole([Role::SUPER_ADMIN]) ?? false;
-    }
-
-    private function applyDelegatedFilter(): void
-    {
-        $search = mb_strtolower(trim($this->delegatedSearch));
-
-        if ($search === '') {
-            $this->filteredDelegatedRows = $this->delegatedRows;
-
-            return;
-        }
-
-        $this->filteredDelegatedRows = array_values(array_filter(
-            $this->delegatedRows,
-            static fn (array $row): bool => str_contains($row['search_index'], $search)
-        ));
-    }
-
-    private function applyInPersonFilter(): void
-    {
-        $search = mb_strtolower(trim($this->inPersonSearch));
-
-        if ($search === '') {
-            $this->filteredInPersonRows = $this->inPersonRows;
-
-            return;
-        }
-
-        $this->filteredInPersonRows = array_values(array_filter(
-            $this->inPersonRows,
-            static fn (array $row): bool => str_contains($row['search_index'], $search)
-        ));
     }
 }

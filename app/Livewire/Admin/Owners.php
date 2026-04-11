@@ -9,7 +9,9 @@ use App\Models\Property;
 use App\SupportedLocales;
 use Livewire\WithPagination;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
+use App\Services\CreateOwnerFormService;
 use App\Actions\Owners\CreateOwnerAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
@@ -21,6 +23,8 @@ class Owners extends Component
     use WithPagination;
 
     private CreateOwnerAction $createOwnerAction;
+
+    private CreateOwnerFormService $createOwnerFormService;
 
     private AssignPropertyAction $assignPropertyAction;
 
@@ -103,14 +107,20 @@ class Owners extends Component
 
     public function boot(
         CreateOwnerAction $createOwnerAction,
+        CreateOwnerFormService $createOwnerFormService,
         AssignPropertyAction $assignPropertyAction,
         UnassignPropertyAction $unassignPropertyAction,
     ): void {
         $this->createOwnerAction = $createOwnerAction;
+        $this->createOwnerFormService = $createOwnerFormService;
         $this->assignPropertyAction = $assignPropertyAction;
         $this->unassignPropertyAction = $unassignPropertyAction;
     }
 
+    /**
+     * Reset pagination when any filter changes
+     * Handling filterStatus separately to also reset ownershipView
+     */
     public function updatedFilterStatus(): void
     {
         $this->resetPage();
@@ -193,83 +203,24 @@ class Owners extends Component
 
     public function createOwner(): void
     {
-        $data = $this->validate([
-            'coprop1Name' => ['required', 'string', 'max:255'],
-            'coprop1Dni' => ['required', 'string', 'max:20', 'unique:owners,coprop1_dni'],
-            'coprop1Phone' => ['nullable', 'string', 'max:20'],
-            'coprop1Email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'language' => ['required', 'string', 'in:eu,es'],
-            'coprop2Name' => ['nullable', 'string', 'max:255'],
-            'coprop2Dni' => ['nullable', 'string', 'max:20'],
-            'coprop2Phone' => ['nullable', 'string', 'max:20'],
-            'coprop2Email' => ['nullable', 'email', 'max:255'],
-            'newAssignments' => ['required', 'array', 'min:1'],
-            'newAssignments.*.property_id' => ['required', 'exists:properties,id'],
-            'newAssignments.*.start_date' => ['required', 'date'],
-            'newAssignments.*.end_date' => ['nullable', 'date'],
-        ], [
-            'newAssignments.*.property_id.required' => __('validation.required', ['attribute' => __('admin.owners.property')]),
-            'newAssignments.*.property_id.exists' => __('validation.exists', ['attribute' => __('admin.owners.property')]),
-            'newAssignments.*.start_date.required' => __('validation.required', ['attribute' => __('admin.owners.start_date')]),
-            'newAssignments.*.start_date.date' => __('validation.date', ['attribute' => __('admin.owners.start_date')]),
-            'newAssignments.*.end_date.date' => __('validation.date', ['attribute' => __('admin.owners.end_date')]),
-        ], [
-            'coprop1Name' => __('admin.owners.form.coprop1_name'),
-            'coprop1Dni' => __('admin.owners.form.coprop1_dni'),
-            'coprop1Phone' => __('admin.owners.form.coprop1_phone'),
-            'coprop1Email' => __('admin.owners.form.coprop1_email'),
-            'language' => __('admin.owners.form.language'),
-            'coprop2Name' => __('admin.owners.form.coprop2_name'),
-            'coprop2Dni' => __('admin.owners.form.coprop2_dni'),
-            'coprop2Phone' => __('admin.owners.form.coprop2_phone'),
-            'coprop2Email' => __('admin.owners.form.coprop2_email'),
-            'newAssignments.*.property_id' => __('admin.owners.property'),
-            'newAssignments.*.start_date' => __('admin.owners.start_date'),
-            'newAssignments.*.end_date' => __('admin.owners.end_date'),
-        ]);
+        $data = $this->validate(
+            $this->ownerCreationRules(),
+            $this->ownerCreationMessages(),
+            $this->ownerCreationAttributes(),
+        );
 
-        foreach ($data['newAssignments'] as $index => $assignment) {
-            if ($assignment['end_date'] !== '' && $assignment['end_date'] !== null && $assignment['end_date'] < $assignment['start_date']) {
-                $this->addError("newAssignments.$index.end_date", __('validation.after_or_equal', ['attribute' => __('admin.owners.end_date'), 'date' => __('admin.owners.start_date')]));
+        $dateErrors = $this->createOwnerFormService->validateAssignmentDates($data['newAssignments']);
 
-                return;
+        if ($dateErrors !== []) {
+            foreach ($dateErrors as $field => $message) {
+                $this->addError($field, $message);
             }
+
+            return;
         }
 
-        $this->createOwnerAction->execute([
-            'coprop1_name' => $data['coprop1Name'],
-            'coprop1_dni' => $data['coprop1Dni'],
-            'coprop1_phone' => $data['coprop1Phone'] ?: null,
-            'coprop1_email' => $data['coprop1Email'],
-            'language' => $data['language'],
-            'coprop2_name' => $data['coprop2Name'] ?: null,
-            'coprop2_dni' => $data['coprop2Dni'] ?: null,
-            'coprop2_phone' => $data['coprop2Phone'] ?: null,
-            'coprop2_email' => $data['coprop2Email'] ?: null,
-            'assignments' => collect(is_array($data['newAssignments']) ? $data['newAssignments'] : [])->map(static function (array $assignment): array {
-                return [
-                    'property_id' => (int) $assignment['property_id'],
-                    'start_date' => $assignment['start_date'],
-                    'end_date' => $assignment['end_date'] !== '' ? $assignment['end_date'] : null,
-                ];
-            })->all(),
-        ]);
-
-        $this->reset([
-            'coprop1Name',
-            'coprop1Dni',
-            'coprop1Phone',
-            'coprop1Email',
-            'language',
-            'coprop2Name',
-            'coprop2Dni',
-            'coprop2Phone',
-            'coprop2Email',
-        ]);
-        $this->newAssignments = [$this->newAssignmentRow()];
-
-        $this->showCreateForm = false;
-        $this->resetPage();
+        $this->createOwnerAction->execute($this->createOwnerFormService->prepareOwnerData($data));
+        $this->resetCreateOwnerFormState();
     }
 
     public function toggleOwnerRow(int $ownerId): void
@@ -506,7 +457,95 @@ class Owners extends Component
 
     public function render(): View
     {
-        $query = Owner::with([
+        return view('livewire.admin.owners.index', [
+            'owners' => $this->buildOwnersQuery()->orderBy('coprop1_name')->paginate(20),
+            ...$this->loadViewData(),
+            'expandedAssignments' => $this->loadExpandedAssignments(),
+        ]);
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    private function ownerCreationRules(): array
+    {
+        return [
+            'coprop1Name' => ['required', 'string', 'max:255'],
+            'coprop1Dni' => ['required', 'string', 'max:20', 'unique:owners,coprop1_dni'],
+            'coprop1Phone' => ['nullable', 'string', 'max:20'],
+            'coprop1Email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'language' => ['required', 'string', 'in:eu,es'],
+            'coprop2Name' => ['nullable', 'string', 'max:255'],
+            'coprop2Dni' => ['nullable', 'string', 'max:20'],
+            'coprop2Phone' => ['nullable', 'string', 'max:20'],
+            'coprop2Email' => ['nullable', 'email', 'max:255'],
+            'newAssignments' => ['required', 'array', 'min:1'],
+            'newAssignments.*.property_id' => ['required', 'exists:properties,id'],
+            'newAssignments.*.start_date' => ['required', 'date'],
+            'newAssignments.*.end_date' => ['nullable', 'date'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function ownerCreationMessages(): array
+    {
+        return [
+            'newAssignments.*.property_id.required' => __('validation.required', ['attribute' => __('admin.owners.property')]),
+            'newAssignments.*.property_id.exists' => __('validation.exists', ['attribute' => __('admin.owners.property')]),
+            'newAssignments.*.start_date.required' => __('validation.required', ['attribute' => __('admin.owners.start_date')]),
+            'newAssignments.*.start_date.date' => __('validation.date', ['attribute' => __('admin.owners.start_date')]),
+            'newAssignments.*.end_date.date' => __('validation.date', ['attribute' => __('admin.owners.end_date')]),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function ownerCreationAttributes(): array
+    {
+        return [
+            'coprop1Name' => __('admin.owners.form.coprop1_name'),
+            'coprop1Dni' => __('admin.owners.form.coprop1_dni'),
+            'coprop1Phone' => __('admin.owners.form.coprop1_phone'),
+            'coprop1Email' => __('admin.owners.form.coprop1_email'),
+            'language' => __('admin.owners.form.language'),
+            'coprop2Name' => __('admin.owners.form.coprop2_name'),
+            'coprop2Dni' => __('admin.owners.form.coprop2_dni'),
+            'coprop2Phone' => __('admin.owners.form.coprop2_phone'),
+            'coprop2Email' => __('admin.owners.form.coprop2_email'),
+            'newAssignments.*.property_id' => __('admin.owners.property'),
+            'newAssignments.*.start_date' => __('admin.owners.start_date'),
+            'newAssignments.*.end_date' => __('admin.owners.end_date'),
+        ];
+    }
+
+    private function resetCreateOwnerFormState(): void
+    {
+        $this->reset([
+            'coprop1Name',
+            'coprop1Dni',
+            'coprop1Phone',
+            'coprop1Email',
+            'language',
+            'coprop2Name',
+            'coprop2Dni',
+            'coprop2Phone',
+            'coprop2Email',
+        ]);
+
+        $this->newAssignments = [$this->newAssignmentRow()];
+        $this->showCreateForm = false;
+        $this->resetPage();
+    }
+
+    /**
+     * @return Builder<Owner>
+     */
+    private function buildOwnersQuery(): Builder
+    {
+        $query = Owner::query()->with([
             'user',
             'activeAssignments.property.location',
             'assignments.property.location',
@@ -522,61 +561,57 @@ class Owners extends Component
             $query->whereDoesntHave('activeAssignments');
         }
 
-        if ($this->filterPortal !== '') {
-            $query->whereHas('activeAssignments.property.location', function (Builder $q) {
-                $q->where('type', 'portal')->where('id', $this->filterPortal);
-            });
+        $this->applyLocationFilter($query, $this->filterPortal, 'portal');
+        $this->applyLocationFilter($query, $this->filterLocal, 'local');
+        $this->applyLocationFilter($query, $this->filterGarage, 'garage');
+        $this->applyLocationFilter($query, $this->filterStorage, 'storage');
+
+        return $query;
+    }
+
+    /**
+     * @return array{portals: Collection<int, Location>, locals: Collection<int, Location>, garages: Collection<int, Location>, storages: Collection<int, Location>, assignableProperties: Collection<int, Property>}
+     */
+    private function loadViewData(): array
+    {
+        return [
+            'portals' => Location::portals()->orderBy('code')->get(),
+            'locals' => Location::locals()->orderBy('code')->get(),
+            'garages' => Location::garages()->orderBy('code')->get(),
+            'storages' => Location::storage()->orderBy('code')->get(),
+            'assignableProperties' => Property::query()
+                ->with('location')
+                ->orderBy('location_id')
+                ->orderBy('name')
+                ->get(),
+        ];
+    }
+
+    /**
+     * @param  Builder<Owner>  $query
+     */
+    private function applyLocationFilter(Builder $query, string $locationId, string $type): void
+    {
+        if ($locationId === '') {
+            return;
         }
 
-        if ($this->filterLocal !== '') {
-            $query->whereHas('activeAssignments.property.location', function (Builder $q) {
-                $q->where('type', 'local')->where('id', $this->filterLocal);
-            });
+        $query->whereHas('activeAssignments.property.location', function (Builder $locationQuery) use ($locationId, $type): void {
+            $locationQuery->where('type', $type)->where('id', $locationId);
+        });
+    }
+
+    private function loadExpandedAssignments(): mixed
+    {
+        if ($this->expandedOwnerId === null) {
+            return collect();
         }
 
-        if ($this->filterGarage !== '') {
-            $query->whereHas('activeAssignments.property.location', function (Builder $q) {
-                $q->where('type', 'garage')->where('id', $this->filterGarage);
-            });
-        }
-
-        if ($this->filterStorage !== '') {
-            $query->whereHas('activeAssignments.property.location', function (Builder $q) {
-                $q->where('type', 'storage')->where('id', $this->filterStorage);
-            });
-        }
-
-        $owners = $query->orderBy('coprop1_name')->paginate(20);
-
-        $portals = Location::portals()->orderBy('code')->get();
-        $locals = Location::locals()->orderBy('code')->get();
-        $garages = Location::garages()->orderBy('code')->get();
-        $storages = Location::storage()->orderBy('code')->get();
-        $assignableProperties = Property::query()
-            ->with('location')
-            ->orderBy('location_id')
-            ->orderBy('name')
+        return PropertyAssignment::query()
+            ->with('property.location')
+            ->where('owner_id', $this->expandedOwnerId)
+            ->orderByRaw('end_date IS NULL DESC')
+            ->orderBy('start_date', 'desc')
             ->get();
-
-        $expandedAssignments = collect();
-
-        if ($this->expandedOwnerId !== null) {
-            $expandedAssignments = PropertyAssignment::query()
-                ->with('property.location')
-                ->where('owner_id', $this->expandedOwnerId)
-                ->orderByRaw('end_date IS NULL DESC')
-                ->orderBy('start_date', 'desc')
-                ->get();
-        }
-
-        return view('livewire.admin.owners.index', [
-            'owners' => $owners,
-            'portals' => $portals,
-            'locals' => $locals,
-            'garages' => $garages,
-            'storages' => $storages,
-            'assignableProperties' => $assignableProperties,
-            'expandedAssignments' => $expandedAssignments,
-        ]);
     }
 }
