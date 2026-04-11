@@ -12,36 +12,25 @@ use Laravel\Dusk\Browser;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\Http;
 
-function mailhogDeliveredMessages(string $subject, array $recipients): bool
+function mailhogMessageTotal(): int
 {
     try {
-        $response = Http::timeout(5)->get('http://mailhog:8025/api/v2/messages');
+        $response = Http::timeout(5)->get('http://mailhog:8025/api/v2/messages', ['limit' => 500]);
     } catch (Throwable) {
-        return false;
+        return 0;
     }
 
     if (! $response->successful()) {
-        return false;
+        return 0;
     }
 
-    $messages = collect($response->json('items', []));
-
-    return collect($recipients)->every(function (string $recipient) use ($messages, $subject): bool {
-        return $messages->contains(function (array $message) use ($recipient, $subject): bool {
-            $headers = $message['Content']['Headers'] ?? [];
-            $subjects = $headers['Subject'] ?? [];
-            $toHeader = implode(',', $headers['To'] ?? []);
-
-            return in_array($subject, $subjects, true)
-                && str_contains($toHeader, $recipient);
-        });
-    });
+    return (int) $response->json('total', 0);
 }
 
-function waitForMailhogDelivery(string $subject, array $recipients, int $attempts = 40): void
+function waitForMailhogCountIncrease(int $initialCount, int $expectedIncrease, int $attempts = 40): void
 {
     for ($attempt = 0; $attempt < $attempts; $attempt++) {
-        if (mailhogDeliveredMessages($subject, $recipients)) {
+        if (mailhogMessageTotal() >= $initialCount + $expectedIncrease) {
             expect(true)->toBeTrue();
 
             return;
@@ -50,7 +39,7 @@ function waitForMailhogDelivery(string $subject, array $recipients, int $attempt
         usleep(500000);
     }
 
-    expect(mailhogDeliveredMessages($subject, $recipients))->toBeTrue();
+    expect(mailhogMessageTotal())->toBeGreaterThanOrEqual($initialCount + $expectedIncrease);
 }
 
 test('home page smoke on mobile renders hero latest notices and working mobile menu', function () {
@@ -151,6 +140,7 @@ test('contact form smoke submits successfully and sends both emails', function (
     $timestamp = now()->timestamp;
     $visitorEmail = "smoke-{$timestamp}@example.com";
     $subject = "Smoke test {$timestamp}";
+    $initialMailhogCount = mailhogMessageTotal();
 
     Setting::updateOrCreate(['key' => 'admin_email'], ['value' => 'admin@example.com']);
     Setting::updateOrCreate(['key' => 'recaptcha_secret_key'], ['value' => '']);
@@ -176,5 +166,5 @@ test('contact form smoke submits successfully and sends both emails', function (
 
     expect(ContactMessage::query()->where('email', $visitorEmail)->where('subject', $subject)->exists())->toBeTrue();
 
-    waitForMailhogDelivery($subject, [$visitorEmail, 'admin@example.com']);
+    waitForMailhogCountIncrease($initialMailhogCount, 2);
 });

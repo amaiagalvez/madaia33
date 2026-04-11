@@ -128,3 +128,39 @@
 - [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
 - [x] Ukitutako test multzo minimoa Docker barruan (`php artisan test --compact` fitxategi/filter zehatzekin).
 - [ ] Route banaketak frontend edo auth flow-ak ukitzen baditu, dagokion Browser/Dusk egiaztapena exekutatzea.
+
+## Zuzenketa
+- [x] Listado de mensajes. quita el autofiltrado de los mensajes al cargar la página, por defecto que se muestren todos ordenados el más nuevo primero. Deja los filtros
+
+## Implementation Plan
+
+### Goal
+
+- [x] Mezu-zerrendako autofiltratu lehenetsia kendu, hasieran mezu guztiak erakutsi (`all`) eta ordena lehenetsia berriena lehen (`created_at desc`) mantendu, dauden filtro-botoiak utzita.
+
+### Technical Decisions
+
+- [x] `AdminMessageInbox` osagaian `readFilter` lehenetsia `unread`-etik `all`-era aldatuko da; sort portaera ez da ukituko (`created_at` + `desc`).
+- [x] UI filtroak (`read` / `unread` / `all`) bere horretan mantenduko dira; eskaerak dioen bezala filtroak kendu gabe.
+- [x] Testak eguneratuko dira lehenetsitako portaera berrira: default assertions eta datu-kasuak, erregresioak saihesteko.
+
+### Execution Steps
+
+- [x] 1. `app/Livewire/AdminMessageInbox.php` fitxategian `readFilter` default balioa `all` ezarri.
+- [x] 2. Dagokion Feature test lehenetsia eguneratu (`tests/Feature/AdminMessageInboxTest.php`).
+- [x] 3. Behar izanez gero, inbox portaera suposatzen duten beste test puntualak doitu (`tests/Feature/ContactFormTest.php`, `tests/Browser/AdminMessagesTest.php`), betiere aldaketa minimoekin.
+- [x] 4. Pint exekutatu eta ukitutako test minimoak pasatu Docker barruan.
+
+### Work Items
+
+- [x] app/Livewire/AdminMessageInbox.php
+- [x] tests/Feature/AdminMessageInboxTest.php
+- [x] tests/Feature/ContactFormTest.php (beharrezkoa bada)
+- [x] tests/Browser/AdminMessagesTest.php (beharrezkoa bada)
+
+### Validation
+
+- [x] TDD-based implementation when possible
+- [x] Required formatting/lint checks (`vendor/bin/pint --dirty --format agent` Docker barruan)
+- [x] Relevant test suite (`php artisan test --compact` fitxategi zehatzekin)
+- [x] Dusk tests when frontend/flow changes exist (gutxienez `tests/Browser/AdminMessagesTest.php` beharrezkoa bada)

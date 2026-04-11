@@ -17,7 +17,7 @@ use App\Models\NoticeLocation;
 use Illuminate\Database\Seeder;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Hash;
-use App\Actions\CastVotingBallotAction;
+use App\Actions\Votings\CastVotingBallotAction;
 use Illuminate\Support\Facades\Storage;
 use App\Support\VotingEligibilityService;
 
@@ -361,7 +361,7 @@ class DevSeeder extends Seeder
                 }
 
                 $delegatedOwner = $eligibleOwners->first(
-                    fn (Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
+                    fn(Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
                 );
 
                 if (! $delegatedOwner instanceof Owner || ! $delegatedUser instanceof User) {
@@ -439,8 +439,8 @@ class DevSeeder extends Seeder
         Storage::disk('public')->makeDirectory('images');
 
         foreach ($items as $index => $item) {
-            $filename = Str::uuid().'.svg';
-            $path = 'images/'.$filename;
+            $filename = Str::uuid() . '.svg';
+            $path = 'images/' . $filename;
             $imageText = $item['alt_es'];
 
             Storage::disk('public')->put(

@@ -195,16 +195,16 @@ it('deleteMessage no hace nada si no hay confirmación activa', function () {
     expect(ContactMessage::find($message->id))->not->toBeNull();
 });
 
-it('por defecto la bandeja muestra solo mensajes no leídos', function () {
+it('por defecto la bandeja muestra todos los mensajes', function () {
     $user = User::factory()->create();
     ContactMessage::factory()->read()->create();
     $unreadMessage = ContactMessage::factory()->unread()->create();
 
     $component = Livewire::actingAs($user)->test('admin-message-inbox');
 
-    expect($component->get('readFilter'))->toBe('unread')
+    expect($component->get('readFilter'))->toBe('all')
         ->and($component->messages->pluck('id')->toArray())->toContain($unreadMessage->id)
-        ->and($component->messages->pluck('id')->toArray())->not->toContain(ContactMessage::query()->where('is_read', true)->firstOrFail()->id);
+        ->and($component->messages->pluck('id')->toArray())->toContain(ContactMessage::query()->where('is_read', true)->firstOrFail()->id);
 });
 
 it('permite buscar por cualquier campo textual del mensaje', function () {

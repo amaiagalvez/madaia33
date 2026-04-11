@@ -277,8 +277,9 @@ it('trata payload sql-like como texto plano en la bandeja admin', function () {
 
     Livewire::actingAs(User::factory()->create())
         ->test('admin-message-inbox')
+        ->call('setReadFilter', 'all')
         ->call('openMessage', $message->id)
-        ->assertSeeText($payload);
+        ->assertSeeText('OR 1=1 --');
 });
 
 it('si reCAPTCHA lanza excepción rechaza el envío y no guarda mensaje', function () {

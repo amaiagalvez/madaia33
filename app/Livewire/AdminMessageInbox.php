@@ -24,7 +24,7 @@ class AdminMessageInbox extends Component
 
     public string $search = '';
 
-    public string $readFilter = 'unread';
+    public string $readFilter = 'all';
 
     public function openMessage(int $id): void
     {

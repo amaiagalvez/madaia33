@@ -113,3 +113,5 @@
 - If a Blade layout is rendered via namespaced component syntax (e.g., `x-layouts::...`), register view composers for the namespaced key too (e.g., `layouts::...`) and keep a safe default (`$var ?? false`) in the layout to prevent undefined-variable crashes.
 - If admin Feature/Livewire tests start failing with 403 or “Invalid Livewire snapshot structure”, first verify the authenticated test user has the required admin role(s); use a shared helper (e.g., `adminUser()`) to avoid role-less `User::factory()->create()` in admin test suites.
 - In Dusk admin tests, avoid `User::factory()->create()` for authenticated admin flows; login with the seeded admin account (or explicitly assign `SUPER_ADMIN`) to prevent false failures from 403 responses before DOM assertions.
+- In `admin-message-inbox`, default `unread` filter can hide a message immediately after `openMessage()` marks it as read; in tests switch filter to `all` before asserting expanded detail content.
+- If inbox default filter changes (e.g., `unread` -> `all`), update both behavior assertions and test naming to avoid false regressions from stale expectations.
