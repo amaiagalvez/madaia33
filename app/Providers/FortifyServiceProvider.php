@@ -9,9 +9,9 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Responses\LoginResponse;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
-use App\Http\Responses\LoginResponse;
 use App\Actions\Fortify\ResetUserPassword;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -100,11 +100,11 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(function () {
             return redirect()->route(SupportedLocales::routeName('private'));
         });
-        Fortify::verifyEmailView(fn() => view('pages::auth.verify-email'));
-        Fortify::twoFactorChallengeView(fn() => view('pages::auth.two-factor-challenge'));
-        Fortify::confirmPasswordView(fn() => view('pages::auth.confirm-password'));
-        Fortify::resetPasswordView(fn() => view('pages::auth.reset-password'));
-        Fortify::requestPasswordResetLinkView(fn() => view('pages::auth.forgot-password'));
+        Fortify::verifyEmailView(fn () => view('pages::auth.verify-email'));
+        Fortify::twoFactorChallengeView(fn () => view('pages::auth.two-factor-challenge'));
+        Fortify::confirmPasswordView(fn () => view('pages::auth.confirm-password'));
+        Fortify::resetPasswordView(fn () => view('pages::auth.reset-password'));
+        Fortify::requestPasswordResetLinkView(fn () => view('pages::auth.forgot-password'));
     }
 
     /**

@@ -76,9 +76,9 @@ class PublicNotices extends Component
             ->map(fn (Location $location): array => [
                 'code' => $location->code,
                 'label' => match ($location->type) {
-                    'portal' => __('notices.portal').' '.$location->code,
-                    'local' => __('notices.local').' '.$location->code,
-                    default => __('notices.garage').' '.$location->code,
+                    'portal' => __('notices.portal') . ' ' . $location->code,
+                    'local' => __('notices.local') . ' ' . $location->code,
+                    default => __('notices.garage') . ' ' . $location->code,
                 },
             ])
             ->all();

@@ -20,10 +20,10 @@ declare(strict_types=1);
 class UserController
 {
     /**
-     * @Route("/users/{id}", methods={"GET"})
-     * @Cache(maxage=3600)
-     * @Security("is_granted('VIEW', user)")
-     */
+        * @Route("/users/{id}", methods={"GET"})
+        * @Cache(maxage=3600)
+        * @Security("is_granted('VIEW', user)")
+        */
     public function show(int $id)
     {
         // Annotations are just comments - no IDE support for validation
@@ -34,15 +34,15 @@ class UserController
 class CreateUserRequest
 {
     /**
-     * @Assert\NotBlank()
-     * @Assert\Email()
-     */
+        * @Assert\NotBlank()
+        * @Assert\Email()
+        */
     public string $email;
 
     /**
-     * @Assert\NotBlank()
-     * @Assert\Length(min=8)
-     */
+        * @Assert\NotBlank()
+        * @Assert\Length(min=8)
+        */
     public string $password;
 }
 ```

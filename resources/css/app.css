@@ -222,8 +222,8 @@ select:focus[data-flux-control] {
 }
 
 /* ========================================
-   Safe Area Insets (iOS notch support)
-   ======================================== */
+    Safe Area Insets (iOS notch support)
+    ======================================== */
 
 .public-header {
     padding-top: max(env(safe-area-inset-top), 0.25rem);
@@ -234,16 +234,16 @@ footer {
 }
 
 /* ========================================
-   Alpine.js: hide before init
-   ======================================== */
+    Alpine.js: hide before init
+    ======================================== */
 
 [x-cloak] {
     display: none !important;
 }
 
 /* ========================================
-   Modal / Lightbox Responsive
-   ======================================== */
+    Modal / Lightbox Responsive
+    ======================================== */
 
 /* Block body scroll when modal is open */
 body.modal-open {
@@ -269,8 +269,8 @@ body.modal-open {
 }
 
 /* ========================================
-   Typography Responsive
-   ======================================== */
+    Typography Responsive
+    ======================================== */
 
 /* Mobile: text-sm (14px) */
 @media (max-width: 767px) {

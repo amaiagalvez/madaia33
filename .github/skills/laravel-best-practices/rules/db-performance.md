@@ -25,9 +25,9 @@ Constrain eager loads to select only needed columns (always include the foreign 
 ```php
 $users = User::with(['posts' => function ($query) {
     $query->select('id', 'user_id', 'title')
-          ->where('published', true)
-          ->latest()
-          ->limit(10);
+            ->where('published', true)
+            ->latest()
+            ->limit(10);
 }])->get();
 ```
 

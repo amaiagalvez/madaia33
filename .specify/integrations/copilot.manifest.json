@@ -1,8 +1,8 @@
 {
-  "integration": "copilot",
-  "version": "0.5.0",
-  "installed_at": "2026-04-07T16:21:52.224713+00:00",
-  "files": {
+    "integration": "copilot",
+    "version": "0.5.0",
+    "installed_at": "2026-04-07T16:21:52.224713+00:00",
+    "files": {
     ".github/agents/speckit.analyze.agent.md": "0dd76be34a60e3630f3eb8b54e4005035bc98d91e04566282b724453951d975d",
     ".github/agents/speckit.checklist.agent.md": "3bfb97f3286265a75f7f9321e79a3d31130a5be213013662fa2e43f22199942a",
     ".github/agents/speckit.clarify.agent.md": "0e7aeb5133272ace15629e560d394f9ea1622ca3873409b4d075c6c9f588d890",
@@ -23,5 +23,5 @@
     ".github/prompts/speckit.taskstoissues.prompt.md": "2f9636d4f312a1470f000747cb62677fec0655d8b4e2357fa4fbf238965fa66d",
     ".specify/integrations/copilot/scripts/update-context.ps1": "31b3cb0e13a4cbb93932ee0ac5de79436b30f58b1da63f73f8e82ca8050b9ea3",
     ".specify/integrations/copilot/scripts/update-context.sh": "89abb5cf143d07d9bd4cb4e4fe2623ec850933674a5c3d2ce2236c65c99d4100"
-  }
+    }
 }

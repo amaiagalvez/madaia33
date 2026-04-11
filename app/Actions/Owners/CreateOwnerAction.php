@@ -147,7 +147,7 @@ class CreateOwnerAction
 
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();

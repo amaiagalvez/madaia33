@@ -48,8 +48,8 @@ class UserRepository
     }
 
     /**
-     * @return User[]
-     */
+        * @return User[]
+        */
     public function getActiveUsers(): array
     {
         $results = $this->db->query("SELECT * FROM users WHERE active = 1");

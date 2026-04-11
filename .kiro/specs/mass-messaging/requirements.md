@@ -18,9 +18,9 @@ Sistema de envío de mensajes multicanal (email, SMS, WhatsApp, Telegram) dirigi
 - **Location**: Modelo existente que representa un portal o planta de garaje.
 - **PropertyAssignment**: Modelo existente que relaciona Owner con Property y, a través de ésta, con Location.
 - **Admin**: Usuario con acceso al panel de administración que puede crear y enviar Campaigns. Existen tres variantes con permisos distintos:
-  - `superadmin`: puede crear y enviar Campaigns a cualquier destinatario (`all`, cualquier portal, cualquier garaje), sin restricción alguna.
-  - `admin_general`: puede crear y enviar Campaigns a todos los destinatarios (`all`), a cualquier portal y a cualquier garaje, sin restricción de asignación.
-  - `admin_comunidad`: solo puede crear y enviar Campaigns a los portales o garajes que tenga asignados en `managedLocations`. No puede seleccionar el filtro `all` ni portales/garajes fuera de su asignación.
+    - `superadmin`: puede crear y enviar Campaigns a cualquier destinatario (`all`, cualquier portal, cualquier garaje), sin restricción alguna.
+    - `admin_general`: puede crear y enviar Campaigns a todos los destinatarios (`all`), a cualquier portal y a cualquier garaje, sin restricción de asignación.
+    - `admin_comunidad`: solo puede crear y enviar Campaigns a los portales o garajes que tenga asignados en `managedLocations`. No puede seleccionar el filtro `all` ni portales/garajes fuera de su asignación.
 
 ---
 

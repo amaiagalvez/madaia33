@@ -28,10 +28,10 @@ Treat these English source files as translation candidates when they exist:
 
 - For each `name.md`, create or update `name_es.md` in the same folder.
 - Examples:
-  - `spec.md` -> `spec_es.md`
-  - `plan.md` -> `plan_es.md`
-  - `contracts/admin-settings-sections.md` -> `contracts/admin-settings-sections_es.md`
-  - `checklists/requirements.md` -> `checklists/requirements_es.md`
+    - `spec.md` -> `spec_es.md`
+    - `plan.md` -> `plan_es.md`
+    - `contracts/admin-settings-sections.md` -> `contracts/admin-settings-sections_es.md`
+    - `checklists/requirements.md` -> `checklists/requirements_es.md`
 
 3. **Synchronization behavior (mandatory)**:
 

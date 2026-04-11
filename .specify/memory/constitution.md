@@ -2,24 +2,24 @@
 Sync Impact Report
 - Version change: 0.0.0-template -> 1.0.0
 - Modified principles:
-	- [PRINCIPLE_1_NAME] -> I. Docker-First Execution
-	- [PRINCIPLE_2_NAME] -> II. Laravel-First Architecture
-	- [PRINCIPLE_3_NAME] -> III. Test and Quality Gates (Non-Negotiable)
-	- [PRINCIPLE_4_NAME] -> IV. Data Safety and Query Efficiency
-	- [PRINCIPLE_5_NAME] -> V. Spec Traceability and Sync
+    - [PRINCIPLE_1_NAME] -> I. Docker-First Execution
+    - [PRINCIPLE_2_NAME] -> II. Laravel-First Architecture
+    - [PRINCIPLE_3_NAME] -> III. Test and Quality Gates (Non-Negotiable)
+    - [PRINCIPLE_4_NAME] -> IV. Data Safety and Query Efficiency
+    - [PRINCIPLE_5_NAME] -> V. Spec Traceability and Sync
 - Added sections:
-	- Technical Baseline and Constraints
-	- Workflow and Delivery Rules
+    - Technical Baseline and Constraints
+    - Workflow and Delivery Rules
 - Removed sections:
-	- None
+    - None
 - Templates requiring updates:
-	- ✅ updated: .specify/templates/plan-template.md
-	- ✅ updated: .specify/templates/spec-template.md
-	- ✅ updated: .specify/templates/tasks-template.md
-	- ✅ no files found: .specify/templates/commands/*.md
-	- ✅ updated: .docs/spec-kit-guia-vscode.md
+    - ✅ updated: .specify/templates/plan-template.md
+    - ✅ updated: .specify/templates/spec-template.md
+    - ✅ updated: .specify/templates/tasks-template.md
+    - ✅ no files found: .specify/templates/commands/*.md
+    - ✅ updated: .docs/spec-kit-guia-vscode.md
 - Follow-up TODOs:
-	- None
+    - None
 -->
 
 # madaia33 Constitution
@@ -60,14 +60,14 @@ updated to preserve alignment between requirements, plan, and implementation.
 - Static quality tools: Pint, Larastan/PHPStan, PHPMD.
 - Localization baseline: Euskera (primary) and Spanish.
 - Security baseline: validate user input, prefer reusable rules, and keep escaped output
-	in rendered views.
+    in rendered views.
 
 ## Workflow and Delivery Rules
 
 1. Create or update specs before implementation for feature work.
 2. Keep tasks independently testable and ordered by dependency.
 3. Run quality gate in Docker before final tests:
-	 `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
+        `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
 4. Run focused tests first, then broader verification if needed.
 5. For public UI changes, include browser-level verification and Dusk when applicable.
 6. Mark tasks done only after validation passes for that task scope.
@@ -77,15 +77,15 @@ updated to preserve alignment between requirements, plan, and implementation.
 This constitution overrides local workflow preferences when conflicts appear.
 
 - Amendment process:
-	- Propose change with rationale and impacted principles.
-	- Update dependent templates and guidance in the same change set.
-	- Record change in the Sync Impact Report header.
+    - Propose change with rationale and impacted principles.
+    - Update dependent templates and guidance in the same change set.
+    - Record change in the Sync Impact Report header.
 - Versioning policy:
-	- MAJOR: Principle removal or incompatible governance change.
-	- MINOR: New principle/section or materially expanded rule.
-	- PATCH: Clarifications, wording, or non-semantic cleanup.
+    - MAJOR: Principle removal or incompatible governance change.
+    - MINOR: New principle/section or materially expanded rule.
+    - PATCH: Clarifications, wording, or non-semantic cleanup.
 - Compliance review expectations:
-	- Each spec workflow phase MUST pass constitution checks before moving forward.
-	- Violations MUST be documented with justification and explicit approval.
+    - Each spec workflow phase MUST pass constitution checks before moving forward.
+    - Violations MUST be documented with justification and explicit approval.
 
 **Version**: 1.0.0 | **Ratified**: 2026-04-07 | **Last Amended**: 2026-04-07

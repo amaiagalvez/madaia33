@@ -357,7 +357,7 @@ class AdminNoticeManager extends Component
             ->map(fn (Location $location): array => [
                 'code' => $location->code,
                 'type' => $location->type,
-                'label' => $this->locationLabel($location).$location->code,
+                'label' => $this->locationLabel($location) . $location->code,
             ])
             ->all();
     }
@@ -365,10 +365,10 @@ class AdminNoticeManager extends Component
     private function locationLabel(Location $location): string
     {
         return match ($location->type) {
-            'portal' => __('admin.locations.types.portal').' ',
-            'local' => __('admin.locations.types.local').' ',
-            'garage' => __('admin.locations.types.garage').' ',
-            'storage' => __('admin.locations.types.storage').' ',
+            'portal' => __('admin.locations.types.portal') . ' ',
+            'local' => __('admin.locations.types.local') . ' ',
+            'garage' => __('admin.locations.types.garage') . ' ',
+            'storage' => __('admin.locations.types.storage') . ' ',
             default => '',
         };
     }

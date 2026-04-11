@@ -42,25 +42,25 @@ si el user no tiene un owner asignado solo podrá logearse con el email siempre 
 
 ### Egin beharreko lanak
 
- - [x] [app/Providers/FortifyServiceProvider.php](app/Providers/FortifyServiceProvider.php): autentikazio arau berriak.
- - [x] [resources/views/public/private.blade.php](resources/views/public/private.blade.php): login botoiaren portaera.
- - [x] [resources/views/pages/auth/forgot-password.blade.php](resources/views/pages/auth/forgot-password.blade.php): estilo + i18n lerrokapena.
- - [x] [resources/views/pages/auth/reset-password.blade.php](resources/views/pages/auth/reset-password.blade.php): pasahitz-aldaketako bista ere auth estilo berrira ekarria.
- - [x] [routes/web.php](routes/web.php) eta/edo auth redirect konfigurazioa: hizkuntza-kontestuko redirecta.
- - [x] [routes/settings.php](routes/settings.php) edo profile loturak: profile route fix.
- - [x] [tests/Feature/Auth/AuthenticationTest.php](tests/Feature/Auth/AuthenticationTest.php): owner + dni/email + is_active kasuak.
- - [x] [tests/Feature/Auth/PasswordResetTest.php](tests/Feature/Auth/PasswordResetTest.php): forgot-password/reset-password bistak eta erregresioak.
+    - [x] [app/Providers/FortifyServiceProvider.php](app/Providers/FortifyServiceProvider.php): autentikazio arau berriak.
+    - [x] [resources/views/public/private.blade.php](resources/views/public/private.blade.php): login botoiaren portaera.
+    - [x] [resources/views/pages/auth/forgot-password.blade.php](resources/views/pages/auth/forgot-password.blade.php): estilo + i18n lerrokapena.
+    - [x] [resources/views/pages/auth/reset-password.blade.php](resources/views/pages/auth/reset-password.blade.php): pasahitz-aldaketako bista ere auth estilo berrira ekarria.
+    - [x] [routes/web.php](routes/web.php) eta/edo auth redirect konfigurazioa: hizkuntza-kontestuko redirecta.
+    - [x] [routes/settings.php](routes/settings.php) edo profile loturak: profile route fix.
+    - [x] [tests/Feature/Auth/AuthenticationTest.php](tests/Feature/Auth/AuthenticationTest.php): owner + dni/email + is_active kasuak.
+    - [x] [tests/Feature/Auth/PasswordResetTest.php](tests/Feature/Auth/PasswordResetTest.php): forgot-password/reset-password bistak eta erregresioak.
 
 ### Balidazioa
 
- - [x] TDD bidez inplementazioa ahal den neurrian (testak eguneratu eta exekutatuta).
- - [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --format agent ...` ukitutako PHP fitxategietan exekutatua.
- - [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/Auth/AuthenticationTest.php tests/Feature/Auth/PasswordResetTest.php tests/Feature/Settings/ProfileUpdateTest.php tests/Feature/AdminAuthTest.php tests/Feature/DashboardTest.php tests/Feature/Auth/TwoFactorChallengeTest.php`
- - [x] Login/private fluxuarekin lotutako Browser testak Dusk workflowarekin exekutatu: `tests/Browser/AdminAuthTest.php` eta `tests/Browser/PrivatePageTest.php`.
+    - [x] TDD bidez inplementazioa ahal den neurrian (testak eguneratu eta exekutatuta).
+    - [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --format agent ...` ukitutako PHP fitxategietan exekutatua.
+    - [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/Auth/AuthenticationTest.php tests/Feature/Auth/PasswordResetTest.php tests/Feature/Settings/ProfileUpdateTest.php tests/Feature/AdminAuthTest.php tests/Feature/DashboardTest.php tests/Feature/Auth/TwoFactorChallengeTest.php`
+    - [x] Login/private fluxuarekin lotutako Browser testak Dusk workflowarekin exekutatu: `tests/Browser/AdminAuthTest.php` eta `tests/Browser/PrivatePageTest.php`.
 
 ### Oharrak
 
- - `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality` exekutatu da, baina ez da osorik pasa repoan aurrez zeuden style arazoengatik ukitu gabeko fitxategi askotan.
+    - `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality` exekutatu da, baina ez da osorik pasa repoan aurrez zeuden style arazoengatik ukitu gabeko fitxategi askotan.
 
 # Zuzenketak 1
 - [x] arregla la ruta /settings/profile

@@ -1,4 +1,4 @@
- # profila
+    # profila
 - [ ] usa el mismo componente para mostrar en el menu del front y del aginte-panela el nombre de usuario y el logout, usa como referencia el del aginte panela que está mejor
 - [ ] 
 un usuario tiene que tener un perfil desde el que pueda ver:

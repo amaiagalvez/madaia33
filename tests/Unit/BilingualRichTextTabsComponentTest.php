@@ -28,8 +28,8 @@ it('renders the same toolbar controls for both bilingual editor panes', function
     $html = (string) $view;
 
     $view->assertSee('data-bilingual-field="privacyContentEu"', false);
-    $view->assertSee('data-bilingual-pane="'.SupportedLocales::BASQUE.'"', false);
-    $view->assertSee('data-bilingual-pane="'.SupportedLocales::SPANISH.'"', false);
+    $view->assertSee('data-bilingual-pane="' . SupportedLocales::BASQUE . '"', false);
+    $view->assertSee('data-bilingual-pane="' . SupportedLocales::SPANISH . '"', false);
 
     expect(substr_count($html, 'data-bilingual-tab='))->toBe(2)
         ->and(substr_count($html, __('admin.settings_form.editor_bold')))->toBe(2)

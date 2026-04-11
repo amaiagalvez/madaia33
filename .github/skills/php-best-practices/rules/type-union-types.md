@@ -19,9 +19,9 @@ declare(strict_types=1);
 class ConfigLoader
 {
     /**
-     * @param string|array $source
-     * @return mixed
-     */
+        * @param string|array $source
+        * @return mixed
+        */
     public function load($source)
     {
         // No type enforcement, relies on docblock

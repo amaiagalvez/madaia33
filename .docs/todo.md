@@ -58,6 +58,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 - [ ] Repasa los feature test y los que se pueedan convertir en unit pasalos
 - [ ] Repasa la suit de test y completa los que falten
 - [ ] dentro de la carpeta madaia33 buscar todos los ficheros y carpetas que sean del usuario root y ponerles amaia:amaia
+sudo find /home/amaia/Dokumentuak/madaia33 -user root -exec chown amaia:amaia {} +
 - [ ] con el agente sorgina repasar el código y proponer mejoras
 - [ ] pint pasa guztira
 

@@ -3,10 +3,10 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Owner;
-use App\SupportedLocales;
 use Livewire\Component;
 use App\Models\Location;
 use App\Models\Property;
+use App\SupportedLocales;
 use Livewire\WithPagination;
 use App\Models\PropertyAssignment;
 use Illuminate\Contracts\View\View;

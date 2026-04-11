@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\PublicHomeController;
 use App\Http\Controllers\PublicVotingController;
@@ -70,7 +70,7 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin\n";
     $content .= "\n";
-    $content .= 'Sitemap: '.route('sitemap')."\n";
+    $content .= 'Sitemap: ' . route('sitemap') . "\n";
 
     return response($content, 200, ['Content-Type' => 'text/plain']);
 })->name('robots');

@@ -29,8 +29,8 @@ interface Encodable
 class CacheService
 {
     /**
-     * @param Cacheable&Encodable $item
-     */
+        * @param Cacheable&Encodable $item
+        */
     public function store($item): void
     {
         // No type enforcement - relies on docblock

@@ -56,26 +56,26 @@ necesito un CRUD para los usarios y para poder asignarles permisos, en el listad
 ### Egin beharreko lanak
 
 - [x] `database/migrations/*`:
-	- rol taulak/pibot taula berriak.
-	- `user_location` (edo baliokidea) `admin_comunidad` kasurako, erabiltzaile bakoitzak kokapen anitz izan ditzan.
+    - rol taulak/pibot taula berriak.
+    - `user_location` (edo baliokidea) `admin_comunidad` kasurako, erabiltzaile bakoitzak kokapen anitz izan ditzan.
 - [x] `app/Models/User.php` eta erlazionatutako modeloak:
-	- rol erlazioak eta helper metodoak.
+    - rol erlazioak eta helper metodoak.
 - [x] `routes/web.php`:
-	- admin/users route berriak eta role middleware aplikazioa.
+    - admin/users route berriak eta role middleware aplikazioa.
 - [x] `resources/views/layouts/admin/main.blade.php`:
-	- menu aukeren role-based ikusgarritasuna.
+    - menu aukeren role-based ikusgarritasuna.
 - [x] `app/Livewire/AdminNoticeManager.php`:
-	- lokazio aukera eta gordetze murrizketak rolez.
+    - lokazio aukera eta gordetze murrizketak rolez.
 - [x] `app/Livewire/Admin/Locations.php` eta lotutako klaseak:
-	- komunitate-adminen sarbide eta kudeaketa murrizketak (esleitutako kokapenetara mugatuta).
+    - komunitate-adminen sarbide eta kudeaketa murrizketak (esleitutako kokapenetara mugatuta).
 - [x] `app/Livewire/PublicVotings.php` eta/edo bozketa action/service:
-	- boto baimen baldintza berriak.
+    - boto baimen baldintza berriak.
 - [x] `app/Actions/CreateOwnerAction.php`:
-	- `propietaria` rol automatikoa.
+    - `propietaria` rol automatikoa.
 - [x] `tests/Feature/**` eta beharrezkoa denean `tests/Unit/**`:
-	- rolak, CRUD baimenak, bozketa murrizketak eta regresio testak.
+    - rolak, CRUD baimenak, bozketa murrizketak eta regresio testak.
 - [x] `lang/eu/**`, `lang/es/**`:
-	- etiketa eta errore mezu berriak.
+    - etiketa eta errore mezu berriak.
 
 ### Balidazioa
 

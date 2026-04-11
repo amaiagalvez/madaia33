@@ -120,9 +120,9 @@ en la lista de personas que han votado a la que se accede desde el listado de vo
 ### Helburua
 
 - [x] Boto presentiziala gehitu: bozka delegatuaren paraleloa baina:
-  - ❌ Ez DNI piden
-  - ✅ `voting_ballots.is_in_person = true` markatuta
-  - ✅ Rola `DELEGATED_VOTE` denak bi mota erabili ditzakete (delegado + presentiziala)
+    - ❌ Ez DNI piden
+    - ✅ `voting_ballots.is_in_person = true` markatuta
+    - ✅ Rola `DELEGATED_VOTE` denak bi mota erabili ditzakete (delegado + presentiziala)
 
 ### Erabaki teknikoak
 

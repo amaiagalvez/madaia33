@@ -26,22 +26,22 @@ description: "Task list template for feature implementation"
 - Paths shown below assume single project - adjust based on plan.md structure
 
 <!-- 
-  ============================================================================
-  IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
-  
-  The /speckit.tasks command MUST replace these with actual tasks based on:
-  - User stories from spec.md (with their priorities P1, P2, P3...)
-  - Feature requirements from plan.md
-  - Entities from data-model.md
-  - Endpoints from contracts/
-  
-  Tasks MUST be organized by user story so each story can be:
-  - Implemented independently
-  - Tested independently
-  - Delivered as an MVP increment
-  
-  DO NOT keep these sample tasks in the generated tasks.md file.
-  ============================================================================
+    ============================================================================
+    IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
+    
+    The /speckit.tasks command MUST replace these with actual tasks based on:
+    - User stories from spec.md (with their priorities P1, P2, P3...)
+    - Feature requirements from plan.md
+    - Entities from data-model.md
+    - Endpoints from contracts/
+    
+    Tasks MUST be organized by user story so each story can be:
+    - Implemented independently
+    - Tested independently
+    - Delivered as an MVP increment
+    
+    DO NOT keep these sample tasks in the generated tasks.md file.
+    ============================================================================
 -->
 
 ## Phase 1: Setup (Shared Infrastructure)
@@ -166,8 +166,8 @@ Examples of foundational tasks (adjust based on your project):
 - **Setup (Phase 1)**: No dependencies - can start immediately
 - **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
 - **User Stories (Phase 3+)**: All depend on Foundational phase completion
-  - User stories can then proceed in parallel (if staffed)
-  - Or sequentially in priority order (P1 → P2 → P3)
+    - User stories can then proceed in parallel (if staffed)
+    - Or sequentially in priority order (P1 → P2 → P3)
 - **Polish (Final Phase)**: Depends on all desired user stories being complete
 
 ### User Story Dependencies
@@ -233,9 +233,9 @@ With multiple developers:
 
 1. Team completes Setup + Foundational together
 2. Once Foundational is done:
-   - Developer A: User Story 1
-   - Developer B: User Story 2
-   - Developer C: User Story 3
+    - Developer A: User Story 1
+    - Developer B: User Story 2
+    - Developer C: User Story 3
 3. Stories complete and integrate independently
 
 ---
@@ -251,5 +251,5 @@ With multiple developers:
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
 - For this repository, run implementation and validation commands in Docker
 - Include quality gate before documentation/final validation:
-  - `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
+    - `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
 - Include a final coverage task as the last task in the generated plan

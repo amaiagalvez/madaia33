@@ -48,22 +48,22 @@ Usage: check-prerequisites.sh [OPTIONS]
 Consolidated prerequisite checking for Spec-Driven Development workflow.
 
 OPTIONS:
-  --json              Output in JSON format
-  --require-tasks     Require tasks.md to exist (for implementation phase)
-  --include-tasks     Include tasks.md in AVAILABLE_DOCS list
-  --paths-only        Only output path variables (no prerequisite validation)
-  --help, -h          Show this help message
+    --json              Output in JSON format
+    --require-tasks     Require tasks.md to exist (for implementation phase)
+    --include-tasks     Include tasks.md in AVAILABLE_DOCS list
+    --paths-only        Only output path variables (no prerequisite validation)
+    --help, -h          Show this help message
 
 EXAMPLES:
-  # Check task prerequisites (plan.md required)
-  ./check-prerequisites.sh --json
-  
-  # Check implementation prerequisites (plan.md + tasks.md required)
-  ./check-prerequisites.sh --json --require-tasks --include-tasks
-  
-  # Get feature paths only (no validation)
-  ./check-prerequisites.sh --paths-only
-  
+    # Check task prerequisites (plan.md required)
+    ./check-prerequisites.sh --json
+    
+    # Check implementation prerequisites (plan.md + tasks.md required)
+    ./check-prerequisites.sh --json --require-tasks --include-tasks
+    
+    # Get feature paths only (no validation)
+    ./check-prerequisites.sh --paths-only
+    
 EOF
             exit 0
             ;;

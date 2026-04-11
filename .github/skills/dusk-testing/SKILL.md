@@ -3,7 +3,7 @@ name: dusk-test
 description: "Use this skill when running, fixing, or debugging Laravel Dusk Browser tests in this project (especially in Docker). Trigger when Browser tests fail with errors like missing chromium binary, missing chromedriver path, or net::ERR_CONNECTION_REFUSED. Uses a selenium-first, non-root workflow with isolated sqlite, in-container app server, and stable APP_URL routing."
 license: MIT
 metadata:
-  author: madaia33
+    author: madaia33
 ---
 
 # Dusk Test Workflow
@@ -16,9 +16,9 @@ Run Browser tests reliably in this repository with a non-root Docker workflow.
 
 - You run tests under `tests/Browser/`.
 - Dusk fails with one of these errors:
-  - `Invalid path to Chromedriver`
-  - `no chrome binary at /usr/bin/chromium`
-  - `unknown error: net::ERR_CONNECTION_REFUSED`
+    - `Invalid path to Chromedriver`
+    - `no chrome binary at /usr/bin/chromium`
+    - `unknown error: net::ERR_CONNECTION_REFUSED`
 - You need reproducible Browser test execution without root installs.
 
 ## Default Workflow (First Try)
@@ -55,8 +55,8 @@ php artisan migrate:fresh --seed --force >/tmp/migrate-seed.log 2>&1
 php artisan serve --host=0.0.0.0 --port=8000 >/tmp/laravel-serve.log 2>&1 &
 SERVER_PID=$!
 for i in $(seq 1 40); do
-  if curl -fsS http://127.0.0.1:8000 >/dev/null 2>&1; then break; fi
-  sleep 1
+    if curl -fsS http://127.0.0.1:8000 >/dev/null 2>&1; then break; fi
+    sleep 1
 done
 php artisan test --compact tests/Browser
 STATUS=$?
@@ -116,8 +116,8 @@ php artisan migrate:fresh --seed --force >/tmp/migrate-seed.log 2>&1
 php artisan serve --host=0.0.0.0 --port=8000 >/tmp/laravel-serve.log 2>&1 &
 SERVER_PID=$!
 for i in $(seq 1 40); do
-   if curl -fsS http://127.0.0.1:8000 >/dev/null 2>&1; then break; fi
-   sleep 1
+    if curl -fsS http://127.0.0.1:8000 >/dev/null 2>&1; then break; fi
+    sleep 1
 done
 php artisan test --compact tests/Browser/PublicNavigationTest.php
 STATUS=$?
@@ -156,12 +156,12 @@ php artisan tinker --execute 'dump(config("database.default"), config("database.
 ## Common Failure and Fix
 
 - Error: `unknown error: net::ERR_CONNECTION_REFUSED`.
-  - Cause: Selenium cannot reach the app server URL.
-  - Fix: use `--name dusk-app`, serve on `0.0.0.0:8000`, and set `APP_URL=http://dusk-app:8000`.
+    - Cause: Selenium cannot reach the app server URL.
+    - Fix: use `--name dusk-app`, serve on `0.0.0.0:8000`, and set `APP_URL=http://dusk-app:8000`.
 
 - Error: Mail assertions fail in Browser tests.
-  - Cause: test run uses `MAIL_MAILER=array` while tests expect Mailhog delivery.
-  - Fix: set `MAIL_MAILER=smtp`, `MAIL_HOST=mailhog`, `MAIL_PORT=1025` for Browser suite runs.
+    - Cause: test run uses `MAIL_MAILER=array` while tests expect Mailhog delivery.
+    - Fix: set `MAIL_MAILER=smtp`, `MAIL_HOST=mailhog`, `MAIL_PORT=1025` for Browser suite runs.
 
 ## Test Scope Rule
 

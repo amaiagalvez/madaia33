@@ -50,10 +50,10 @@ test('bilingual settings blocks keep the same height when switching between EUS 
                         return false;
                     }
 
-              root.querySelector('[data-bilingual-tab="{$basqueLocale}"]').click();
+                root.querySelector('[data-bilingual-tab="{$basqueLocale}"]').click();
                     const euHeight = Math.round(root.getBoundingClientRect().height);
 
-              root.querySelector('[data-bilingual-tab="{$spanishLocale}"]').click();
+                root.querySelector('[data-bilingual-tab="{$spanishLocale}"]').click();
                     const esHeight = Math.round(root.getBoundingClientRect().height);
 
                     return Math.abs(euHeight - esHeight) <= 1;
@@ -68,10 +68,10 @@ test('bilingual settings blocks keep the same height when switching between EUS 
                         return false;
                     }
 
-              root.querySelector('[data-bilingual-tab="{$basqueLocale}"]').click();
+                root.querySelector('[data-bilingual-tab="{$basqueLocale}"]').click();
                     const euHeight = Math.round(root.getBoundingClientRect().height);
 
-              root.querySelector('[data-bilingual-tab="{$spanishLocale}"]').click();
+                root.querySelector('[data-bilingual-tab="{$spanishLocale}"]').click();
                     const esHeight = Math.round(root.getBoundingClientRect().height);
 
                     return Math.abs(euHeight - esHeight) <= 1;

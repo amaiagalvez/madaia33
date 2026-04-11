@@ -23,8 +23,8 @@ Evitar regresiones repetidas tras correcciones y convertir hallazgos técnicos e
 
 - Encapsular escrituras relacionadas en transacciones.
 - Para exclusividad (por ejemplo, un único registro activo), combinar:
-  - validación de aplicación con bloqueo transaccional, y
-  - restricción en base de datos.
+    - validación de aplicación con bloqueo transaccional, y
+    - restricción en base de datos.
 
 ### 3) Auditoría y trazabilidad
 
@@ -50,10 +50,10 @@ Evitar regresiones repetidas tras correcciones y convertir hallazgos técnicos e
 
 - Evitar tests acoplados a datos semilla concretos cuando se pueda usar factory.
 - Añadir tests para cubrir:
-  - caminos felices,
-  - restricciones de seguridad,
-  - validaciones de borde,
-  - escenarios de regresión detectados.
+    - caminos felices,
+    - restricciones de seguridad,
+    - validaciones de borde,
+    - escenarios de regresión detectados.
 
 ### 8) Calidad y verificación
 

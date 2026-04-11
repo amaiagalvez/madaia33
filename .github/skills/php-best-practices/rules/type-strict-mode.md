@@ -230,9 +230,9 @@ final class UserService
     }
 
     /**
-     * @param array<int> $ids
-     * @return array<User>
-     */
+        * @param array<int> $ids
+        * @return array<User>
+        */
     public function findMany(array $ids): array
     {
         return $this->repository->findMany($ids);

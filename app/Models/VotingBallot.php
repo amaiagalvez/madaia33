@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Database\Factories\VotingBallotFactory;
 use Illuminate\Database\Eloquent\Model;
+use Database\Factories\VotingBallotFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

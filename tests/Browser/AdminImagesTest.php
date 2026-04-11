@@ -10,10 +10,10 @@ use Laravel\Dusk\Browser;
 
 test('admin can upload an image and it appears in the public gallery', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
-    $altText = 'Dusk test irudia '.time();
+    $altText = 'Dusk test irudia ' . time();
 
     // Create a temporary test image inside the container's temp dir
-    $tmpImage = '/tmp/dusk_test_'.time().'.jpg';
+    $tmpImage = '/tmp/dusk_test_' . time() . '.jpg';
     $img = imagecreatetruecolor(100, 100);
     $color = imagecolorallocate($img, 100, 150, 200);
     imagefill($img, 0, 0, $color);
@@ -34,13 +34,13 @@ test('admin can upload an image and it appears in the public gallery', function 
         $browser->type('#altEu', $altText)
             ->select('#tag', 'madaia')
             ->press('Argazkia igo')
-            ->waitUntil("document.body.innerText.includes('".addslashes($altText)."')", 30)
-            ->assertScript("return document.body.innerText.includes('".addslashes($altText)."');", true);
+            ->waitUntil("document.body.innerText.includes('" . addslashes($altText) . "')", 30)
+            ->assertScript("return document.body.innerText.includes('" . addslashes($altText) . "');", true);
 
         // Verify in public gallery
         $browser->visit('/eu/argazki-bilduma')
-            ->waitUntil("document.body.innerText.includes('".addslashes($altText)."')", 30)
-            ->assertScript("return document.body.innerText.includes('".addslashes($altText)."');", true);
+            ->waitUntil("document.body.innerText.includes('" . addslashes($altText) . "')", 30)
+            ->assertScript("return document.body.innerText.includes('" . addslashes($altText) . "');", true);
     });
 
     @unlink($tmpImage);

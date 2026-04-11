@@ -353,7 +353,7 @@ class AdminSettings extends Component
             return Storage::url($logoPath);
         }
 
-        return asset('storage/'.ltrim($logoPath, '/'));
+        return asset('storage/' . ltrim($logoPath, '/'));
     }
 
     public function openTestEmailModal(): void

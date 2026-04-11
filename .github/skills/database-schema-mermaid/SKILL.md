@@ -3,7 +3,7 @@ name: database-schema-mermaid
 description: "Use this skill when you need to document, update, or review the database structure as a Mermaid ER diagram in this Laravel project. Trigger on requests like: database diagram, ERD, Mermaid DB schema, table relations, or migration structure update."
 license: MIT
 metadata:
-  author: madaia33
+    author: madaia33
 ---
 
 # Database Schema Mermaid
@@ -20,9 +20,9 @@ Use this skill to keep a single up-to-date Mermaid ER diagram for the current La
 
 1. Read all migrations in `database/migrations/`.
 2. List entities (tables) and key columns:
-   - primary key
-   - foreign keys
-   - business-critical columns (status, dates, unique keys)
+    - primary key
+    - foreign keys
+    - business-critical columns (status, dates, unique keys)
 3. Extract relations from `foreignId()->constrained()` and explicit foreign declarations.
 4. Update the ER diagram below.
 5. Validate Mermaid syntax before finishing.

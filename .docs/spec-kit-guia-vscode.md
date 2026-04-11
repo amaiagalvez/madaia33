@@ -25,25 +25,25 @@ Comandos principales disponibles:
 ## 2) Flujo recomendado (corto)
 
 1. Define reglas del proyecto:
-   - `/speckit.constitution Define principios de calidad, testing, rendimiento y seguridad para este proyecto Laravel`
+    - `/speckit.constitution Define principios de calidad, testing, rendimiento y seguridad para este proyecto Laravel`
 
 2. Crea la especificacion funcional (que/por que, no como):
-   - `/speckit.specify Quiero implementar ...`
+    - `/speckit.specify Quiero implementar ...`
 
 3. Aclara ambiguedades antes del plan:
-   - `/speckit.clarify`
+    - `/speckit.clarify`
 
 4. Genera el plan tecnico:
-   - `/speckit.plan Usar Laravel 13, Livewire 4, Tailwind v4, MariaDB y Pest`
+    - `/speckit.plan Usar Laravel 13, Livewire 4, Tailwind v4, MariaDB y Pest`
 
 5. Genera tareas ejecutables:
-   - `/speckit.tasks`
+    - `/speckit.tasks`
 
 6. Revisa consistencia entre spec/plan/tareas:
-   - `/speckit.analyze`
+    - `/speckit.analyze`
 
 7. Implementa por fases:
-   - `/speckit.implement`
+    - `/speckit.implement`
 
 ## 3) Estructura que vas a ver
 
@@ -89,19 +89,19 @@ Esto ya esta pasado a la constitucion y a las plantillas de plan/spec/tasks.
 Usa este enfoque para no inventar:
 
 1. Fuente de verdad tecnica:
-   - AGENTS.md
-   - composer.json y package.json
-   - tests/ y herramientas de calidad configuradas
+    - AGENTS.md
+    - composer.json y package.json
+    - tests/ y herramientas de calidad configuradas
 
 2. Pasa esas reglas a principios declarativos (MUST/SHOULD):
-   - Ejemplo: "Docker-first" -> "All project commands MUST run in Docker".
+    - Ejemplo: "Docker-first" -> "All project commands MUST run in Docker".
 
 3. Mueve requisitos operativos a "Workflow and Delivery Rules":
-   - quality gate
-   - orden de validacion
-   - cobertura al final
+    - quality gate
+    - orden de validacion
+    - cobertura al final
 
 4. Si cambias un principio:
-   - actualiza `.specify/memory/constitution.md`
-   - revisa plantillas `.specify/templates/*.md`
-   - deja trazabilidad en el comentario "Sync Impact Report"
+    - actualiza `.specify/memory/constitution.md`
+    - revisa plantillas `.specify/templates/*.md`
+    - deja trazabilidad en el comentario "Sync Impact Report"

@@ -309,7 +309,7 @@ public function test_fetches_data_from_external_api(): void
 
     Http::assertSent(function ($request) {
         return $request->url() === 'https://api.example.com/data' &&
-               $request->hasHeader('Authorization');
+                $request->hasHeader('Authorization');
     });
 }
 

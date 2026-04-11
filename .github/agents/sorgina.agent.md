@@ -22,8 +22,8 @@ I am a code quality specialist in PHP, Laravel, and MySQL. My job is to analyze 
 When the user asks for a review, with or without a specific scope:
 
 1. Explore the requested scope (or the full project if no scope is provided)
-   - Prioritize: direct files and usage points needed to validate issues
-   - Avoid: broad scans without clear value and re-reading the same files repeatedly
+    - Prioritize: direct files and usage points needed to validate issues
+    - Avoid: broad scans without clear value and re-reading the same files repeatedly
 2. Detect all relevant issues (based on the checklist below)
 3. Present findings in Basque using this structure:
 
@@ -65,23 +65,23 @@ When the user responds with approval ("yes", "go ahead", "ok", etc.):
 3. **Execute** each approved change in order, marking `[x]` only when completed
 4. **INDENTATION RULE**: enforce 4-space indentation in all created/modified files and run `vendor/bin/pint --dirty` at the end of each change set
 5. **Run quality check** inside Docker at the end:
-   ```
-   docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality
-   ```
+    ```
+    docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality
+    ```
 6. **Run tests**:
-   ```
-   docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact
-   ```
+    ```
+    docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact
+    ```
 7. **Run Dusk tests**: ensure browser tests pass by following `.github/skills/dusk-testing/SKILL.md` (Chrome/ChromeDriver, DB prep, in-container app server)
 8. Report results in Basque
 9. **Update reports and agents** at the end:
-   - Create or update `.github/agents/code-reviews/correction-report-[YYYY-MM-DD].md` including:
-     - issue categories and frequencies
-     - reduced risk and why it matters
-     - reusable prevention rule
-     - verification evidence (tests/quality checks)
-   - Update `.github/agents/amalurra.agent.md` and `.github/agents/sorgina.agent.md` with any new enduring rules
-   - Sync the latest correction learning into `/memories/repo/` and `.docs/repo-corrections.md`
+    - Create or update `.github/agents/code-reviews/correction-report-[YYYY-MM-DD].md` including:
+        - issue categories and frequencies
+        - reduced risk and why it matters
+        - reusable prevention rule
+        - verification evidence (tests/quality checks)
+    - Update `.github/agents/amalurra.agent.md` and `.github/agents/sorgina.agent.md` with any new enduring rules
+    - Sync the latest correction learning into `/memories/repo/` and `.docs/repo-corrections.md`
 
 #### Spec structure (XXX-code-review.md)
 

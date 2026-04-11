@@ -57,7 +57,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn($word) => Str::substr($word, 0, 1))
+            ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 
@@ -232,8 +232,8 @@ class User extends Authenticatable
     public function syncRoleNames(array $roles): void
     {
         $normalizedRoles = collect($roles)
-            ->filter(static fn(string $role): bool => in_array($role, Role::names(), true))
-            ->reject(fn(string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
+            ->filter(static fn (string $role): bool => in_array($role, Role::names(), true))
+            ->reject(fn (string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
             ->unique()
             ->values();
 

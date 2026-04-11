@@ -48,7 +48,7 @@ class PropertySeeder extends Seeder
 
         foreach (range(1, 6) as $floor) {
             foreach (['A', 'B', 'C'] as $letter) {
-                $portalProperties[] = $floor.'-'.$letter;
+                $portalProperties[] = $floor . '-' . $letter;
             }
         }
 

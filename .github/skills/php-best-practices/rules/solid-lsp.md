@@ -234,16 +234,16 @@ declare(strict_types=1);
 interface PaymentGateway
 {
     /**
-     * Process a payment.
-     *
-     * @throws InsufficientFundsException When balance is insufficient
-     * @throws PaymentDeclinedException When payment is declined
-     */
+        * Process a payment.
+        *
+        * @throws InsufficientFundsException When balance is insufficient
+        * @throws PaymentDeclinedException When payment is declined
+        */
     public function charge(Money $amount, PaymentMethod $method): PaymentResult;
 
     /**
-     * Refund must return the same currency as the original payment.
-     */
+        * Refund must return the same currency as the original payment.
+        */
     public function refund(PaymentId $paymentId, Money $amount): RefundResult;
 }
 

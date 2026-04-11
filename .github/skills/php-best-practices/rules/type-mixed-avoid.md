@@ -68,10 +68,10 @@ class DataProcessor
 
     // Generic-like approach using templates (PHPStan/Psalm)
     /**
-     * @template T
-     * @param T $input
-     * @return T
-     */
+        * @template T
+        * @param T $input
+        * @return T
+        */
     public function transform(mixed $input): mixed
     {
         // When mixed is unavoidable, use generics for type tracking
@@ -81,24 +81,24 @@ class DataProcessor
 
 // Type-safe cache using generics
 /**
- * @template T
- */
+    * @template T
+    */
 class TypedCache
 {
     /** @var array<string, T> */
     private array $storage = [];
 
     /**
-     * @param T $value
-     */
+        * @param T $value
+        */
     public function set(string $key, mixed $value): void
     {
         $this->storage[$key] = $value;
     }
 
     /**
-     * @return T|null
-     */
+        * @return T|null
+        */
     public function get(string $key): mixed
     {
         return $this->storage[$key] ?? null;
@@ -126,11 +126,11 @@ class UserCache
 class JsonEncoder
 {
     /**
-     * Encodes any JSON-serializable value.
-     * Mixed is appropriate here as JSON can encode any scalar, array, or object.
-     *
-     * @param scalar|array|object|null $value
-     */
+        * Encodes any JSON-serializable value.
+        * Mixed is appropriate here as JSON can encode any scalar, array, or object.
+        *
+        * @param scalar|array|object|null $value
+        */
     public function encode(mixed $value): string
     {
         return json_encode($value, JSON_THROW_ON_ERROR);

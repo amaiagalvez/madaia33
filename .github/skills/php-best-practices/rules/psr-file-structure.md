@@ -35,13 +35,13 @@ use App\Repositories\UserRepository;
 <?php
 
 /**
- * This file is part of the MyApp package.
- *
- * (c) Company Name <email@example.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+    * This file is part of the MyApp package.
+    *
+    * (c) Company Name <email@example.com>
+    *
+    * For the full copyright and license information, please view the LICENSE
+    * file that was distributed with this source code.
+    */
 
 declare(strict_types=1);
 
@@ -57,8 +57,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Handles user-related business operations.
- */
+    * Handles user-related business operations.
+    */
 final class UserService implements UserServiceInterface
 {
     use LoggableTrait;
@@ -166,9 +166,9 @@ final class UserService implements UserServiceInterface
 5. namespace declaration
 6. Blank line
 7. use statements (grouped and sorted)
-   - PHP native classes
-   - External packages
-   - Internal project classes
+    - PHP native classes
+    - External packages
+    - Internal project classes
 8. Blank line
 9. Class/Interface/Trait/Enum docblock
 10. Class/Interface/Trait/Enum declaration

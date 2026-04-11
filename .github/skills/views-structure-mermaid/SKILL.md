@@ -3,7 +3,7 @@ name: views-structure-mermaid
 description: "Use this skill when you need to document, update, or review the structure of Blade views and their relationships (routes, layouts, components, includes, and Livewire mounts) as a Mermaid diagram in this Laravel project. Trigger on requests like: views diagram, Blade architecture, Mermaid views map, template relations, or route-to-view structure update."
 license: MIT
 metadata:
-  author: madaia33
+    author: madaia33
 ---
 
 # Views Structure Mermaid

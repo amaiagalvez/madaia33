@@ -75,11 +75,11 @@ La implementación concreta de SMS y WhatsApp se definirá cuando se elija el pr
 class RecipientResolver
 {
     /**
-     * Resuelve los Owners que cumplen el filtro y genera CampaignRecipient
-     * para cada contacto válido (coprop1 y coprop2) según el canal.
-     *
-     * @return Collection<int, array{owner_id: int, slot: string, contact: string}>
-     */
+        * Resuelve los Owners que cumplen el filtro y genera CampaignRecipient
+        * para cada contacto válido (coprop1 y coprop2) según el canal.
+        *
+        * @return Collection<int, array{owner_id: int, slot: string, contact: string}>
+        */
     public function resolve(Campaign $campaign): Collection;
 }
 ```
@@ -99,9 +99,9 @@ Para cada Owner se generan hasta dos entradas: `coprop1` (si tiene contacto) y `
 class MessageVariableResolver
 {
     /**
-     * Sustituye todas las variables **nombre_variable** en el texto
-     * por los valores del Owner/Recipient correspondiente.
-     */
+        * Sustituye todas las variables **nombre_variable** en el texto
+        * por los valores del Owner/Recipient correspondiente.
+        */
     public function resolve(string $text, Owner $owner, string $slot): string;
 }
 ```
@@ -234,11 +234,11 @@ El comando busca Campaigns con `status = 'scheduled'` y `scheduled_at <= now()` 
 **`AdminCampaignDetail`** (`app/Livewire/AdminCampaignDetail.php`)
 
 - Panel de métricas agregadas por Campaign:
-  - Total enviados
-  - Aperturas únicas + porcentaje sobre total enviados (solo email)
-  - Clics únicos + porcentaje sobre total enviados
-  - Descargas únicas + porcentaje sobre total enviados
-  - Fallos de entrega + porcentaje sobre total enviados
+    - Total enviados
+    - Aperturas únicas + porcentaje sobre total enviados (solo email)
+    - Clics únicos + porcentaje sobre total enviados
+    - Descargas únicas + porcentaje sobre total enviados
+    - Fallos de entrega + porcentaje sobre total enviados
 - Tabla de detalle por Recipient con columnas: nombre, contacto, estado de entrega, abierto (sí/no), clics, descargas, última actividad.
 - Cada fila expandible para ver el detalle de todos los `CampaignTrackingEvent` del Recipient (tipo, URL/documento, fecha y hora, IP).
 - Botón "Reenviar a no abiertos": crea una nueva Campaign en estado `draft` con el mismo contenido, canal y documentos, con los Recipients sin evento `open` como destinatarios, para que el Admin la revise y confirme el envío.

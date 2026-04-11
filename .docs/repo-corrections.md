@@ -120,3 +120,4 @@
 - If the user asks to add rules in specific agent files, update `.github/agents/*.agent.md` directly (not only `AGENTS.md`) and keep the rule text symmetric across the requested agents.
 - If a migration alters ENUM constraints, make it database-driver aware (MySQL/SQLite). In SQLite tests, rebuild table with updated CHECK constraint or equivalent compatible path to avoid `near "MODIFY"` failures.
 - In this repo, user-model observer/hooks for mirrored owner fields may not trigger reliably in all test flows; keep synchronization deterministic by calling an explicit `User::syncOwnerIdentity()` right after user profile/admin saves, and cover it with focused Feature tests.
+- In indentation normalization scripts, preserve PHPDoc/JSDoc block indentation (`/** ... */`) to avoid misaligned comment stars; skip those blocks while normalizing code indentation.

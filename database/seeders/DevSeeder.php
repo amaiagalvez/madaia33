@@ -460,8 +460,8 @@ class DevSeeder extends Seeder
         Storage::disk('public')->makeDirectory('images');
 
         foreach ($items as $index => $item) {
-            $filename = Str::uuid().'.svg';
-            $path = 'images/'.$filename;
+            $filename = Str::uuid() . '.svg';
+            $path = 'images/' . $filename;
             $imageText = $item['alt_es'];
 
             Storage::disk('public')->put(

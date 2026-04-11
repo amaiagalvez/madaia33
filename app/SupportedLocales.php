@@ -76,7 +76,7 @@ final class SupportedLocales
 
     public static function localizedKey(string $prefix, ?string $locale = null): string
     {
-        return $prefix.'_'.self::normalize($locale ?? self::current());
+        return $prefix . '_' . self::normalize($locale ?? self::current());
     }
 
     /**
@@ -85,7 +85,7 @@ final class SupportedLocales
     public static function localizedKeys(string $prefix, ?string $locale = null): array
     {
         return array_map(
-            static fn (string $supportedLocale): string => $prefix.'_'.$supportedLocale,
+            static fn (string $supportedLocale): string => $prefix . '_' . $supportedLocale,
             self::fallbackChain($locale),
         );
     }
@@ -107,13 +107,13 @@ final class SupportedLocales
 
     public static function routeName(string $baseName, ?string $locale = null): string
     {
-        return $baseName.'.'.self::normalize($locale ?? self::current());
+        return $baseName . '.' . self::normalize($locale ?? self::current());
     }
 
     public static function baseRouteName(string $routeName): string
     {
         foreach (self::all() as $locale) {
-            $suffix = '.'.$locale;
+            $suffix = '.' . $locale;
             if (str_ends_with($routeName, $suffix)) {
                 return substr($routeName, 0, -strlen($suffix));
             }

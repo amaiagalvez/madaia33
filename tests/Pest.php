@@ -67,7 +67,7 @@ function attachNoticeToLocationCode(Notice $notice, string $code): NoticeLocatio
         $locationId = Location::factory()->create([
             'type' => str_starts_with($code, 'P-') ? 'garage' : 'portal',
             'code' => $code,
-            'name' => 'Location '.$code,
+            'name' => 'Location ' . $code,
         ])->id;
     }
 

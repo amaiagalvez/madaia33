@@ -3,7 +3,7 @@ name: lighthouse-frontend-audit
 description: "Use this skill after frontend changes in this project to run Lighthouse in a Docker-first workflow (after relevant Dusk tests pass), analyze results, and propose concrete improvements. Trigger on requests mentioning lighthouse, frontend audit, performance/accessibility/seo/best-practices review, or post-Dusk quality checks."
 license: MIT
 metadata:
-  author: madaia33
+    author: madaia33
 ---
 
 # Lighthouse Frontend Audit Workflow
@@ -17,10 +17,10 @@ Run Lighthouse reliably in this repository using Docker-only commands, then prov
 - Frontend Blade/Livewire/Tailwind pages were changed.
 - Relevant Dusk tests already passed (required gate before Lighthouse).
 - You need a measurable report for:
-  - Performance
-  - Accessibility
-  - Best Practices
-  - SEO
+    - Performance
+    - Accessibility
+    - Best Practices
+    - SEO
 
 ## Mandatory Preconditions
 
@@ -53,10 +53,10 @@ node - <<'NODE'
 const fs = require('fs');
 const files = fs.readdirSync('.docs').filter(f => f.startsWith('lighthouse-') && f.endsWith('.json')).sort();
 for (const file of files) {
-  const r = JSON.parse(fs.readFileSync(`.docs/${file}`, 'utf8'));
-  const c = r.categories;
-  const pct = (v) => Math.round((v?.score ?? 0) * 100);
-  console.log(`${file}: performance=${pct(c.performance)} accessibility=${pct(c.accessibility)} best-practices=${pct(c['best-practices'])} seo=${pct(c.seo)}`);
+    const r = JSON.parse(fs.readFileSync(`.docs/${file}`, 'utf8'));
+    const c = r.categories;
+    const pct = (v) => Math.round((v?.score ?? 0) * 100);
+    console.log(`${file}: performance=${pct(c.performance)} accessibility=${pct(c.accessibility)} best-practices=${pct(c['best-practices'])} seo=${pct(c.seo)}`);
 }
 NODE
 ```
@@ -69,22 +69,22 @@ Save improved reports with a `-v2` suffix (e.g. `lighthouse-madaia33-es-galeria-
 node - <<'NODE'
 const fs = require('fs');
 const pairs = fs.readdirSync('.docs')
-  .filter(f => f.endsWith('-v2.json') && f.startsWith('lighthouse-'))
-  .map(v2 => ({ v2, v1: v2.replace('-v2.json', '.json') }))
-  .filter(p => fs.existsSync(`.docs/${p.v1}`));
+    .filter(f => f.endsWith('-v2.json') && f.startsWith('lighthouse-'))
+    .map(v2 => ({ v2, v1: v2.replace('-v2.json', '.json') }))
+    .filter(p => fs.existsSync(`.docs/${p.v1}`));
 
 const cats = ['performance', 'accessibility', 'best-practices', 'seo'];
 const pct = (r, c) => Math.round((r.categories[c]?.score ?? 0) * 100);
 const sign = d => (d > 0 ? '+' : '') + d;
 
 for (const { v1, v2 } of pairs) {
-  const a = JSON.parse(fs.readFileSync(`.docs/${v1}`, 'utf8'));
-  const b = JSON.parse(fs.readFileSync(`.docs/${v2}`, 'utf8'));
-  console.log(`\n=== ${v1.replace('lighthouse-madaia33-es-', '').replace('.json', '')} ===`);
-  for (const c of cats) {
+    const a = JSON.parse(fs.readFileSync(`.docs/${v1}`, 'utf8'));
+    const b = JSON.parse(fs.readFileSync(`.docs/${v2}`, 'utf8'));
+    console.log(`\n=== ${v1.replace('lighthouse-madaia33-es-', '').replace('.json', '')} ===`);
+    for (const c of cats) {
     const before = pct(a, c), after = pct(b, c);
     console.log(`  ${c.padEnd(18)} ${before} → ${after}  (${sign(after - before)})`);
-  }
+    }
 }
 NODE
 ```
@@ -92,20 +92,20 @@ NODE
 ## Common Failures and Fixes
 
 - Error: `SyntaxError: Unexpected token 'with'` from Lighthouse locale imports.
-  - Cause: incompatible host Node runtime with newer Lighthouse.
-  - Fix: run Lighthouse in Docker image with compatible Node/Chrome (`ghcr.io/puppeteer/puppeteer:22.15.0`) and pin `lighthouse@11`.
+    - Cause: incompatible host Node runtime with newer Lighthouse.
+    - Fix: run Lighthouse in Docker image with compatible Node/Chrome (`ghcr.io/puppeteer/puppeteer:22.15.0`) and pin `lighthouse@11`.
 
 - Error: Lighthouse cannot reach URL / `ERR_CONNECTION_REFUSED`.
-  - Cause: wrong hostname/port from inside Docker network.
-  - Fix: target `http://madaia33/...` (service name), not `localhost` from a separate container.
+    - Cause: wrong hostname/port from inside Docker network.
+    - Fix: target `http://madaia33/...` (service name), not `localhost` from a separate container.
 
 - No report files appear in workspace.
-  - Cause: output path not inside mounted volume.
-  - Fix: write to `/work/.docs/...` and ensure `-v "$PWD:/work"` is present.
+    - Cause: output path not inside mounted volume.
+    - Fix: write to `/work/.docs/...` and ensure `-v "$PWD:/work"` is present.
 
 - HTTPS audit failure in local environment.
-  - Cause: local test URL is HTTP.
-  - Fix: treat this as expected local-only signal unless HTTPS is configured for local reverse proxy.
+    - Cause: local test URL is HTTP.
+    - Fix: treat this as expected local-only signal unless HTTPS is configured for local reverse proxy.
 
 ## Analysis Checklist
 
@@ -115,8 +115,8 @@ For each audited page, capture:
 2. Core metrics (FCP, LCP, TBT, CLS)
 3. Top failing audits (at least 3)
 4. Whether issue is:
-   - environment-only (local HTTP, source map policy)
-   - code-level (render-blocking assets, lazy LCP image, heading order, missing accessible names)
+    - environment-only (local HTTP, source map policy)
+    - code-level (render-blocking assets, lazy LCP image, heading order, missing accessible names)
 
 ## Improvement Proposal Standard
 

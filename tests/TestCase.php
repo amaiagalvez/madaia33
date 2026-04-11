@@ -11,7 +11,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        app()->useStoragePath(sys_get_temp_dir().'/madaia33-storage-tests-'.getmypid());
+        app()->useStoragePath(sys_get_temp_dir() . '/madaia33-storage-tests-' . getmypid());
     }
 
     protected function skipUnlessFortifyFeature(string $feature, ?string $message = null): void

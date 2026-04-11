@@ -190,8 +190,8 @@ Use union types when a value can legitimately be one of multiple types (PHP 8.0+
 <?php
 class DataLoader {
     /**
-     * @param string|array $source
-     */
+        * @param string|array $source
+        */
     public function load($source) {
         // Relies on docblock, no type enforcement
     }
@@ -644,13 +644,13 @@ Follow PSR-4 autoloading standard for class file organization.
 **Structure:**
 ```
 src/
-  Domain/
+    Domain/
     User/
-      User.php          -> App\Domain\User\User
-      UserRepository.php
-  Application/
+        User.php          -> App\Domain\User\User
+        UserRepository.php
+    Application/
     Services/
-      UserService.php   -> App\Application\Services\UserService
+        UserService.php   -> App\Application\Services\UserService
 ```
 
 **composer.json:**

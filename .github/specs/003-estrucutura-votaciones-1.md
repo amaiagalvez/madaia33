@@ -1,44 +1,44 @@
 ## tengo varias locations: portales, plantas de garajes y trasteros
-  los portales son 33-A, 33-B, ... 33-J
-  los garajes son P-1, P-2 y P-3
-  los trasteros son A, B, ... J
+    los portales son 33-A, 33-B, ... 33-J
+    los garajes son P-1, P-2 y P-3
+    los trasteros son A, B, ... J
 
 ## portales
-  dentro de cada portal hay varias propiedades 1A, 1B, .... 6C
-  cada portal tiene las suyas
-  cada propiedad tiene un porcentaje de participación por portal y otro por comunidad
+    dentro de cada portal hay varias propiedades 1A, 1B, .... 6C
+    cada portal tiene las suyas
+    cada propiedad tiene un porcentaje de participación por portal y otro por comunidad
 
 ## plantas de garajes
-  dentro de cada planta de garajes hay varias propiedades 1, 2, 3, ... 190
-  cada garaje tiene las suyas
-  cada propiedad tiene un porcentaje de participación por planta de garaje y otro por comunidad
+    dentro de cada planta de garajes hay varias propiedades 1, 2, 3, ... 190
+    cada garaje tiene las suyas
+    cada propiedad tiene un porcentaje de participación por planta de garaje y otro por comunidad
 
 ## trasteros
-  dentro de cada trastero hay varias propiedades 1, 2, 3, ... 190
-  cada trastero tiene las suyas
-  los trasteros no tiene porcentaje de participación
+    dentro de cada trastero hay varias propiedades 1, 2, 3, ... 190
+    cada trastero tiene las suyas
+    los trasteros no tiene porcentaje de participación
 
 ## propietarias/os
-  hay personas que son propietarias de una o varias propiedades
-  una persona puede tener en el portal 33-A el 1A, en el garaje P-1 el 160 y en los trasteros el 30
-  una persona puede vender sus propiedes, entonces la nueva persona pasa a ser propietaria, pero no se debe perder el historial, debo saber que la persona1 tubo el 33-A 1-A del 2020-01-01 al 2021-01-31 y que la persona2 tiene ahora el 33-A 1-A desde del 2021-02-01, sin fecha de fin. 
-  puede ocurrir que la persona1 siga siendo propietara del P-1 160 auunque ya no lo sea del 33-A 1-A
-  Las que no tengan fecha de fin son las propietarias actuales
+    hay personas que son propietarias de una o varias propiedades
+    una persona puede tener en el portal 33-A el 1A, en el garaje P-1 el 160 y en los trasteros el 30
+    una persona puede vender sus propiedes, entonces la nueva persona pasa a ser propietaria, pero no se debe perder el historial, debo saber que la persona1 tubo el 33-A 1-A del 2020-01-01 al 2021-01-31 y que la persona2 tiene ahora el 33-A 1-A desde del 2021-02-01, sin fecha de fin. 
+    puede ocurrir que la persona1 siga siendo propietara del P-1 160 auunque ya no lo sea del 33-A 1-A
+    Las que no tengan fecha de fin son las propietarias actuales
 
-  cada propietario tiene sus datos: nombre completo, dni, telefono, email para guardar datos de dos personas (coopropietaria1 y coopropietaria2)
+    cada propietario tiene sus datos: nombre completo, dni, telefono, email para guardar datos de dos personas (coopropietaria1 y coopropietaria2)
 
-  al dar de alta a una nueva propietaria, nos debe dar la opción de añadirle las propiedades de los portales, garajes y trasteros que sean necesarios.
-  
-  para poder reasignar una propiedad, hay que validar que no la tiene nadie, mientras haya una propietaria que tenga el 33-I 1-A, no se la podremos asignar a nadie mas
-  
-  las asignaciones de las propieedades, a parte de fecha inicio y fecha fin necesitan dos campos de validación, uno para el admin y otro para la propietaria 
-  no puede haber dos asignaciones a una misma propiedad sin fehca de fin, para poder asignar una nueva propietaria, todas lass asignaciones anteriores tienen que tener fecha fin.
+    al dar de alta a una nueva propietaria, nos debe dar la opción de añadirle las propiedades de los portales, garajes y trasteros que sean necesarios.
+    
+    para poder reasignar una propiedad, hay que validar que no la tiene nadie, mientras haya una propietaria que tenga el 33-I 1-A, no se la podremos asignar a nadie mas
+    
+    las asignaciones de las propieedades, a parte de fecha inicio y fecha fin necesitan dos campos de validación, uno para el admin y otro para la propietaria 
+    no puede haber dos asignaciones a una misma propiedad sin fehca de fin, para poder asignar una nueva propietaria, todas lass asignaciones anteriores tienen que tener fecha fin.
 
-  hay que dar la opción de desasignar una propiedad añadiendole una fecha de fin, no borrar, para no perder el historial
+    hay que dar la opción de desasignar una propiedad añadiendole una fecha de fin, no borrar, para no perder el historial
 
-  al crear una nueva propietaria hay que asignarle un nuevo user, con username = dni y password aleatorio, se le enviará por email para que confirme sus datos.
+    al crear una nueva propietaria hay que asignarle un nuevo user, con username = dni y password aleatorio, se le enviará por email para que confirme sus datos.
 
-  al dar de baja a una propietaria, el user se desactivara (active=0) para que no tenga acceso al panel.
+    al dar de baja a una propietaria, el user se desactivara (active=0) para que no tenga acceso al panel.
 
 ## listados que necesito con sus correspondientes CRUD
 1. portales
@@ -47,7 +47,7 @@
     en la lsita de sus propiedades no tienen que aparecer los datos de las propietarias.
     tengo que tener la opción de añadir una nueva propiedad al portal.
 2. plantas de garajes
-   al entrar dentro de la ficha de una planta de garaje me aparecerá un formulario con su nombre y una lista con las propiedades
+    al entrar dentro de la ficha de una planta de garaje me aparecerá un formulario con su nombre y una lista con las propiedades
     en la lista de sus propiedades aparecerá el nombre (editable), porcentaje parcipación comunidad (editable), porcentaje participación garaje(editable), asignado (si - cuando tenga alguna propietaria sin fecha fin/no - cuando no tenga propietaria o todas las propietarias que tenga tengan fecha fin), valdidado admin (si - asignado es si y la asignacion tiene validado admin a 1/no - en caso contrairo), valdidado propietaria (si - asignado es si y la asignacion tiene validado propietaria a 1/no - en caso contrairo)
     en la lsita de sus propiedades no tienen que aparecer los datos de las propietarias.
     tengo que tener la opción de añadir una nueva propiedad al portal.
@@ -57,12 +57,12 @@
     en la lsita de sus propiedades no tienen que aparecer los datos de las propietarias.
     tengo que tener la opción de añadir una nueva propiedad al portal.
 4. propietarias
-   por defecto se cargará el listado de propietarias actuales, todas aquellas que tengan una asignación sin fecha fin
-   columnas de la tabla nombre1 | nombre2 | portales | garajes | trasteros
+    por defecto se cargará el listado de propietarias actuales, todas aquellas que tengan una asignación sin fecha fin
+    columnas de la tabla nombre1 | nombre2 | portales | garajes | trasteros
     en la columnna portales se mostrará las asignaciones que tiene esa propietaria en las propiedades de los portales (ejemplo: 33I 1A / 33J 6B), en rojo si ya no estan (fecha fin rellenada) y sino en verde 
     en la columnna garajes se mostrará las asignaciones que tiene esa propietaria en las propiedades de los garajes (ejemplo: P-1 160 / P-2 99), en rojo si ya no estan (fecha fin rellenada) y sino en verde
-  puede ocurrir que una misma propietara tenga una propiedades cerradas con fecha fin y otras no 
-  
+    puede ocurrir que una misma propietara tenga una propiedades cerradas con fecha fin y otras no 
+    
     editar propietaria: se tienen que poder editar los datos personales de las dos coopropietarias (solo los datos de la primera son obligatorios, la segunda coopropietaria es opcional)
     se muestra una lista con sus propiedades y fecha incio (editable) y fecha fin (editable)
     hay la opción de añadir nuevas propiedades
@@ -73,7 +73,7 @@
     - garajes: listado de garajes o todos por defecto
     - trasteros: listado de trasteros o todos por defecto
 
-  al editar una propietaria y al modificar una propietaria, se tiene que guardar en una tabla aparte de la base de datos el usuario, la fecha y la hora y lo que se modifico (estado anterior y nuevo estado)
+    al editar una propietaria y al modificar una propietaria, se tiene que guardar en una tabla aparte de la base de datos el usuario, la fecha y la hora y lo que se modifico (estado anterior y nuevo estado)
 
 ---
 
@@ -108,21 +108,21 @@ users (existente)    → + is_active (boolean, default true)
 
 locations            → id, type(portal|garage|storage), code, name, timestamps, deleted_at
 properties           → id, location_id, name,
-                       community_pct(decimal 8,4, nullable — null trasteroetan),
-                       location_pct(decimal 8,4, nullable — null trasteroetan),
-                       timestamps, deleted_at
+                        community_pct(decimal 8,4, nullable — null trasteroetan),
+                        location_pct(decimal 8,4, nullable — null trasteroetan),
+                        timestamps, deleted_at
 owners               → id, user_id,
-                       coprop1_name, coprop1_dni, coprop1_phone, coprop1_email,
-                       coprop2_name(null), coprop2_dni(null), coprop2_phone(null), coprop2_email(null),
-                       timestamps, deleted_at
+                        coprop1_name, coprop1_dni, coprop1_phone, coprop1_email,
+                        coprop2_name(null), coprop2_dni(null), coprop2_phone(null), coprop2_email(null),
+                        timestamps, deleted_at
 property_assignments → id, property_id, owner_id,
-                       start_date(date), end_date(date, null),
-                       admin_validated(bool, default false),
-                       owner_validated(bool, default false),
-                       timestamps, deleted_at
+                        start_date(date), end_date(date, null),
+                        admin_validated(bool, default false),
+                        owner_validated(bool, default false),
+                        timestamps, deleted_at
 owner_audit_logs     → id, owner_id, changed_by_user_id,
-                       field, old_value(text), new_value(text),
-                       timestamps (created_at = aldaketa data)
+                        field, old_value(text), new_value(text),
+                        timestamps (created_at = aldaketa data)
 ```
 
 ### Exekuzio urratsak
@@ -232,9 +232,9 @@ hobeto esan => "usa la tabla que hay en /admin/avisos como base para que todas l
 
 - Seeder berria idempotentea izango da (`upsert`/egiaztapenekin), exekuzio errepikatuan ez dadin datu bikoizketarik sortu.
 - Propietateen sorrera `locations.type`-aren arabera egingo da:
-  - `portal`: `1-A`..`6-C` (18 erregistro portal bakoitzeko)
-  - `garage`: `1`..`180` (180 erregistro garaje bakoitzeko)
-  - `storage`: oraingoz ez da automatikoki sortuko, eskaeran ez delako patroia zehaztu.
+    - `portal`: `1-A`..`6-C` (18 erregistro portal bakoitzeko)
+    - `garage`: `1`..`180` (180 erregistro garaje bakoitzeko)
+    - `storage`: oraingoz ez da automatikoki sortuko, eskaeran ez delako patroia zehaztu.
 - Admin menua taldekatuta antolatuko da lehendik dagoen layout-ean, route izenak eta baimen-eredua hautsi gabe.
 - Panel-taulen estiloa Blade osagai partekatu batera aterako da DRY bermatzeko.
 - Jabe berria sortzeko UIa lehendik dagoen `CreateOwnerAction`-arekin lotuko da; ez da negozio-logika bikoiztuko Livewire osagaian.
