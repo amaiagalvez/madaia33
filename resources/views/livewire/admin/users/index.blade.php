@@ -26,100 +26,101 @@
                 <x-admin.form-shell :title="$editingUserId ? __('general.buttons.edit') : __('admin.users.create')">
                     <form wire:submit="saveUser" class="space-y-4">
                         <div class="grid gap-4 md:grid-cols-2">
-                        <div>
-                            <label for="user-name"
-                                class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.name') }}</label>
-                            <input id="user-name" type="text" wire:model="name"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
-                            @error('name')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
+                            <div>
+                                <label for="user-name"
+                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.name') }}</label>
+                                <input id="user-name" type="text" wire:model="name"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
+                                @error('name')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="user-email"
+                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.email') }}</label>
+                                <input id="user-email" type="email" wire:model="email"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
+                                @error('email')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="user-password"
+                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.password') }}</label>
+                                <input id="user-password" type="password" wire:model="password"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
+                                <p class="mt-1 text-xs text-stone-500">
+                                    {{ __('admin.users.password_hint') }}</p>
+                                @error('password')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="user-active"
+                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('admin.users.active') }}</label>
+                                <select id="user-active" wire:model="isActive"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                                    <option value="1">{{ __('admin.common.yes') }}</option>
+                                    <option value="0">{{ __('admin.common.no') }}</option>
+                                </select>
+                                @error('isActive')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div>
-                            <label for="user-email"
-                                class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.email') }}</label>
-                            <input id="user-email" type="email" wire:model="email"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
-                            @error('email')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="user-password"
-                                class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.password') }}</label>
-                            <input id="user-password" type="password" wire:model="password"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
-                            <p class="mt-1 text-xs text-stone-500">
-                                {{ __('admin.users.password_hint') }}</p>
-                            @error('password')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="user-active"
-                                class="mb-1 block text-sm font-medium text-stone-700">{{ __('admin.users.active') }}</label>
-                            <select id="user-active" wire:model="isActive"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
-                                <option value="1">{{ __('admin.common.yes') }}</option>
-                                <option value="0">{{ __('admin.common.no') }}</option>
-                            </select>
-                            @error('isActive')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div>
-                        <p class="mb-2 text-sm font-medium text-stone-700">
-                            {{ __('admin.users.roles') }}</p>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach ($roles as $role)
-                                <label class="cursor-pointer select-none">
-                                    <input type="checkbox" wire:model="selectedRoles"
-                                        value="{{ $role }}" class="sr-only peer" />
-                                    <span
-                                        class="inline-flex items-center rounded-full border border-stone-300 px-3 py-1.5 text-xs font-semibold text-stone-700 transition-colors peer-checked:border-[#d9755b] peer-checked:bg-[#d9755b] peer-checked:text-white hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
-                                        {{ __('admin.users.roles_labels.' . $role) }}
-                                    </span>
-                                </label>
-                            @endforeach
-                        </div>
-                        @error('selectedRoles')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                        @error('selectedRoles.*')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    @if (in_array('admin_comunidad', $selectedRoles, true))
                         <div>
                             <p class="mb-2 text-sm font-medium text-stone-700">
-                                {{ __('admin.users.managed_locations') }}</p>
+                                {{ __('admin.users.roles') }}</p>
                             <div class="flex flex-wrap gap-2">
-                                @foreach ($communityLocations as $location)
+                                @foreach ($roles as $role)
                                     <label class="cursor-pointer select-none">
-                                        <input type="checkbox" wire:model="selectedManagedLocations"
-                                            value="{{ $location->id }}" class="sr-only peer" />
+                                        <input type="checkbox" wire:model="selectedRoles"
+                                            value="{{ $role }}" class="sr-only peer" />
                                         <span
                                             class="inline-flex items-center rounded-full border border-stone-300 px-3 py-1.5 text-xs font-semibold text-stone-700 transition-colors peer-checked:border-[#d9755b] peer-checked:bg-[#d9755b] peer-checked:text-white hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
-                                            {{ __('admin.locations.types.' . $location->type) }}
-                                            {{ $location->code }}
+                                            {{ __('admin.users.roles_labels.' . $role) }}
                                         </span>
                                     </label>
                                 @endforeach
                             </div>
-                            @error('selectedManagedLocations')
+                            @error('selectedRoles')
                                 <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                             @enderror
-                            @error('selectedManagedLocations.*')
+                            @error('selectedRoles.*')
                                 <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-                    @endif
+
+                        @if (in_array('admin_comunidad', $selectedRoles, true))
+                            <div>
+                                <p class="mb-2 text-sm font-medium text-stone-700">
+                                    {{ __('admin.users.managed_locations') }}</p>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach ($communityLocations as $location)
+                                        <label class="cursor-pointer select-none">
+                                            <input type="checkbox"
+                                                wire:model="selectedManagedLocations"
+                                                value="{{ $location->id }}" class="sr-only peer" />
+                                            <span
+                                                class="inline-flex items-center rounded-full border border-stone-300 px-3 py-1.5 text-xs font-semibold text-stone-700 transition-colors peer-checked:border-[#d9755b] peer-checked:bg-[#d9755b] peer-checked:text-white hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
+                                                {{ __('admin.locations.types.' . $location->type) }}
+                                                {{ $location->code }}
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                @error('selectedManagedLocations')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                                @error('selectedManagedLocations.*')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @endif
 
                         <div
                             class="mt-6 flex items-center justify-end gap-2 border-t border-stone-200 pt-4">

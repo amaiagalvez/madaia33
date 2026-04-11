@@ -63,6 +63,6 @@ class BrandingSettingsComposer
             return Storage::url($logoPath);
         }
 
-        return asset('storage/'.ltrim($logoPath, '/'));
+        return asset('storage/' . ltrim($logoPath, '/'));
     }
 }

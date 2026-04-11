@@ -26,18 +26,18 @@ $privatePageHandler = static function () {
 
 // ─── Root redirect ────────────────────────────────────────────────────────────
 
-Route::get('/', fn () => redirect()->route('home.eu'))->name('root');
+Route::get('/', fn() => redirect()->route('home.eu'))->name('root');
 Route::middleware(['guest', 'throttle:5,1'])->post('/forgot-password', PasswordResetLinkController::class)->name('password.email');
 
 // ─── Public routes ────────────────────────────────────────────────────────────
 
 Route::prefix('eu')->group(function () use ($privatePageHandler) {
     Route::get('/', [PublicHomeController::class, 'index'])->name('home.eu');
-    Route::get('/iragarkiak', fn () => view('public.notices'))->name('notices.eu');
-    Route::get('/argazki-bilduma', fn () => view('public.gallery'))->name('gallery.eu');
-    Route::get('/harremana', fn () => view('public.contact'))->name('contact.eu');
+    Route::get('/iragarkiak', fn() => view('public.notices'))->name('notices.eu');
+    Route::get('/argazki-bilduma', fn() => view('public.gallery'))->name('gallery.eu');
+    Route::get('/harremana', fn() => view('public.contact'))->name('contact.eu');
     Route::get('/pribatua', $privatePageHandler)->name('private.eu');
-    Route::get('/pasahitza-ahaztu', fn () => view('pages::auth.forgot-password'))->name('password.request.eu');
+    Route::get('/pasahitza-ahaztu', fn() => view('pages::auth.forgot-password'))->name('password.request.eu');
     Route::get('/pasahitza-berrezarri/{token}', function (Request $request, string $token) {
         return view('pages::auth.reset-password', [
             'token' => $token,
@@ -52,11 +52,11 @@ Route::prefix('eu')->group(function () use ($privatePageHandler) {
 
 Route::prefix('es')->group(function () use ($privatePageHandler) {
     Route::get('/', [PublicHomeController::class, 'index'])->name('home.es');
-    Route::get('/avisos', fn () => view('public.notices'))->name('notices.es');
-    Route::get('/galeria', fn () => view('public.gallery'))->name('gallery.es');
-    Route::get('/contacto', fn () => view('public.contact'))->name('contact.es');
+    Route::get('/avisos', fn() => view('public.notices'))->name('notices.es');
+    Route::get('/galeria', fn() => view('public.gallery'))->name('gallery.es');
+    Route::get('/contacto', fn() => view('public.contact'))->name('contact.es');
     Route::get('/privado', $privatePageHandler)->name('private.es');
-    Route::get('/olvido-contrasena', fn () => view('pages::auth.forgot-password'))->name('password.request.es');
+    Route::get('/olvido-contrasena', fn() => view('pages::auth.forgot-password'))->name('password.request.es');
     Route::get('/restablecer-contrasena/{token}', function (Request $request, string $token) {
         return view('pages::auth.reset-password', [
             'token' => $token,
@@ -76,7 +76,7 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin\n";
     $content .= "\n";
-    $content .= 'Sitemap: '.route('sitemap')."\n";
+    $content .= 'Sitemap: ' . route('sitemap') . "\n";
 
     return response($content, 200, ['Content-Type' => 'text/plain']);
 })->name('robots');
@@ -96,25 +96,25 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
             'votingsCount' => Voting::query()->count(),
         ]);
     })->name('dashboard');
-    Route::get('/avisos', fn () => view('admin.notices'))
+    Route::get('/avisos', fn() => view('admin.notices'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('notices');
-    Route::get('/imagenes', fn () => view('admin.images'))
+    Route::get('/imagenes', fn() => view('admin.images'))
         ->middleware('role:superadmin')
         ->name('images');
-    Route::get('/mensajes', fn () => view('admin.messages'))
+    Route::get('/mensajes', fn() => view('admin.messages'))
         ->middleware('role:superadmin')
         ->name('messages');
-    Route::get('/configuracion', fn () => view('admin.settings'))
+    Route::get('/configuracion', fn() => view('admin.settings'))
         ->middleware('role:superadmin')
         ->name('settings');
-    Route::get('/portales', fn () => view('admin.locations.index', ['type' => 'portal']))
+    Route::get('/portales', fn() => view('admin.locations.index', ['type' => 'portal']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.portals');
-    Route::get('/garajes', fn () => view('admin.locations.index', ['type' => 'garage']))
+    Route::get('/garajes', fn() => view('admin.locations.index', ['type' => 'garage']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.garages');
-    Route::get('/trasteros', fn () => view('admin.locations.index', ['type' => 'storage']))
+    Route::get('/trasteros', fn() => view('admin.locations.index', ['type' => 'storage']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.storages');
     Route::get('/ubicaciones/{location}', function (Location $location) {
@@ -125,16 +125,16 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
 
         return view('admin.locations.show', ['location' => $location]);
     })->name('locations.show');
-    Route::get('/propietarias', fn () => view('admin.owners.index'))
+    Route::get('/propietarias', fn() => view('admin.owners.index'))
         ->middleware('role:superadmin')
         ->name('owners.index');
-    Route::get('/propietarias/{owner}', fn (Owner $owner) => view('admin.owners.show', ['owner' => $owner]))
+    Route::get('/propietarias/{owner}', fn(Owner $owner) => view('admin.owners.show', ['owner' => $owner]))
         ->middleware('role:superadmin')
         ->name('owners.show');
-    Route::get('/votaciones', fn () => view('admin.votings'))
+    Route::get('/votaciones', fn() => view('admin.votings'))
         ->middleware('role:superadmin')
         ->name('votings');
-    Route::get('/usuarios', fn () => view('admin.users.index'))
+    Route::get('/usuarios', fn() => view('admin.users.index'))
         ->middleware('role:superadmin,admin_general')
         ->name('users.index');
 });
@@ -142,4 +142,4 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
 Route::middleware('auth')->post('/votings/delegated/clear', [PublicVotingController::class, 'clearDelegatedVoting'])
     ->name('votings.delegated.clear');
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

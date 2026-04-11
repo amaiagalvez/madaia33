@@ -26,8 +26,8 @@
                 ])>
                 {{ __('contact.admin.unread') }}
             </button>
-            <button type="button" wire:click="setReadFilter('all')"
-                data-messages-filter-btn="all" @class([
+            <button type="button" wire:click="setReadFilter('all')" data-messages-filter-btn="all"
+                @class([
                     'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
                     'border-[#d9755b] bg-[#d9755b] text-white' => $readFilter === 'all',
                     'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
