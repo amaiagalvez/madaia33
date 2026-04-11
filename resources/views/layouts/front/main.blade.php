@@ -35,6 +35,7 @@
 <body class="min-h-screen bg-white text-gray-900 antialiased flex flex-col public-surface">
 
     @php($showVotingsLink = $showVotingsLink ?? false)
+    @php($isImpersonating = session()->has('impersonator_user_id'))
 
     <a href="#main-content"
         class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-gray-900 focus:shadow-md focus:ring-2 focus:ring-gray-500 focus:outline-none">
@@ -99,11 +100,12 @@
                             class="hidden min-w-0 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 shadow-sm md:flex">
                             <span
                                 class="max-w-36 truncate text-sm font-medium text-stone-700">{{ auth()->user()->name }}</span>
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form method="POST"
+                                action="{{ $isImpersonating ? route('admin.users.stop_impersonation') : route('logout') }}">
                                 @csrf
                                 <button type="submit"
-                                    class="inline-flex items-center rounded-md border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">
-                                    {{ __('admin.logout') }}
+                                    class="inline-flex items-center rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors {{ $isImpersonating ? 'border border-red-700 bg-red-600 text-white hover:bg-red-700' : 'border border-stone-200 bg-white text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
+                                    {{ $isImpersonating ? __('admin.users.back_to_my_user') : __('admin.logout') }}
                                 </button>
                             </form>
                         </div>
@@ -174,11 +176,13 @@
                     <div class="mt-2 border-t border-gray-200 pt-3">
                         <p class="px-3 text-sm font-medium text-stone-700">{{ auth()->user()->name }}
                         </p>
-                        <form method="POST" action="{{ route('logout') }}" class="mt-2 px-3">
+                        <form method="POST"
+                            action="{{ $isImpersonating ? route('admin.users.stop_impersonation') : route('logout') }}"
+                            class="mt-2 px-3">
                             @csrf
                             <button type="submit"
-                                class="inline-flex min-h-11 w-full items-center justify-center rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">
-                                {{ __('admin.logout') }}
+                                class="inline-flex min-h-11 w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors {{ $isImpersonating ? 'border border-red-700 bg-red-600 text-white hover:bg-red-700' : 'border border-stone-200 bg-white text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
+                                {{ $isImpersonating ? __('admin.users.back_to_my_user') : __('admin.logout') }}
                             </button>
                         </form>
                     </div>
@@ -189,6 +193,15 @@
 
     {{-- Main content --}}
     <main id="main-content" class="relative flex-1 overflow-x-clip" tabindex="-1">
+        @if ($isImpersonating)
+            <div class="mx-auto mb-4 mt-4 max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3">
+                    <p class="text-sm font-semibold text-red-700">
+                        {{ __('admin.users.impersonating_as', ['name' => auth()->user()?->name, 'email' => auth()->user()?->email]) }}
+                    </p>
+                </div>
+            </div>
+        @endif
         <div aria-hidden="true"
             class="pointer-events-none absolute -left-32 top-20 -z-10 h-72 w-72 rounded-full bg-[#f1bd4d]/20 blur-3xl">
         </div>

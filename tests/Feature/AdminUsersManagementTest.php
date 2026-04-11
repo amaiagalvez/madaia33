@@ -109,4 +109,31 @@ it('allows superadmin to login as listed users from users table action', functio
         ->assertRedirect(route('home.eu'));
 
     test()->assertAuthenticatedAs($targetUser);
+    expect(session('impersonator_user_id'))->toBe($superadmin->id);
+});
+
+it('returns from impersonated session back to original user', function () {
+    $superadmin = User::factory()->create([
+        'id' => 1,
+        'email' => 'superadmin@example.com',
+    ]);
+    $superadmin->assignRole(Role::SUPER_ADMIN);
+
+    $targetUser = User::factory()->create([
+        'email' => 'ownerlike@example.com',
+    ]);
+
+    Livewire::actingAs($superadmin)
+        ->test(Users::class)
+        ->call('loginAs', $targetUser->id)
+        ->assertRedirect(route('home.eu'));
+
+    test()->assertAuthenticatedAs($targetUser);
+
+    test()->withSession(['_token' => 'return-token'])
+        ->post(route('admin.users.stop_impersonation'), ['_token' => 'return-token'])
+        ->assertRedirect(route('admin.users.index'));
+
+    test()->assertAuthenticatedAs($superadmin);
+    expect(session()->has('impersonator_user_id'))->toBeFalse();
 });

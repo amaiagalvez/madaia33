@@ -17,6 +17,7 @@
 </head>
 
 <body class="min-h-screen bg-stone-100">
+    @php($isImpersonating = session()->has('impersonator_user_id'))
 
     <div class="flex min-h-screen">
 
@@ -264,11 +265,12 @@
                         @endif
                     </nav>
                     <div class="border-t border-stone-200 p-4">
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST"
+                            action="{{ $isImpersonating ? route('admin.users.stop_impersonation') : route('logout') }}">
                             @csrf
                             <button type="submit"
-                                class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">
-                                {{ __('admin.logout') }}
+                                class="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors {{ $isImpersonating ? 'bg-red-600 text-white hover:bg-red-700' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
+                                {{ $isImpersonating ? __('admin.users.back_to_my_user') : __('admin.logout') }}
                             </button>
                         </form>
                     </div>
@@ -288,22 +290,30 @@
                         </p>
                     </div>
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST"
+                        action="{{ $isImpersonating ? route('admin.users.stop_impersonation') : route('logout') }}">
                         @csrf
                         <button type="submit"
-                            class="inline-flex items-center gap-2 rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">
+                            class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors {{ $isImpersonating ? 'border border-red-700 bg-red-600 text-white hover:bg-red-700' : 'border border-stone-200 bg-white text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                             <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24"
                                 stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                             </svg>
-                            {{ __('admin.logout') }}
+                            {{ $isImpersonating ? __('admin.users.back_to_my_user') : __('admin.logout') }}
                         </button>
                     </form>
                 </nav>
             </header>
 
             <main class="flex-1 pt-16 lg:pt-0 p-6">
+                @if ($isImpersonating)
+                    <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3">
+                        <p class="text-sm font-semibold text-red-700">
+                            {{ __('admin.users.impersonating_as', ['name' => auth()->user()?->name, 'email' => auth()->user()?->email]) }}
+                        </p>
+                    </div>
+                @endif
                 {{ $slot }}
             </main>
         </div>

@@ -35,6 +35,7 @@ Use this skill to keep a single up-to-date Mermaid ER diagram for the current La
 flowchart LR
     USERS --> OWNERS
     USERS --> SESSIONS
+    USERS --> USER_LOGIN_SESSIONS
     USERS --> OWNER_AUDIT_LOGS
     USERS --> ROLE_USER
     ROLES --> ROLE_USER
@@ -86,6 +87,17 @@ erDiagram
         string id
         bigint user_id
         integer last_activity
+    }
+
+    USER_LOGIN_SESSIONS {
+        bigint id
+        bigint user_id
+        bigint impersonator_user_id
+        string session_id
+        string ip_address
+        timestamp logged_in_at
+        timestamp logged_out_at
+        datetime deleted_at
     }
 
     LOCATIONS {
@@ -199,6 +211,7 @@ erDiagram
     USERS ||--o{ OWNERS : has_many
     USERS ||--o{ SESSIONS : has_many
     USERS ||--o{ OWNER_AUDIT_LOGS : changed_by
+    USERS ||--o{ USER_LOGIN_SESSIONS : login_events
     USERS ||--o{ ROLE_USER : has_many
     ROLES ||--o{ ROLE_USER : has_many
     USERS ||--o{ LOCATION_USER : manages

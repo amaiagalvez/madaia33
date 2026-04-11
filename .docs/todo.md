@@ -21,10 +21,6 @@
 - [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
 - [ ] configurar el sentry
 - [ ] añadir debugbar y algo para ver los logs
-- [ ] registro sessions en bd
-- [ ] listado users y sus sessions
-- [ ] traducciones del crud erabiltzaileak. En el formulario no mostrar contraseña. No dejar editar los campos nombre y email (se gestionarán desde owner), añadir botón para abrir la lista de owners con la ficha del owner abierta.
-- [ ] al utilizar el loginAs en la lista de usuarios, mostrar arriba en rojo el nombre y el email del usuarioo logueado, pero en vez de saioa itxi, volver a mi usuario botoiareekin.
 
 # Home
 - [ ] Osatu pribatutasun-politika eta lege-oharrak testuak
@@ -44,6 +40,7 @@
 
 - [ ] Hay que marcar quien es el jefe de portal o de planta de garaje
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
+
 
 
 # nohizbehinka egiteko 2026-04-11

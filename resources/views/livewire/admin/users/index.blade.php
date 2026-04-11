@@ -29,7 +29,7 @@
                             <div>
                                 <label for="user-name"
                                     class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.name') }}</label>
-                                <input id="user-name" type="text" wire:model="name"
+                                <input id="user-name" type="text" wire:model="name" @disabled($editingUserId !== null) @readonly($editingUserId !== null)
                                     class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
                                 @error('name')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -39,21 +39,9 @@
                             <div>
                                 <label for="user-email"
                                     class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.email') }}</label>
-                                <input id="user-email" type="email" wire:model="email"
+                                <input id="user-email" type="email" wire:model="email" @disabled($editingUserId !== null) @readonly($editingUserId !== null)
                                     class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
                                 @error('email')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label for="user-password"
-                                    class="mb-1 block text-sm font-medium text-stone-700">{{ __('validation.attributes.password') }}</label>
-                                <input id="user-password" type="password" wire:model="password"
-                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
-                                <p class="mt-1 text-xs text-stone-500">
-                                    {{ __('admin.users.password_hint') }}</p>
-                                @error('password')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -71,6 +59,15 @@
                                 @enderror
                             </div>
                         </div>
+
+                        @if ($editingUserId !== null && $editingOwnerId !== null)
+                            <div class="rounded-md border border-[#edd2c7] bg-[#edd2c7]/20 p-3">
+                                <a href="{{ route('admin.owners.show', ['owner' => $editingOwnerId]) }}"
+                                    class="inline-flex items-center rounded-md bg-[#793d3d] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5f2f2f]">
+                                    {{ __('admin.users.open_owner_profile') }}
+                                </a>
+                            </div>
+                        @endif
 
                         <div>
                             <p class="mb-2 text-sm font-medium text-stone-700">
@@ -133,6 +130,38 @@
                                 {{ __('general.buttons.save') }}
                             </button>
                         </div>
+
+                        @if ($editingUserId !== null)
+                            <div class="rounded-xl border border-stone-200">
+                                <div class="border-b border-stone-200 bg-stone-50 px-4 py-3">
+                                    <h3 class="text-sm font-semibold text-stone-800">{{ __('admin.users.sessions_title') }}</h3>
+                                </div>
+                                <div class="max-h-80 overflow-y-auto">
+                                    <table class="min-w-full divide-y divide-stone-200">
+                                        <thead class="bg-stone-50">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">{{ __('admin.users.sessions_login_at') }}</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">{{ __('admin.users.sessions_logout_at') }}</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-stone-500">IP</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-stone-100 bg-white">
+                                            @forelse ($editingUserSessions as $session)
+                                                <tr>
+                                                    <td class="px-4 py-2 text-xs text-stone-700">{{ $session['logged_in_at'] ?? '—' }}</td>
+                                                    <td class="px-4 py-2 text-xs text-stone-700">{{ $session['logged_out_at'] ?? '—' }}</td>
+                                                    <td class="px-4 py-2 text-xs text-stone-700">{{ $session['ip_address'] ?? '—' }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="3" class="px-4 py-4 text-center text-xs text-stone-500">{{ __('admin.users.sessions_empty') }}</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @endif
                     </form>
                 </x-admin.form-shell>
             </div>
@@ -156,6 +185,10 @@
                 </th>
                 <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    {{ __('admin.users.managed_locations') }}
+                </th>
+                <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     {{ __('admin.users.active') }}
                 </th>
                 <th scope="col" class="relative px-6 py-3">
@@ -175,6 +208,18 @@
                                 <span
                                     class="inline-flex items-center rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-700">
                                     {{ __('admin.users.roles_labels.' . $role->name) }}
+                                </span>
+                            @empty
+                                <span class="text-stone-400">—</span>
+                            @endforelse
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        <div class="flex flex-wrap gap-1">
+                            @forelse ($user->managedLocations as $managedLocation)
+                                <span
+                                    class="inline-flex items-center rounded-full bg-[#edd2c7]/45 px-2 py-0.5 text-xs font-medium text-[#793d3d]">
+                                    {{ __('admin.locations.types.' . $managedLocation->type) }} {{ $managedLocation->code }}
                                 </span>
                             @empty
                                 <span class="text-stone-400">—</span>
@@ -214,7 +259,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('admin.users.empty') }}
                     </td>
                 </tr>

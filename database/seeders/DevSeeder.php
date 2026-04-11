@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use App\Models\ContactMessage;
 use App\Models\NoticeLocation;
 use Illuminate\Database\Seeder;
+use App\Models\UserLoginSession;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -43,6 +44,7 @@ class DevSeeder extends Seeder
         $this->seedImages();
         $this->seedOwnersAndProperties();
         $this->seedRoleUsers();
+        $this->seedUserLoginSessions();
         $this->call(VotingSeeder::class);
         $this->seedVotingBallots();
         $this->seedContactMessages();
@@ -213,6 +215,24 @@ class DevSeeder extends Seeder
         $this->seedCommunityAdminUser();
         $this->seedPropertyOwnerUser();
         $this->seedDelegatedVoteUser();
+    }
+
+    private function seedUserLoginSessions(): void
+    {
+        $users = User::query()
+            ->orderBy('id')
+            ->limit(3)
+            ->get(['id']);
+
+        foreach ($users as $user) {
+            UserLoginSession::factory()->closed()->create([
+                'user_id' => $user->id,
+            ]);
+
+            UserLoginSession::factory()->create([
+                'user_id' => $user->id,
+            ]);
+        }
     }
 
     private function seedGeneralAdminUser(): void

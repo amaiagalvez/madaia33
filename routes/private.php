@@ -6,6 +6,7 @@ use App\Models\Owner;
 use App\Models\Notice;
 use App\Models\Voting;
 use App\Models\Location;
+use Illuminate\Http\Request;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -69,7 +70,21 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/usuarios', fn () => view('admin.users.index'))
         ->middleware('role:superadmin,admin_general')
         ->name('users.index');
+
 });
+
+Route::middleware('auth')->post('/impersonacion/volver-a-mi-usuario', function (Request $request) {
+    $impersonatorUserId = $request->session()->get('impersonator_user_id');
+
+    abort_if(! is_numeric($impersonatorUserId), 403);
+
+    $impersonator = User::query()->findOrFail((int) $impersonatorUserId);
+
+    Auth::login($impersonator);
+    $request->session()->forget('impersonator_user_id');
+
+    return redirect()->route('admin.users.index');
+})->name('admin.users.stop_impersonation');
 
 Route::middleware('auth')->post('/votings/delegated/clear', [PublicVotingController::class, 'clearDelegatedVoting'])
     ->name('votings.delegated.clear');

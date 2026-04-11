@@ -6,15 +6,20 @@ use Throwable;
 use App\Models\Owner;
 use App\Models\Setting;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\View;
 use App\Observers\OwnerAuditObserver;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\ServiceProvider;
+use App\Listeners\RecordUserLoginSession;
 use Illuminate\Validation\Rules\Password;
+use App\Listeners\RecordUserLogoutSession;
 use App\Http\Composers\BrandingSettingsComposer;
 use App\Http\Composers\VotingsNavigationComposer;
 
@@ -37,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         $this->applyConfiguredMailSettings();
         $this->registerLegacyBladeComponentAliases();
         $this->registerViewComposers();
+        $this->registerAuthSessionListeners();
 
         Owner::observe(OwnerAuditObserver::class);
     }
@@ -121,5 +127,11 @@ class AppServiceProvider extends ServiceProvider
             'layouts.shared.auth.card',
             'partials.shared.head',
         ], BrandingSettingsComposer::class);
+    }
+
+    protected function registerAuthSessionListeners(): void
+    {
+        Event::listen(Login::class, RecordUserLoginSession::class);
+        Event::listen(Logout::class, RecordUserLogoutSession::class);
     }
 }

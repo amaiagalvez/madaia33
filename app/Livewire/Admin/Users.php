@@ -7,8 +7,10 @@ use App\Models\User;
 use Livewire\Component;
 use App\Models\Location;
 use App\SupportedLocales;
+use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use App\Models\UserLoginSession;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,6 +44,13 @@ class Users extends Component
 
     public string $search = '';
 
+    public ?int $editingOwnerId = null;
+
+    /**
+     * @var array<int, array<string, string|null>>
+     */
+    public array $editingUserSessions = [];
+
     public function mount(): void
     {
         abort_unless($this->currentUser()?->canManageUsers(), 403);
@@ -63,7 +72,7 @@ class Users extends Component
         abort_unless($this->currentUser()?->canManageUsers(), 403);
 
         $user = User::query()
-            ->with(['roles', 'managedLocations'])
+            ->with(['roles', 'managedLocations', 'owner'])
             ->findOrFail($userId);
 
         abort_if($user->id === 1, 403);
@@ -72,9 +81,11 @@ class Users extends Component
         $this->name = $user->name;
         $this->email = $user->email;
         $this->password = '';
+        $this->editingOwnerId = $user->owner?->id;
         $this->isActive = (bool) $user->is_active;
         $this->selectedRoles = $user->roleNames()->all();
-        $this->selectedManagedLocations = $user->managedLocations()->pluck('locations.id')->map(static fn($id): string => (string) $id)->all();
+        $this->selectedManagedLocations = $user->managedLocations()->pluck('locations.id')->map(static fn ($id): string => (string) $id)->all();
+        $this->loadEditingUserSessions($user->id);
         $this->showForm = true;
     }
 
@@ -89,7 +100,6 @@ class Users extends Component
         $validated = $this->validate($this->rules(), [], [
             'name' => __('validation.attributes.name'),
             'email' => __('validation.attributes.email'),
-            'password' => __('validation.attributes.password'),
             'selectedRoles' => __('admin.users.roles'),
             'selectedManagedLocations' => __('admin.users.managed_locations'),
         ]);
@@ -100,13 +110,13 @@ class Users extends Component
 
         abort_if($user->id === 1, 403);
 
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
-        $user->is_active = (bool) $validated['isActive'];
-
-        if ($validated['password'] !== '') {
-            $user->password = $validated['password'];
+        if ($this->editingUserId === null) {
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            $user->password = Str::password(20);
         }
+
+        $user->is_active = (bool) $validated['isActive'];
 
         $user->save();
         $user->syncOwnerIdentity();
@@ -155,8 +165,11 @@ class Users extends Component
 
         $user = User::query()->where('id', '!=', 1)->findOrFail($userId);
 
+        if (! session()->has('impersonator_user_id')) {
+            session()->put('impersonator_user_id', $this->currentUser()?->id);
+        }
+
         Auth::login($user);
-        session()->regenerate();
 
         $this->redirect(route(SupportedLocales::routeName('home')));
     }
@@ -178,12 +191,11 @@ class Users extends Component
             $emailRule = $emailRule->ignore($this->editingUserId);
         }
 
-        $roleRule = Rule::in(array_values(array_filter(Role::names(), static fn(string $name): bool => $name !== Role::SUPER_ADMIN)));
+        $roleRule = Rule::in(array_values(array_filter(Role::names(), static fn (string $name): bool => $name !== Role::SUPER_ADMIN)));
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', $emailRule],
-            'password' => ['nullable', 'string', 'min:8'],
             'isActive' => ['boolean'],
             'selectedRoles' => ['array'],
             'selectedRoles.*' => ['string', $roleRule],
@@ -191,8 +203,9 @@ class Users extends Component
             'selectedManagedLocations.*' => ['integer', 'exists:locations,id'],
         ];
 
-        if ($this->editingUserId === null) {
-            $rules['password'] = ['required', 'string', 'min:8'];
+        if ($this->editingUserId !== null) {
+            $rules['name'] = ['nullable', 'string', 'max:255'];
+            $rules['email'] = ['nullable', 'email', 'max:255', $emailRule];
         }
 
         if (in_array(Role::COMMUNITY_ADMIN, $this->selectedRoles, true)) {
@@ -205,7 +218,7 @@ class Users extends Component
     private function syncUserRolesAndLocations(User $user): void
     {
         $roleNames = collect($this->selectedRoles)
-            ->filter(static fn(string $role): bool => $role !== Role::SUPER_ADMIN)
+            ->filter(static fn (string $role): bool => $role !== Role::SUPER_ADMIN)
             ->unique()
             ->values()
             ->all();
@@ -219,7 +232,7 @@ class Users extends Component
         }
 
         $locationIds = collect($this->selectedManagedLocations)
-            ->map(static fn(string $locationId): int => (int) $locationId)
+            ->map(static fn (string $locationId): int => (int) $locationId)
             ->unique()
             ->values()
             ->all();
@@ -234,10 +247,29 @@ class Users extends Component
         $this->editingUserId = null;
         $this->name = '';
         $this->email = '';
+        $this->editingOwnerId = null;
+        $this->editingUserSessions = [];
         $this->password = '';
         $this->isActive = true;
         $this->selectedRoles = [];
         $this->selectedManagedLocations = [];
+    }
+
+    private function loadEditingUserSessions(int $userId): void
+    {
+        $this->editingUserSessions = UserLoginSession::query()
+            ->where('user_id', $userId)
+            ->orderByDesc('logged_in_at')
+            ->get(['id', 'ip_address', 'logged_in_at', 'logged_out_at'])
+            ->map(static function (UserLoginSession $session): array {
+                return [
+                    'id' => (string) $session->id,
+                    'ip_address' => $session->ip_address,
+                    'logged_in_at' => $session->logged_in_at?->format('Y-m-d H:i:s'),
+                    'logged_out_at' => $session->logged_out_at?->format('Y-m-d H:i:s'),
+                ];
+            })
+            ->all();
     }
 
     public function render(): View
@@ -245,13 +277,13 @@ class Users extends Component
         abort_unless($this->currentUser()?->canManageUsers(), 403);
 
         $users = User::query()
-            ->with(['roles'])
+            ->with(['roles', 'managedLocations'])
             ->where('id', '!=', 1)
             ->when($this->search !== '', function ($query): void {
                 $query->where(function ($innerQuery): void {
                     $innerQuery
-                        ->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                        ->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('email', 'like', '%'.$this->search.'%');
                 });
             })
             ->orderBy('name')
@@ -260,7 +292,7 @@ class Users extends Component
         return view('livewire.admin.users.index', [
             'users' => $users,
             'roles' => collect(Role::names())
-                ->reject(static fn(string $name): bool => $name === Role::SUPER_ADMIN)
+                ->reject(static fn (string $name): bool => $name === Role::SUPER_ADMIN)
                 ->values()
                 ->all(),
             'communityLocations' => Location::query()
