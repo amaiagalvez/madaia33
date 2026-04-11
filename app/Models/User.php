@@ -18,12 +18,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
-#[Fillable(['name', 'email', 'password', 'is_active'])]
+#[Fillable(['name', 'email', 'password', 'is_active', 'language'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
+
+    /**
+     * @var array<string, string>
+     */
+    protected $attributes = [
+        'language' => SupportedLocales::DEFAULT,
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -36,6 +43,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'language' => 'string',
         ];
     }
 
@@ -47,7 +55,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 
@@ -57,6 +65,36 @@ class User extends Authenticatable
     public function owner(): HasOne
     {
         return $this->hasOne(Owner::class);
+    }
+
+    public function syncOwnerIdentity(): void
+    {
+        $owner = $this->owner;
+
+        if ($owner === null) {
+            return;
+        }
+
+        $updated = false;
+
+        if ($owner->coprop1_name !== $this->name) {
+            $owner->coprop1_name = $this->name;
+            $updated = true;
+        }
+
+        if ($owner->coprop1_email !== $this->email) {
+            $owner->coprop1_email = $this->email;
+            $updated = true;
+        }
+
+        if ($owner->language !== $this->language) {
+            $owner->language = $this->language;
+            $updated = true;
+        }
+
+        if ($updated) {
+            $owner->saveQuietly();
+        }
     }
 
     /**
@@ -184,8 +222,8 @@ class User extends Authenticatable
     public function syncRoleNames(array $roles): void
     {
         $normalizedRoles = collect($roles)
-            ->filter(static fn (string $role): bool => in_array($role, Role::names(), true))
-            ->reject(fn (string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
+            ->filter(static fn(string $role): bool => in_array($role, Role::names(), true))
+            ->reject(fn(string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
             ->unique()
             ->values();
 

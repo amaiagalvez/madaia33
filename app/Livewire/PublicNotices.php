@@ -53,7 +53,7 @@ class PublicNotices extends Component
                 $query->where(function ($q) {
                     // Include notices with the selected location
                     $q->whereHas('locations', function ($locationQuery): void {
-                        $locationQuery->whereHas('location', fn($query) => $query->where('code', $this->locationFilter));
+                        $locationQuery->whereHas('location', fn ($query) => $query->where('code', $this->locationFilter));
                     });
                     // Also include general notices (no locations)
                     $q->orWhereDoesntHave('locations');
@@ -73,12 +73,12 @@ class PublicNotices extends Component
             ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 WHEN type = 'garage' THEN 3 ELSE 4 END")
             ->orderBy('code')
             ->get(['type', 'code'])
-            ->map(fn(Location $location): array => [
+            ->map(fn (Location $location): array => [
                 'code' => $location->code,
                 'label' => match ($location->type) {
-                    'portal' => __('notices.portal') . ' ' . $location->code,
-                    'local' => __('notices.local') . ' ' . $location->code,
-                    default => __('notices.garage') . ' ' . $location->code,
+                    'portal' => __('notices.portal').' '.$location->code,
+                    'local' => __('notices.local').' '.$location->code,
+                    default => __('notices.garage').' '.$location->code,
                 },
             ])
             ->all();

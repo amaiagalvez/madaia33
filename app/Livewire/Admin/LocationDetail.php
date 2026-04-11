@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Admin;
 
-use Livewire\Component;
 use App\Models\User;
+use Livewire\Component;
 use App\Models\Location;
 use App\Models\Property;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class LocationDetail extends Component
 {

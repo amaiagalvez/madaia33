@@ -119,3 +119,4 @@
 - When adding agent-policy rules in `AGENTS.md`, encode the requirement with explicit agent scope + mandatory wording (e.g., `amalurra priority rule (mandatory)`) so the instruction is unambiguous and easy to enforce.
 - If the user asks to add rules in specific agent files, update `.github/agents/*.agent.md` directly (not only `AGENTS.md`) and keep the rule text symmetric across the requested agents.
 - If a migration alters ENUM constraints, make it database-driver aware (MySQL/SQLite). In SQLite tests, rebuild table with updated CHECK constraint or equivalent compatible path to avoid `near "MODIFY"` failures.
+- In this repo, user-model observer/hooks for mirrored owner fields may not trigger reliably in all test flows; keep synchronization deterministic by calling an explicit `User::syncOwnerIdentity()` right after user profile/admin saves, and cover it with focused Feature tests.

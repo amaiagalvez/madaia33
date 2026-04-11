@@ -1,5 +1,6 @@
 <?php
 
+use App\SupportedLocales;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -14,6 +15,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->enum('language', SupportedLocales::all())->default(SupportedLocales::default());
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

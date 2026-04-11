@@ -109,6 +109,7 @@ class Users extends Component
         }
 
         $user->save();
+        $user->syncOwnerIdentity();
 
         $this->syncUserRolesAndLocations($user);
 

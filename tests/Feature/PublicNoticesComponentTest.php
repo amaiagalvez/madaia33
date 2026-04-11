@@ -86,7 +86,7 @@ test('livewire public notices orders by published_at descending', function () {
     $notice3 = Notice::factory()->public()->create(['published_at' => now()]);
 
     Livewire::test(PublicNotices::class)
-        ->assertViewHas('notices', fn($notices) => $notices->count() === 3);
+        ->assertViewHas('notices', fn ($notices) => $notices->count() === 3);
 });
 
 test('livewire public notices handles empty state', function () {

@@ -7,9 +7,9 @@ use App\Models\Setting;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
+use Illuminate\Support\Facades\Storage;
 use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Validations\AdminSettingsValidation;
 
@@ -345,7 +345,7 @@ class AdminSettings extends Component
             return Storage::url($logoPath);
         }
 
-        return asset('storage/' . ltrim($logoPath, '/'));
+        return asset('storage/'.ltrim($logoPath, '/'));
     }
 
     public function openTestEmailModal(): void

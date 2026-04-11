@@ -153,7 +153,7 @@ class Votings extends Component
                     'label_es' => trim((string) ($option['labelEs'] ?? '')),
                 ];
             })
-            ->filter(fn(array $option): bool => $option['label_eu'] !== '')
+            ->filter(fn (array $option): bool => $option['label_eu'] !== '')
             ->values();
 
         if ($normalizedOptions->isEmpty()) {
@@ -217,7 +217,7 @@ class Votings extends Component
         $owners = $this->eligibilityService->eligibleOwners($voting);
 
         $this->ownersModalRows = $owners
-            ->map(fn(Owner $owner): array => [
+            ->map(fn (Owner $owner): array => [
                 'name' => $owner->coprop1_name,
                 'percentage' => $this->eligibilityService->percentageForOwner($voting, $owner),
                 'delegated_by' => '—',
@@ -241,7 +241,7 @@ class Votings extends Component
             ->get();
 
         $this->ownersModalRows = $ballots
-            ->map(fn(VotingBallot $ballot): array => [
+            ->map(fn (VotingBallot $ballot): array => [
                 'name' => $ballot->owner?->coprop1_name ?? '—',
                 'percentage' => $ballot->owner instanceof Owner ? $this->eligibilityService->percentageForOwner($voting, $ballot->owner) : 0.0,
                 'delegated_by' => $ballot->is_in_person ? __('votings.admin.in_person_vote') : ($ballot->castByUser?->name ?? '—'),
@@ -305,7 +305,7 @@ class Votings extends Component
         abort_unless($this->canManageAdminVotings(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn(array $row): int => $row['owner']->id)
+            ->map(static fn (array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -360,7 +360,7 @@ class Votings extends Component
         abort_unless($this->canManageAdminVotings(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn(array $row): int => $row['owner']->id)
+            ->map(static fn (array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -416,15 +416,15 @@ class Votings extends Component
             ->map(static function ($rows): array {
                 return [
                     'residential_ids' => $rows
-                        ->filter(static fn($row): bool => in_array($row->location_type, ['portal', 'local'], true))
+                        ->filter(static fn ($row): bool => in_array($row->location_type, ['portal', 'local'], true))
                         ->pluck('location_id')
-                        ->map(static fn($id): int => (int) $id)
+                        ->map(static fn ($id): int => (int) $id)
                         ->values()
                         ->all(),
                     'garage_ids' => $rows
                         ->where('location_type', 'garage')
                         ->pluck('location_id')
-                        ->map(static fn($id): int => (int) $id)
+                        ->map(static fn ($id): int => (int) $id)
                         ->values()
                         ->all(),
                 ];
@@ -502,7 +502,7 @@ class Votings extends Component
 
         $this->filteredDelegatedRows = array_values(array_filter(
             $this->delegatedRows,
-            static fn(array $row): bool => str_contains($row['search_index'], $search)
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
         ));
     }
 
@@ -518,7 +518,7 @@ class Votings extends Component
 
         $this->filteredInPersonRows = array_values(array_filter(
             $this->inPersonRows,
-            static fn(array $row): bool => str_contains($row['search_index'], $search)
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
         ));
     }
 }

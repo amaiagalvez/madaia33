@@ -84,6 +84,8 @@ class FortifyServiceProvider extends ServiceProvider
                 return null;
             }
 
+            $request->session()->put('locale', SupportedLocales::normalize($user->language));
+
             return $user;
         });
     }
@@ -96,11 +98,11 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(function () {
             return redirect()->route(SupportedLocales::routeName('private'));
         });
-        Fortify::verifyEmailView(fn () => view('pages::auth.verify-email'));
-        Fortify::twoFactorChallengeView(fn () => view('pages::auth.two-factor-challenge'));
-        Fortify::confirmPasswordView(fn () => view('pages::auth.confirm-password'));
-        Fortify::resetPasswordView(fn () => view('pages::auth.reset-password'));
-        Fortify::requestPasswordResetLinkView(fn () => view('pages::auth.forgot-password'));
+        Fortify::verifyEmailView(fn() => view('pages::auth.verify-email'));
+        Fortify::twoFactorChallengeView(fn() => view('pages::auth.two-factor-challenge'));
+        Fortify::confirmPasswordView(fn() => view('pages::auth.confirm-password'));
+        Fortify::resetPasswordView(fn() => view('pages::auth.reset-password'));
+        Fortify::requestPasswordResetLinkView(fn() => view('pages::auth.forgot-password'));
     }
 
     /**
@@ -126,7 +128,7 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
         });

@@ -220,7 +220,7 @@ Before proposing or implementing any change, load the relevant skill:
 ## Project-Specific Rules (madaia33)
 
 - **Docker-first**: run commands inside Docker (`docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 ...`)
-- **Pint**: after PHP edits, run `vendor/bin/pint --dirty --format agent`
+- **Pint**: after PHP edits, run `vendor/bin/pint --dirty`
 - **Verify Livewire mount path**: `resources/views/components/⚡*.blade.php` (Volt SFC) vs `app/Livewire/*.php` (class-based)
 - **Translations**: update both `lang/eu/` and `lang/es/` when copy changes
 - **Settings batch access**: prefer `whereIn` + `upsert` over repeated single-key queries

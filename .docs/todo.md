@@ -23,6 +23,8 @@
 - [ ] añadir debugbar y algo para ver los logs
 - [ ] registro sessions en bd
 - [ ] listado users y sus sessions
+- [ ] traducciones del crud erabiltzaileak. En el formulario no mostrar contraseña. No dejar editar los campos nombre y email (se gestionarán desde owner), añadir botón para abrir la lista de owners con la ficha del owner abierta.
+- [ ] al utilizar el loginAs en la lista de usuarios, mostrar arriba en rojo el nombre y el email del usuarioo logueado, pero en vez de saioa itxi, volver a mi usuario botoiareekin.
 
 # Home
 - [ ] Osatu pribatutasun-politika eta lege-oharrak testuak
@@ -33,9 +35,8 @@
 
 - [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak (aldatu dezakezu migrazioa, ez dago indarrean)
 
-
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
-- [ ] añadir hizkuntza a la ficha de propietaria y al user, mantener sincronizados tanto el idioma como el nombre y el email con el nombre y el email del koop1. Al loguearse por defecto se cargará el idioma del user logeado
+
 - [ ] en el skill db-schema separar las tablas de las votoaciones en otro bloque
 
 - [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla "receivers" con el user_id de a quien se le ha enviado, el email al que se ha enviado, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje

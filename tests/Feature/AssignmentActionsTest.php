@@ -3,9 +3,9 @@
 use App\Models\Owner;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
+use Illuminate\Validation\ValidationException;
 use App\Actions\Properties\AssignPropertyAction;
 use App\Actions\Properties\UnassignPropertyAction;
-use Illuminate\Validation\ValidationException;
 
 describe('AssignPropertyAction', function () {
     it('creates an active assignment for an unassigned property and activates owner user', function () {
@@ -38,7 +38,7 @@ describe('AssignPropertyAction', function () {
 
         $action = new AssignPropertyAction;
 
-        expect(fn() => $action->execute($property, $owner2, '2026-06-01'))
+        expect(fn () => $action->execute($property, $owner2, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -97,7 +97,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn() => $action->execute($assignment, '2026-06-01'))
+        expect(fn () => $action->execute($assignment, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -106,7 +106,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn() => $action->execute($assignment, '2026-03-09'))
+        expect(fn () => $action->execute($assignment, '2026-03-09'))
             ->toThrow(ValidationException::class);
     });
 });

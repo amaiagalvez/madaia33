@@ -229,7 +229,7 @@ Before implementation, load the relevant skill for the scope touched by the spec
 ## Project-Specific Rules (madaia33)
 
 - **Docker-first**: run all commands in Docker (`docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 ...`)
-- **Pint**: after PHP edits run `vendor/bin/pint --dirty --format agent`
+- **Pint**: after PHP edits run `vendor/bin/pint --dirty`
 - **Git branch creation**: create branch before changes using spec-name slug (`003-estrucutura-votaciones-1`, without full path or `.md`)
 - **Verify Livewire mount target**: confirm whether active mount is `resources/views/components/⚡*.blade.php` or `app/Livewire/*.php`
 - **DB change documentation**: if migrations change tables/columns/indexes/FKs, update Mermaid ERD in `.github/skills/database-schema-mermaid/SKILL.md` in the same task

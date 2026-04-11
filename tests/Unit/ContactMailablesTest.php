@@ -1,11 +1,11 @@
 <?php
 
+use App\Models\Owner;
+use App\Models\Voting;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
 use App\Mail\VotingConfirmationMail;
-use App\Models\Owner;
-use App\Models\Voting;
 
 const CONTACT_MAIL_VISITOR_NAME = 'Ane Etxebarria';
 const CONTACT_MAIL_SUBJECT = 'Proba gaia';

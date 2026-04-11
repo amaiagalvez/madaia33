@@ -48,7 +48,7 @@ test('admin can read a message and it gets marked as read', function () {
             $result = $browser->script("return document.body.innerText.includes({$escapedBody});");
 
             return (bool) ($result[0] ?? false);
-        }, "Message body was not rendered in admin inbox detail view.")
+        }, 'Message body was not rendered in admin inbox detail view.')
             ->assertSee($messageBody);
 
         // Verify marked as read in DB

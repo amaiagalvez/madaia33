@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Owner;
+use App\SupportedLocales;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,6 +23,7 @@ class OwnerFactory extends Factory
             'coprop1_dni' => strtoupper(fake()->bothify('########?')),
             'coprop1_phone' => fake()->phoneNumber(),
             'coprop1_email' => fake()->unique()->safeEmail(),
+            'language' => SupportedLocales::default(),
             'coprop2_name' => null,
             'coprop2_dni' => null,
             'coprop2_phone' => null,

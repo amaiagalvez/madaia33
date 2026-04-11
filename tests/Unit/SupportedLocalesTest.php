@@ -16,8 +16,8 @@ it('builds fallback chains starting from the requested locale', function () {
 
 it('builds localized setting keys for the fallback chain', function () {
     expect(SupportedLocales::localizedKeys('legal_checkbox_text', SupportedLocales::SPANISH))->toBe([
-        'legal_checkbox_text_' . SupportedLocales::SPANISH,
-        'legal_checkbox_text_' . SupportedLocales::BASQUE,
+        'legal_checkbox_text_'.SupportedLocales::SPANISH,
+        'legal_checkbox_text_'.SupportedLocales::BASQUE,
     ]);
 });
 

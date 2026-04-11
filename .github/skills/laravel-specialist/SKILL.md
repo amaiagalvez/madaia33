@@ -29,17 +29,18 @@ Senior Laravel specialist with deep expertise in Laravel 10+, Eloquent ORM, and 
 
 Load detailed guidance based on context:
 
-| Topic | Reference | Load When |
-|-------|-----------|-----------|
-| Eloquent ORM | `references/eloquent.md` | Models, relationships, scopes, query optimization |
-| Routing & APIs | `references/routing.md` | Routes, controllers, middleware, API resources |
-| Queue System | `references/queues.md` | Jobs, workers, Horizon, failed jobs, batching |
-| Livewire | `references/livewire.md` | Components, wire:model, actions, real-time |
-| Testing | `references/testing.md` | Feature tests, factories, mocking, Pest PHP |
+| Topic          | Reference                | Load When                                         |
+| -------------- | ------------------------ | ------------------------------------------------- |
+| Eloquent ORM   | `references/eloquent.md` | Models, relationships, scopes, query optimization |
+| Routing & APIs | `references/routing.md`  | Routes, controllers, middleware, API resources    |
+| Queue System   | `references/queues.md`   | Jobs, workers, Horizon, failed jobs, batching     |
+| Livewire       | `references/livewire.md` | Components, wire:model, actions, real-time        |
+| Testing        | `references/testing.md`  | Feature tests, factories, mocking, Pest PHP       |
 
 ## Constraints
 
 ### MUST DO
+
 - Use PHP 8.2+ features (readonly, enums, typed properties)
 - Type hint all method parameters and return types
 - Use Eloquent relationships properly (avoid N+1 with eager loading)
@@ -50,6 +51,7 @@ Load detailed guidance based on context:
 - Follow PSR-12 coding standards
 
 ### MUST NOT DO
+
 - Use raw queries without protection (SQL injection)
 - Skip eager loading (causes N+1 problems)
 - Store sensitive data unencrypted
@@ -249,13 +251,13 @@ it('queues a publish job when a draft is submitted', function (): void {
 
 Run these at each workflow stage to confirm correctness before proceeding:
 
-| Stage | Command | Expected Result |
-|-------|---------|-----------------|
-| After migration | `php artisan migrate:status` | All migrations show `Ran` |
-| After routing | `php artisan route:list --path=api` | New routes appear with correct verbs |
-| After job dispatch | `php artisan queue:work --once` | Job processes without exception |
-| After implementation | `php artisan test --coverage` | >85% coverage, 0 failures |
-| Before PR | `./vendor/bin/pint --test` | PSR-12 linting passes |
+| Stage                | Command                             | Expected Result                      |
+| -------------------- | ----------------------------------- | ------------------------------------ |
+| After migration      | `php artisan migrate:status`        | All migrations show `Ran`            |
+| After routing        | `php artisan route:list --path=api` | New routes appear with correct verbs |
+| After job dispatch   | `php artisan queue:work --once`     | Job processes without exception      |
+| After implementation | `php artisan test --coverage`       | >85% coverage, 0 failures            |
+| Before PR            | `./vendor/bin/pint`                 | PSR-12 linting passes                |
 
 ## Knowledge Reference
 

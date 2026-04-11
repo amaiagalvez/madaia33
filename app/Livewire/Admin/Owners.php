@@ -7,13 +7,13 @@ use Livewire\Component;
 use App\Models\Location;
 use App\Models\Property;
 use Livewire\WithPagination;
-use App\Actions\Owners\CreateOwnerAction;
 use App\Models\PropertyAssignment;
 use Illuminate\Contracts\View\View;
-use App\Actions\Properties\AssignPropertyAction;
-use App\Actions\Properties\UnassignPropertyAction;
+use App\Actions\Owners\CreateOwnerAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
+use App\Actions\Properties\AssignPropertyAction;
+use App\Actions\Properties\UnassignPropertyAction;
 
 class Owners extends Component
 {

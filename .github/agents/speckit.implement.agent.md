@@ -173,7 +173,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Before marking a task complete**, run relevant validation for changed scope:
      - `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
      - `docker compose exec madaia33 php artisan test --compact` (or the smallest affected subset)
-     - `docker compose exec madaia33 vendor/bin/pint --dirty --format agent`
+     - `docker compose exec madaia33 vendor/bin/pint --dirty`
    - If public pages or navigation are affected, run Browser tests and follow `dusk-testing` skill workflow.
    - Do not mark tasks complete when feature logic tests fail; report blockers and next steps.
 

@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\Setting;
-use App\Support\ConfiguredMailSettings;
 use Illuminate\Http\UploadedFile;
+use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\Facades\Validator;
 use App\Validations\AdminSettingsValidation;
 

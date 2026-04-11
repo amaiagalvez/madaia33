@@ -67,7 +67,7 @@ class VotingEligibilityService
     public function percentageForOwner(Voting $voting, Owner $owner): float
     {
         return (float) $this->eligibleAssignments($voting, $owner)
-            ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
     }
 
     /**
@@ -82,7 +82,7 @@ class VotingEligibilityService
             ->publishedOpen()
             ->orderBy('starts_at')
             ->get()
-            ->filter(fn(Voting $voting): bool => $this->ownerCanVote($voting, $owner));
+            ->filter(fn (Voting $voting): bool => $this->ownerCanVote($voting, $owner));
     }
 
     /**
@@ -103,14 +103,14 @@ class VotingEligibilityService
             ->whereIn('voting_id', $openVotings->pluck('id'))
             ->get(['owner_id', 'voting_id'])
             ->groupBy('owner_id')
-            ->map(fn(Collection $ballots): Collection => $ballots->pluck('voting_id'));
+            ->map(fn (Collection $ballots): Collection => $ballots->pluck('voting_id'));
 
         $eligibleOwnerIdsByVoting = $openVotings
             ->mapWithKeys(function (Voting $voting): array {
                 return [
                     $voting->id => $this->eligibleOwnersQuery($voting)
                         ->pluck('owners.id')
-                        ->map(static fn($ownerId): int => (int) $ownerId)
+                        ->map(static fn ($ownerId): int => (int) $ownerId)
                         ->all(),
                 ];
             });
@@ -141,27 +141,27 @@ class VotingEligibilityService
             ->map(function (Owner $owner) use ($pendingByOwner): array {
                 $portalCodes = $owner->activeAssignments
                     ->pluck('property.location')
-                    ->filter(static fn($location): bool => $location !== null && $location->type === 'portal')
+                    ->filter(static fn ($location): bool => $location !== null && $location->type === 'portal')
                     ->pluck('code')
-                    ->map(static fn($code): string => (string) $code)
+                    ->map(static fn ($code): string => (string) $code)
                     ->unique()
                     ->sort()
                     ->values();
 
                 $garageCodes = $owner->activeAssignments
                     ->pluck('property.location')
-                    ->filter(static fn($location): bool => $location !== null && $location->type === 'garage')
+                    ->filter(static fn ($location): bool => $location !== null && $location->type === 'garage')
                     ->pluck('code')
-                    ->map(static fn($code): string => (string) $code)
+                    ->map(static fn ($code): string => (string) $code)
                     ->unique()
                     ->sort()
                     ->values();
 
                 $localCodes = $owner->activeAssignments
                     ->pluck('property.location')
-                    ->filter(static fn($location): bool => $location !== null && $location->type === 'local')
+                    ->filter(static fn ($location): bool => $location !== null && $location->type === 'local')
                     ->pluck('code')
-                    ->map(static fn($code): string => (string) $code)
+                    ->map(static fn ($code): string => (string) $code)
                     ->unique()
                     ->sort()
                     ->values();
@@ -200,12 +200,12 @@ class VotingEligibilityService
         $voting->loadMissing('locations.location');
 
         $residentialIds = $voting->locations
-            ->filter(fn($votingLocation): bool => in_array($votingLocation->location?->type, ['portal', 'local'], true))
+            ->filter(fn ($votingLocation): bool => in_array($votingLocation->location?->type, ['portal', 'local'], true))
             ->pluck('location_id')
             ->all();
 
         $garageIds = $voting->locations
-            ->filter(fn($votingLocation): bool => $votingLocation->location?->type === 'garage')
+            ->filter(fn ($votingLocation): bool => $votingLocation->location?->type === 'garage')
             ->pluck('location_id')
             ->all();
 

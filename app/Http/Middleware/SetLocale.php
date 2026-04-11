@@ -33,8 +33,11 @@ class SetLocale
             return $firstSegment;
         }
 
+        $userLocale = $request->user()?->language;
+
         return SupportedLocales::normalize(
             $request->route('locale')
+                ?? $userLocale
                 ?? $request->session()->get('locale')
                 ?? SupportedLocales::default()
         );
