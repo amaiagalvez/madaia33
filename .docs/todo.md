@@ -15,12 +15,12 @@
 - [ ] crear un componente, si todavía no lo hay, para que todas los listados tablas tengan la missma estructura
 - [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente si no lo hay
 - [ ] Ordena los ficheros dentro de la carpeta Livewire en subcarpetas Admin y Front
+- [ ] componente para inputs del formulario
 
 - [ ] user hizkuntza, besdin du front-ekoa
 - [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
 - [ ] configurar el sentry
 - [ ] añadir debugbar y algo para ver los logs
-- [ ] componente para inputs del formulario
 - [ ] registro sessions en bd
 - [ ] listado users y sus sessions
 
@@ -91,18 +91,3 @@ pasar los test con coverage
 - [ ] añadir espacio para comercios
 - [ ] en el aginte-panela añade estadísticas de las tablas que falta
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
-
-## Implementation Plan - locations type `local` (eginda)
-
-### Execution Steps
-
-- [x] 1. Datu-eredua egokitu: `locations.type` enum-era `local` gehitu, `Location` model scope/laguntzaileak zabaldu, eta factory state berria gehitu.
-- [x] 2. Seeders egokitu: `LocationSeeder`, `PropertySeeder`, `DevSeeder` eta lotutako bootstrap datuak `local` onartzera zabaldu (portalarekin pareko jokabidea).
-- [x] 3. Erabilera-filtro guztiak egokitu: `whereIn(['portal', ...])` edo `type === 'portal'` duten query eta iragazkiak `local` ere kontuan hartzera aldatu (Owners, Users, Notice manager, Public notices, Votings eligibility, etab.).
-- [x] 4. UI eta route testuingurua egokitu: admin locations nabigazioa/routak, taulak eta etiketa/itzulpenak (`eu` + `es`) `local` motari eusteko.
-- [x] 5. Test suite eguneratu/gehitu: ukitutako jokabideetan `local` kasuak gehitu (seeders, filtroak, eligibility eta bistak), eta gutxieneko test espezifikoak exekutatu Docker bidez.
-
-### Validation
-
-- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty --format agent`
-- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/PropertySeederTest.php tests/Feature/AdminOwnersAndLocationsTest.php tests/Feature/AdminVotingsTest.php tests/Feature/PublicNoticesTest.php tests/Feature/PublicNoticesComponentTest.php`

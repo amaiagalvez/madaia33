@@ -112,9 +112,9 @@
                         <td class="px-6 py-4 text-sm font-medium text-gray-900">
                             {{ $property->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-500">
-                            {{ $property->community_pct ?? '—' }}</td>
+                            %{{ number_format($property->community_pct ?? 0, 2, ',', '.') }}</td>
                         <td class="px-6 py-4 text-sm text-gray-500">
-                            {{ $property->location_pct ?? '—' }}</td>
+                            %{{ number_format($property->location_pct ?? 0, 2, ',', '.') }}</td>
                         <td class="px-6 py-4 text-sm">
                             <flux:badge :color="$isAssigned ? 'green' : 'zinc'"
                                 data-assigned="{{ $isAssigned ? 'yes' : 'no' }}">

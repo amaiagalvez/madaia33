@@ -145,6 +145,8 @@ return [
         'code' => 'Kodea',
         'name' => 'Izena',
         'properties_count' => 'Jabetzak',
+        'total_community_pct' => 'Guztira % Komunitatea',
+        'total_location_pct' => 'Guztira % Kokalekua',
         'view' => 'Ikusi',
         'no_records' => 'Ez dago erregistrorik.',
         'add_property' => 'Gehitu jabetza',
@@ -158,6 +160,7 @@ return [
         'admin_validated' => 'Adm. bal.',
         'owner_validated' => 'Jabearen bal.',
         'no_properties' => 'Ez dago jabetzarik.',
+        'community_pct_must_be_100' => 'Komunitate ehunekoa guztira %100 izan behar du.',
     ],
     'owners' => [
         'menu' => 'Jabeak',

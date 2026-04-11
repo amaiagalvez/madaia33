@@ -145,6 +145,8 @@ return [
         'code' => 'Código',
         'name' => 'Nombre',
         'properties_count' => 'Propiedades',
+        'total_community_pct' => 'Total % Comunidad',
+        'total_location_pct' => 'Total % Ubicación',
         'view' => 'Ver',
         'no_records' => 'No hay registros.',
         'add_property' => 'Añadir propiedad',
@@ -158,6 +160,7 @@ return [
         'admin_validated' => 'Val. admin',
         'owner_validated' => 'Val. propietaria',
         'no_properties' => 'No hay propiedades.',
+        'community_pct_must_be_100' => 'El porcentaje de comunidad debe sumar %100.',
     ],
     'owners' => [
         'menu' => 'Propietarias',

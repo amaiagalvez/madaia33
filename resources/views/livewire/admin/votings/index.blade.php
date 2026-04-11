@@ -262,7 +262,7 @@
                                 <tr>
                                     <td class="px-4 py-2 text-gray-800">{{ $row['name'] }}</td>
                                     <td class="px-4 py-2 text-gray-600">
-                                        {{ number_format($row['percentage'], 4, ',', '.') }}%</td>
+                                        %{{ number_format($row['percentage'], 2, ',', '.') }}%</td>
                                     <td class="px-4 py-2 text-gray-600">{{ $row['delegated_by'] }}
                                     </td>
                                     <td class="px-4 py-2 text-gray-600">{{ $row['delegate_dni'] }}

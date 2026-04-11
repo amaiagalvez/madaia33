@@ -410,3 +410,100 @@ it('allows creating and editing owner assignments inline from owners list', func
         ->and($assignment->owner_validated)->toBeTrue()
         ->and($owner->user->fresh()->is_active)->toBeFalse();
 });
+
+it('displays aggregated community and location percentages in locations listing', function () {
+    $user = adminUser();
+
+    $portal = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+
+    // Create properties with known percentages
+    Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => '1A',
+        'community_pct' => 1.5,
+        'location_pct' => 2.0,
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => '1B',
+        'community_pct' => 2.5,
+        'location_pct' => 3.5,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertSee('4.0000')
+        ->assertSee('5.5000');
+});
+
+it('shows red warning in locations listing when community percentages do not sum to 100%', function () {
+    $user = adminUser();
+
+    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A']);
+
+    // Properties that don't sum to 100%
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1A',
+        'community_pct' => 30.0,
+        'location_pct' => 50.0,
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1B',
+        'community_pct' => 40.0,
+        'location_pct' => 50.0,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertSeeHtml('data-flux-callout');
+});
+
+it('does not show warning in locations listing when all community percentages sum to 100%', function () {
+    $user = adminUser();
+
+    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A']);
+
+    // Properties that sum exactly to 100%
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1A',
+        'community_pct' => 50.0,
+        'location_pct' => 50.0,
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '1B',
+        'community_pct' => 50.0,
+        'location_pct' => 50.0,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertDontSeeHtml('data-flux-callout');
+});
+
+it('shows red text for location percentage total in listing when not equal to 100%', function () {
+    $user = adminUser();
+
+    $portalInvalid = Location::factory()->create([
+        'type' => 'portal',
+        'code' => 'P-INVALID',
+        'name' => 'Portal Invalid',
+    ]);
+
+    Property::factory()->create([
+        'location_id' => $portalInvalid->id,
+        'name' => '1A',
+        'community_pct' => 40.0,
+        'location_pct' => 60.0, // Should be 100%
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Locations::class)
+        ->assertSeeHtml('text-red-600');
+});
