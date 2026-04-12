@@ -486,10 +486,14 @@
                                     <thead>
                                         <tr class="bg-gray-50">
                                             <x-admin.table-header-cell class="px-3 py-2">
-                                                {{ __('admin.owners.location') }}
+                                                {{ __('admin.owners.location') }} /
+                                                {{ __('admin.owners.property') }}
                                             </x-admin.table-header-cell>
                                             <x-admin.table-header-cell class="px-3 py-2">
-                                                {{ __('admin.owners.property') }}
+                                                {{ __('admin.locations.community_pct') }}
+                                            </x-admin.table-header-cell>
+                                            <x-admin.table-header-cell class="px-3 py-2">
+                                                {{ __('admin.locations.location_pct') }}
                                             </x-admin.table-header-cell>
                                             <x-admin.table-header-cell class="px-3 py-2">
                                                 {{ __('admin.owners.start_date') }}
@@ -513,11 +517,19 @@
             @forelse($expandedAssignments as $assignment)
                 <tr wire:key="owner-inline-assignment-{{ $assignment->id }}"
                     class="hover:bg-gray-50/60">
-                    <td class="px-3 py-3 text-sm font-medium text-gray-900">
-                        {{ $assignment->property->location->code }}
+                    <td class="px-3 py-3 text-sm text-gray-600">
+                        <div class="font-medium text-gray-900">
+                            {{ $assignment->property->location->code }}
+                        </div>
+                        <div>
+                            {{ $assignment->property->name }}
+                        </div>
                     </td>
                     <td class="px-3 py-3 text-sm text-gray-600">
-                        {{ $assignment->property->name }}
+                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                    </td>
+                    <td class="px-3 py-3 text-sm text-gray-600">
+                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 2, ',', '.') . '%' : '-' }}
                     </td>
                     <td class="px-3 py-3">
                         <x-admin.form-date-input :label="__('admin.owners.start_date')" :model="'assignmentEdits.' . $assignment->id . '.start_date'"
@@ -553,7 +565,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-3 py-3 text-sm text-gray-500">
+                    <td colspan="8" class="px-3 py-3 text-sm text-gray-500">
                         {{ __('admin.owners.no_assignments') }}
                     </td>
                 </tr>

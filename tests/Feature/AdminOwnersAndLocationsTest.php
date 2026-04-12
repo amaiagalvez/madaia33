@@ -477,6 +477,8 @@ it('uses shared styling components in owners inline assignments panel', function
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '5A',
+        'community_pct' => 1.25,
+        'location_pct' => 2.5,
     ]);
 
     PropertyAssignment::factory()->create([
@@ -492,7 +494,10 @@ it('uses shared styling components in owners inline assignments panel', function
         ->assertSeeHtml('data-owner-inline-table="' . $owner->id . '"')
         ->assertSeeHtml('data-admin-table-header')
         ->assertSeeHtml('data-admin-date-input')
-        ->assertSee('5A');
+        ->assertSee('33-Z')
+        ->assertSee('5A')
+        ->assertSee('1,25%')
+        ->assertSee('2,50%');
 });
 
 it('filters owners by text search across owner record fields', function () {

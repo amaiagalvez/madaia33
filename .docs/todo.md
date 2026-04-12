@@ -11,7 +11,9 @@
 
 # Code
 - [ ] reepasar estatistikak home
-
+- [ ] añadir papelera para poder reestaurarr los borrrados
+- [ ] tipo votaciones, una persona un voto / por poorcentajes de participación
+- [ ] 
 - [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
 - [ ] configurar el sentry
 - [ ] añadir debugbar y algo para ver los logs
