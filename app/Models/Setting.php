@@ -30,6 +30,8 @@ class Setting extends Model
 
     public const SECTION_OWNERS = 'owners';
 
+    public const SECTION_VOTE_DELEGATE = 'vote_delegate';
+
     protected $fillable = [
         'key',
         'value',
@@ -73,6 +75,7 @@ class Setting extends Model
             self::SECTION_GENERAL,
             self::SECTION_RECAPTCHA,
             self::SECTION_OWNERS,
+            self::SECTION_VOTE_DELEGATE,
         ];
     }
 

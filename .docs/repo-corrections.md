@@ -176,3 +176,4 @@
 - If a shared bilingual rich-text Blade component uses `@input="sync(...)"` or toolbar actions, define `sync/format/link` inside the same component `x-data`; otherwise Livewire fields may stay empty on save and block create flows.
 - For contact message user-linking across mixed migration states, keep the historical add-column migration and make it duplicate-tolerant (catch duplicate column on fresh DBs) while ensuring runtime code can persist `user_id` in both front contact and profile modal flows.
 - If `contact_messages.user_id` exists in schema/fillable, include `user_id` explicitly in every `ContactMessage::create(...)` path (public form and profile modal); otherwise profile history tabs filtered by user will appear empty.
+- In Feature POST tests to locale-prefixed form routes (`profile.terms.accept.*`), include a CSRF token (`withSession('_token')` + payload `_token`) to avoid false 419 failures unrelated to business logic.

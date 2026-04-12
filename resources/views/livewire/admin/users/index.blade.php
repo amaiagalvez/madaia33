@@ -134,6 +134,9 @@
                     {{ __('admin.users.roles') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
+                    {{ __('admin.users.delegated_vote_terms_accepted') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
                     {{ __('admin.users.managed_locations') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
@@ -161,6 +164,18 @@
                                 <span class="text-stone-400">—</span>
                             @endforelse
                         </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        @php($hasDelegatedVoteRole = $user->roles->contains('name', \App\Models\Role::DELEGATED_VOTE))
+                        @if ($hasDelegatedVoteRole)
+                            <span
+                                class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold {{ $user->delegated_vote_terms_accepted_at !== null ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600' }}"
+                                data-user-delegated-terms="{{ $user->id }}">
+                                {{ $user->delegated_vote_terms_accepted_at !== null ? __('admin.common.yes') : __('admin.common.no') }}
+                            </span>
+                        @else
+                            <span class="text-stone-400">—</span>
+                        @endif
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600">
                         <div class="flex flex-wrap gap-1">
@@ -200,7 +215,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('admin.users.empty') }}
                     </td>
                 </tr>

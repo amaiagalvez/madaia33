@@ -148,3 +148,61 @@ Un community_admin puede tener asingadas varias propiedades, tambien puede que s
 - [x] Aginte paneneal `COMUNITY_ADMIN`ek admin-votings zerrenda ikus dezake soilik bere erabiltzaileak lotuta dazukan ubikazioekin lotuta dauden bozkeitak, horietan sortu/edita/ezabatu ahal du, eta `Ver Censo` / `Ver Votantes` modaletan jabe-izenak ezkutatuta erakutsi behar dira.
 - [x] si el usuario con DELEGATED_VOTE o con PROPERTY_OWNER pero que no tiene el rol GENERAL_ADMIN o COMUNITY_ADMIN, al intentar acceder al panel le debe redirigir al home
 - [x] en /eu/bozketak, si está activadoo "Boto delegatua itxi", no mostrar los votones "Boto presentziala" y "Boto delegatua"
+
+## Implementation Plan (DELEGATED_VOTE baldintza legal berria)
+
+### Goal
+
+- [x] `DELEGATED_VOTE` rola duten erabiltzaileek front-eko `bozketak` ikuspegian baldintza legal espezifikoak onartu behar izatea, onartu arte ekintza guztiak blokeatuta.
+- [x] Testu legala `settings`-en `vote_delegate` section berrian kudeatzea (EU/ES hizkuntzekin).
+- [x] Onarpen egoera `users` taulan gordetzea eta admin `erabiltzaileak` zerrendan `si/no` gisa erakustea, soilik erabiltzaileak `DELEGATED_VOTE` rola badu.
+
+### Technical Decisions
+
+- [x] Datu-eredua: `users` taulan `delegated_vote_terms_accepted_at` (`nullable timestamp`) gehitzea, auditagarritasuna eta denbora-zigilua mantentzeko.
+- [x] Baimen-logika: `PublicVotings` osagaian owner baldintzetatik aparte, `DELEGATED_VOTE` baldintza independentea gehitzea (`requiresDelegateTermsAcceptance`), eta modal/blur/pointer-events patroia berrerabiltzea.
+- [x] Persistitzea: onarpena `ProfileController::acceptTerms` metodoan zabaltzea (edo endpoint dedikatu minimo bat), `return_to` fluxua mantenduz eta only-auth segurtasunarekin.
+- [x] Ezarpenak: `Setting::SECTION_VOTE_DELEGATE` eta `AdminSettings` map/validation/partials kate osoa gehitzea, `owners_terms_text_*` patroi berarekin baina key berriekin (`vote_delegate_terms_text_eu/es`).
+- [x] Admin users taula: rolen badgeen ondoko/taulako zutabe dedikatua gehitzea; `DELEGATED_VOTE` ez duen erabiltzaileentzat `—`, eta duenentzat `si/no`.
+
+### Execution Steps
+
+- [x] 1. Datu-egitura: users migration berria + `User` model (`fillable`/`casts`) eguneratu.
+- [x] 2. Settings azpiegitura: `Setting` section berria, `AdminSettings` property/map/assign/save, `AdminSettingsValidation`, eta owners-like partial berria (`vote-delegate-tab`) konektatu.
+- [x] 3. Front bozketa flowa: `PublicVotings`-en delegated terms check berria, setting key berria kargatu, eta `public-votings` blade-an modal blokeo dedikatua gehitu.
+- [x] 4. Onarpen endpointa: `acceptTerms` fluxuan users eremua eguneratu eta delegated kasuan redirect koherentea mantendu.
+- [x] 5. Admin users listing: zutabe berria + i18n testuak + role-baldintzatutako renderra.
+- [x] 6. Testak: Feature test berriak/eguneratuak (`VotingsFeatureTest`, `AdminUsersManagementTest`, `AdminSettings*` dagokiona) delegated modal, blokeo eta zutabe egoera egiaztatzeko.
+- [x] 7. Formatu/kalitate balidazioa Docker barruan (`pint`, test fokalizatua, quality gate).
+
+### Work Items
+
+- [x] `database/migrations/*_add_delegated_vote_terms_accepted_at_to_users_table.php`
+- [x] `app/Models/User.php`
+- [x] `app/Models/Setting.php`
+- [x] `app/Livewire/AdminSettings.php`
+- [x] `app/Validations/AdminSettingsValidation.php`
+- [x] `resources/views/livewire/admin/settings.blade.php`
+- [x] `resources/views/livewire/admin/settings/partials/vote-delegate-tab.blade.php`
+- [x] `app/Livewire/PublicVotings.php`
+- [x] `resources/views/livewire/front/public-votings.blade.php`
+- [x] `app/Http/Controllers/ProfileController.php`
+- [x] `app/Livewire/Admin/Users.php`
+- [x] `resources/views/livewire/admin/users/index.blade.php`
+- [x] `lang/eu/admin.php`
+- [x] `lang/es/admin.php`
+- [x] `tests/Feature/VotingsFeatureTest.php`
+- [x] `tests/Feature/AdminUsersManagementTest.php`
+
+### Validation
+
+- [x] TDD/ATDD minimoa: testak lehenik eguneratu, gero inplementazioa.
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/VotingsFeatureTest.php --filter=delegated`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminUsersManagementTest.php`
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality` (blokeatuta: repoan aurrez zeuden lint/style arazo orokorrak + safe.directory oharra)
+
+### Questions or Risks
+
+- [x] `DELEGATED_VOTE + PROPERTY_OWNER` konbinazioan bi baldintzak aplikatu dira mailaka (delegated lehenik, gero owner baldintza hala badagokio).
+- [x] Zutabe berria `roles` ondoren kokatu da, ikusgarritasun testarekin egiaztatuta.

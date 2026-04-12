@@ -52,9 +52,13 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-- texto legal que tiene que aceptar los que tiene rol "Voto delegado", al entrar a la vista bozketak del front, si no lo tienen aceptado que les salga un modal, como el de los propietarios, y hasta que no lo acepten que no les deje hacer nada más. El texto se tiene que almacenar en settings en la section 
-- 
+- problema con los textarea biligues con mini editor, al escribir, automáticamentee el cursor se va al principio
+- Formulario para crear nueva propietaria, añadir campo id (zbkia / Num) comprobar que sea único. Mostrar el id en el listado de propietarias del panel.
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
+- Aktak
+- Resultado votaciones
+- Deialdiak sartzek formularioa
+- bozketak pdf presencial/delegado
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
 - [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak (aldatu dezakezu migrazioa, ez dago indarrean)

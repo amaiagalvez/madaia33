@@ -101,6 +101,37 @@ it('filters users list by selected role', function () {
         ->assertDontSee('Delegated Role User');
 });
 
+it('shows delegated vote terms status only for delegated-vote users', function () {
+    $manager = adminUser([
+        'email' => 'manager-delegated-status@example.com',
+    ]);
+
+    $delegatedNoTerms = User::factory()->create([
+        'name' => 'Delegated No Terms',
+    ]);
+    $delegatedNoTerms->assignRole(Role::DELEGATED_VOTE);
+
+    $delegatedWithTerms = User::factory()->create([
+        'name' => 'Delegated With Terms',
+        'delegated_vote_terms_accepted_at' => now(),
+    ]);
+    $delegatedWithTerms->assignRole(Role::DELEGATED_VOTE);
+
+    $regularUser = User::factory()->create([
+        'name' => 'Regular Without Delegated Role',
+    ]);
+
+    test()->actingAs($manager)
+        ->get(route('admin.users.index'))
+        ->assertOk()
+        ->assertSee('Delegated No Terms')
+        ->assertSee('Delegated With Terms')
+        ->assertSee('Regular Without Delegated Role')
+        ->assertSeeHtml('data-user-delegated-terms="' . $delegatedNoTerms->id . '"')
+        ->assertSeeHtml('data-user-delegated-terms="' . $delegatedWithTerms->id . '"')
+        ->assertDontSeeHtml('data-user-delegated-terms="' . $regularUser->id . '"');
+});
+
 it('allows superadmin to create a community admin with multiple locations', function () {
     $manager = adminUser();
 

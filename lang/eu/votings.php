@@ -68,6 +68,8 @@ return [
         'delegated_modal_title' => 'Bozkatu gabe dauden jabeak',
         'delegated_search' => 'Boto delegatuan bilatu',
         'delegated_search_placeholder' => 'Bilatu jabea, ko-jabea, NAN, emaila, telefonoa, portal, lokal edo garaje kodea',
+        'delegated_terms_title' => 'Boto delegatuaren baldintzak',
+        'delegated_terms_default_text' => 'Boto delegatua erabili aurretik baldintzak onartu behar dituzu.',
         'delegated_mode' => 'Boto delegatuan zaude: :owner jabe gisa bozkatu duzu.',
         'leave_delegated_mode' => 'Boto delegatua itxi',
         'delegate_dni_label' => 'Jabeak emandako baimena egiaztatzeko NAN-a',

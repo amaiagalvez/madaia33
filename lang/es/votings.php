@@ -68,6 +68,8 @@ return [
         'delegated_modal_title' => 'Propietarias pendientes de votar',
         'delegated_search' => 'Buscar en voto delegado',
         'delegated_search_placeholder' => 'Buscar por propietaria, copropietaria, DNI, email, teléfono, portal, local o garaje',
+        'delegated_terms_title' => 'Condiciones del voto delegado',
+        'delegated_terms_default_text' => 'Debes aceptar las condiciones antes de usar el voto delegado.',
         'delegated_mode' => 'Modo delegado activo: estás votando como :owner.',
         'leave_delegated_mode' => 'Salir del voto delegado',
         'delegate_dni_label' => 'DNI de la persona a la que se le ha delegado el voto para verificar la delegación',

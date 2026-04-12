@@ -1,0 +1,1 @@
+<x-admin.bilingual-rich-text-tabs :title="__('admin.settings_form.vote_delegate_terms_text')" :locale-configs="$this->localeConfigsFor('voteDelegateTermsText', 'admin.settings_form.vote_delegate_terms_text')" />

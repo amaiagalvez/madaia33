@@ -82,6 +82,9 @@ return [
         'owners_terms_text' => 'Erabilera baldintzak (jabeak)',
         'owners_terms_text_eu' => 'Baldintzak (EU)',
         'owners_terms_text_es' => 'Baldintzak (ES)',
+        'vote_delegate_terms_text' => 'Erabilera baldintzak (boto delegatua)',
+        'vote_delegate_terms_text_eu' => 'Baldintzak (EU)',
+        'vote_delegate_terms_text_es' => 'Baldintzak (ES)',
     ],
     'stats' => [
         'published_notices' => 'Argitaratutako iragarkiak',
@@ -107,6 +110,7 @@ return [
         'general' => 'Orokorra',
         'recaptcha' => 'reCAPTCHA',
         'owners' => 'Jabeak',
+        'vote_delegate' => 'Boto delegatua',
     ],
     'test_email' => [
         'button' => 'Bidali proba-eposta',
@@ -208,6 +212,7 @@ return [
         'assign' => 'Esleitu',
         'unassign' => 'Desesleitu',
         'active' => 'Aktiboa',
+        'delegated_vote_terms_accepted' => 'Boto delegatuaren baldintzak',
         'closed' => 'Itxita',
         'no_assignments' => 'Ez dago esleipenik jabe honentzat.',
         'filters' => [
@@ -298,6 +303,7 @@ return [
             'propietaria' => 'Jabea',
             'voto_delegado' => 'Boto delegatua',
         ],
+        'delegated_vote_terms_accepted' => 'Baldintzak',
     ],
     'votings' => [
         'menu' => 'Bozketak',

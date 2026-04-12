@@ -71,6 +71,66 @@ it('shows terms blocking modal in front votings when owner has not accepted term
         ->count())->toBe(0);
 });
 
+it('shows delegated terms blocking modal when delegated-vote user has not accepted delegated terms', function () {
+    $delegatedUser = User::factory()->create();
+    $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    createSetting('vote_delegate_terms_text_eu', '<p>Boto delegatuaren baldintzak</p>');
+
+    Livewire::actingAs($delegatedUser)
+        ->test(PublicVotings::class)
+        ->assertSet('requiresTermsAcceptance', true)
+        ->assertSet('termsScope', 'vote_delegate')
+        ->assertSeeHtml('data-votings-terms-modal')
+        ->assertSee('Boto delegatuaren baldintzak');
+});
+
+it('blocks delegated vote actions until delegated terms are accepted', function () {
+    $delegatedUser = User::factory()->create();
+    $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    Livewire::actingAs($delegatedUser)
+        ->test(PublicVotings::class)
+        ->assertSet('requiresTermsAcceptance', true)
+        ->assertSet('showDelegatedModal', false)
+        ->call('openDelegatedVoteModal')
+        ->assertSet('showDelegatedModal', false);
+});
+
+it('stores delegated terms acceptance timestamp for delegated-vote users', function () {
+    $delegatedUser = User::factory()->create();
+    $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+
+    test()->actingAs($delegatedUser)
+        ->withSession(['_token' => 'delegated-terms-token'])
+        ->post(route('profile.terms.accept.eu'), [
+            '_token' => 'delegated-terms-token',
+            'terms_scope' => 'vote_delegate',
+            'return_to' => route('votings.eu', absolute: false),
+        ])
+        ->assertRedirect(route('votings.eu', absolute: false));
+
+    expect($delegatedUser->fresh()?->delegated_vote_terms_accepted_at)->not->toBeNull();
+});
+
 it('allows an eligible owner to vote once and stores auditable rows', function () {
     Mail::fake();
 
@@ -225,6 +285,7 @@ it('stores delegated voter user id when voting on behalf of another owner', func
     $delegatedOwner = Owner::factory()->create();
     $adminUser = User::factory()->create();
     $adminUser->assignRole(Role::DELEGATED_VOTE);
+    $adminUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
     $portal = Location::factory()->portal()->create(['code' => '33-C']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
@@ -356,6 +417,7 @@ it('requires delegate dni when voting in delegated mode', function () {
     $delegatedOwner = Owner::factory()->create();
     $adminUser = User::factory()->create();
     $adminUser->assignRole(Role::DELEGATED_VOTE);
+    $adminUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
     $portal = Location::factory()->portal()->create(['code' => '33-F']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
@@ -393,6 +455,7 @@ it('requires delegate dni when voting in delegated mode', function () {
 it('allows delegated-vote users to select delegated owner from public votings screen', function () {
     $delegatedUser = User::factory()->create();
     $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+    $delegatedUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
     $delegatedOwner = Owner::factory()->create([
         'coprop1_name' => 'Aukeratzeko Jabea',
@@ -436,6 +499,7 @@ it('stores in person vote without dni when voting on behalf of another owner', f
     $inPersonOwner = Owner::factory()->create();
     $adminUser = User::factory()->create();
     $adminUser->assignRole(Role::DELEGATED_VOTE);
+    $adminUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
     $portal = Location::factory()->portal()->create(['code' => '33-G']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
@@ -532,6 +596,7 @@ it('allows superadmin to cast in-person vote', function () {
 it('allows delegated-vote users to select in-person owner from public votings screen', function () {
     $delegatedUser = User::factory()->create();
     $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+    $delegatedUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
     $inPersonOwner = Owner::factory()->create([
         'coprop1_name' => 'Presentziala Jabea',
@@ -572,6 +637,7 @@ it('allows delegated-vote users to select in-person owner from public votings sc
 it('hides delegated action buttons when delegated mode is active', function () {
     $delegatedUser = User::factory()->create();
     $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+    $delegatedUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
     $delegatedOwner = Owner::factory()->create([
         'coprop1_name' => 'Delegazio Moduko Jabea',
@@ -618,6 +684,12 @@ it('allows privileged roles to cast direct vote when they also have property own
     $user = $owner->user()->firstOrFail();
     $user->assignRole(Role::PROPERTY_OWNER);
     $user->assignRole($extraRole);
+
+    if ($extraRole === Role::DELEGATED_VOTE) {
+        $user->update([
+            'delegated_vote_terms_accepted_at' => now(),
+        ]);
+    }
 
     $portal = Location::factory()->portal()->create(['code' => '33-ROL-' . strtoupper(substr($extraRole, 0, 2))]);
     $property = Property::factory()->create(['location_id' => $portal->id]);

@@ -68,6 +68,8 @@
                 @include('livewire.admin.settings.partials.recaptcha-tab')
             @elseif ($activeSection === 'owners')
                 @include('livewire.admin.settings.partials.owners-tab')
+            @elseif ($activeSection === 'vote_delegate')
+                @include('livewire.admin.settings.partials.vote-delegate-tab')
             @endif
 
             <div>

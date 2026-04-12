@@ -64,6 +64,10 @@ class AdminSettings extends Component
             'ownersTermsTextEu' => 'owners_terms_text_eu',
             'ownersTermsTextEs' => 'owners_terms_text_es',
         ],
+        Setting::SECTION_VOTE_DELEGATE => [
+            'voteDelegateTermsTextEu' => 'vote_delegate_terms_text_eu',
+            'voteDelegateTermsTextEs' => 'vote_delegate_terms_text_es',
+        ],
     ];
 
     public string $activeSection = '';
@@ -143,6 +147,10 @@ class AdminSettings extends Component
 
     public string $ownersTermsTextEs = '';
 
+    public string $voteDelegateTermsTextEu = '';
+
+    public string $voteDelegateTermsTextEs = '';
+
     public bool $saved = false;
 
     public bool $showTestEmailModal = false;
@@ -206,6 +214,8 @@ class AdminSettings extends Component
         $this->ownersWelcomeSubjectEs = $settings['owners_welcome_subject_es'] ?? '';
         $this->ownersTermsTextEu = $settings['owners_terms_text_eu'] ?? '';
         $this->ownersTermsTextEs = $settings['owners_terms_text_es'] ?? '';
+        $this->voteDelegateTermsTextEu = $settings['vote_delegate_terms_text_eu'] ?? '';
+        $this->voteDelegateTermsTextEs = $settings['vote_delegate_terms_text_es'] ?? '';
         $this->ownersWelcomeTextEu = $settings['owners_welcome_text_eu'] ?? '';
         $this->ownersWelcomeTextEs = $settings['owners_welcome_text_es'] ?? '';
         $this->historyTextEu = $settings['home_history_text_eu'] ?? '';

@@ -5,7 +5,7 @@
             <div
                 class="w-full max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-2xl">
                 <h2 class="text-base font-semibold text-amber-900">
-                    {{ __('profile.terms.title') }}
+                    {{ $termsScope === 'vote_delegate' ? __('votings.front.delegated_terms_title') : __('profile.terms.title') }}
                 </h2>
                 <div class="prose prose-sm mt-3 max-h-72 overflow-y-auto max-w-none text-amber-900">
                     {!! $termsHtml !!}
@@ -15,6 +15,7 @@
                     action="{{ route(\App\SupportedLocales::routeName('profile.terms.accept')) }}"
                     class="mt-5">
                     @csrf
+                    <input type="hidden" name="terms_scope" value="{{ $termsScope }}">
                     <input type="hidden" name="return_to"
                         value="{{ route(\App\SupportedLocales::routeName('votings'), absolute: false) }}">
                     <button type="submit" data-votings-terms-accept-button

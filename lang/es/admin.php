@@ -82,6 +82,9 @@ return [
         'owners_terms_text' => 'Condiciones de uso (propietarias)',
         'owners_terms_text_eu' => 'Condiciones (EU)',
         'owners_terms_text_es' => 'Condiciones (ES)',
+        'vote_delegate_terms_text' => 'Condiciones de uso (voto delegado)',
+        'vote_delegate_terms_text_eu' => 'Condiciones (EU)',
+        'vote_delegate_terms_text_es' => 'Condiciones (ES)',
     ],
     'stats' => [
         'published_notices' => 'Avisos publicados',
@@ -107,6 +110,7 @@ return [
         'general' => 'General',
         'recaptcha' => 'reCAPTCHA',
         'owners' => 'Propietarias',
+        'vote_delegate' => 'Voto delegado',
     ],
     'test_email' => [
         'button' => 'Enviar correo de prueba',
@@ -280,6 +284,7 @@ return [
         'name' => 'Nombre',
         'email' => 'Email',
         'active' => 'Activa',
+        'delegated_vote_terms_accepted' => 'Condiciones de voto delegado',
         'password_hint' => 'Déjalo vacío si no quieres cambiar la contraseña.',
         'sessions_title' => 'Registro de sesiones',
         'sessions_login_at' => 'Hora de entrada',
@@ -298,6 +303,7 @@ return [
             'propietaria' => 'Propietaria',
             'voto_delegado' => 'Voto delegado',
         ],
+        'delegated_vote_terms_accepted' => 'Condiciones',
     ],
     'votings' => [
         'menu' => 'Votaciones',
