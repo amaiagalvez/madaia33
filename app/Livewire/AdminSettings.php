@@ -371,6 +371,22 @@ class AdminSettings extends Component
         $this->hasUnsavedChanges = false;
     }
 
+    /**
+     * @param  array<string, mixed>  $editorValues
+     */
+    public function saveWithEditorValues(array $editorValues = []): void
+    {
+        foreach ($editorValues as $field => $value) {
+            if (! is_string($field) || ! property_exists($this, $field)) {
+                continue;
+            }
+
+            $this->{$field} = is_string($value) ? $value : '';
+        }
+
+        $this->save();
+    }
+
     public function getFrontLogoPreviewUrlProperty(): ?string
     {
         if ($this->frontLogoImage !== null) {

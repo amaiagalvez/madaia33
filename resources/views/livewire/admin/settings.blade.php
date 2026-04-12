@@ -1,38 +1,17 @@
 <div x-data="{
-    format(field, command) {
-            const editor = this.$refs[field];
-            if (!editor) {
-                return;
-            }
+    submitWithEditors(event) {
+        const form = event.target;
+        const editorValues = {};
 
-            editor.focus();
-            document.execCommand(command, false, null);
-            this.sync(field);
-        },
-        link(field) {
-            const editor = this.$refs[field];
-            if (!editor) {
-                return;
-            }
+        window.dispatchEvent(new CustomEvent('admin-settings-before-save'));
 
-            const url = window.prompt('{{ __('admin.settings_form.editor_link_prompt') }}', 'https://');
-            if (!url) {
-                return;
-            }
-
-            editor.focus();
-            document.execCommand('createLink', false, url);
-            this.sync(field);
-        },
-        sync(field) {
-            const editor = this.$refs[field];
-            if (!editor) {
-                return;
-            }
-
+        form.querySelectorAll('[contenteditable=true][id]').forEach((editor) => {
             const html = editor.innerHTML.trim();
-            this.$wire.set(field, html === '<br>' ? '' : html);
-        },
+            editorValues[editor.id] = html === '<br>' ? '' : html;
+        });
+
+        this.$wire.saveWithEditorValues(editorValues);
+    },
 }">
     <div x-data="{ dirty: @entangle('hasUnsavedChanges') }">
         {{-- Section tabs --}}
@@ -56,7 +35,7 @@
             </div>
         @endif
 
-        <form wire:submit="save"
+        <form @submit.prevent="submitWithEditors($event)"
             class="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             @if ($activeSection === 'contact_form')
                 @include('livewire.admin.settings.partials.contact-form-tab')

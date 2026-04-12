@@ -59,6 +59,10 @@
 <div wire:key="bilingual-tabs-{{ $rootField }}" x-data="{
     tab: '{{ $initialTab }}',
     syncTimers: {},
+    cancelPendingSyncs() {
+        Object.values(this.syncTimers).forEach((timer) => clearTimeout(timer));
+        this.syncTimers = {};
+    },
     format(field, command) {
         const editor = this.$refs[field];
         if (!editor) {
@@ -102,6 +106,7 @@
         }, 160);
     },
 }"
+    @admin-settings-before-save.window="cancelPendingSyncs()"
     class="space-y-6 rounded-lg border border-gray-200 bg-stone-50 p-4"
     data-bilingual-field="{{ $rootField }}">
     <div class="flex flex-wrap items-center justify-between gap-3">

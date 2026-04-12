@@ -245,6 +245,24 @@ it('loads votings explanation EU and ES values in settings even with stale cache
         ->assertSet('votingsExplanationTextEs', '<p>Explicacion sin cache ES</p>');
 });
 
+it('saves rich-text values in one submit action', function () {
+    $user = adminUser();
+
+    createSetting('votings_explanation_text_eu', '<p>Aurreko balioa EU</p>');
+    createSetting('votings_explanation_text_es', '<p>Valor previo ES</p>');
+
+    Livewire::actingAs($user)
+        ->test(AdminSettings::class)
+        ->call('setSection', Setting::SECTION_VOTINGS)
+        ->call('saveWithEditorValues', [
+            'votingsExplanationTextEu' => '<p>Balio berria EU</p>',
+            'votingsExplanationTextEs' => '<p>Valor nuevo ES</p>',
+        ]);
+
+    expect(settingValue('votings_explanation_text_eu'))->toBe('<p>Balio berria EU</p>')
+        ->and(settingValue('votings_explanation_text_es'))->toBe('<p>Valor nuevo ES</p>');
+});
+
 it('recaptcha_secret_key field renders as type password', function () {
     $user = adminUser();
 
