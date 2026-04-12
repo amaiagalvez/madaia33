@@ -146,7 +146,7 @@ class CastVotingBallotAction
         $owner->loadMissing('activeAssignments.property');
 
         $ownerPct = $owner->activeAssignments
-            ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
 
         $total = VotingOptionTotal::query()
             ->where('voting_id', $voting->id)

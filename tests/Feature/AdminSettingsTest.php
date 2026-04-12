@@ -12,8 +12,8 @@ use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\Facades\Storage;
 use App\Validations\AdminSettingsValidation;
@@ -410,7 +410,7 @@ it('dashboard shows real statistics', function () {
 it('factory-created settings have valid section', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

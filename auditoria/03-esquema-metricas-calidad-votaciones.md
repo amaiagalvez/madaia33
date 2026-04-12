@@ -42,14 +42,14 @@
 
 ## 8. Umbrales sugeridos (semaforo)
 - Verde:
-  - Desviacion = 0
-  - Incidencias criticas = 0
-  - Cierre de acta en plazo definido
+    - Desviacion = 0
+    - Incidencias criticas = 0
+    - Cierre de acta en plazo definido
 - Ambar:
-  - Incidencias no criticas o retrasos moderados
+    - Incidencias no criticas o retrasos moderados
 - Rojo:
-  - Cualquier desviacion de recuento
-  - Incidencia critica sin resolver
+    - Cualquier desviacion de recuento
+    - Incidencia critica sin resolver
 
 ## 9. Evidencias minimas por metrica
 - Fuente de datos (tabla/reporte).

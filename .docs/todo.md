@@ -70,7 +70,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 # nohizbehinka egiteko 2026-04-11
 - [ ] Repasa los feature test y los que se pueedan convertir en unit pasalos
 - [ ] Repasa la suit de test y completa los que falten
-- [ ] con el agente sorgina repasar el código y proponer mejoras
+- [ ] con el agente sorgina repasar el código y proponer mejoras (código repetido, test que faltan, ...)
 
 - [ ] sudo find /home/amaia/Dokumentuak/madaia33 -user root -exec chown amaia:amaia {} +
 - [ ] bash scripts/enforce-indent-4.sh 

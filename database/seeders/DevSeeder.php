@@ -11,15 +11,14 @@ use App\Models\Voting;
 use App\Models\Setting;
 use App\Models\Location;
 use App\Models\Property;
-use App\Models\VotingBallot;
-use App\Models\VotingOption;
-use App\Models\VotingSelection;
-use App\Models\VotingOptionTotal;
 use Illuminate\Support\Str;
+use App\Models\VotingBallot;
 use App\Models\ContactMessage;
 use App\Models\NoticeLocation;
+use App\Models\VotingSelection;
 use Illuminate\Database\Seeder;
 use App\Models\UserLoginSession;
+use App\Models\VotingOptionTotal;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -403,10 +402,32 @@ class DevSeeder extends Seeder
             ],
         );
 
-        $propertyId = Property::query()
+        $existingPropertyId = $ownerDelegated->activeAssignments()
+            ->orderBy('id')
+            ->value('property_id');
+
+        $availablePropertyId = Property::query()
             ->doesntHave('activeAssignments')
             ->orderBy('id')
             ->value('id');
+
+        $propertyId = $existingPropertyId ?? $availablePropertyId;
+
+        if ($propertyId === null) {
+            $fallbackLocationId = Location::query()
+                ->whereIn('type', ['portal', 'local', 'garage'])
+                ->orderBy('id')
+                ->value('id');
+
+            if ($fallbackLocationId !== null) {
+                $propertyId = Property::query()->create([
+                    'location_id' => $fallbackLocationId,
+                    'name' => 'DEMO-OWNER-DELEGATED',
+                    'community_pct' => null,
+                    'location_pct' => null,
+                ])->id;
+            }
+        }
 
         if ($propertyId === null) {
             return;
@@ -467,7 +488,7 @@ class DevSeeder extends Seeder
                 }
 
                 $delegatedOwner = $eligibleOwners->first(
-                    fn(Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
+                    fn (Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
                 );
 
                 if (! $delegatedOwner instanceof Owner || ! $delegatedUser instanceof User) {
@@ -486,7 +507,7 @@ class DevSeeder extends Seeder
                 $votedIds = collect([$selfVotingOwner?->id, $delegatedOwner->id])->filter()->values();
 
                 $eligibleOwners
-                    ->reject(fn(Owner $owner): bool => $votedIds->contains($owner->id))
+                    ->reject(fn (Owner $owner): bool => $votedIds->contains($owner->id))
                     ->take(4)
                     ->each(function (Owner $owner) use ($castVotingBallotAction, $voting): void {
                         if ($owner->user === null) {
@@ -535,7 +556,7 @@ class DevSeeder extends Seeder
 
                     $owner->loadMissing('activeAssignments.property');
                     $ownerPct = $owner->activeAssignments
-                        ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+                        ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
 
                     $ballot = VotingBallot::create([
                         'voting_id' => $voting->id,
@@ -652,7 +673,7 @@ class DevSeeder extends Seeder
                 'path' => $path,
                 'alt_text_eu' => $item['alt_eu'],
                 'alt_text_es' => $item['alt_es'],
-                'tag' => $item['tag'] ?? null,
+                'tag' => $item['tag'],
             ]);
         }
     }

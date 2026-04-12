@@ -98,30 +98,8 @@ class PublicVotings extends Component
 
         abort_unless($user !== null, 403);
 
-        $requiresOwnerTermsAcceptance = $this->shouldRequireOwnerTermsAcceptance($user);
-        $requiresDelegatedTermsAcceptance = $this->shouldRequireDelegatedTermsAcceptance($user);
-
-        $this->requiresTermsAcceptance = $requiresOwnerTermsAcceptance || $requiresDelegatedTermsAcceptance;
-        $this->termsScope = $requiresDelegatedTermsAcceptance ? 'vote_delegate' : 'owner';
-        $this->termsHtml = $this->termsScope === 'vote_delegate'
-            ? (Setting::localizedString(
-                'vote_delegate_terms_text',
-                __('votings.front.delegated_terms_default_text'),
-            ) ?? __('votings.front.delegated_terms_default_text'))
-            : (Setting::localizedString(
-                'owners_terms_text',
-                __('profile.terms.default_text'),
-            ) ?? __('profile.terms.default_text'));
-
-        $activeLocale = SupportedLocales::normalize((string) session('locale', SupportedLocales::current()));
-        $currentLocaleExplanationKey = SupportedLocales::localizedKey('votings_explanation_text', $activeLocale);
-        $currentLocaleExplanationHtml = trim((string) Setting::query()
-            ->where('key', $currentLocaleExplanationKey)
-            ->value('value'));
-
-        $this->votingsExplanationHtml = $currentLocaleExplanationHtml !== ''
-            ? $currentLocaleExplanationHtml
-            : __('votings.front.explanation_default_text');
+        $this->setTermsState($user);
+        $this->setVotingsExplanationHtml();
 
         $this->canManageDelegatedVoting = $this->canManageDelegatedVotingForCurrentUser();
 
@@ -139,6 +117,38 @@ class PublicVotings extends Component
         );
 
         $this->initializeOwnerVotingMode($user, $delegatedOwnerId, $inPersonOwnerId);
+    }
+
+    private function setTermsState(User $user): void
+    {
+        $requiresOwnerTermsAcceptance = $this->shouldRequireOwnerTermsAcceptance($user);
+        $requiresDelegatedTermsAcceptance = $this->shouldRequireDelegatedTermsAcceptance($user);
+
+        $this->requiresTermsAcceptance = $requiresOwnerTermsAcceptance || $requiresDelegatedTermsAcceptance;
+        $this->termsScope = $requiresDelegatedTermsAcceptance ? 'vote_delegate' : 'owner';
+
+        $this->termsHtml = $this->termsScope === 'vote_delegate'
+            ? (Setting::localizedString(
+                'vote_delegate_terms_text',
+                __('votings.front.delegated_terms_default_text'),
+            ) ?? __('votings.front.delegated_terms_default_text'))
+            : (Setting::localizedString(
+                'owners_terms_text',
+                __('profile.terms.default_text'),
+            ) ?? __('profile.terms.default_text'));
+    }
+
+    private function setVotingsExplanationHtml(): void
+    {
+        $activeLocale = SupportedLocales::normalize((string) session('locale', SupportedLocales::current()));
+        $currentLocaleExplanationKey = SupportedLocales::localizedKey('votings_explanation_text', $activeLocale);
+        $currentLocaleExplanationHtml = trim((string) Setting::query()
+            ->where('key', $currentLocaleExplanationKey)
+            ->value('value'));
+
+        $this->votingsExplanationHtml = $currentLocaleExplanationHtml !== ''
+            ? $currentLocaleExplanationHtml
+            : __('votings.front.explanation_default_text');
     }
 
     public function openDelegatedVoteModal(): void
@@ -193,7 +203,7 @@ class PublicVotings extends Component
         abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn(array $row): int => $row['owner']->id)
+            ->map(static fn (array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -255,7 +265,7 @@ class PublicVotings extends Component
         abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn(array $row): int => $row['owner']->id)
+            ->map(static fn (array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -468,7 +478,7 @@ class PublicVotings extends Component
             ->where('owner_id', $this->activeOwner->id)
             ->whereIn('voting_id', $votings->pluck('id'))
             ->pluck('voting_id')
-            ->map(static fn($votingId): int => (int) $votingId)
+            ->map(static fn ($votingId): int => (int) $votingId)
             ->all();
 
         return view('livewire.front.public-votings', [
@@ -597,7 +607,7 @@ class PublicVotings extends Component
 
         $this->filteredDelegatedRows = array_values(array_filter(
             $this->delegatedRows,
-            static fn(array $row): bool => str_contains($row['search_index'], $search)
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
         ));
     }
 
@@ -613,7 +623,7 @@ class PublicVotings extends Component
 
         $this->filteredInPersonRows = array_values(array_filter(
             $this->inPersonRows,
-            static fn(array $row): bool => str_contains($row['search_index'], $search)
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
         ));
     }
 }

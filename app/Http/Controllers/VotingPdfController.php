@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use App\SupportedLocales;
-use App\Services\VotingPdfBuilder;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\VotingPdfBuilder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VotingPdfController extends Controller
@@ -106,16 +106,16 @@ class VotingPdfController extends Controller
         }
 
         return collect($rawIds)
-            ->map(static fn(mixed $id): int => (int) $id)
-            ->filter(static fn(int $id): bool => $id > 0)
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
             ->unique()
             ->values()
             ->all();
     }
 
-    private function localizedFilename(string $type, ?User $user): string
+    private function localizedFilename(string $type, User $user): string
     {
-        $locale = SupportedLocales::normalize($user?->language ?? app()->getLocale());
+        $locale = SupportedLocales::normalize($user->language);
         $translationKey = match ($type) {
             'in_person' => 'votings.pdf.filename_in_person',
             'results' => 'votings.pdf.filename_results',

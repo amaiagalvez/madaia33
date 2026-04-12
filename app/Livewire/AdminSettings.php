@@ -312,7 +312,7 @@ class AdminSettings extends Component
         $settings = Setting::query()
             ->whereIn('key', $allKeys)
             ->pluck('value', 'key')
-            ->map(static fn(mixed $value): string => (string) $value)
+            ->map(static fn (mixed $value): string => (string) $value)
             ->all();
 
         $this->assignSettingValues($settings);
@@ -377,7 +377,7 @@ class AdminSettings extends Component
     public function saveWithEditorValues(array $editorValues = []): void
     {
         foreach ($editorValues as $field => $value) {
-            if (! is_string($field) || ! property_exists($this, $field)) {
+            if (! property_exists($this, $field)) {
                 continue;
             }
 

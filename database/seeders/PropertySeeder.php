@@ -41,7 +41,7 @@ class PropertySeeder extends Seeder
     {
         if ($type === 'garage') {
             return array_map(
-                static fn(int $number): string => (string) $number,
+                static fn (int $number): string => (string) $number,
                 range(1, 180),
             );
         }
@@ -66,7 +66,7 @@ class PropertySeeder extends Seeder
     {
         return match ($type) {
             'garage' => 0.0185,
-            default  => 0.3571,
+            default => 0.3571,
         };
     }
 
@@ -79,7 +79,7 @@ class PropertySeeder extends Seeder
     {
         return match ($type) {
             'garage' => 0.5556,
-            default  => 5.5556,
+            default => 5.5556,
         };
     }
 }

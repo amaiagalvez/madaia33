@@ -134,9 +134,9 @@ class Setting extends Model
     public static function allStringValues(): array
     {
         /** @var array<string, string> $values */
-        $values = Cache::rememberForever(self::STRING_VALUES_CACHE_KEY, static fn(): array => self::query()
+        $values = Cache::rememberForever(self::STRING_VALUES_CACHE_KEY, static fn (): array => self::query()
             ->pluck('value', 'key')
-            ->map(static fn(mixed $value): string => (string) $value)
+            ->map(static fn (mixed $value): string => (string) $value)
             ->all());
 
         return $values;
