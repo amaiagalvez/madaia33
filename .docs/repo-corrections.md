@@ -160,3 +160,4 @@
 - En filtros nuevos de listados Livewire, añade siempre `updating<Filter>() { resetPage(); }` para evitar páginas vacías cuando cambia el criterio con paginación activa.
 - If Docker quality/lint depends on git dirty detection, `vendor/bin/pint --dirty` may skip changed files under dubious ownership; run Pint on explicit file paths and then re-run phpstan/tests.
 - After moving methods into traits, re-check phpdoc type names inside the host class (`CarbonInterface`, etc.); missing leading namespace can create fake classes like `App\\Livewire\\Admin\\CarbonInterface` in PHPStan.
+- In profile flows, keep controller/view data types aligned: if Blade uses `->count()`/`->isEmpty()`, return `Collection`; if returning arrays, use `count(...)`/`=== []` in Blade to avoid runtime errors for non-owner users.

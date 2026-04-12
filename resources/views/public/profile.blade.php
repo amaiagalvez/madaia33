@@ -85,7 +85,7 @@
                             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                 {{ __('profile.overview.sessions_count') }}</p>
                             <p class="mt-2 text-2xl font-bold text-gray-900">
-                                {{ $loginSessions->count() }}</p>
+                                {{ count($loginSessions) }}</p>
                         </article>
                         <article class="rounded-xl border border-gray-200 bg-gray-50 p-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -151,7 +151,7 @@
                         {{ __('profile.sessions.title') }}
                     </h2>
 
-                    @if ($loginSessions->isEmpty())
+                    @if ($loginSessions === [])
                         <div
                             class="mt-4 rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center">
                             <p class="text-sm text-gray-500">{{ __('profile.sessions.empty') }}</p>

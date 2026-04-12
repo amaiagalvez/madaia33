@@ -53,6 +53,18 @@ it('shows profile tabs with user voting and session information', function () {
         ->assertSee('Profile User');
 });
 
+it('renders profile page for users without owner profile', function () {
+    $user = User::factory()->create([
+        'name' => 'No Owner User',
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('profile.eu'))
+        ->assertOk()
+        ->assertSee(__('profile.overview.title'))
+        ->assertSee(__('profile.tabs.owner'));
+});
+
 it('accepts owner terms from profile page', function () {
     $user = User::factory()->create();
     $owner = Owner::factory()->for($user)->create([
