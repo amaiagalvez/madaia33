@@ -7,4 +7,9 @@
 <p><strong>{{ __('contact.message') }}:</strong></p>
 <p>{{ $messageBody }}</p>
 
+@if ($legalText)
+    <hr>
+    <div>{!! $legalText !!}</div>
+@endif
+
 <p>{{ __('contact.mail.confirmation_footer') }}</p>

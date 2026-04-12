@@ -21,7 +21,7 @@ class NoticeFactory extends Factory
         $titleEu = fake()->sentence(4);
 
         return [
-            'slug' => Str::slug($titleEu).'-'.fake()->unique()->randomNumber(5),
+            'slug' => Str::slug($titleEu) . '-' . fake()->unique()->randomNumber(5),
             'title_eu' => $titleEu,
             'title_es' => fake()->sentence(4),
             'content_eu' => fake()->paragraphs(2, true),

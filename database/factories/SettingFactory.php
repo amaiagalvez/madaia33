@@ -20,6 +20,7 @@ class SettingFactory extends Factory
         return [
             'key' => fake()->unique()->slug(3),
             'value' => fake()->sentence(),
+            'section' => fake()->randomElement(Setting::allowedSections()),
         ];
     }
 

@@ -1,8 +1,13 @@
 <?php
 
 use Tests\TestCase;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\Notice;
 use App\Models\Setting;
 use Tests\DuskTestCase;
+use App\Models\Location;
+use App\Models\NoticeLocation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 pest()->extend(DuskTestCase::class)
@@ -29,21 +34,6 @@ pest()->extend(TestCase::class)
 
 /*
 |--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
-
-/*
-|--------------------------------------------------------------------------
 | Functions
 |--------------------------------------------------------------------------
 |
@@ -58,7 +48,44 @@ function settingValue(string $key, mixed $default = null): mixed
     return Setting::where('key', $key)->value('value') ?? $default;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Global Setup
+|--------------------------------------------------------------------------
+*/
+
 function createSetting(string $key, mixed $value): Setting
 {
     return Setting::factory()->forKey($key, (string) $value)->create();
+}
+
+function attachNoticeToLocationCode(Notice $notice, string $code): NoticeLocation
+{
+    $locationId = Location::query()->where('code', $code)->value('id');
+
+    if ($locationId === null) {
+        $locationId = Location::factory()->create([
+            'type' => str_starts_with($code, 'P-') ? 'garage' : 'portal',
+            'code' => $code,
+            'name' => 'Location ' . $code,
+        ])->id;
+    }
+
+    return NoticeLocation::create([
+        'notice_id' => $notice->id,
+        'location_id' => $locationId,
+    ]);
+}
+
+function adminUser(array $attributes = []): User
+{
+    $user = User::factory()->create($attributes);
+
+    Role::query()->firstOrCreate([
+        'name' => Role::SUPER_ADMIN,
+    ]);
+
+    $user->assignRole(Role::SUPER_ADMIN);
+
+    return $user;
 }

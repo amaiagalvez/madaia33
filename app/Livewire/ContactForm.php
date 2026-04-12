@@ -2,20 +2,40 @@
 
 namespace App\Livewire;
 
+use App\Models\User;
 use App\Models\Setting;
 use Livewire\Component;
+use App\SupportedLocales;
 use App\Models\ContactMessage;
+use App\Support\ContactMailData;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use App\Support\ConfiguredMailSettings;
 use App\Validations\ContactFormValidation;
 
 class ContactForm extends Component
 {
     private const DUPLICATE_SUBMISSION_WINDOW_SECONDS = 15;
+
+    private const EMAIL_SETTING_KEYS = [
+        'admin_email',
+        'contact_form_subject_eu',
+        'contact_form_subject_es',
+        'from_address',
+        'from_name',
+        'smtp_host',
+        'smtp_port',
+        'smtp_username',
+        'smtp_password',
+        'smtp_encryption',
+    ];
+
+    /** @var array<string, string>|null */
+    private ?array $cachedSettings = null;
 
     public string $name = '';
 
@@ -39,7 +59,7 @@ class ContactForm extends Component
      */
     protected function rules(): array
     {
-        $siteKey = (string) (Setting::where('key', 'recaptcha_site_key')->value('value') ?? '');
+        $siteKey = $this->settings()['recaptcha_site_key'] ?? '';
 
         return ContactFormValidation::rules($siteKey);
     }
@@ -100,23 +120,48 @@ class ContactForm extends Component
         return ContactMessage::create([
             'name' => $this->name,
             'email' => $this->email,
+            'user_id' => $this->matchingUserIdByEmail(),
             'subject' => $this->subject,
             'message' => $this->message,
         ]);
     }
 
+    private function matchingUserIdByEmail(): ?int
+    {
+        $normalizedEmail = mb_strtolower(trim($this->email));
+
+        if ($normalizedEmail === '') {
+            return null;
+        }
+
+        return User::query()
+            ->whereRaw('LOWER(email) = ?', [$normalizedEmail])
+            ->value('id');
+    }
+
     private function sendContactEmails(ContactMessage $contactMessage): bool
     {
         try {
-            $adminEmail = Setting::where('key', 'admin_email')->value('value') ?? config('mail.from.address');
+            $emailSettings = $this->emailSettings();
+            $this->configuredMailSettings()->apply($emailSettings);
+            $adminEmail = $emailSettings['admin_email'] ?: (string) config('mail.from.address');
+            $fromAddress = $emailSettings['from_address'] ?: (string) config('mail.from.address');
+            $fromName = ($emailSettings['from_name'] ?? '') !== '' ? $emailSettings['from_name'] : (string) config('mail.from.name');
+            $legalText = Setting::localizedStringFrom($emailSettings, 'legal_text');
+            $mailSubject = Setting::localizedStringFrom($emailSettings, 'contact_form_subject', $this->subject);
 
             Mail::to($this->email)->send(new ContactConfirmation(
-                visitorName: $this->name,
-                messageSubject: $this->subject,
-                messageBody: $this->message,
+                new ContactMailData(
+                    visitorName: $this->name,
+                    messageSubject: (string) $mailSubject,
+                    messageBody: $this->message,
+                    legalText: $legalText,
+                ),
+                $fromAddress,
+                $fromName,
             ));
 
-            Mail::to($adminEmail)->send(new ContactNotification($contactMessage));
+            Mail::to($adminEmail)->send(new ContactNotification($contactMessage, $legalText, $fromAddress, $fromName));
 
             return false;
         } catch (\Throwable $e) {
@@ -199,7 +244,42 @@ class ContactForm extends Component
 
     private function recaptchaSecretKey(): string
     {
-        return (string) (Setting::where('key', 'recaptcha_secret_key')->value('value') ?? '');
+        return $this->settings()['recaptcha_secret_key'] ?? '';
+    }
+
+    private function configuredMailSettings(): ConfiguredMailSettings
+    {
+        return app(ConfiguredMailSettings::class);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function emailSettings(): array
+    {
+        return $this->settings();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function settings(): array
+    {
+        if ($this->cachedSettings !== null) {
+            return $this->cachedSettings;
+        }
+
+        $keys = [
+            ...self::EMAIL_SETTING_KEYS,
+            'recaptcha_site_key',
+            'recaptcha_secret_key',
+            ...SupportedLocales::localizedKeys('legal_text'),
+            ...SupportedLocales::localizedKeys('legal_checkbox_text'),
+        ];
+
+        $this->cachedSettings = Setting::stringValues(array_values(array_unique($keys)));
+
+        return $this->cachedSettings;
     }
 
     private function verifyRecaptchaToken(string $secretKey): bool
@@ -222,16 +302,14 @@ class ContactForm extends Component
 
     public function render(): View
     {
-        $locale = app()->getLocale();
-        $legalTextKey = "legal_checkbox_text_{$locale}";
-        $settings = Setting::whereIn('key', [$legalTextKey, 'legal_url', 'recaptcha_site_key'])->pluck('value', 'key');
-        $legalText = (string) ($settings[$legalTextKey] ?? __('contact.legal_text'));
-        $legalUrl = (string) ($settings['legal_url'] ?? route('privacy-policy'));
-        $siteKey = (string) ($settings['recaptcha_site_key'] ?? '');
+        $settings = $this->settings();
 
-        return view('livewire.contact-form', [
+        $legalText = Setting::localizedStringFrom($settings, 'legal_checkbox_text', __('contact.legal_text'));
+
+        $siteKey = $settings['recaptcha_site_key'] ?? '';
+
+        return view('livewire.front.contact-form', [
             'legalText' => $legalText,
-            'legalUrl' => $legalUrl,
             'siteKey' => $siteKey,
         ]);
     }

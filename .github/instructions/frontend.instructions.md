@@ -23,13 +23,23 @@ Usar siempre el layout correcto según la sección. No crear layouts nuevos sin 
 
 ## Paleta de colores y estilo
 
-La parte pública mantiene base neutra, pero puede usar acentos visuales modernos para mejorar jerarquía:
+Paleta de marca activa (fuente de verdad para frontend):
+
+- `#edd2c7` (base cálida clara)
+- `#f1bd4d` (acento dorado)
+- `#b9a7a5` (tono neutro medio)
+- `#d9755b` (acento terracota)
+- `#793d3d` (acento principal oscuro)
+
+La parte pública mantiene base neutra, pero debe usar estos acentos para mejorar jerarquía:
 
 - Base recomendada: `bg-white`, `text-gray-900`, `text-gray-600`, `border-gray-200`
 - Se permiten fondos de sección con gradientes suaves (`bg-gradient-to-*`) y contraste AA
 - Tarjetas/paneles: `bg-white border border-gray-200 rounded-lg/rounded-2xl shadow-sm`
 - Estado activo en nav: `text-gray-900 underline underline-offset-4` o equivalente accesible
 - Hover y focus siempre visibles (`hover:*` + `focus-visible:ring-*`)
+
+Guardar y mantener estos colores en `resources/css/app.css` (tokens de marca) y consumirlos desde clases/components. Evitar introducir nuevas paletas sin actualizar primero ese archivo.
 
 El panel de administración usa `bg-gray-100` como fondo y `bg-white` para sidebar y tarjetas.
 
@@ -60,14 +70,14 @@ Usar SVG inline con clases Tailwind. Ejemplo estándar:
 
 ```html
 <svg
-  class="h-5 w-5 shrink-0"
-  fill="none"
-  viewBox="0 0 24 24"
-  stroke-width="1.5"
-  stroke="currentColor"
-  aria-hidden="true"
+    class="h-5 w-5 shrink-0"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.5"
+    stroke="currentColor"
+    aria-hidden="true"
 >
-  <path stroke-linecap="round" stroke-linejoin="round" d="..." />
+    <path stroke-linecap="round" stroke-linejoin="round" d="..." />
 </svg>
 ```
 
@@ -116,9 +126,9 @@ Para listas sin resultados, usar este patrón:
 
 ```html
 <div
-  class="rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center"
+    class="rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center"
 >
-  <p class="text-gray-500 text-sm">{{ __('...mensaje...') }}</p>
+    <p class="text-gray-500 text-sm">{{ __('...mensaje...') }}</p>
 </div>
 ```
 
@@ -126,9 +136,9 @@ Para listas sin resultados, usar este patrón:
 
 ```html
 <span
-  class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800"
+    class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800"
 >
-  texto
+    texto
 </span>
 ```
 

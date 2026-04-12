@@ -1,30 +1,96 @@
 <?php
 
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
+use App\SupportedLocales;
 use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\Lang;
+use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
+dataset('supported_locales', SupportedLocales::all());
+
 beforeEach(function () {
-    $this->skipUnlessFortifyFeature(Features::resetPasswords());
+    test()->skipUnlessFortifyFeature(Features::resetPasswords());
+
+    foreach (Role::names() as $roleName) {
+        Role::query()->firstOrCreate([
+            'name' => $roleName,
+        ]);
+    }
 });
 
 test('reset password link screen can be rendered', function () {
-    $response = $this->get(route('password.request'));
+    $response = test()->get(route('password.request'));
 
-    $response->assertOk();
+    $response->assertOk()
+        ->assertSee('data-auth-shell', false)
+        ->assertSee(__('admin.password_reset.request_title'))
+        ->assertSee(__('admin.password_reset.request_description'));
 });
+
+test('localized password request routes can be rendered', function (string $locale) {
+    $response = test()->get(route(SupportedLocales::routeName('password.request', $locale)));
+
+    $response->assertOk()
+        ->assertSee('data-auth-shell', false)
+        ->assertSee(__('admin.password_reset.request_title'));
+})->with('supported_locales');
 
 test('reset password link can be requested', function () {
     Notification::fake();
 
     $user = User::factory()->create();
 
-    $this->withoutMiddleware(PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('reset password link can be requested with coproprietary email 1', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+    $user->assignRole(Role::PROPERTY_OWNER);
+
+    Owner::factory()->for($user)->create([
+        'coprop1_email' => 'owner1@example.com',
+    ]);
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => 'owner1@example.com']);
+
+    Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('reset password link can be requested with coproprietary email 2', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+    $user->assignRole(Role::PROPERTY_OWNER);
+
+    Owner::factory()->for($user)->create([
+        'coprop2_email' => 'owner2@example.com',
+    ]);
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => 'owner2@example.com']);
+
+    Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('password reset flow applies sender configuration from settings', function () {
+    createSetting('from_address', 'noreply@madaia33.test');
+    createSetting('from_name', 'Madaia 33 Test');
+
+    (new AppServiceProvider(app()))->boot();
+
+    expect(config('mail.from.address'))->toBe('noreply@madaia33.test')
+        ->and(config('mail.from.name'))->toBe('Madaia 33 Test');
 });
 
 test('reset password screen can be rendered', function () {
@@ -32,28 +98,67 @@ test('reset password screen can be rendered', function () {
 
     $user = User::factory()->create();
 
-    $this->withoutMiddleware(PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-        $response = $this->get(route('password.reset', $notification->token));
+        $response = test()->get(route('password.reset', $notification->token));
 
-        $response->assertOk();
+        $response->assertOk()
+            ->assertSee('data-auth-shell', false)
+            ->assertSee(__('admin.password_reset.reset_title'))
+            ->assertSee(__('admin.password_reset.reset_description'));
 
         return true;
     });
 });
+
+test('password reset notification keeps the visitor locale and localized reset link', function (string $locale) {
+    Notification::fake();
+
+    $user = User::factory()->create();
+
+    test()->get(route(SupportedLocales::routeName('password.request', $locale)));
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification, array $channels, User $notifiable, ?string $sentLocale) use ($locale, $user) {
+        $expectedPath = parse_url(
+            route(SupportedLocales::routeName('password.reset', $locale), [
+                'token' => $notification->token,
+                'email' => $user->email,
+            ]),
+            PHP_URL_PATH,
+        );
+
+        $originalLocale = app()->getLocale();
+        app()->setLocale($sentLocale ?? $originalLocale);
+
+        $mailMessage = $notification->toMail($user);
+
+        app()->setLocale($originalLocale);
+
+        expect($notifiable->is($user))->toBeTrue()
+            ->and($channels)->toContain('mail')
+            ->and($sentLocale)->toBe($locale)
+            ->and($mailMessage->subject)->toBe(Lang::get('Reset your password', [], $locale))
+            ->and($mailMessage->actionUrl)->toContain((string) $expectedPath);
+
+        return true;
+    });
+})->with('supported_locales');
 
 test('password can be reset with valid token', function () {
     Notification::fake();
 
     $user = User::factory()->create();
 
-    $this->withoutMiddleware(PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = $this->withoutMiddleware(PreventRequestForgery::class)
+        $response = test()->withoutMiddleware(PreventRequestForgery::class)
             ->post(route('password.update'), [
                 'token' => $notification->token,
                 'email' => $user->email,

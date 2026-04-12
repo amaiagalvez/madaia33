@@ -5,21 +5,22 @@
  */
 
 use App\Models\User;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('admin can upload an image and it appears in the public gallery', function () {
-    $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
-    $altText = 'Dusk test irudia '.time();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $altText = 'Dusk test irudia ' . time();
 
     // Create a temporary test image inside the container's temp dir
-    $tmpImage = '/tmp/dusk_test_'.time().'.jpg';
+    $tmpImage = '/tmp/dusk_test_' . time() . '.jpg';
     $img = imagecreatetruecolor(100, 100);
     $color = imagecolorallocate($img, 100, 150, 200);
     imagefill($img, 0, 0, $color);
     imagejpeg($img, $tmpImage);
     imagedestroy($img);
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $tmpImage, $altText) {
         $browser->loginAs($admin)
             ->visit('/admin/imagenes')
@@ -31,14 +32,16 @@ test('admin can upload an image and it appears in the public gallery', function 
 
         // Fill alt text and submit
         $browser->type('#altEu', $altText)
+            ->waitFor('[data-admin-pill-option="madaia"]', 5)
+            ->click('[data-admin-pill-option="madaia"]')
             ->press('Argazkia igo')
-            ->waitFor('img[alt="'.$altText.'"]', 30)
-            ->assertPresent('img[alt="'.$altText.'"]');
+            ->waitUntil("document.body.innerText.includes('" . addslashes($altText) . "')", 30)
+            ->assertScript("return document.body.innerText.includes('" . addslashes($altText) . "');", true);
 
         // Verify in public gallery
-        $browser->visit('/galeria')
-            ->waitFor('img[alt="'.$altText.'"]', 30)
-            ->assertPresent('img[alt="'.$altText.'"]');
+        $browser->visit('/eu/argazki-bilduma')
+            ->waitUntil("document.body.innerText.includes('" . addslashes($altText) . "')", 30)
+            ->assertScript("return document.body.innerText.includes('" . addslashes($altText) . "');", true);
     });
 
     @unlink($tmpImage);

@@ -4,10 +4,11 @@
  * Validates: Requirements 16.4
  */
 
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('sitemap.xml is publicly accessible and contains public URLs', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/sitemap.xml');
 
@@ -17,8 +18,9 @@ test('sitemap.xml is publicly accessible and contains public URLs', function () 
             ->and($source)->toContain('<loc>');
 
         // Should contain public routes
-        expect($source)->toContain('/avisos')
-            ->and($source)->toContain('/galeria')
-            ->and($source)->toContain('/contacto');
+        expect($source)->toContain('/eu/iragarkiak')
+            ->and($source)->toContain('/es/avisos')
+            ->and($source)->toContain('/eu/argazki-bilduma')
+            ->and($source)->toContain('/eu/harremana');
     });
 });

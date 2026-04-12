@@ -1,18 +1,22 @@
 <?php
 
-use App\Concerns\ProfileValidationRules;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\SupportedLocales;
+use Livewire\Component;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Title;
-use Livewire\Component;
+use App\Concerns\ProfileValidationRules;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 new #[Title('Profile settings')] class extends Component {
     use ProfileValidationRules;
 
     public string $name = '';
+
     public string $email = '';
+
+    public string $language = '';
 
     /**
      * Mount the component.
@@ -21,6 +25,7 @@ new #[Title('Profile settings')] class extends Component {
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->language = SupportedLocales::normalize(Auth::user()->language);
     }
 
     /**
@@ -39,6 +44,10 @@ new #[Title('Profile settings')] class extends Component {
         }
 
         $user->save();
+        $user->syncOwnerIdentity();
+
+        app()->setLocale($user->language);
+        session()->put('locale', $user->language);
 
         $this->dispatch('profile-updated', name: $user->name);
     }
@@ -51,7 +60,7 @@ new #[Title('Profile settings')] class extends Component {
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('dashboard', absolute: false));
+            $this->redirectIntended(default: route('admin.dashboard', absolute: false));
 
             return;
         }
@@ -64,41 +73,44 @@ new #[Title('Profile settings')] class extends Component {
     #[Computed]
     public function hasUnverifiedEmail(): bool
     {
-        return Auth::user() instanceof MustVerifyEmail && ! Auth::user()->hasVerifiedEmail();
+        return Auth::user() instanceof MustVerifyEmail && !Auth::user()->hasVerifiedEmail();
     }
 
     #[Computed]
     public function showDeleteUser(): bool
     {
-        return ! Auth::user() instanceof MustVerifyEmail
-            || (Auth::user() instanceof MustVerifyEmail && Auth::user()->hasVerifiedEmail());
+        return !Auth::user() instanceof MustVerifyEmail || (Auth::user() instanceof MustVerifyEmail && Auth::user()->hasVerifiedEmail());
     }
 }; ?>
 
 <section class="w-full">
-    @include('partials.settings-heading')
+    @include('partials.admin.settings-heading')
 
     <flux:heading class="sr-only">{{ __('Profile settings') }}</flux:heading>
 
-    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
+    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name, email address, and language')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus
+                autocomplete="name" />
 
             <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
+                <flux:input wire:model="email" :label="__('Email')" type="email" required
+                    autocomplete="email" />
 
                 @if ($this->hasUnverifiedEmail)
                     <div>
                         <flux:text class="mt-4">
                             {{ __('Your email address is unverified.') }}
 
-                            <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
+                            <flux:link class="text-sm cursor-pointer"
+                                wire:click.prevent="resendVerificationNotification">
                                 {{ __('Click here to re-send the verification email.') }}
                             </flux:link>
                         </flux:text>
 
                         @if (session('status') === 'verification-link-sent')
-                            <flux:text class="mt-2 font-medium !dark:text-green-400 !text-green-600">
+                            <flux:text
+                                class="mt-2 font-medium dark:text-green-400! text-green-600!">
                                 {{ __('A new verification link has been sent to your email address.') }}
                             </flux:text>
                         @endif
@@ -106,16 +118,24 @@ new #[Title('Profile settings')] class extends Component {
                 @endif
             </div>
 
+            <flux:select wire:model="language" :label="__('Language')" required>
+                <flux:select.option :value="SupportedLocales::BASQUE">
+                    {{ __('general.language.eu') }}</flux:select.option>
+                <flux:select.option :value="SupportedLocales::SPANISH">
+                    {{ __('general.language.es') }}</flux:select.option>
+            </flux:select>
+
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
+                    <flux:button variant="primary" type="submit" class="w-full"
+                        data-test="update-profile-button">
                         {{ __('Save') }}
                     </flux:button>
                 </div>
 
-                <x-action-message class="me-3" on="profile-updated">
+                <x-shared.action-message class="me-3" on="profile-updated">
                     {{ __('Saved.') }}
-                </x-action-message>
+                </x-shared.action-message>
             </div>
         </form>
 

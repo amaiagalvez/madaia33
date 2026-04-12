@@ -14,6 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->string('key')->unique();
             $table->text('value')->nullable();
+            $table->string('section')->default('general');
+            $table->index('section');
             $table->timestamps();
             $table->softDeletes();
         });

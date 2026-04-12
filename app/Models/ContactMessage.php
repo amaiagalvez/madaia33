@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Database\Factories\ContactMessageFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ContactMessage extends Model
@@ -15,6 +16,7 @@ class ContactMessage extends Model
     protected $fillable = [
         'name',
         'email',
+        'user_id',
         'subject',
         'message',
         'is_read',
@@ -22,7 +24,21 @@ class ContactMessage extends Model
     ];
 
     protected $casts = [
+        'user_id' => 'integer',
         'is_read' => 'boolean',
         'read_at' => 'datetime',
     ];
+
+    protected static function newFactory(): ContactMessageFactory
+    {
+        return ContactMessageFactory::new();
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

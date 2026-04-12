@@ -5,25 +5,31 @@
  */
 
 use App\Models\User;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('private page shows placeholder with login link for unauthenticated visitors', function () {
-    /** @var \Tests\DuskTestCase $this */
-    $this->browse(function (Browser $browser) {
-        $browser->visit('/privado')
-            ->assertPathIs('/privado')
-            ->assertPresent('a[href*="login"]');
+    $privatePath = '/eu/pribatua';
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($privatePath) {
+        $browser->visit($privatePath)
+            ->assertPathIs($privatePath)
+            ->assertPresent('[data-private-placeholder]')
+            ->assertSee('Eremu pribatuan sartu')
+            ->assertSee('Saioa hasi');
     });
 });
 
-test('private page shows development message for authenticated admin', function () {
-    $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
+test('private page redirects authenticated admin to dashboard', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $privatePath = '/eu/pribatua';
 
-    /** @var \Tests\DuskTestCase $this */
-    $this->browse(function (Browser $browser) use ($admin) {
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $privatePath) {
         $browser->loginAs($admin)
-            ->visit('/privado')
-            ->assertPathIs('/privado')
-            ->assertSee('garatzen');
+            ->visit($privatePath)
+            ->waitForLocation('/admin')
+            ->assertPathIs('/admin');
     });
 });

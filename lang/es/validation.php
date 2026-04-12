@@ -1,0 +1,48 @@
+<?php
+
+return [
+    'accepted' => 'El campo :attribute debe ser aceptado.',
+    'accepted_if' => 'El campo :attribute debe ser aceptado cuando :other es :value.',
+    'after' => 'El campo :attribute debe ser una fecha posterior a :date.',
+    'after_or_equal' => 'El campo :attribute debe ser una fecha posterior o igual a :date.',
+    'array' => 'El campo :attribute debe ser un array.',
+    'boolean' => 'El campo :attribute debe ser verdadero o falso.',
+    'date' => 'El campo :attribute debe ser una fecha valida.',
+    'email' => 'El campo :attribute debe ser una direccion de correo valida.',
+    'exists' => 'El :attribute seleccionado no es valido.',
+    'in' => 'El :attribute seleccionado no es valido.',
+    'integer' => 'El campo :attribute debe ser un numero entero.',
+    'max' => [
+        'array' => 'El campo :attribute no debe tener mas de :max elementos.',
+        'file' => 'El campo :attribute no debe ser mayor de :max kilobytes.',
+        'numeric' => 'El campo :attribute no debe ser mayor de :max.',
+        'string' => 'El campo :attribute no debe ser mayor de :max caracteres.',
+    ],
+    'min' => [
+        'array' => 'El campo :attribute debe tener al menos :min elementos.',
+        'file' => 'El campo :attribute debe ser de al menos :min kilobytes.',
+        'numeric' => 'El campo :attribute debe ser de al menos :min.',
+        'string' => 'El campo :attribute debe tener al menos :min caracteres.',
+    ],
+    'nullable' => 'El campo :attribute puede estar vacio.',
+    'numeric' => 'El campo :attribute debe ser un numero.',
+    'required' => 'El campo :attribute es obligatorio.',
+    'required_if' => 'El campo :attribute es obligatorio cuando :other es :value.',
+    'required_with' => 'El campo :attribute es obligatorio cuando :values esta presente.',
+    'same' => 'Los campos :attribute y :other deben coincidir.',
+    'string' => 'El campo :attribute debe ser una cadena de texto.',
+    'unique' => 'El campo :attribute ya esta en uso.',
+
+    'attributes' => [
+        'coprop1Name' => 'nombre',
+        'coprop1Dni' => 'DNI',
+        'coprop1Phone' => 'telefono',
+        'coprop1Email' => 'email',
+        'editCoprop1Name' => 'nombre',
+        'editCoprop1Dni' => 'DNI',
+        'editCoprop1Phone' => 'telefono',
+        'editCoprop1Email' => 'email',
+        'inlineStartDate' => 'fecha de inicio',
+        'inlineEndDate' => 'fecha fin',
+    ],
+];

@@ -1,8 +1,51 @@
 {
-  "LaravelExtraIntellisense.phpCommand": "docker compose run --rm madaia33 php -r \"{code}\"",
-  "LaravelExtraIntellisense.basePathForCode": "/docker",
-  "chat.tools.terminal.autoApprove": {
-    "docker compose": true,
-    "timeout": true
-  }
+    "LaravelExtraIntellisense.phpCommand": "docker compose run --rm --no-deps madaia33 php -r \"{code}\"",
+    "LaravelExtraIntellisense.basePathForCode": "/docker",
+    "chat.tools.terminal.autoApprove": {
+        "docker compose": true,
+        "timeout": true,
+        ".specify/scripts/bash/": true,
+        ".specify/scripts/powershell/": true,
+        "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json --paths-only 2>/dev/null \\| head -50$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd /home/amaia/Dokumentuak/madaia33 && bash \\.specify/scripts/bash/setup-plan\\.sh --json$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^bash \\.specify/scripts/bash/setup-plan\\.sh --json$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json --paths-only$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^bash \\.specify/scripts/bash/update-agent-context\\.sh copilot$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd /home/amaia/Dokumentuak/madaia33 && bash \\.specify/scripts/bash/check-prerequisites\\.sh --json$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json --require-tasks --include-tasks$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^bash \\.specify/scripts/bash/check-prerequisites\\.sh --json --require-tasks --include-tasks 2>&1 \\| head -80$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "docker rm": true,
+        "true": true
+    },
+    "chat.promptFilesRecommendations": {
+        "speckit.constitution": true,
+        "speckit.specify": true,
+        "speckit.plan": true,
+        "speckit.tasks": true,
+        "speckit.implement": true
+    }
 }

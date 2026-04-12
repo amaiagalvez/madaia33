@@ -2,33 +2,50 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\App;
 use Database\Factories\ImageFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Concerns\ResolvesLocalizedAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Image extends Model
 {
     /** @use HasFactory<ImageFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+
+    use ResolvesLocalizedAttributes;
+    use SoftDeletes;
+
+    public const TAG_HISTORY = 'historia';
+
+    public const TAG_MADAIA = 'madaia';
 
     protected $fillable = [
         'filename',
         'path',
         'alt_text_eu',
         'alt_text_es',
+        'tag',
     ];
+
+    /**
+     * @return list<string>
+     */
+    public static function allowedTags(): array
+    {
+        return [
+            self::TAG_HISTORY,
+            self::TAG_MADAIA,
+        ];
+    }
 
     /**
      * Bilingual accessor for alt_text with fallback.
      */
     public function getAltTextAttribute(): string
     {
-        $locale = App::getLocale();
-
-        return $this->{"alt_text_{$locale}"} ?? $this->alt_text_eu ?? $this->alt_text_es ?? '';
+        return $this->resolveLocalizedAttribute('alt_text');
     }
 
     /**

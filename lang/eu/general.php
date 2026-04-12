@@ -2,9 +2,11 @@
 
 return [
     'nav' => [
+        'home' => 'Hasiera',
         'notices' => 'Iragarkiak',
         'gallery' => 'Argazki-bilduma',
         'contact' => 'Kontaktua',
+        'votings' => 'Bozketak',
         'private' => 'Eremu pribatua',
         'admin' => 'Administrazioa',
     ],
@@ -21,6 +23,9 @@ return [
         'back' => 'Itzuli',
         'send' => 'Bidali',
         'create' => 'Sortu',
+        'create_new' => 'Sortu berria',
+        'all' => 'Guztiak',
+        'confirm' => 'Baieztatu',
     ],
     'messages' => [
         'saved' => 'Aldaketak gordeta.',
@@ -30,12 +35,12 @@ return [
     'footer' => [
         'privacy_policy' => 'Pribatutasun-politika',
         'legal_notice' => 'Lege-oharra',
-        'privacy_policy_description' => 'Pribatutasun-politika ofiziala: datu pertsonalen tratamendua, eskubideak eta erabilera baldintzak.',
-        'legal_notice_description' => 'Lege-ohar ofiziala: webgunearen identifikazioa, erabilera baldintzak eta erantzukizun juridikoa.',
+        'cookie_policy' => 'Cookie politika',
     ],
     'pagination' => [
         'previous' => 'Aurrekoa',
         'next' => 'Hurrengoa',
+        'go_to_page' => 'Joan :page. orrira',
     ],
     'font_sizes' => [
         'mobile' => 'text-sm',
@@ -49,5 +54,13 @@ return [
         'auth_message' => 'Eremu pribatua oraindik garatzen ari da.',
         'login_cta' => 'Saioa hasi',
         'seo_description' => 'Komunitateko eremu pribatura sartzeko, saioa hasi eta zure kudeaketa pertsonalak kontsultatu.',
+        'form_title' => 'Eremu pribatuan sartu',
+        'username' => 'Erabiltzailea',
+        'username_placeholder' => 'Adibidez: bizilaguna01',
+        'password' => 'Pasahitza',
+        'change_password_option' => 'Pasahitza aldatu',
+        'show_password' => 'Pasahitza erakutsi',
+        'hide_password' => 'Pasahitza ezkutatu',
+        'form_note' => 'Formulario honek oraingoz diseinua bakarrik erakusten du; funtzioak hurrengo fasean aktibatuko dira.',
     ],
 ];

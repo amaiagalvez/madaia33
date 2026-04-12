@@ -20,6 +20,7 @@ class ContactMessageFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->safeEmail(),
+            'user_id' => null,
             'subject' => fake()->sentence(4),
             'message' => fake()->paragraph(),
             'is_read' => false,

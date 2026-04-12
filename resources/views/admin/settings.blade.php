@@ -1,9 +1,7 @@
-<x-layouts::admin :title="__('admin.settings')">
-    <div class="max-w-3xl mx-auto">
-        <h1 class="text-2xl font-bold text-gray-900 mb-8">{{ __('admin.settings') }}</h1>
+<x-layouts::admin.main :title="__('admin.settings')">
+    <div class="max-w-7xl mx-auto">
+        <x-admin.page-header :title="__('admin.settings')" />
 
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
-            <livewire:admin-settings />
-        </div>
+        <livewire:admin-settings />
     </div>
-</x-layouts::admin>
+</x-layouts::admin.main>

@@ -16,6 +16,8 @@ return new class extends Migration {
             $table->string('path');
             $table->string('alt_text_eu')->nullable();
             $table->string('alt_text_es')->nullable();
+            $table->string('tag')->nullable();
+            $table->index('tag');
             $table->timestamps();
             $table->softDeletes();
         });

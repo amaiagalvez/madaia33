@@ -18,10 +18,11 @@ class ImageFactory extends Factory
     public function definition(): array
     {
         return [
-            'filename' => fake()->uuid().'.jpg',
-            'path' => 'images/'.fake()->uuid().'.jpg',
+            'filename' => fake()->uuid() . '.jpg',
+            'path' => 'images/' . fake()->uuid() . '.jpg',
             'alt_text_eu' => fake()->sentence(4),
             'alt_text_es' => fake()->sentence(4),
+            'tag' => null,
         ];
     }
 
@@ -42,6 +43,20 @@ class ImageFactory extends Factory
     {
         return $this->state([
             'alt_text_eu' => null,
+        ]);
+    }
+
+    public function history(): static
+    {
+        return $this->state([
+            'tag' => Image::TAG_HISTORY,
+        ]);
+    }
+
+    public function madaia(): static
+    {
+        return $this->state([
+            'tag' => Image::TAG_MADAIA,
         ]);
     }
 }

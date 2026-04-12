@@ -3,7 +3,7 @@
 return [
     'title' => 'Galería',
     'seo_description' => 'Explora la galeria de imagenes de la comunidad con fotos de espacios y actividades compartidas.',
-    'subtitle' => 'Recorre los espacios y momentos de la comunidad con una mirada más cuidada.',
+    'subtitle' => 'Explora en imágenes los espacios, recuerdos de Madaia.',
     'editorial_badge' => 'Imágenes seleccionadas',
     'editorial_summary' => 'La galería construye una imagen más atractiva de la comunidad: espacios, actividad y detalles compartidos organizados con mejor ritmo visual.',
     'mosaic_note' => 'Una imagen principal marca el ritmo visual y el resto completa la narrativa.',
@@ -13,12 +13,17 @@ return [
     'filter' => [
         'label' => 'Filtrar por ubicación',
         'all' => 'Todos',
+        'history' => 'Historia',
+        'madaia' => 'Madaya',
     ],
     'admin' => [
         'list' => 'Lista de imágenes',
         'upload' => 'Subir imagen',
+        'file' => 'Imagen',
         'alt_eu' => 'Texto alternativo (EU)',
         'alt_es' => 'Texto alternativo (ES)',
+        'tag' => 'Etiqueta',
+        'tag_placeholder' => 'Selecciona una etiqueta',
         'locations' => 'Ubicación(es)',
         'confirm_delete' => '¿Estás seguro de que quieres eliminar esta imagen?',
         'formats' => 'Formatos aceptados: JPG, PNG, WebP. Tamaño máximo: 5 MB.',

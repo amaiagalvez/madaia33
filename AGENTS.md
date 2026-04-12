@@ -8,6 +8,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Quick Checklist
 
 - Work inside Docker only (`docker compose run ...` / `docker compose exec ...`).
+- Always run Docker commands as non-root (`--user ${DC_UID:-1000}:${DC_GID:-1000}`) when creating or modifying project files.
 - Do not run `php`, `composer`, `npm`, `artisan`, `pint`, or tests directly on host.
 
 ## Foundational Context
@@ -42,7 +43,10 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `livewire-development` — Use for any task or question involving Livewire. Activate if user mentions Livewire, wire: directives, or Livewire-specific concepts like wire:model, wire:click, wire:sort, or islands, invoke this skill. Covers building new components, debugging reactivity issues, real-time form validation, drag-and-drop, loading states, migrating from Livewire 3 to 4, converting component formats (SFC/MFC/class-based), and performance optimization. Do not use for non-Livewire reactive UI (React, Vue, Alpine-only, Inertia.js) or standard Laravel forms without Livewire.
 - `pest-testing` — Use this skill for Pest PHP testing in Laravel projects only. Trigger whenever any test is being written, edited, fixed, or refactored — including fixing tests that broke after a code change, adding assertions, converting PHPUnit to Pest, adding datasets, and TDD workflows. Always activate when the user asks how to write something in Pest, mentions test files or directories (tests/Feature, tests/Unit, tests/Browser), or needs browser testing, smoke testing multiple pages for JS errors, or architecture tests. Covers: it()/expect() syntax, datasets, mocking, browser testing (visit/click/fill), smoke testing, arch(), Livewire component tests, RefreshDatabase, and all Pest 4 features. Do not use for factories, seeders, migrations, controllers, models, or non-test PHP code.
 - `dusk-test` — Use this skill when running, fixing, or debugging Browser tests under `tests/Browser/` in this project, especially in Docker. Trigger when Dusk fails with missing ChromeDriver path, missing Chromium binary, or `net::ERR_CONNECTION_REFUSED`. Follow its reproducible workflow: install browser, install matching driver, prepare database with seeds, start in-container app server, run only affected Browser tests, and clean up background processes.
+- `lighthouse-frontend-audit` — Use this skill after frontend changes once relevant Dusk tests pass. Trigger on requests mentioning Lighthouse, frontend audit, or performance/accessibility/SEO/best-practices checks. Follow its Docker-first workflow for Chrome + Lighthouse execution, analyze measured results, and iteratively improve proposals until they are implementation-ready and measurable.
 - `tailwindcss-development` — Always invoke when the user's message includes 'tailwind' in any form. Also invoke for: building responsive grid layouts (multi-column card grids, product grids), flex/grid page structures (dashboards with sidebars, fixed topbars, mobile-toggle navs), styling UI components (cards, tables, navbars, pricing sections, forms, inputs, badges), adding dark mode variants, fixing spacing or typography, and Tailwind v3/v4 work. The core use case: writing or fixing Tailwind utility classes in HTML templates (Blade, JSX, Vue). Skip for backend PHP logic, database queries, API routes, JavaScript with no HTML/CSS component, CSS file audits, build tool configuration, and vanilla CSS.
+- `laravel-specialist` — Build and configure Laravel 10+ applications, including creating Eloquent models and relationships, implementing Sanctum authentication, configuring Horizon queues, designing RESTful APIs with API resources, and building reactive interfaces with Livewire. Use when creating Laravel models, setting up queue workers, implementing Sanctum auth flows, building Livewire components, optimizing Eloquent queries, or writing Pest/PHPUnit tests for Laravel features.
+- `php-best-practices` — PHP 8.x modern patterns, PSR standards, and SOLID principles. Use when reviewing PHP code, checking type safety, auditing code quality, or ensuring PHP best practices. Trigger on requests like "review PHP", "check PHP code", "audit PHP", or "PHP best practices".
 
 ## Conventions
 
@@ -50,7 +54,20 @@ This project has domain-specific skills available. You MUST activate the relevan
 - **Docker-first workflow**: Always run project commands inside Docker (`docker compose run ...` / `docker compose exec ...`). Do not run `php`, `composer`, `npm`, `artisan`, `pint`, or tests directly on the host.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
+- **Bilingual UI dedup rule**: If bilingual logic/UI is repeated across multiple partials, encapsulate it in a reusable Blade component to avoid inconsistencies and layout bugs; in tests, prefer stable `data-*` selectors over internal implementation details (for example Alpine variable names).
+- **Livewire implementation resolution rule**: Before editing a Livewire UI, confirm which implementation is actually mounted. In this repo a component name may resolve to a Volt SFC under `resources/views/components/⚡*.blade.php` even if a parallel file exists under `resources/views/livewire/`; never assume the class-based or view-based file is active without checking.
+- **Locale fallback diagnosis rule**: If admin validation messages appear in English while the app locale is Basque (`APP_LOCALE=eu`), first verify that `lang/eu/validation.php` and other base Laravel translation files exist before changing validation rules, component code, or locale wiring.
+- **Brand palette source of truth**: Store the active frontend palette in `resources/css/app.css` theme tokens and mirror the same palette in `.github/instructions/frontend.instructions.md`. For new UI changes, prefer these tokens/colors instead of introducing ad-hoc color scales.
 - **Query minimization**: Prioritize speed by reducing database round-trips whenever possible. Batch related reads/writes (e.g., one `whereIn`/`upsert` instead of repeated single-key queries) and avoid repeated queries in the same request lifecycle.
+- **Clean Blade rule (mandatory)**: Never run database queries inside Blade views (`resources/views/**`). Prepare all view data in routes/controllers/Livewire components/view composers and pass only ready-to-render variables to templates.
+- **Strict DRY rule (mandatory)**: Never duplicate business logic or mapping blocks across files/classes. If the same logic appears twice (or would appear a second time), extract it immediately into a shared class/trait/component/helper and replace all existing duplicates in the touched scope. Ship no intentional copy-paste logic.
+- **KISS rule (mandatory)**: Always choose the simplest solution that fulfils the requirement. Do not introduce extra layers of abstraction (base classes, traits, service containers, pipelines) unless two or more concrete use cases already exist in the codebase. Prefer a plain method over a class, a named route closure over a controller when the handler is trivial, and a single Eloquent query over a repository pattern. If a simpler alternative exists and passes the same tests, use it.
+- **YAGNI rule (mandatory)**: Never build functionality for a hypothetical future requirement. Only implement what is explicitly requested in the current task. Do not add optional parameters, configuration flags, generic abstractions, or extension points "just in case". If a requirement is not in the current spec, leave it out entirely; adding it speculatively creates dead code and increases maintenance burden.
+- **SOLID — Single Responsibility (mandatory)**: Each class and each public method must do exactly one thing. Controllers only handle HTTP input/output — no business logic, no DB queries beyond what Eloquent provides. Livewire components only manage UI state and delegate persistence to models or service classes. Migration files only alter schema. If a method needs a second paragraph to describe what it does, split it.
+- **SOLID — Open/Closed (mandatory)**: Design classes so that adding a new variant (new locale, new section type, new mail template) requires adding a new class or extending existing configuration — not editing existing class internals. Use polymorphism, strategy objects, or data-driven config (arrays, enums) instead of growing `if/switch` chains. When a `match`/`switch` block would need a new branch for every new case, replace it with a data map or a registry pattern.
+- **SOLID — Liskov Substitution (mandatory)**: Any subclass or implementation of an interface must be fully substitutable for its parent without altering behaviour. Never override a method to throw an exception or return a different type than declared. If a subclass cannot honour a parent contract, extract a new interface instead of overriding.
+- **SOLID — Interface Segregation (mandatory)**: Keep interfaces narrow and role-specific. Do not add methods to an interface that some implementors will have to leave empty or throw on. Prefer multiple focused interfaces over one fat contract. In Laravel context: keep Form Requests scoped to a single form, keep Policies scoped to a single model.
+- **SOLID — Dependency Inversion (mandatory)**: High-level classes (controllers, Livewire components, service classes) must depend on abstractions (interfaces, type-hinted contracts) not on concrete implementations. Inject dependencies through constructor or method injection — never instantiate collaborators with `new` inside business logic. Bind concrete implementations in `AppServiceProvider` when needed.
 - **Settings batch access**: For multiple settings keys, prefer explicit in-context queries using `whereIn('key', [...])->get(['key', 'value'])->pluck('value', 'key')` and batch writes with `upsert(...)`; avoid introducing generic model helpers like `getMany`/`setMany` unless explicitly requested.
 - **SoftDeletes**: Every Eloquent model in this application uses `SoftDeletes`. When creating a new model, always add `use SoftDeletes;` and add `$table->softDeletes()` to its migration. Never use hard deletes unless explicitly requested.
 - **Unit vs Feature tests**: Prefer Unit tests (`tests/Unit/`) for logic that does not require the database: model accessors, pure classes, value objects, static helpers. Only use Feature tests (which receive `RefreshDatabase` automatically via `Pest.php`) when DB, HTTP, or Livewire is genuinely needed. Never add `uses(RefreshDatabase::class)` inside individual test files.
@@ -61,6 +78,10 @@ This project has domain-specific skills available. You MUST activate the relevan
 - **Specs sync after code changes**: After any code change that affects documented behaviour, review `.kiro/specs/community-web/` and update `design.md`, plus `requirements.md` or `tasks.md` when affected, so the specs stay aligned with the implemented code before finishing.
 - **Spec completion quality gate**: At the end of each spec task set, before updating documentation and before running tests, execute quality checks inside Docker with a non-root user. Minimum required gate: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
 - **`->repeat()` in tests**: Only use `->repeat()` on property-based tests that randomise inputs with `rand()` or `fake()`. Never use on deterministic tests. Keep the count at 2 or below.
+- **Post-correction learning rule**: At the end of every correction response, include a short `Aprendizajes:` section with the concrete root cause and how to avoid repeating it, and persist that learning in memory so it can be consulted in the next correction.
+- **Correction memory mirroring rule**: Every time content is added or updated in `/memories/correction-workflow.md`, mirror the same content in `.docs/repo-corrections.md` in the repository.
+- **Frontend Lighthouse follow-up rule**: After any frontend change, once the relevant Dusk tests pass, run Lighthouse in Chrome, review the report (Performance, Accessibility, Best Practices, SEO), and include concrete improvement proposals based on the measured results.
+- **VS Code Problems rule**: Before finalizing any correction, always review the VS Code PROBLEMS panel and fix the warnings/errors found in the files touched by that correction. If there are unrelated pre-existing problems outside the scope, report them explicitly.
 
 ## Verification Scripts
 
@@ -113,6 +134,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Artisan
 
 - Run Artisan commands directly via the command line (e.g., `php artisan route:list`). Use `php artisan list` to discover available commands and `php artisan [command] --help` to check parameters.
+- In this workspace (`madaia33`), run Artisan inside Docker using `docker compose run --rm madaia33 php artisan ...`.
 - Inspect routes with `php artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
 - Read configuration values using dot notation: `php artisan config:show app.name`, `php artisan config:show database.default`. Or read config files directly from the `config/` directory.
 - To check environment variables, read the `.env` file directly.
@@ -121,7 +143,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
 - Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
-  - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
+    - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
 
 === php rules ===
 
@@ -185,8 +207,8 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 # Laravel Pint Code Formatter
 
-- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
-- Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
+- If you have modified any PHP files, you must run `vendor/bin/pint --dirty` before finalizing changes to ensure your code matches the project's expected style.
+- Do not run `vendor/bin/pint --test`, simply run `vendor/bin/pint` to fix any formatting issues.
 
 === pest/core rules ===
 
@@ -195,6 +217,17 @@ This project has domain-specific skills available. You MUST activate the relevan
 - This project uses Pest for testing. Create tests: `php artisan make:test --pest {name}`.
 - Run tests: `php artisan test --compact` or filter: `php artisan test --compact --filter=testName`.
 - Do NOT delete tests without approval.
+
+=== unit testing preferences (amalurra, sorgina) ===
+
+## Unit Tests Without Database (Preferred)
+
+- **amalurra priority rule (mandatory)**: When `amalurra` proposes or executes testing work, it must prioritize Unit tests first and only keep/add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
+- **sorgina priority rule (mandatory)**: When `sorgina` proposes or executes testing work, it must prioritize Unit tests first and only keep/add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
+- **amalurra** and **sorgina** agents: Always prefer **Unit tests** (`tests/Unit/`) over Feature tests when validating logic that does not require database access (pure functions, value objects, transformers, formatters, helpers, service methods without persistence).
+- Split test scenarios: keep pure logic unit tests fast (`tests/Unit/`), and use Feature tests only for database interaction, HTTP flows, or Livewire reactivity.
+- Rationale: Unit tests without database run in milliseconds and provide instant feedback, enabling faster iteration and reducing CI/CD overhead. Reserve Feature tests for integration scenarios only.
+- Examples of Unit test candidates: validation rules, formatters, enums, casting logic, computed properties, string transformations, mathematical operations, data mappers.
 
 </laravel-boost-guidelines>
 

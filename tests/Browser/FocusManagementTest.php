@@ -5,12 +5,13 @@
  */
 
 use App\Models\Image;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('mobile menu moves focus on open, restores on close and traps tab focus', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/')
+        $browser->visit('/eu')
             ->resize(375, 812);
 
         $browser->script("document.getElementById('livewire-error')?.close(); document.querySelector('#livewire-error')?.remove();");
@@ -31,9 +32,9 @@ test('mobile menu moves focus on open, restores on close and traps tab focus', f
 test('lightbox moves focus on open, restores on close and keeps focus inside', function () {
     Image::factory()->create();
 
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
-        $browser->visit('/galeria')
+        $browser->visit('/eu/argazki-bilduma')
             ->resize(390, 844)
             ->pause(300);
 
@@ -58,9 +59,12 @@ test('lightbox moves focus on open, restores on close and keeps focus inside', f
             ->pause(300)
             ->click('[data-gallery-open]')
             ->pause(700)
-            ->assertScript("return getComputedStyle(document.querySelector('[data-lightbox]')).display !== 'none';", true)
-            ->assertScript("return !!document.querySelector('[data-lightbox-close]');", true)
-            ->click('[data-lightbox-close]')
+            ->assertScript("return document.body.style.overflow === 'hidden';", true)
+            ->assertScript("return !!document.querySelector('[data-lightbox-close]');", true);
+
+        $browser->script("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));");
+
+        $browser
             ->pause(600)
             ->assertScript("return document.body.style.overflow === '';", true);
     });

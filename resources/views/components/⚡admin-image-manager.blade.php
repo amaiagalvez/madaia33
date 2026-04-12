@@ -16,6 +16,8 @@ new class extends Component {
 
     public string $altEs = '';
 
+    public string $tag = '';
+
     // ── Delete confirmation ──────────────────────────────────────────────────
     public ?int $confirmingDeleteId = null;
 
@@ -35,6 +37,7 @@ new class extends Component {
             'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
             'altEu' => 'nullable|string|max:255',
             'altEs' => 'nullable|string|max:255',
+            'tag' => 'required|string|in:historia,madaia',
         ]);
 
         $filename = $this->photo->hashName();
@@ -45,6 +48,7 @@ new class extends Component {
             'path' => $path,
             'alt_text_eu' => filled($this->altEu) ? $this->altEu : null,
             'alt_text_es' => filled($this->altEs) ? $this->altEs : null,
+            'tag' => $this->tag,
         ]);
 
         $this->resetUploadForm();
@@ -84,6 +88,7 @@ new class extends Component {
         $this->photo = null;
         $this->altEu = '';
         $this->altEs = '';
+        $this->tag = '';
         $this->resetValidation();
     }
 };
@@ -96,17 +101,8 @@ new class extends Component {
 
         <form wire:submit="uploadImage" class="space-y-4">
             {{-- File input --}}
-            <div>
-                <label for="photo" class="block text-sm font-medium text-gray-700 mb-1">
-                    {{ __('gallery.admin.upload') }}
-                </label>
-                <input id="photo" type="file" wire:model="photo" accept=".jpg,.jpeg,.png,.webp"
-                    class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200" />
-                <p class="mt-1 text-xs text-gray-500">{{ __('gallery.admin.formats') }}</p>
-                @error('photo')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-admin.form-file-input id="photo" model="photo" :label="__('gallery.admin.file')"
+                accept=".jpg,.jpeg,.png,.webp" :hint="__('gallery.admin.formats')" />
 
             {{-- Preview --}}
             @if ($photo)
@@ -118,34 +114,24 @@ new class extends Component {
 
             {{-- Bilingual alt text --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label for="altEu" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ __('gallery.admin.alt_eu') }}
-                    </label>
-                    <input id="altEu" type="text" wire:model="altEu"
-                        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500" />
-                    @error('altEu')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div>
-                    <label for="altEs" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ __('gallery.admin.alt_es') }}
-                    </label>
-                    <input id="altEs" type="text" wire:model="altEs"
-                        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500" />
-                    @error('altEs')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <x-admin.form-input name="altEu" model="altEu" :label="__('gallery.admin.alt_eu')" />
+                <x-admin.form-input name="altEs" model="altEs" :label="__('gallery.admin.alt_es')" />
             </div>
 
-            <div class="pt-2">
-                <button type="submit"
-                    class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    {{ __('gallery.admin.upload') }}
-                </button>
-            </div>
+            <x-admin.form-single-radio-pills :legend="__('gallery.admin.tag')" model="tag"
+                data-gallery-tag-selector :options="[
+                    [
+                        'value' => \App\Models\Image::TAG_HISTORY,
+                        'label' => __('gallery.filter.history'),
+                    ],
+                    [
+                        'value' => \App\Models\Image::TAG_MADAIA,
+                        'label' => __('gallery.filter.madaia'),
+                    ],
+                ]" />
+
+            <x-admin.form-footer-actions class="pt-2 mt-0" show-default-buttons :show-cancel-button="false"
+                :save-label="__('gallery.admin.upload')" />
         </form>
     </div>
 
@@ -157,11 +143,11 @@ new class extends Component {
                 <p class="text-sm text-gray-700 mb-6">{{ __('gallery.admin.confirm_delete') }}</p>
                 <div class="flex justify-end gap-3">
                     <button wire:click="cancelDelete"
-                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                         {{ __('general.buttons.cancel') }}
                     </button>
                     <button wire:click="deleteImage"
-                        class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
+                        class="rounded-md bg-[#793d3d] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5f2f2f] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                         {{ __('general.buttons.delete') }}
                     </button>
                 </div>
@@ -182,23 +168,37 @@ new class extends Component {
         @else
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-6">
                 @foreach ($this->images as $image)
-                    <div
-                        class="group relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-                        <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
-                            loading="lazy" class="h-full w-full object-cover" />
+                    <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
+                        data-admin-image-card="{{ $image->id }}">
+                        <div class="group relative aspect-square bg-gray-100">
+                            <img src="{{ $image->public_url }}" alt="{{ $image->alt_text }}"
+                                loading="lazy" class="h-full w-full object-cover" />
 
-                        {{-- Action overlay --}}
+                            {{-- Action overlay --}}
+                            <div
+                                class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-200 group-hover:bg-black/40">
+                                <x-admin.icon-button-delete
+                                    wire:click="confirmDelete({{ $image->id }})"
+                                    :title="__('general.buttons.delete')"
+                                    aria-label="{{ __('general.buttons.delete') }}"
+                                    class="bg-[#d9755b] text-white opacity-0! transition-all duration-200 group-hover:opacity-100 hover:bg-[#793d3d] focus:opacity-100" />
+                            </div>
+                        </div>
+
                         <div
-                            class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-colors duration-200">
-                            <button wire:click="confirmDelete({{ $image->id }})"
-                                class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-red-600 p-2 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                                aria-label="{{ __('general.buttons.delete') }}">
-                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="2" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                </svg>
-                            </button>
+                            class="space-y-1 border-t border-gray-200 px-3 py-2 text-xs text-gray-700">
+                            <p class="truncate" data-image-alt-eu="{{ $image->id }}">
+                                <span class="font-semibold">EU:</span>
+                                {{ $image->alt_text_eu ?? '-' }}
+                            </p>
+                            <p class="truncate" data-image-alt-es="{{ $image->id }}">
+                                <span class="font-semibold">ES:</span>
+                                {{ $image->alt_text_es ?? '-' }}
+                            </p>
+                            <p class="truncate" data-image-tag="{{ $image->id }}">
+                                <span class="font-semibold">{{ __('gallery.admin.tag') }}:</span>
+                                {{ $image->tag === \App\Models\Image::TAG_HISTORY ? __('gallery.filter.history') : ($image->tag === \App\Models\Image::TAG_MADAIA ? __('gallery.filter.madaia') : '-') }}
+                            </p>
                         </div>
                     </div>
                 @endforeach

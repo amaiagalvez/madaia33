@@ -3,7 +3,7 @@
 return [
     'title' => 'Contacto',
     'seo_description' => 'Contacta con la comunidad mediante un formulario seguro para consultas, incidencias o sugerencias.',
-    'subtitle' => 'Envía tu mensaje de forma segura, clara y con el mismo tono cuidado que el resto de la web.',
+    'subtitle' => 'Envía tu aportación, consulta o duda. Te responderemos lo antes posible.',
     'required_hint' => '* Los campos marcados son obligatorios.',
     'support_badge' => 'Atención directa',
     'support_title' => 'Una vía clara para hablar con la comunidad',
@@ -23,6 +23,7 @@ return [
     'send' => 'Enviar',
     'legal_text' => 'He leído y acepto la política de privacidad.',
     'success' => 'Tu mensaje ha sido enviado. ¡Gracias!',
+    'success_hint' => 'Te responderemos pronto en el correo electrónico que has indicado.',
     'error' => 'Ha ocurrido un error. Inténtalo de nuevo.',
     'email_error' => 'El mensaje ha sido recibido, pero puede haber un problema al enviar el correo de confirmación.',
     'spam_error' => 'Tu solicitud no ha podido ser procesada. Inténtalo de nuevo.',
@@ -50,6 +51,9 @@ return [
         'unread' => 'No leído',
         'mark_read' => 'Marcar como leído',
         'mark_unread' => 'Marcar como no leído',
+        'confirm_mark_read' => '¿Seguro que quieres marcar este mensaje como leído?',
+        'confirm_mark_unread' => '¿Seguro que quieres marcar este mensaje como no leído?',
+        'search' => 'Buscar en cualquier campo del mensaje',
         'confirm_delete' => '¿Estás seguro de que quieres eliminar este mensaje?',
     ],
 ];

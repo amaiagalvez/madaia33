@@ -68,11 +68,7 @@ it('soft deletes a setting', function () {
 
 it('soft deletes a notice location', function () {
     $notice = Notice::factory()->create();
-    $location = NoticeLocation::create([
-        'notice_id' => $notice->id,
-        'location_type' => 'portal',
-        'location_code' => '33-A',
-    ]);
+    $location = attachNoticeToLocationCode($notice, '33-A');
 
     $location->delete();
 

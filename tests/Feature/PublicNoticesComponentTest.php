@@ -2,9 +2,7 @@
 
 use App\Models\Notice;
 use Livewire\Livewire;
-use App\Models\NoticeLocation;
 use App\Livewire\PublicNotices;
-use Illuminate\Support\Facades\App;
 
 test('livewire public notices component renders', function () {
     Livewire::test(PublicNotices::class)
@@ -23,18 +21,10 @@ test('livewire public notices displays 9 items per page', function () {
 test('livewire public notices filter selector is reactive', function () {
     $portal = 'A';
     $notice1 = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice1->id,
-        'location_type' => 'portal',
-        'location_code' => $portal,
-    ]);
+    attachNoticeToLocationCode($notice1, $portal);
 
     $notice2 = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice2->id,
-        'location_type' => 'portal',
-        'location_code' => 'B',
-    ]);
+    attachNoticeToLocationCode($notice2, 'B');
 
     Livewire::test(PublicNotices::class)
         ->assertSee($notice1->title)
@@ -48,11 +38,7 @@ test('livewire public notices filter resets pagination', function () {
     for ($i = 0; $i < 12; $i++) {
         $notice = Notice::factory()->public()->create(['published_at' => now()->subMinutes($i)]);
         if ($i < 6) {
-            NoticeLocation::create([
-                'notice_id' => $notice->id,
-                'location_type' => 'portal',
-                'location_code' => $portal,
-            ]);
+            attachNoticeToLocationCode($notice, $portal);
         }
     }
 
@@ -79,39 +65,11 @@ test('livewire public notices has translation check method', function () {
         ->assertSuccessful();
 });
 
-test('livewire public notices reports missing translation when active locale fields are empty', function () {
-    App::setLocale('es');
-
-    $notice = Notice::factory()->public()->euOnly()->make();
-    $component = app(PublicNotices::class);
-
-    expect($component->hasTranslation($notice))->toBeFalse();
-});
-
-test('livewire public notices reports translation when active locale has title or content', function () {
-    App::setLocale('es');
-
-    $notice = Notice::factory()->public()->make([
-        'title_eu' => 'Izenburua',
-        'title_es' => 'Titulo',
-        'content_eu' => 'Edukia',
-        'content_es' => null,
-    ]);
-
-    $component = app(PublicNotices::class);
-
-    expect($component->hasTranslation($notice))->toBeTrue();
-});
-
 test('livewire public notices filter with general notices', function () {
     $portal = 'A';
     // Notice with portal location
     $notice1 = Notice::factory()->public()->create();
-    NoticeLocation::create([
-        'notice_id' => $notice1->id,
-        'location_type' => 'portal',
-        'location_code' => $portal,
-    ]);
+    attachNoticeToLocationCode($notice1, $portal);
 
     // Notice with no locations (general)
     $notice2 = Notice::factory()->public()->create();

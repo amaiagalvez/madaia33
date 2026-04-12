@@ -2,6 +2,7 @@
 
 use App\Models\Image;
 use Livewire\Livewire;
+use App\SupportedLocales;
 use App\Livewire\HeroSlider;
 
 describe('HeroSlider image loading', function () {
@@ -130,8 +131,9 @@ describe('HeroSlider navigation', function () {
         Image::factory()->count(3)->create();
 
         Livewire::test(HeroSlider::class)
-            ->assertViewIs('livewire.hero-slider')
+            ->assertViewIs('livewire.front.hero-slider')
             ->assertSee('absolute inset-0')
-            ->assertSee('object-contain');
+            ->assertSee('object-contain')
+            ->assertDontSee(route(SupportedLocales::routeName('gallery', SupportedLocales::DEFAULT)));
     });
 });

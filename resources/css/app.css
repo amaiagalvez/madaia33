@@ -27,12 +27,18 @@
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
 
-    /* Brand: earth-tone palette */
-    --color-brand: #92400e;
-    --color-brand-hover: #78350f;
-    --color-brand-light: #fffbeb;
-    --color-brand-border: #fcd34d;
-    --color-brand-text: #78350f;
+    /* Brand palette */
+    --color-brand-100: #edd2c7;
+    --color-brand-300: #b9a7a5;
+    --color-brand-500: #f1bd4d;
+    --color-brand-600: #d9755b;
+    --color-brand-900: #793d3d;
+
+    --color-brand: var(--color-brand-600);
+    --color-brand-hover: var(--color-brand-900);
+    --color-brand-light: var(--color-brand-100);
+    --color-brand-border: var(--color-brand-500);
+    --color-brand-text: var(--color-brand-900);
 }
 
 @layer theme {
@@ -62,9 +68,9 @@
 @layer components {
     .public-surface {
         background-image:
-            radial-gradient(70rem 70rem at 90% -15%, rgb(254 243 199 / 55%), transparent 55%),
-            radial-gradient(50rem 50rem at -10% 30%, rgb(237 224 212 / 70%), transparent 50%),
-            linear-gradient(180deg, rgb(255 255 255 / 96%), rgb(250 247 242 / 96%));
+            radial-gradient(70rem 70rem at 90% -15%, rgb(241 189 77 / 28%), transparent 55%),
+            radial-gradient(50rem 50rem at -10% 30%, rgb(237 210 199 / 45%), transparent 50%),
+            linear-gradient(180deg, rgb(255 255 255 / 96%), rgb(250 245 243 / 96%));
     }
 
     .section-shell {
@@ -72,11 +78,22 @@
     }
 
     .elevated-card {
-        @apply rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-amber-300;
+        @apply rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+        border-color: color-mix(in srgb, var(--color-brand-300) 45%, white);
+    }
+
+    .elevated-card:hover {
+        border-color: var(--color-brand-600);
     }
 
     .btn-brand {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-amber-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2;
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+        background-color: var(--color-brand);
+        --tw-ring-color: var(--color-brand-600);
+    }
+
+    .btn-brand:hover {
+        background-color: var(--color-brand-hover);
     }
 
     .glass-panel {
@@ -88,7 +105,9 @@
     }
 
     .feature-chip {
-        @apply inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm;
+        @apply inline-flex items-center gap-2 rounded-full border bg-white/90 px-3 py-1.5 text-xs font-medium shadow-sm;
+        border-color: color-mix(in srgb, var(--color-brand-300) 50%, white);
+        color: var(--color-brand-900);
     }
 
     .hero-frame {
@@ -96,19 +115,27 @@
     }
 
     .page-icon-amber {
-        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600;
+        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl;
+        background-color: color-mix(in srgb, var(--color-brand-100) 70%, white);
+        color: var(--color-brand-900);
     }
 
     .page-icon-emerald {
-        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600;
+        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl;
+        background-color: color-mix(in srgb, var(--color-brand-300) 35%, white);
+        color: var(--color-brand-900);
     }
 
     .page-icon-indigo {
-        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-700;
+        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl;
+        background-color: color-mix(in srgb, var(--color-brand-500) 35%, white);
+        color: var(--color-brand-900);
     }
 
     .page-icon-rose {
-        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600;
+        @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl;
+        background-color: color-mix(in srgb, var(--color-brand-600) 24%, white);
+        color: var(--color-brand-900);
     }
 }
 
@@ -121,7 +148,7 @@
 
         to {
             opacity: 1;
-            transform: translateY(0);
+            transform: none;
         }
     }
 
@@ -133,12 +160,48 @@
         animation: soft-rise .65s ease-out both;
     }
 
+    @keyframes admin-slideover-backdrop-in {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes admin-slideover-panel-in {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .admin-slideover-backdrop {
+        animation: admin-slideover-backdrop-in .2s ease-out both;
+    }
+
+    .admin-slideover-panel {
+        animation: admin-slideover-panel-in .28s cubic-bezier(.22, 1, .36, 1) both;
+        will-change: transform, opacity;
+    }
+
     @media (prefers-reduced-motion: reduce) {
         .animate-soft-rise {
             animation: none;
         }
 
         .animate-soft-rise-delayed {
+            animation: none;
+        }
+
+        .admin-slideover-backdrop,
+        .admin-slideover-panel {
             animation: none;
         }
     }
@@ -149,7 +212,27 @@
 }
 
 [data-flux-label] {
-    @apply mb-0! leading-tight!;
+    @apply mb-0 ! leading-tight !;
+}
+
+/* Keep owner side-panel form controls readable regardless of inherited dark/light variables. */
+[data-section="owner-create-form"] [data-flux-label],
+[data-section="owner-edit-form"] [data-flux-label] {
+    color: var(--color-zinc-700);
+}
+
+[data-section="owner-create-form"] [data-flux-control],
+[data-section="owner-edit-form"] [data-flux-control],
+[data-section="owner-create-form"] select[data-flux-select-native],
+[data-section="owner-edit-form"] select[data-flux-select-native] {
+    color: var(--color-zinc-900);
+    background-color: var(--color-white);
+    border-color: var(--color-zinc-300);
+}
+
+[data-section="owner-create-form"] [data-flux-control]::placeholder,
+[data-section="owner-edit-form"] [data-flux-control]::placeholder {
+    color: var(--color-zinc-400);
 }
 
 input:focus[data-flux-control],
@@ -159,8 +242,8 @@ select:focus[data-flux-control] {
 }
 
 /* ========================================
-   Safe Area Insets (iOS notch support)
-   ======================================== */
+    Safe Area Insets (iOS notch support)
+    ======================================== */
 
 .public-header {
     padding-top: max(env(safe-area-inset-top), 0.25rem);
@@ -171,16 +254,16 @@ footer {
 }
 
 /* ========================================
-   Alpine.js: hide before init
-   ======================================== */
+    Alpine.js: hide before init
+    ======================================== */
 
 [x-cloak] {
     display: none !important;
 }
 
 /* ========================================
-   Modal / Lightbox Responsive
-   ======================================== */
+    Modal / Lightbox Responsive
+    ======================================== */
 
 /* Block body scroll when modal is open */
 body.modal-open {
@@ -206,8 +289,8 @@ body.modal-open {
 }
 
 /* ========================================
-   Typography Responsive
-   ======================================== */
+    Typography Responsive
+    ======================================== */
 
 /* Mobile: text-sm (14px) */
 @media (max-width: 767px) {

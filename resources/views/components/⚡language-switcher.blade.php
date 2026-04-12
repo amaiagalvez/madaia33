@@ -1,41 +1,44 @@
 <?php
 
+use App\SupportedLocales;
 use Livewire\Component;
 use Illuminate\Support\Facades\App;
 
 new class extends Component {
-    public string $currentLocale = 'eu';
+    public string $currentLocale = SupportedLocales::DEFAULT;
+
+    /** @var array<string, string> */
+    public array $localeUrls = [];
 
     public function mount(): void
     {
-        $this->currentLocale = App::getLocale();
-    }
+        $this->currentLocale = SupportedLocales::normalize(App::getLocale());
 
-    public function switchLocale(string $locale): void
-    {
-        if (!in_array($locale, ['eu', 'es'])) {
-            return;
+        $currentRoute = request()->route();
+        $routeName = (string) $currentRoute?->getName();
+        $baseName = SupportedLocales::baseRouteName($routeName);
+
+        foreach (SupportedLocales::all() as $locale) {
+            try {
+                $this->localeUrls[$locale] = route(SupportedLocales::routeName($baseName, $locale));
+            } catch (\Throwable) {
+                $this->localeUrls[$locale] = route(SupportedLocales::routeName('home', $locale));
+            }
         }
-
-        session(['locale' => $locale]);
-
-        $this->redirect(request()->header('Referer', '/'), navigate: false);
     }
 };
 ?>
 
 <div class="flex items-center gap-2">
-    <button wire:click="switchLocale('eu')" data-language-option="eu"
-        class="cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors {{ $currentLocale === 'eu' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:text-gray-900' }}"
-        aria-label="{{ __('general.language.eu') }}"
-        @if ($currentLocale === 'eu') aria-current="true" @endif>
-        EU
-    </button>
-    <span class="text-gray-400" aria-hidden="true">|</span>
-    <button wire:click="switchLocale('es')" data-language-option="es"
-        class="cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors {{ $currentLocale === 'es' ? 'bg-gray-800 text-white' : 'text-gray-600 hover:text-gray-900' }}"
-        aria-label="{{ __('general.language.es') }}"
-        @if ($currentLocale === 'es') aria-current="true" @endif>
-        ES
-    </button>
+    @foreach (SupportedLocales::all() as $locale)
+        <a href="{{ $this->localeUrls[$locale] }}" data-language-option="{{ $locale }}"
+            class="cursor-pointer rounded px-2 py-1 text-sm font-medium transition-colors {{ $currentLocale === $locale ? 'bg-[#793d3d] text-white' : 'text-gray-600 hover:text-[#793d3d]' }}"
+            aria-label="{{ __('general.language.' . $locale) }}"
+            @if ($currentLocale === $locale) aria-current="true" @endif>
+            {{ SupportedLocales::switcherLabel($locale) }}
+        </a>
+        @if (!$loop->last)
+            <span class="text-gray-400" aria-hidden="true">|</span>
+        @endif
+    @endforeach
 </div>

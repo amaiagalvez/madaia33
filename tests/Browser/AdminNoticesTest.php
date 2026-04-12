@@ -5,51 +5,62 @@
  */
 
 use App\Models\User;
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('admin can create, publish, verify public, unpublish and delete a notice', function () {
-    $admin = User::where('email', 'admin@madaia33.eus')->firstOrFail();
-    $title = 'Dusk Test Iragarkia '.now()->timestamp;
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $title = 'Dusk Test Iragarkia ' . now()->timestamp;
+    $adminNoticesPath = '/admin/avisos';
 
-    /** @var \Tests\DuskTestCase $this */
-    $this->browse(function (Browser $browser) use ($admin, $title) {
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $title, $adminNoticesPath) {
         // Login and go to notices admin
         $browser->loginAs($admin)
-            ->visit('/admin/avisos')
+            ->visit($adminNoticesPath)
             ->assertSee('Iragarkiak');
 
         // Create notice (draft, not public)
-        $browser->press('Sortu')
+        $browser->press('Sortu berria')
             ->waitFor('#titleEu')
             ->type('#titleEu', $title)
             ->type('#contentEu', 'Dusk test edukia.')
-            ->press('Gorde')
+            ->press('Sortu berria')
             ->waitForText($title)
             ->assertSee($title);
 
-        // Publish notice — click the "Argitaratu" button in the row containing the title
-        $browser->waitForText('Argitaratu')
-            ->pause(500);
+        // Publish notice from row action
+        $browser->pause(500);
 
         $browser->script("
             const rows = document.querySelectorAll('tbody tr');
             for (const row of rows) {
                 if (row.textContent.includes('{$title}')) {
-                    const btn = row.querySelector('button.text-green-600');
+                    const btn = row.querySelector('button[title=\"Argitaratu\"]');
                     if (btn) btn.click();
                     break;
                 }
             }
         ");
 
-        $browser->waitForText('Argitalpena kendu', 5);
+        $browser->waitForText('Baieztatu', 5);
+
+        $browser->script(<<<'JS'
+            const confirmButton = Array.from(document.querySelectorAll('dialog[open] button'))
+                .find((button) => button.textContent.includes('Baieztatu'));
+            if (confirmButton) {
+                confirmButton.click();
+            }
+        JS);
+
+        $browser->waitForTextIn('tbody', $title, 5);
 
         // Verify visible in public
-        $browser->visit('/avisos')
+        $browser->visit('/eu/iragarkiak')
             ->assertSee($title);
 
         // Unpublish
-        $browser->visit('/admin/avisos')
+        $browser->visit($adminNoticesPath)
             ->waitForText($title)
             ->pause(500);
 
@@ -57,21 +68,31 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
             const rows = document.querySelectorAll('tbody tr');
             for (const row of rows) {
                 if (row.textContent.includes('{$title}')) {
-                    const btn = row.querySelector('button.text-yellow-600');
+                    const btn = row.querySelector('button[title=\"Argitalpena kendu\"]');
                     if (btn) btn.click();
                     break;
                 }
             }
         ");
 
-        $browser->pause(1000);
+        $browser->waitForText('Baieztatu', 5);
+
+        $browser->script(<<<'JS'
+            const confirmButton = Array.from(document.querySelectorAll('dialog[open] button'))
+                .find((button) => button.textContent.includes('Baieztatu'));
+            if (confirmButton) {
+                confirmButton.click();
+            }
+        JS);
+
+        $browser->pause(500);
 
         // Verify not visible in public
-        $browser->visit('/avisos')
+        $browser->visit('/eu/iragarkiak')
             ->assertDontSee($title);
 
         // Delete — click delete button in the row, then confirm
-        $browser->visit('/admin/avisos')
+        $browser->visit($adminNoticesPath)
             ->waitForText($title)
             ->pause(500);
 
@@ -79,8 +100,8 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
             const rows = document.querySelectorAll('tbody tr');
             for (const row of rows) {
                 if (row.textContent.includes('{$title}')) {
-                    const btns = row.querySelectorAll('button.text-red-600');
-                    if (btns.length) btns[btns.length - 1].click();
+                    const btn = row.querySelector('button[title=\"Ezabatu\"]');
+                    if (btn) btn.click();
                     break;
                 }
             }
@@ -88,18 +109,7 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
 
         // Confirm deletion
         $browser->waitForText('Ziur zaude', 5)
-            ->pause(300);
-
-        $browser->script("
-            const rows = document.querySelectorAll('tbody tr');
-            for (const row of rows) {
-                if (row.textContent.includes('{$title}')) {
-                    const btns = row.querySelectorAll('button.text-red-600');
-                    if (btns.length) btns[btns.length - 1].click();
-                    break;
-                }
-            }
-        ");
+            ->press('Ezabatu');
 
         $browser->pause(1500)
             ->assertDontSee($title);

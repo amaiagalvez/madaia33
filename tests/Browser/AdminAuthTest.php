@@ -4,14 +4,15 @@
  * Validates: Requirements 6.1, 6.2
  */
 
+use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('admin can login with valid credentials and is redirected to dashboard', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/login')
             ->waitFor('input[name=email]', 5)
-            ->type('input[name=email]', 'admin@madaia33.eus')
+            ->type('input[name=email]', 'info@madaia33.eus')
             ->type('input[name=password]', 'password')
             ->press('[data-test="login-button"]')
             ->waitForLocation('/admin')
@@ -20,16 +21,16 @@ test('admin can login with valid credentials and is redirected to dashboard', fu
 });
 
 test('admin login with invalid credentials shows error', function () {
-    /** @var \Tests\DuskTestCase $this */
+    /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         // Ensure we're logged out before testing invalid login
         $browser->visit('/_dusk/logout')
             ->visit('/login')
             ->waitFor('input[name=email]', 5)
-            ->type('input[name=email]', 'admin@madaia33.eus')
+            ->type('input[name=email]', 'info@madaia33.eus')
             ->type('input[name=password]', 'wrong-password')
             ->press('[data-test="login-button"]')
             ->pause(2000)
-            ->assertPathIs('/login');
+            ->assertPathIs('/eu/pribatua');
     });
 });

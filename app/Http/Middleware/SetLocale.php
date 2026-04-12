@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\SupportedLocales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,14 +17,29 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->session()->get('locale', 'eu');
-
-        if (! in_array($locale, ['eu', 'es'])) {
-            $locale = 'eu';
-        }
+        $locale = $this->resolveLocale($request);
 
         App::setLocale($locale);
+        $request->session()->put('locale', $locale);
 
         return $next($request);
+    }
+
+    private function resolveLocale(Request $request): string
+    {
+        $firstSegment = (string) $request->segment(1);
+
+        if (SupportedLocales::isSupported($firstSegment)) {
+            return $firstSegment;
+        }
+
+        $userLocale = $request->user()?->language;
+
+        return SupportedLocales::normalize(
+            $request->route('locale')
+                ?? $userLocale
+                ?? $request->session()->get('locale')
+                ?? SupportedLocales::default()
+        );
     }
 }
