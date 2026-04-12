@@ -58,6 +58,7 @@
 
 <div x-data="{
     tab: '{{ $initialTab }}',
+    syncTimers: {},
     format(field, command) {
         const editor = this.$refs[field];
         if (!editor) {
@@ -90,7 +91,15 @@
         }
 
         const html = editor.innerHTML.trim();
-        this.$wire.set(field, html === '<br>' ? '' : html);
+        const payload = html === '<br>' ? '' : html;
+
+        if (this.syncTimers[field]) {
+            clearTimeout(this.syncTimers[field]);
+        }
+
+        this.syncTimers[field] = setTimeout(() => {
+            this.$wire.set(field, payload);
+        }, 160);
     },
 }" class="space-y-6 rounded-lg border border-gray-200 bg-stone-50 p-4"
     data-bilingual-field="{{ $rootField }}">
@@ -130,7 +139,7 @@
                         <span class="text-red-500" aria-hidden="true">*</span>
                     @endif
                 </p>
-                <div class="rounded-md border border-gray-300 bg-white shadow-sm">
+                <div class="rounded-md border border-gray-300 bg-white shadow-sm" wire:ignore>
                     <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 px-2 py-2"
                         role="toolbar" aria-label="{{ __('admin.settings_form.editor_toolbar') }}">
                         @foreach ($toolbarActions as $toolbarAction)
@@ -142,6 +151,7 @@
                     <div id="{{ $tabConfig['field'] }}" x-ref="{{ $tabConfig['field'] }}"
                         contenteditable="true" aria-labelledby="{{ $tabConfig['field'] }}Label"
                         @input="sync('{{ $tabConfig['field'] }}')"
+                        @blur="sync('{{ $tabConfig['field'] }}')"
                         class="h-52 w-full overflow-y-auto bg-white px-3 py-2 text-sm text-stone-900 focus:outline-none">
                         {!! $tabConfig['value'] !!}</div>
                 </div>

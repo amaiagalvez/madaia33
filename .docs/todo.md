@@ -52,12 +52,12 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-- problema con los textarea biligues con mini editor, al escribir, automáticamentee el cursor se va al principio
+
 - Formulario para crear nueva propietaria, añadir campo id (zbkia / Num) comprobar que sea único. Mostrar el id en el listado de propietarias del panel.
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
 - Resultado votaciones
-- Deialdiak sartzek formularioa
+- Deialdiak sartzeko formularioa
 - bozketak pdf presencial/delegado
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
@@ -98,3 +98,35 @@ pasar los test con coverage
 - [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
 - [ ] añadir espacio para comercios
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
+
+## Implementation Plan
+
+### Goal
+
+- [Konpondu textarea elebiduneko mini-editorean idaztean cursorra hasierara salto egitea, edukia galdu gabe eta UX egonkorrarekin.]
+
+### Technical Decisions
+
+- [Mini-editorearen sinkronizazioa berrikusiko da `resources/views/components/admin/bilingual-tabs.blade.php` osagaian, `contenteditable` + Livewire eguneratzeen arteko re-render zikloa mozteko.]
+- [Mantendu egingo da egungo elebidun tab egitura (`x-show`, ez `x-if`) eta datu-fluxua zentralizatuko da `sync()` metodoan, cursor posizioa ez apurtzeko.]
+- [Livewire eguneratze maiztasuna doituko da (defer/debounce edo ignore estrategiaren bidez), idazketa bakoitzean DOM osoa berreraiki ez dadin.]
+
+### Execution Steps
+
+- [x]   1. Erreproduzitu arazoa settings/admin mini-editorean eta identifikatu zein lotura (`@input` + `$wire.set`) ari den cursorra resetatzen.
+- [x]   2. `bilingual-tabs` osagaian konponketa aplikatu (sinkronizazio estrategia egokia) eta rich-text + field moduak ez direla hausten egiaztatu.
+- [x]   3. Dagokion test estaldura gehitu/eguneratu (gutxienez Feature test egonkorra `data-*` selectorrekin, eta beharrezkoa bada Browser test osagarria).
+- [x]   4. Docker barruan format + test minimoak exekutatu eta emaitzak balioztatu.
+
+### Work Items
+
+- [x] resources/views/components/admin/bilingual-tabs.blade.php
+- [x] tests/Feature/** (ukitutako elebidun editorearen fluxuari dagokiona)
+- [ ] tests/Browser/** (beharrezkoa bada cursor/typing portaera bisuala egiaztatzeko)
+
+### Validation
+
+- [x] TDD-based implementation when possible
+- [x] Required formatting/lint checks
+- [x] Relevant test suite
+- [ ] Dusk tests when frontend/flow changes exist

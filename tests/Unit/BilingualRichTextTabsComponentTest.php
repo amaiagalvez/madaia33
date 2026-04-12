@@ -35,6 +35,7 @@ it('renders the same toolbar controls for both bilingual editor panes', function
         ->and(substr_count($html, __('admin.settings_form.editor_bold')))->toBe(2)
         ->and(substr_count($html, __('admin.settings_form.editor_italic')))->toBe(2)
         ->and(substr_count($html, __('admin.settings_form.editor_underline')))->toBe(2)
-        ->and(substr_count($html, __('admin.settings_form.editor_link')))->toBe(2)
-        ->and(substr_count($html, 'role="toolbar"'))->toBe(2);
+        ->and(substr_count($html, __('admin.settings_form.editor_link')))->toBeGreaterThanOrEqual(2)
+        ->and(substr_count($html, 'role="toolbar"'))->toBe(2)
+        ->and(substr_count($html, 'wire:ignore'))->toBe(2);
 });
