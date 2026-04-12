@@ -1,22 +1,3 @@
-## Status
-
-✅ **PASSED**: 506 tests × 1596 assertions — 103.31s
-
-### Hotfix: Flux assets in admin layout
-
-**Issue**: AdminSettingsTest asserted `/flux/flux.js` not present, but it was loading.
-
-**Fix**:
-	1. Removed `@fluxAppearance` from `resources/views/layouts/admin/main.blade.php` (line 17)
-	2. Removed `@fluxScripts` from admin layout footer (line 313)
-	3. Flux CSS still imported in `resources/css/app.css` (needed for Tailwind integration)
-
-**Validation**:
-	- ✅ AdminSettingsTest::it does not load flux or external fonts in admin settings view — PASS
-	- ✅ All 506 tests pass
-	- ✅ Pint formatting fixed (ProfileController.php unary operator spacing)
-	- ✅ composer quality: all checks pass
-
 # tests suit
 **IMPORTANT**
 comprobar si hay un test que cubre el caso y si no añadirlo
@@ -60,3 +41,10 @@ Un community_admin puede tener asingadas varias propiedades, tambien puede que s
 **IMPORTANT**
 Si hay alguna acción del panel de control que no está en este listado (si tener el cuenta el superadmin), es que el usuario logueado no tiene permiso para realizarla.
 tratalo y escribe aquí las funcionalidades que hayas encontrado que no estén en esta lista (sin tener en cuenta el superadmin).
+
+
+
+profila. al pinchar en Jabearen fitxa, no dupliquess el formulario. Reutiliza el mismo formulario que se enseña en el panel en la lista de propietarios al pinchar en el botón edit.
+
+
+al entrar en la vista de bozketak del front, si el propietario no ha aceptado las condicioones, mostrar el modal como en el profil para que no pueda hacer nada hasta que no acepte las condiciones.

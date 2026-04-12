@@ -32,7 +32,8 @@ test('admin can upload an image and it appears in the public gallery', function 
 
         // Fill alt text and submit
         $browser->type('#altEu', $altText)
-            ->select('#tag', 'madaia')
+            ->waitFor('[data-admin-pill-option="madaia"]', 5)
+            ->click('[data-admin-pill-option="madaia"]')
             ->press('Argazkia igo')
             ->waitUntil("document.body.innerText.includes('" . addslashes($altText) . "')", 30)
             ->assertScript("return document.body.innerText.includes('" . addslashes($altText) . "');", true);

@@ -55,6 +55,8 @@ Para que todo esto sea legal de verdad, asegúrate de:
 
 # Panela
 - en el profil, añadir un formulario para que si alguien tiene propblmas con sus datos mande un mensaje.
+- testo legal que tiene que aceptar los que tiene rol "Voto delegado", al entrar a la vista bozketak del front, si no lo tienen aceptado que les salga un modal, como el de los propietarios, y hasta que no lo acepten que no les deje hacer nada más.
+
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
