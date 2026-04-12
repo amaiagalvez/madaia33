@@ -41,6 +41,8 @@ owners => Propietarias
 - [ ] Cookies sartu
 - [ ] legeak.html begiratu
 
+- [ ] config email, recaptcha, analitics
+
 https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
 
 Para que todo esto sea legal de verdad, asegúrate de:

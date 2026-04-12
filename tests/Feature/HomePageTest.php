@@ -162,11 +162,14 @@ test('home page keeps mobile order general notices then location notices then hi
 });
 
 test('home page footer uses shared menu brand on left and keeps configured contact email on right', function () {
+    createSetting('front_logo_image_path', 'branding/front-logo.png');
+    createSetting('front_primary_email', 'front-primary@example.com');
+
     test()->get(route(SupportedLocales::routeName('home', SupportedLocales::DEFAULT)))
         ->assertSuccessful()
-        ->assertSee(asset('storage/madaia33/madaia33.png'), false)
+        ->assertSee(asset('storage/branding/front-logo.png'), false)
         ->assertSee(config('app.name', 'Madaia'))
-        ->assertSee('mailto:info@madaia33.eus', false)
+        ->assertSee('mailto:front-primary@example.com', false)
         ->assertSee(asset('amaia-footer.png'), false)
         ->assertDontSee('&copy;', false);
 });

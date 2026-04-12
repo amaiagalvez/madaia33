@@ -22,7 +22,7 @@ test('private page shows placeholder with login link for unauthenticated visitor
 });
 
 test('private page redirects authenticated admin to dashboard', function () {
-    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'example@email.eus')->firstOrFail();
     $privatePath = '/eu/pribatua';
 
     /** @var DuskTestCase $this */

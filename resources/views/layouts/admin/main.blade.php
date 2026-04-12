@@ -28,7 +28,7 @@
             <div class="flex items-center h-16 px-6 border-b border-stone-200">
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center gap-3 text-base font-semibold text-stone-900 hover:text-stone-700 transition-colors">
-                    <img src="{{ $publicLogoUrl ?? asset('storage/madaia33/madaia33.png') }}"
+                    <img src="{{ $publicLogoUrl ?? '' }}"
                         alt="{{ $publicSiteName ?? config('app.name', 'Laravel') }} logo"
                         class="h-8 w-8 rounded-xl object-cover" />
                     {{ $publicSiteName ?? config('app.name', 'Laravel') }}
@@ -187,7 +187,7 @@
                 </svg>
             </button>
             <div class="flex items-center gap-2">
-                <img src="{{ $publicLogoUrl ?? asset('storage/madaia33/madaia33.png') }}"
+                <img src="{{ $publicLogoUrl ?? '' }}"
                     alt="{{ $publicSiteName ?? config('app.name', 'Madaia') }} logo"
                     class="h-8 w-8 rounded-xl object-cover" />
                 <span
@@ -204,7 +204,7 @@
                         class="flex items-center justify-between h-16 px-6 border-b border-stone-200">
                         <span
                             class="flex items-center gap-2 text-base font-semibold text-gray-900">
-                            <img src="{{ $publicLogoUrl ?? asset('storage/madaia33/madaia33.png') }}"
+                            <img src="{{ $publicLogoUrl ?? '' }}"
                                 alt="{{ $publicSiteName ?? config('app.name', 'Madaia') }} logo"
                                 class="h-8 w-8 rounded-xl object-cover" />
                             {{ __('admin.dashboard') }}
@@ -289,8 +289,8 @@
         {{-- Main content area --}}
         <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
             <header
-                class="relative z-[60] hidden overflow-visible lg:flex h-16 items-center justify-end border-b border-stone-200 bg-stone-50 px-6">
-                <nav class="relative z-[60] flex items-center gap-4"
+                class="relative z-60 hidden overflow-visible lg:flex h-16 items-center justify-end border-b border-stone-200 bg-stone-50 px-6">
+                <nav class="relative z-60 flex items-center gap-4"
                     aria-label="{{ __('admin.dashboard') }}">
                     <x-shared.desktop-user-menu />
                 </nav>

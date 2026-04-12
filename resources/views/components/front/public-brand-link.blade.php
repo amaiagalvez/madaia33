@@ -5,7 +5,7 @@
 
 @php
     $resolvedSiteName = $publicSiteName ?? config('app.name', 'Madaia');
-    $resolvedLogoUrl = $publicLogoUrl ?? asset('storage/madaia33/madaia33.png');
+    $resolvedLogoUrl = $publicLogoUrl ?? '';
 @endphp
 
 <a href="{{ $href }}"

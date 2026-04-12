@@ -246,7 +246,7 @@
                             {{ __('general.footer.cookie_policy') }}</p>
                     </a>
                 </nav>
-                <a href="mailto:{{ $publicPrimaryEmail ?? 'info@madaia33.eus' }}"
+                <a href="mailto:info@amaia.eus"
                     class="inline-flex items-center self-end lg:self-center focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
                     aria-label="Contact with Amaia">
                     <img src="{{ asset('amaia-footer.png') }}" alt="Amaia logo"
