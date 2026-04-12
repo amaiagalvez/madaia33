@@ -82,6 +82,7 @@ return new class extends Migration {
             $table->foreignId('voting_id')->constrained();
             $table->foreignId('voting_option_id')->constrained();
             $table->unsignedInteger('votes_count')->default(0);
+            $table->decimal('pct_total', 8, 4)->default(0);
             $table->timestamps();
             $table->softDeletes();
 

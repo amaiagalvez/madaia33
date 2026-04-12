@@ -9,6 +9,7 @@ use App\Models\VotingBallot;
 use App\Models\VotingOption;
 use App\Models\VotingSelection;
 use App\Models\VotingOptionTotal;
+use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Mail\VotingConfirmationMail;
@@ -135,13 +136,18 @@ class CastVotingBallotAction
             ]);
         }
 
-        $this->incrementVotingTotal($voting, $option);
+        $this->incrementVotingTotal($voting, $option, $owner);
 
         return $ballot;
     }
 
-    private function incrementVotingTotal(Voting $voting, VotingOption $option): void
+    private function incrementVotingTotal(Voting $voting, VotingOption $option, Owner $owner): void
     {
+        $owner->loadMissing('activeAssignments.property');
+
+        $ownerPct = $owner->activeAssignments
+            ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+
         $total = VotingOptionTotal::query()
             ->where('voting_id', $voting->id)
             ->where('voting_option_id', $option->id)
@@ -153,9 +159,11 @@ class CastVotingBallotAction
                 'voting_id' => $voting->id,
                 'voting_option_id' => $option->id,
                 'votes_count' => 1,
+                'pct_total' => $ownerPct,
             ]);
         } else {
             $total->increment('votes_count');
+            $total->increment('pct_total', $ownerPct);
         }
     }
 

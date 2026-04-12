@@ -245,7 +245,7 @@ it('allows an eligible owner to vote once and stores auditable rows', function (
         'accepted_terms_at' => now(),
     ]);
     $portal = Location::factory()->portal()->create(['code' => '33-A']);
-    $property = Property::factory()->create(['location_id' => $portal->id]);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'community_pct' => 1.5000]);
 
     PropertyAssignment::factory()->create([
         'owner_id' => $owner->id,
@@ -293,6 +293,11 @@ it('allows an eligible owner to vote once and stores auditable rows', function (
         ->where('voting_id', $voting->id)
         ->where('voting_option_id', $option->id)
         ->value('votes_count'))->toBe(1);
+
+    expect(VotingOptionTotal::query()
+        ->where('voting_id', $voting->id)
+        ->where('voting_option_id', $option->id)
+        ->value('pct_total'))->toBe('1.5000');
 
     Livewire::actingAs($owner->user)
         ->test(PublicVotings::class)
@@ -351,7 +356,7 @@ it('does not store option selections for anonymous votings', function () {
         'accepted_terms_at' => now(),
     ]);
     $portal = Location::factory()->portal()->create(['code' => '33-B']);
-    $property = Property::factory()->create(['location_id' => $portal->id]);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'community_pct' => 2.2500]);
 
     PropertyAssignment::factory()->create([
         'owner_id' => $owner->id,
@@ -384,6 +389,11 @@ it('does not store option selections for anonymous votings', function () {
         ->where('voting_id', $voting->id)
         ->where('voting_option_id', $option->id)
         ->value('votes_count'))->toBe(1);
+
+    expect(VotingOptionTotal::query()
+        ->where('voting_id', $voting->id)
+        ->where('voting_option_id', $option->id)
+        ->value('pct_total'))->toBe('2.2500');
 });
 
 it('stores delegated voter user id when voting on behalf of another owner', function () {

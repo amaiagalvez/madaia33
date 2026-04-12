@@ -21,6 +21,7 @@ class VotingOptionTotalFactory extends Factory
             'voting_id' => Voting::factory(),
             'voting_option_id' => VotingOption::factory(),
             'votes_count' => fake()->numberBetween(0, 500),
+            'pct_total' => fake()->randomFloat(4, 0, 100),
         ];
     }
 }

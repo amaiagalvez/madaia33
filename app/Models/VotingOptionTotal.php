@@ -17,7 +17,15 @@ class VotingOptionTotal extends Model
         'voting_id',
         'voting_option_id',
         'votes_count',
+        'pct_total',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'pct_total' => 'decimal:4',
+        ];
+    }
 
     protected static function newFactory(): VotingOptionTotalFactory
     {
