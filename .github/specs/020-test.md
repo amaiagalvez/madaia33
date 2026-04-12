@@ -1,20 +1,3 @@
-Igandea
-=======
-- pasar pint, quality y test a todo 
-- Testak Rolak Panela y Front
-- votaciones pdf
-- votaciones resultados (suma de porcentajes)
-- azalpena bozketak front-ean gehitzeko
-- spec kiro pendientes
-- unificar terminologia
-
-# unificar terminología
-
-locations: Ubicaciones => Comunidades
-properties: Propiedades => Fincas
-property_assignments => Propiedades
-owners => Propietarias
-
 # tests suit
 **IMPORTANT**
 comprobar si hay un test que cubre el caso y si no añadirlo
@@ -58,3 +41,42 @@ Un community_admin puede tener asingadas varias propiedades, tambien puede que s
 **IMPORTANT**
 Si hay alguna acción del panel de control que no está en este listado (si tener el cuenta el superadmin), es que el usuario logueado no tiene permiso para realizarla.
 tratalo y escribe aquí las funcionalidades que hayas encontrado que no estén en esta lista (sin tener en cuenta el superadmin).
+
+## Implementation Plan
+
+### Goal
+
+- [x] `composer quality`-ko PHPMD blokeoak kentzea, arauen atalaseak igo gabe.
+
+### Technical Decisions
+
+- [x] `AssignLocationChiefAction::execute()` metodoa helper txikiagoetan banatu (balidazioa, aurreko chief transferra, role sinkronizazioa).
+- [x] `Owners::saveAssignment()` metodoa flow txikietan zatitu (`reopen`, `close`, `keep-open`) konplexutasuna eta NPath jaisteko.
+- [x] `Owners` eta `Votings` klaseetan bloke koherenteak trait pribatuetara mugitzea, API publikoa eta UI portaera aldatu gabe.
+
+### Execution Steps
+
+- [x] 1. PHPMD baseline berria atera (`phpmd app text phpmd.xml`) eta errore lerroak baieztatu.
+- [x] 2. `AssignLocationChiefAction` refactor txikia egin eta dagoen test focused-a exekutatu.
+- [x] 3. `Owners::saveAssignment()` zatitu eta errore mezuen tratamendua bateratu.
+- [x] 4. `Owners` klasearen tamaina murriztu trait batera erauziz assignment-related metodoak.
+- [x] 5. `Votings` klasearen tamaina murriztu trait batera erauziz modal/delegation-related metodoak.
+- [x] 6. Pint, PHPStan, test focused eta `composer quality` exekutatu Docker barruan.
+
+### Work Items
+
+- [x] app/Actions/Locations/AssignLocationChiefAction.php
+- [x] app/Livewire/Admin/Owners.php
+- [x] app/Livewire/Admin/Votings.php
+- [x] app/Livewire/Admin/Concerns/* (berria, beharrezkoa bada)
+
+### Validation
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/phpstan analyse --memory-limit=1G --no-progress`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersAndLocationsTest.php`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
+
+### Notes
+
+- Branch berria sortzeko saiakera egin da (`git checkout -b 020-test-phpmd-refactor`), baina terminal deia erabiltzaileak skip egin du.

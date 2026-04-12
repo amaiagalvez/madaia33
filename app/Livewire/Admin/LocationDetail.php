@@ -193,7 +193,7 @@ class LocationDetail extends Component
 
         $owner = $activeAssignment->owner;
 
-        if (! $owner instanceof Owner || $owner->user_id === null) {
+        if (! $owner instanceof Owner) {
             $this->addError('chiefPropertyId', __('admin.locations.chief_owner_without_user'));
 
             return;

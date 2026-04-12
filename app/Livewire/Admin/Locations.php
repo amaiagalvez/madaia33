@@ -8,7 +8,7 @@ use Livewire\Component;
 use App\Models\Location;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
-use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -219,6 +219,9 @@ class Locations extends Component
         ]);
     }
 
+    /**
+     * @param  LengthAwarePaginator<int, Location>  $locations
+     */
     private function attachChiefPropertyNames(LengthAwarePaginator $locations): void
     {
         $locationIds = $locations->getCollection()->pluck('id')->all();
@@ -227,7 +230,7 @@ class Locations extends Component
             return;
         }
 
-        $chiefDataByLocation = PropertyAssignment::query()
+        $chiefDataByLocation = DB::table('property_assignments')
             ->join('properties', 'properties.id', '=', 'property_assignments.property_id')
             ->join('owners', 'owners.id', '=', 'property_assignments.owner_id')
             ->join('users', 'users.id', '=', 'owners.user_id')
@@ -240,17 +243,24 @@ class Locations extends Component
             ->where('roles.name', Role::COMMUNITY_ADMIN)
             ->whereNull('property_assignments.end_date')
             ->whereIn('properties.location_id', $locationIds)
-            ->selectRaw('properties.location_id, MIN(properties.name) as chief_property_name, MIN(owners.coprop1_name) as community_admin_name')
+            ->selectRaw('properties.location_id as location_id, MIN(properties.name) as chief_property_name, MIN(owners.coprop1_name) as community_admin_name')
             ->groupBy('properties.location_id')
             ->get()
-            ->keyBy('location_id');
+            ->mapWithKeys(static function (object $row): array {
+                return [
+                    (int) $row->location_id => [
+                        'chief_property_name' => $row->chief_property_name,
+                        'community_admin_name' => $row->community_admin_name,
+                    ],
+                ];
+            });
 
         $locations->setCollection(
             $locations->getCollection()->map(function (Location $location) use ($chiefDataByLocation): Location {
                 $chiefData = $chiefDataByLocation->get($location->id);
 
-                $location->setAttribute('chief_property_name', $chiefData?->chief_property_name);
-                $location->setAttribute('community_admin_name', $chiefData?->community_admin_name);
+                $location->setAttribute('chief_property_name', $chiefData['chief_property_name'] ?? null);
+                $location->setAttribute('community_admin_name', $chiefData['community_admin_name'] ?? null);
 
                 return $location;
             })
@@ -259,13 +269,7 @@ class Locations extends Component
 
     private function canManageAllLocations(User $user): bool
     {
-        $method = 'canManageAllLocations';
-
-        if (! is_callable([$user, $method])) {
-            return false;
-        }
-
-        return (bool) $user->{$method}();
+        return $user->canManageAllLocations();
     }
 
     /**
@@ -273,12 +277,6 @@ class Locations extends Component
      */
     private function managedLocationIds(User $user): array
     {
-        $relation = 'managedLocations';
-
-        if (! is_callable([$user, $relation])) {
-            return [];
-        }
-
-        return $user->{$relation}()->pluck('locations.id')->all();
+        return $user->managedLocations()->pluck('locations.id')->all();
     }
 }

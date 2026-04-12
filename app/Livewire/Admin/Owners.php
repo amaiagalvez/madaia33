@@ -2,25 +2,24 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\User;
 use App\Models\Owner;
 use Livewire\Component;
-use App\Models\Property;
 use App\SupportedLocales;
 use Livewire\WithPagination;
 use App\Models\OwnerAuditLog;
-use App\Models\PropertyAssignment;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use App\Services\CreateOwnerFormService;
 use App\Actions\Owners\CreateOwnerAction;
 use App\Concerns\InteractsWithAdminOwners;
-use Illuminate\Validation\ValidationException;
 use App\Actions\Properties\AssignPropertyAction;
 use App\Actions\Properties\UnassignPropertyAction;
+use App\Livewire\Admin\Concerns\ManagesOwnerAssignments;
 
 class Owners extends Component
 {
     use InteractsWithAdminOwners;
+    use ManagesOwnerAssignments;
     use WithPagination;
 
     private CreateOwnerAction $createOwnerAction;
@@ -238,168 +237,6 @@ class Owners extends Component
         $this->resetCreateOwnerFormState();
     }
 
-    public function toggleOwnerRow(int $ownerId): void
-    {
-        if ($this->expandedOwnerId === $ownerId) {
-            $this->expandedOwnerId = null;
-            $this->assignmentEdits = [];
-            $this->inlinePropertyId = '';
-            $this->inlineStartDate = '';
-            $this->inlineEndDate = '';
-            $this->rowErrorMessage = '';
-
-            return;
-        }
-
-        $this->expandedOwnerId = $ownerId;
-        $this->rowErrorMessage = '';
-        $this->inlinePropertyId = '';
-        $this->inlineStartDate = now()->format('Y-m-d');
-        $this->inlineEndDate = '';
-
-        $this->loadAssignmentEdits($ownerId);
-    }
-
-    public function saveAssignment(int $assignmentId): void
-    {
-        $assignment = PropertyAssignment::query()
-            ->where('owner_id', $this->expandedOwnerId)
-            ->findOrFail($assignmentId);
-
-        $edit = $this->assignmentEdits[$assignmentId] ?? null;
-
-        if ($edit === null) {
-            return;
-        }
-
-        $this->validate([
-            "assignmentEdits.$assignmentId.start_date" => ['required', 'date'],
-            "assignmentEdits.$assignmentId.end_date" => ['nullable', 'date'],
-        ]);
-
-        if ($edit['end_date'] !== '' && $edit['end_date'] < $edit['start_date']) {
-            $this->addError("assignmentEdits.$assignmentId.end_date", __('validation.after_or_equal', ['attribute' => __('admin.owners.end_date'), 'date' => __('admin.owners.start_date')]));
-
-            return;
-        }
-
-        $isClosingAssignment = $edit['end_date'] !== '';
-        $isAlreadyClosed = $assignment->end_date !== null;
-        $isReopeningAssignment = $isAlreadyClosed && ! $isClosingAssignment;
-        $willBeClosed = $isAlreadyClosed || $isClosingAssignment;
-
-        if ($isReopeningAssignment) {
-            try {
-                DB::transaction(function () use ($assignment, $edit): void {
-                    $this->assignPropertyAction->assertNoActiveAssignment((int) $assignment->property_id, (int) $assignment->id);
-
-                    $assignment->update([
-                        'start_date' => $edit['start_date'],
-                        'end_date' => null,
-                        'admin_validated' => (bool) $assignment->admin_validated,
-                        'owner_validated' => (bool) $assignment->owner_validated,
-                    ]);
-
-                    $assignment->owner()->first()?->user()->update(['is_active' => true]);
-                });
-            } catch (ValidationException $e) {
-                $this->rowErrorMessage = (string) collect($e->errors())->flatten()->first();
-
-                return;
-            }
-
-            $this->loadAssignmentEdits((int) $assignment->owner_id);
-
-            return;
-        }
-
-        $assignment->update([
-            'start_date' => $edit['start_date'],
-            'admin_validated' => $willBeClosed ? $assignment->admin_validated : (bool) $edit['admin_validated'],
-            'owner_validated' => $willBeClosed ? $assignment->owner_validated : (bool) $edit['owner_validated'],
-        ]);
-
-        if (! $isAlreadyClosed && $isClosingAssignment) {
-            try {
-                $this->unassignPropertyAction->execute($assignment, $edit['end_date']);
-            } catch (ValidationException $e) {
-                $this->rowErrorMessage = (string) collect($e->errors())->flatten()->first();
-
-                return;
-            }
-        } elseif (! $isClosingAssignment) {
-            $assignment->update(['end_date' => null]);
-        }
-
-        $this->loadAssignmentEdits((int) $assignment->owner_id);
-    }
-
-    public function createInlineAssignment(): void
-    {
-        if ($this->expandedOwnerId === null) {
-            return;
-        }
-
-        $validated = $this->validate([
-            'inlinePropertyId' => ['required', 'exists:properties,id'],
-            'inlineStartDate' => ['required', 'date'],
-            'inlineEndDate' => ['nullable', 'date'],
-        ]);
-
-        if ($validated['inlineEndDate'] !== '' && $validated['inlineEndDate'] < $validated['inlineStartDate']) {
-            $this->addError('inlineEndDate', __('validation.after_or_equal', ['attribute' => __('admin.owners.end_date'), 'date' => __('admin.owners.start_date')]));
-
-            return;
-        }
-
-        $owner = Owner::findOrFail($this->expandedOwnerId);
-        $property = Property::findOrFail((int) $validated['inlinePropertyId']);
-
-        try {
-            if ($validated['inlineEndDate'] === '') {
-                $this->assignPropertyAction->execute($property, $owner, $validated['inlineStartDate']);
-            } else {
-                PropertyAssignment::create([
-                    'owner_id' => $owner->id,
-                    'property_id' => $property->id,
-                    'start_date' => $validated['inlineStartDate'],
-                    'end_date' => $validated['inlineEndDate'],
-                    'admin_validated' => false,
-                    'owner_validated' => false,
-                ]);
-            }
-
-            $this->inlinePropertyId = '';
-            $this->inlineStartDate = now()->format('Y-m-d');
-            $this->inlineEndDate = '';
-            $this->rowErrorMessage = '';
-
-            $this->loadAssignmentEdits($owner->id);
-        } catch (ValidationException $e) {
-            $this->rowErrorMessage = (string) collect($e->errors())->flatten()->first();
-        }
-    }
-
-    private function loadAssignmentEdits(int $ownerId): void
-    {
-        $assignments = PropertyAssignment::query()
-            ->where('owner_id', $ownerId)
-            ->orderByRaw('end_date IS NULL DESC')
-            ->orderBy('start_date', 'desc')
-            ->get();
-
-        $this->assignmentEdits = [];
-
-        foreach ($assignments as $assignment) {
-            $this->assignmentEdits[$assignment->id] = [
-                'start_date' => optional($assignment->start_date)->format('Y-m-d') ?? '',
-                'end_date' => optional($assignment->end_date)->format('Y-m-d') ?? '',
-                'admin_validated' => (bool) $assignment->admin_validated,
-                'owner_validated' => (bool) $assignment->owner_validated,
-            ];
-        }
-    }
-
     public function openEditOwnerForm(int $ownerId): void
     {
         $owner = Owner::findOrFail($ownerId);
@@ -510,11 +347,15 @@ class Owners extends Component
             ->limit(25)
             ->get()
             ->map(function (OwnerAuditLog $log) use ($fieldLabels): array {
+                $changedByUser = $log->changedBy;
+
                 return [
                     'field_label' => $fieldLabels[$log->field] ?? $log->field,
                     'old_value' => $log->old_value !== '' ? $log->old_value : '—',
                     'new_value' => $log->new_value !== '' ? $log->new_value : '—',
-                    'changed_by' => $log->changedBy?->name ?? __('admin.owners.audit.system'),
+                    'changed_by' => $changedByUser instanceof User
+                        ? $changedByUser->name
+                        : __('admin.owners.audit.system'),
                     'changed_at' => $log->created_at?->format('d/m/Y H:i') ?? '—',
                 ];
             })

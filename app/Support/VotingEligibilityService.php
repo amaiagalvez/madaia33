@@ -8,8 +8,10 @@ use App\Models\VotingBallot;
 use Illuminate\Support\Carbon;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class VotingEligibilityService
 {
@@ -231,9 +233,9 @@ class VotingEligibilityService
 
     private function propertyLabelWithCommunityPct(PropertyAssignment $assignment): string
     {
-        $code = (string) ($assignment->property?->location?->code ?? '');
-        $name = (string) ($assignment->property?->name ?? '');
-        $communityPct = $assignment->property?->community_pct;
+        $code = (string) $assignment->property->location->code;
+        $name = (string) $assignment->property->name;
+        $communityPct = $assignment->property->community_pct;
 
         $label = trim($code . ' ' . $name);
 
@@ -276,12 +278,10 @@ class VotingEligibilityService
         [$residentialIds, $garageIds] = $this->allowedLocationIds($voting);
 
         return Owner::query()
-            ->with([
-                'user',
-                'assignments' => function (HasMany $assignmentQuery) use ($referenceDate, $residentialIds, $garageIds): void {
-                    $this->applyEligibleAssignmentQueryConstraints($assignmentQuery, $referenceDate, $residentialIds, $garageIds);
-                },
-            ])
+            ->with('user')
+            ->with('assignments', function (Relation $assignmentQuery) use ($referenceDate, $residentialIds, $garageIds): void {
+                $this->applyEligibleAssignmentQueryConstraints($assignmentQuery, $referenceDate, $residentialIds, $garageIds);
+            })
             ->whereHas('assignments', function (Builder $assignmentQuery) use ($referenceDate, $residentialIds, $garageIds): void {
                 $this->applyEligibleAssignmentQueryConstraints($assignmentQuery, $referenceDate, $residentialIds, $garageIds);
             });
@@ -309,16 +309,15 @@ class VotingEligibilityService
 
     private function votingReferenceDate(Voting $voting): Carbon
     {
-        return $voting->starts_at instanceof Carbon
-            ? $voting->starts_at->copy()
-            : Carbon::parse($voting->starts_at ?? today());
+        return Carbon::parse($voting->starts_at);
     }
 
     /**
+     * @param  Builder<Model>|HasMany<PropertyAssignment, Owner>|Relation<Model, Owner, *>  $assignmentQuery
      * @param  array<int, int>  $residentialIds
      * @param  array<int, int>  $garageIds
      */
-    private function applyEligibleAssignmentQueryConstraints(Builder|HasMany $assignmentQuery, Carbon $referenceDate, array $residentialIds, array $garageIds): void
+    private function applyEligibleAssignmentQueryConstraints(Builder|HasMany|Relation $assignmentQuery, Carbon $referenceDate, array $residentialIds, array $garageIds): void
     {
         $assignmentQuery
             ->with('property.location')

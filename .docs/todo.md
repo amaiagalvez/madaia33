@@ -23,6 +23,23 @@
 - [ ] traducciones repetidas
 - [ ] añadir el MCP para que consulte la documentación de laravel
 
+Igandea
+=======
+- pasar pint, quality y test a todo 
+- Testak Rolak Panela y Front
+- votaciones pdf
+- votaciones resultados (suma de porcentajes)
+- azalpena bozketak front-ean gehitzeko
+- spec kiro pendientes
+- unificar terminologia
+
+# unificar terminología
+
+locations: Ubicaciones => Comunidades
+properties: Propiedades => Fincas
+property_assignments => Propiedades
+owners => Propietarias
+
 # Home
 - [ ] Osatu pribatutasun-politika eta lege-oharrak testuak
 - [ ] Cookies sartu

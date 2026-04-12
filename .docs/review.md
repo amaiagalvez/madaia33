@@ -41,4 +41,4 @@ Repasa los ficheros que están sin commitear
 ## styles
 añadir estilo acorde al proyecto con los componenetes adecuados a la lista admin/votaciones tomando como base el listado de avisoos
 
-## kiro para especificar feature nuevas complejass
+## kiro para especificar feature nuevas complejas
