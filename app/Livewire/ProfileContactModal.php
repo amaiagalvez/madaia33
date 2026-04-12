@@ -4,13 +4,14 @@ namespace App\Livewire;
 
 use App\Models\Setting;
 use Livewire\Component;
+use App\Rules\NoScriptTags;
 use App\Models\ContactMessage;
 use App\Support\ContactMailData;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 
@@ -47,7 +48,7 @@ class ProfileContactModal extends Component
     protected function rules(): array
     {
         return [
-            'message' => ['required', 'string', 'max:5000', new \App\Rules\NoScriptTags],
+            'message' => ['required', 'string', 'max:5000', new NoScriptTags],
         ];
     }
 
@@ -103,6 +104,9 @@ class ProfileContactModal extends Component
         }
     }
 
+    /**
+     * @param  array<string, string>  $settings
+     */
     private function buildSubject(array $settings): string
     {
         $base = Setting::localizedStringFrom($settings, 'contact_form_subject') ?? '';
@@ -110,6 +114,9 @@ class ProfileContactModal extends Component
         return '[' . __('profile.contact_modal.message_subject') . '] ' . $base;
     }
 
+    /**
+     * @param  array<string, string>  $settings
+     */
     private function sendEmails(ContactMessage $contactMessage, array $settings, string $mailSubject): bool
     {
         try {

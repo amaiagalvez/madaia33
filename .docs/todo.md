@@ -53,12 +53,21 @@ Para que todo esto sea legal de verdad, asegúrate de:
 
 # Panela
 
-- Formulario para crear nueva propietaria, añadir campo id (zbkia / Num) comprobar que sea único. Mostrar el id en el listado de propietarias del panel.
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
 - Resultado votaciones
 - Deialdiak sartzeko formularioa
-- bozketak pdf presencial/delegado
+- bozketak pdf presencial/delegado  
+  en el setting crear un nuevo section "votings" para guardar el texto del pdf para voto delegado, eu y es.
+  en el setting en la section votings, añadir nuevos registros para guardar el texto del pdf para voto presencial, eu y es
+  
+  crear un pdf para el voto delegado con las votaciones activas, a dos columnas, izquierda en euskera y derecha en castellano con loss textos guardados en el settings con los textos de voto delegado.
+  debajo y a ancho completo las votaciones, pregunta y casillas con opciones para pooder marcarlas en el papel con boli. Cada votación debe aparecer una sola vez en los dos idiomas juntos (euskera negrita y castellano en normal)
+
+  crear un pdf para el voto presencial, igual que el voto delegado pero con los registros del settings correspoondientes.
+
+  poner los botones para descargar los pdf-s tanto en el listado de votaciones del panel de control como en el front votaciones.
+  
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
 - [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak (aldatu dezakezu migrazioa, ez dago indarrean)
@@ -98,35 +107,3 @@ pasar los test con coverage
 - [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
 - [ ] añadir espacio para comercios
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
-
-## Implementation Plan
-
-### Goal
-
-- [Konpondu textarea elebiduneko mini-editorean idaztean cursorra hasierara salto egitea, edukia galdu gabe eta UX egonkorrarekin.]
-
-### Technical Decisions
-
-- [Mini-editorearen sinkronizazioa berrikusiko da `resources/views/components/admin/bilingual-tabs.blade.php` osagaian, `contenteditable` + Livewire eguneratzeen arteko re-render zikloa mozteko.]
-- [Mantendu egingo da egungo elebidun tab egitura (`x-show`, ez `x-if`) eta datu-fluxua zentralizatuko da `sync()` metodoan, cursor posizioa ez apurtzeko.]
-- [Livewire eguneratze maiztasuna doituko da (defer/debounce edo ignore estrategiaren bidez), idazketa bakoitzean DOM osoa berreraiki ez dadin.]
-
-### Execution Steps
-
-- [x]   1. Erreproduzitu arazoa settings/admin mini-editorean eta identifikatu zein lotura (`@input` + `$wire.set`) ari den cursorra resetatzen.
-- [x]   2. `bilingual-tabs` osagaian konponketa aplikatu (sinkronizazio estrategia egokia) eta rich-text + field moduak ez direla hausten egiaztatu.
-- [x]   3. Dagokion test estaldura gehitu/eguneratu (gutxienez Feature test egonkorra `data-*` selectorrekin, eta beharrezkoa bada Browser test osagarria).
-- [x]   4. Docker barruan format + test minimoak exekutatu eta emaitzak balioztatu.
-
-### Work Items
-
-- [x] resources/views/components/admin/bilingual-tabs.blade.php
-- [x] tests/Feature/** (ukitutako elebidun editorearen fluxuari dagokiona)
-- [ ] tests/Browser/** (beharrezkoa bada cursor/typing portaera bisuala egiaztatzeko)
-
-### Validation
-
-- [x] TDD-based implementation when possible
-- [x] Required formatting/lint checks
-- [x] Relevant test suite
-- [ ] Dusk tests when frontend/flow changes exist

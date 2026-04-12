@@ -86,7 +86,7 @@ return [
             'message_required' => 'El mensaje es obligatorio.',
             'message_max' => 'El mensaje no puede superar los 5000 caracteres.',
         ],
-        'message_subject' => 'PERFIL. PROBLEMAS CON LOS DATOS'
+        'message_subject' => 'PERFIL. PROBLEMAS CON LOS DATOS',
     ],
     'terms' => [
         'title' => 'Debes aceptar las condiciones de uso',

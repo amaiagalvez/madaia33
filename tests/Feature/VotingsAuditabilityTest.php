@@ -91,7 +91,9 @@ it('rejects vote attempts when owner does not belong to the allowed locations', 
 it('ignores delegated session impersonation for owner users', function () {
     Mail::fake();
 
-    $ownerA = Owner::factory()->create();
+    $ownerA = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
     $ownerB = Owner::factory()->create();
 
     $portal = Location::factory()->portal()->create(['code' => '57-A']);

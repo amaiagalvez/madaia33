@@ -281,6 +281,9 @@
         <thead class="bg-gray-50">
             <tr>
                 <x-admin.table-header-cell>
+                    {{ __('admin.owners.columns.num') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
                     {{ __('admin.owners.columns.coprop1') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
@@ -309,6 +312,9 @@
         <tbody class="divide-y divide-gray-200 bg-white">
             @forelse($owners as $owner)
                 <tr wire:key="owner-{{ $owner->id }}" data-owner-id="{{ $owner->id }}">
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        <span class="font-mono text-xs">{{ $owner->id }}</span>
+                    </td>
                     <td class="px-6 py-4 text-sm text-gray-900">
 
                         <div class="font-medium"> {{ $owner->coprop1_name }}

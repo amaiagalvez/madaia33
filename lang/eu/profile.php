@@ -86,7 +86,7 @@ return [
             'message_required' => 'Mezua derrigorrezkoa da.',
             'message_max' => 'Mezuak gehienez 5000 karaktere izan ditzake.',
         ],
-        'message_subject' => 'PROFILA. ARAZOAK DATUEKIN'
+        'message_subject' => 'PROFILA. ARAZOAK DATUEKIN',
     ],
     'terms' => [
         'title' => 'Erabilera baldintzak onartu behar dituzu',

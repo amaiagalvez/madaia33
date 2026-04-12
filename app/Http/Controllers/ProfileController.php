@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use App\Models\User;
 use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\Setting;
@@ -70,35 +71,29 @@ class ProfileController extends Controller
             'requiresTermsAcceptance' => $requiresTermsAcceptance,
             'termsHtml' => $termsHtml,
             'userBallots' => $this->userBallots($user?->id),
-            'userMessages' => $this->userMessages($user?->id),
+            'userMessages' => collect($this->userMessages($user?->id)),
         ]);
     }
 
     public function acceptTerms(Request $request): RedirectResponse
     {
         $user = $request->user();
-        $owner = $user?->owner;
-        $returnTo = (string) $request->input('return_to', '');
-        $termsScope = (string) $request->input('terms_scope', 'owner');
-
-        if (! in_array($termsScope, ['owner', 'vote_delegate', 'auto'], true)) {
-            $termsScope = 'owner';
-        }
+        $returnTo = $this->resolveReturnTo($request);
+        $termsScope = $this->resolveTermsScope($request);
 
         if ($user === null) {
             return redirect()->route(SupportedLocales::routeName('profile'));
         }
 
-        if (($termsScope === 'owner' || $termsScope === 'auto') && $owner !== null && $owner->accepted_terms_at === null) {
+        if ($this->shouldAcceptOwnerTerms($user->owner, $termsScope)) {
+            $owner = $user->owner;
+
             $owner->forceFill([
                 'accepted_terms_at' => now(),
             ])->save();
         }
 
-        if (($termsScope === 'vote_delegate' || $termsScope === 'auto')
-            && $user->hasRole(Role::DELEGATED_VOTE)
-            && $user->delegated_vote_terms_accepted_at === null
-        ) {
+        if ($this->shouldAcceptDelegatedVoteTerms($user, $termsScope)) {
             $user->forceFill([
                 'delegated_vote_terms_accepted_at' => now(),
             ])->save();
@@ -111,6 +106,36 @@ class ProfileController extends Controller
         return redirect()
             ->route(SupportedLocales::routeName('profile'), ['tab' => 'owner'])
             ->with('status', __('profile.terms.accepted'));
+    }
+
+    private function resolveReturnTo(Request $request): string
+    {
+        return (string) $request->input('return_to', '');
+    }
+
+    private function resolveTermsScope(Request $request): string
+    {
+        $termsScope = (string) $request->input('terms_scope', 'owner');
+
+        if (! in_array($termsScope, ['owner', 'vote_delegate', 'auto'], true)) {
+            return 'owner';
+        }
+
+        return $termsScope;
+    }
+
+    private function shouldAcceptOwnerTerms(?Owner $owner, string $termsScope): bool
+    {
+        return in_array($termsScope, ['owner', 'auto'], true)
+            && $owner !== null
+            && $owner->accepted_terms_at === null;
+    }
+
+    private function shouldAcceptDelegatedVoteTerms(User $user, string $termsScope): bool
+    {
+        return in_array($termsScope, ['vote_delegate', 'auto'], true)
+            && $user->hasRole(Role::DELEGATED_VOTE)
+            && $user->delegated_vote_terms_accepted_at === null;
     }
 
     public function updateOwner(Request $request): RedirectResponse
@@ -240,12 +265,12 @@ class ProfileController extends Controller
     }
 
     /**
-     * @return Collection<int, array{id: int, subject: string, message: string, is_read: bool, created_at: Carbon, read_at: ?Carbon}>
+     * @return array<int, array{id: int, subject: string, message: string, is_read: bool, created_at: Carbon, read_at: ?Carbon}>
      */
-    private function userMessages(?int $userId): Collection
+    private function userMessages(?int $userId): array
     {
         if ($userId === null) {
-            return collect();
+            return [];
         }
 
         return ContactMessage::query()
@@ -259,7 +284,9 @@ class ProfileController extends Controller
                 'is_read' => (bool) $message->is_read,
                 'created_at' => Carbon::parse($message->created_at),
                 'read_at' => $message->read_at !== null ? Carbon::parse($message->read_at) : null,
-            ]);
+            ])
+            ->values()
+            ->all();
     }
 
     /**

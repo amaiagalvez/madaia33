@@ -3,8 +3,8 @@
 // Feature: community-web, Task 8: Admin panel authentication
 // Validates: Requirements 6.5, 6.6
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 beforeEach(function () {

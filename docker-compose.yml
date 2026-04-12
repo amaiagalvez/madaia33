@@ -139,7 +139,6 @@ services:
             - db
         networks:
             - frontend
-
     madaia33-pentest:
         image: webdevops/php-apache-dev:${DC_PHP:-8.4}
         user: "${DC_UID:-1000}:${DC_GID:-1000}"

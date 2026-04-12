@@ -5,8 +5,8 @@ use App\Models\User;
 use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
-use App\Livewire\Admin\LocationDetail;
 use App\Livewire\Admin\Locations;
+use App\Livewire\Admin\LocationDetail;
 
 beforeEach(function () {
     foreach (Role::names() as $roleName) {

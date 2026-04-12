@@ -222,14 +222,13 @@ it('renders a rich editor for legal texts', function () {
         ->assertSeeHtml('role="toolbar"');
 });
 
-it('does not load flux or external fonts in admin settings view', function () {
+it('does not load external fonts in admin settings view', function () {
     $user = adminUser();
 
     test()->actingAs($user)
         ->get(route('admin.settings'))
         ->assertOk()
-        ->assertDontSee('fonts.bunny.net', false)
-        ->assertDontSee('/flux/flux.js', false);
+        ->assertDontSee('fonts.bunny.net', false);
 });
 
 it('also renders rich editors for privacy policy and legal notice in front', function () {

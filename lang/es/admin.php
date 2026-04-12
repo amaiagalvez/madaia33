@@ -228,6 +228,7 @@ return [
             'back_to_default' => 'Volver a filtros por defecto',
         ],
         'columns' => [
+            'num' => 'Núm',
             'coprop1' => 'Copropietaria 1',
             'coprop2' => 'Copropietaria 2',
             'portals' => 'Portales',

@@ -229,6 +229,7 @@ return [
             'back_to_default' => 'Filtro arruntetara itzuli',
         ],
         'columns' => [
+            'num' => 'Zbkia',
             'coprop1' => 'Ko-jabea 1',
             'coprop2' => 'Ko-jabea 2',
             'portals' => 'Atariak',
