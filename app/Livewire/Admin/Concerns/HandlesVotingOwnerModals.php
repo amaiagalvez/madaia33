@@ -15,7 +15,11 @@ trait HandlesVotingOwnerModals
 {
     public function openCensus(int $votingId): void
     {
+        abort_unless($this->canManageAdminVotings(), 403);
+
         $voting = Voting::query()->with('locations.location')->findOrFail($votingId);
+        abort_unless($this->canAccessVoting($voting), 403);
+
         $owners = $this->eligibilityService->eligibleOwnersAtVotingDate($voting);
 
         $ballots = VotingBallot::query()
@@ -35,7 +39,7 @@ trait HandlesVotingOwnerModals
 
         $this->ownersModalRows = $owners
             ->map(fn (Owner $owner): array => [
-                'name' => $owner->coprop1_name,
+                'name' => $this->canSeeOwnerNamesInVotingModals() ? $owner->coprop1_name : '—',
                 'has_voted' => isset($votedOwnerIds[$owner->id]),
                 'vote' => $votesByOwner[$owner->id] ?? '',
                 'properties' => $owner->activeAssignments
@@ -55,7 +59,11 @@ trait HandlesVotingOwnerModals
 
     public function openVoters(int $votingId): void
     {
+        abort_unless($this->canManageAdminVotings(), 403);
+
         $voting = Voting::query()->with('locations.location')->findOrFail($votingId);
+        abort_unless($this->canAccessVoting($voting), 403);
+
         $owners = $this->eligibilityService->eligibleOwnersAtVotingDate($voting)->keyBy('id');
 
         $ballots = VotingBallot::query()
@@ -121,13 +129,13 @@ trait HandlesVotingOwnerModals
         $castByUser = $ballot?->castByUser;
 
         return [
-            'name' => $owner->coprop1_name,
+            'name' => $this->canSeeOwnerNamesInVotingModals() ? $owner->coprop1_name : '—',
             'percentage' => $this->eligibilityService->percentageForOwnerAtVotingDate($voting, $owner),
             'vote' => $ballot instanceof VotingBallot ? $this->formatBallotOptionName($ballot) : '',
             'delegated_by' => $ballot instanceof VotingBallot
                 ? ($ballot->is_in_person
-                ? __('votings.admin.in_person_vote')
-                : ($castByUser instanceof User ? $castByUser->name : '—'))
+                    ? __('votings.admin.in_person_vote')
+                    : ($castByUser instanceof User ? $castByUser->name : '—'))
                 : '—',
             'delegate_dni' => $ballot instanceof VotingBallot ? ($ballot->cast_delegate_dni ?? '—') : '—',
             'has_voted' => $ballot instanceof VotingBallot,
@@ -180,7 +188,7 @@ trait HandlesVotingOwnerModals
 
     private function openVoterModal(string $type): void
     {
-        abort_unless($this->canManageAdminVotings(), 403);
+        abort_unless($this->canManageInPersonAndDelegatedSessions(), 403);
 
         $rows = $this->eligibilityService
             ->ownersWithPendingDelegations()
@@ -233,7 +241,7 @@ trait HandlesVotingOwnerModals
 
     private function startVoterSession(int $ownerId, string $type): void
     {
-        abort_unless($this->canManageAdminVotings(), 403);
+        abort_unless($this->canManageInPersonAndDelegatedSessions(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
             ->map(static fn (array $row): int => $row['owner']->id)

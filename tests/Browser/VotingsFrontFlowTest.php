@@ -283,3 +283,33 @@ test('delegated-vote user sees in-person button on public votings and can open m
             ->assertPresent('[data-front-in-person-vote-as-owner]');
     });
 });
+
+test('delegated-vote user without active assignments sees delegated tools but no direct owner vote submit', function () {
+    $delegatedUser = User::factory()->create();
+
+    Role::query()->firstOrCreate([
+        'name' => Role::DELEGATED_VOTE,
+    ]);
+
+    $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+
+    Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($delegatedUser) {
+        $browser->loginAs($delegatedUser)
+            ->visit('/eu/bozketak')
+            ->waitFor('[data-page="votings"]')
+            ->assertMissing('[data-vote-submit]')
+            ->assertPresent('[data-open-front-delegated-modal]')
+            ->assertPresent('[data-open-front-in-person-modal]')
+            ->click('[data-open-front-delegated-modal]')
+            ->waitFor('[data-front-delegated-modal]')
+            ->click('[data-front-delegated-modal] button[wire\\:click="closeDelegatedVoteModal"]')
+            ->waitUntilMissing('[data-front-delegated-modal]')
+            ->click('[data-open-front-in-person-modal]')
+            ->waitFor('[data-front-in-person-modal]');
+    });
+});

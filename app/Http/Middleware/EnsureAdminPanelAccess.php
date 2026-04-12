@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Role;
+use App\SupportedLocales;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +17,15 @@ class EnsureAdminPanelAccess
     {
         $user = $request->user();
 
-        if ($user === null || ! $user->canAccessAdminPanel()) {
+        if ($user === null) {
+            abort(403);
+        }
+
+        if (! $user->canAccessAdminPanel()) {
+            if ($user->hasAnyRole([Role::DELEGATED_VOTE, Role::PROPERTY_OWNER])) {
+                return redirect()->route(SupportedLocales::routeName('home'));
+            }
+
             abort(403);
         }
 

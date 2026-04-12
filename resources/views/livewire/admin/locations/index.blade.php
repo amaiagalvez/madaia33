@@ -12,10 +12,12 @@
     @endif
 
     <div class="mb-6 flex items-center justify-end">
-        @unless ($showCreateForm || $showEditForm)
-            <x-admin.create-record-button wire:click="createLocation">
-            </x-admin.create-record-button>
-        @endunless
+        @if ($canManageLocationCrud)
+            @unless ($showCreateForm || $showEditForm)
+                <x-admin.create-record-button wire:click="createLocation">
+                </x-admin.create-record-button>
+            @endunless
+        @endif
     </div>
 
     {{-- Type tabs --}}
@@ -137,12 +139,14 @@
                     <td class="px-6 py-4 text-right text-sm font-medium">
                         <x-admin.table-row-actions :bars-href="route('admin.locations.show', $location)" :bars-title="__('admin.locations.view_properties')"
                             :bars-sr-text="__('admin.locations.view_properties')">
-                            <x-admin.icon-button-edit
-                                wire:click="openEditForm({{ $location->id }})"
-                                :title="__('admin.locations.edit_location')" />
-                            <x-admin.icon-button-delete
-                                wire:click="confirmDelete({{ $location->id }})"
-                                :title="__('general.buttons.delete')" />
+                            @if ($canManageLocationCrud)
+                                <x-admin.icon-button-edit
+                                    wire:click="openEditForm({{ $location->id }})"
+                                    :title="__('admin.locations.edit_location')" />
+                                <x-admin.icon-button-delete
+                                    wire:click="confirmDelete({{ $location->id }})"
+                                    :title="__('general.buttons.delete')" />
+                            @endif
                         </x-admin.table-row-actions>
                     </td>
                 </tr>

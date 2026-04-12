@@ -4,8 +4,9 @@ namespace App\Livewire;
 
 use App\Models\User;
 use App\Models\Owner;
-use App\Models\Setting;
+use App\Models\Role;
 use App\Models\Voting;
+use App\Models\Setting;
 use Livewire\Component;
 use App\SupportedLocales;
 use App\Models\VotingBallot;
@@ -17,6 +18,7 @@ use Illuminate\Validation\ValidationException;
 use App\Actions\Votings\CastVotingBallotAction;
 use App\Http\Controllers\PublicVotingController;
 
+/** @SuppressWarnings("PHPMD.ExcessiveClassLength") */
 class PublicVotings extends Component
 {
     private VotingEligibilityService $eligibilityService;
@@ -106,7 +108,12 @@ class PublicVotings extends Component
             return;
         }
 
-        abort_unless($user->canVoteInVotings() || $user->canUseDelegatedVoting(), 403);
+        abort_unless(
+            $user->canVoteInVotings()
+                || $user->canUseDelegatedVoting()
+                || $this->canAccessFrontVotingsReadOnly($user),
+            403
+        );
 
         $this->initializeOwnerVotingMode($user, $delegatedOwnerId, $inPersonOwnerId);
     }
@@ -285,7 +292,14 @@ class PublicVotings extends Component
             return;
         }
 
+        if ($this->canAccessFrontVotingsReadOnly($user) && ! $user->canVoteInVotings()) {
+            $this->canCastVotes = false;
+
+            return;
+        }
+
         $this->activeOwner = $this->resolveOwner();
+        $this->canCastVotes = $user->canVoteInVotings();
     }
 
     private function activateSelectedOwner(): void
@@ -512,6 +526,11 @@ class PublicVotings extends Component
         }
 
         return $user->isSuperadmin() || $user->canUseDelegatedVoting();
+    }
+
+    private function canAccessFrontVotingsReadOnly(User $user): bool
+    {
+        return $user->hasAnyRole([Role::GENERAL_ADMIN, Role::COMMUNITY_ADMIN]);
     }
 
     private function ensureTermsAccepted(): bool

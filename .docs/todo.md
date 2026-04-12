@@ -53,7 +53,9 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-- en el profil, añadir un formulario para que si alguien tiene propblmas con sus datos mande un mensaje.
+- en el profil, añadir un pequeño formulario con un textarea para que si alguien tiene propblmas con sus datos mande un mensaje, darle el mismo tratamiento que se le da a ls mensajes que se envía desde eu/harremana, enviar respuesta al mail del usuario logeado y al del admin que está en settings. Cuando se envie un mensaje desde el proofil, en el asunto añadir el texto "PERFIL".
+
+
 - testo legal que tiene que aceptar los que tiene rol "Voto delegado", al entrar a la vista bozketak del front, si no lo tienen aceptado que les salga un modal, como el de los propietarios, y hasta que no lo acepten que no les deje hacer nada más.
 
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
@@ -96,3 +98,34 @@ pasar los test con coverage
 - [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
 - [ ] añadir espacio para comercios
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
+
+## Implementation Plan - Admin bozketak: galdera testua galtzen da gordetzean
+
+### Goal
+
+- Admin bozketen sortze/edizio formularioan `questionEu` eta `questionEs` balioak modu egonkorrean sinkronizatzea, gorde ostean testua ez galtzeko eta bozketa berria normaltasunez sortu ahal izateko.
+
+### Technical Decisions
+
+- Errorearen jatorria osagai partekatuan dagoela tratatu: [resources/views/components/admin/bilingual-tabs.blade.php](resources/views/components/admin/bilingual-tabs.blade.php) rich-text moduan erabiltzen denean `sync/format/link` metodoak falta dira.
+- Konponketa KISS/DRY bidez egingo da: rich-text sinkronizazio metodoak osagai partekatuan bertan inplementatuta, parent osagai bakoitzean kode bikoiztua saihesteko.
+- Erregresioa saihesteko, bozketa sortze-fluxua estaltzen duen Pest test bat gehitu/eguneratuko da [tests/Feature/AdminVotingsTest.php](tests/Feature/AdminVotingsTest.php) fitxategian, EU/ES galdera testua datu-basean gordetzen dela egiaztatuz.
+
+### Execution Steps
+
+- [ ] 1. [resources/views/components/admin/bilingual-tabs.blade.php](resources/views/components/admin/bilingual-tabs.blade.php) eguneratu, rich-text eremuetarako `sync`, `format` eta `link` Alpine metodoak gehituz.
+- [ ] 2. [tests/Feature/AdminVotingsTest.php](tests/Feature/AdminVotingsTest.php) testa gehitu/eguneratu, bozketa berriaren `question_eu` eta `question_es` persistitzen direla ziurtatzeko.
+- [ ] 3. Docker barruan test minimoa exekutatu (`php artisan test --compact` fitxategi espezifikoarekin).
+- [ ] 4. Docker barruan `vendor/bin/pint --dirty` exekutatu ukitutako PHP fitxategi bakoitzerako.
+- [ ] 5. VS Code Problems berrikusi ukitutako fitxategietan eta agertutako arazo berriak konpondu.
+
+### Work Items
+
+- [ ] [resources/views/components/admin/bilingual-tabs.blade.php](resources/views/components/admin/bilingual-tabs.blade.php)
+- [ ] [tests/Feature/AdminVotingsTest.php](tests/Feature/AdminVotingsTest.php)
+
+### Validation
+
+- [ ] TDD oinarritutako eguneraketa (testa idatzi/eguneratu, gero inplementazioa balidatu)
+- [ ] Pint formateoa (`vendor/bin/pint --dirty`)
+- [ ] Eragindako test suite minimoa (`tests/Feature/AdminVotingsTest.php`)

@@ -33,6 +33,117 @@ it('allows superadmin id 1 to access admin votings route', function () {
         ->assertOk();
 });
 
+it('allows general admin to access admin votings route', function () {
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    test()->actingAs($generalAdmin)
+        ->get(route('admin.votings'))
+        ->assertOk();
+});
+
+it('shows only global votings for general admin users', function () {
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    $visibleVoting = Voting::factory()->create([
+        'name_eu' => 'Bozketa Orokorra',
+        'name_es' => 'Votacion Global',
+    ]);
+
+    $hiddenVoting = Voting::factory()->create([
+        'name_eu' => 'Bozketa Kokatua',
+        'name_es' => 'Votacion Ubicada',
+    ]);
+
+    $location = Location::factory()->portal()->create();
+    $hiddenVoting->locations()->create(['location_id' => $location->id]);
+
+    Livewire::actingAs($generalAdmin)
+        ->test(Votings::class)
+        ->assertSee('Bozketa Orokorra')
+        ->assertDontSee('Bozketa Kokatua')
+        ->call('editVoting', $hiddenVoting->id)
+        ->assertForbidden();
+});
+
+it('shows only managed-location votings for community admin users', function () {
+    $communityAdmin = User::factory()->create();
+    $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
+
+    $managedLocation = Location::factory()->portal()->create(['code' => 'CM-1']);
+    $otherLocation = Location::factory()->portal()->create(['code' => 'CM-2']);
+    $communityAdmin->managedLocations()->sync([$managedLocation->id]);
+
+    $managedVoting = Voting::factory()->create([
+        'name_eu' => 'Kudeatutako Bozketa',
+        'name_es' => 'Votacion Gestionada',
+    ]);
+    $managedVoting->locations()->create(['location_id' => $managedLocation->id]);
+
+    $otherVoting = Voting::factory()->create([
+        'name_eu' => 'Kanpoko Bozketa',
+        'name_es' => 'Votacion Externa',
+    ]);
+    $otherVoting->locations()->create(['location_id' => $otherLocation->id]);
+
+    Livewire::actingAs($communityAdmin)
+        ->test(Votings::class)
+        ->assertSee('Kudeatutako Bozketa')
+        ->assertDontSee('Kanpoko Bozketa')
+        ->call('editVoting', $otherVoting->id)
+        ->assertForbidden();
+});
+
+it('hides owner names in census and voters modals for non super admin users', function () {
+    app()->setLocale('es');
+
+    $communityAdmin = User::factory()->create();
+    $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
+
+    $owner = Owner::factory()->create(['coprop1_name' => 'Propietaria Oculta']);
+    $location = Location::factory()->portal()->create(['code' => 'HID-1']);
+    $property = Property::factory()->create(['location_id' => $location->id]);
+
+    $communityAdmin->managedLocations()->sync([$location->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create(['is_published' => true, 'name_es' => 'Votacion Privada']);
+    $voting->locations()->create(['location_id' => $location->id]);
+
+    $option = VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $ballot = VotingBallot::factory()->create([
+        'voting_id' => $voting->id,
+        'owner_id' => $owner->id,
+        'cast_by_user_id' => $communityAdmin->id,
+    ]);
+
+    VotingSelection::factory()->create([
+        'voting_id' => $voting->id,
+        'owner_id' => $owner->id,
+        'voting_ballot_id' => $ballot->id,
+        'voting_option_id' => $option->id,
+    ]);
+
+    Livewire::actingAs($communityAdmin)
+        ->test(Votings::class)
+        ->call('openCensus', $voting->id)
+        ->assertDontSee('Propietaria Oculta')
+        ->assertSee('—')
+        ->call('openVoters', $voting->id)
+        ->assertDontSee('Propietaria Oculta')
+        ->assertSee('—');
+});
+
 it('shows active votings with census and votes in admin component', function () {
     app()->setLocale('es');
 
@@ -422,4 +533,163 @@ it('prevents deleting a voting when ballots already exist', function () {
         ->assertSee(__('votings.admin.delete_blocked_with_votes'));
 
     expect(Voting::query()->whereKey($voting->id)->exists())->toBeTrue();
+});
+
+it('allows general admin to create edit and delete global votings', function () {
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    Livewire::actingAs($generalAdmin)
+        ->test(Votings::class)
+        ->call('createVoting')
+        ->set('nameEu', 'GENERAL_ADMIN Bozketa')
+        ->set('questionEu', 'GENERAL_ADMIN galdera?')
+        ->set('startsAt', now()->addDay()->format('Y-m-d'))
+        ->set('endsAt', now()->addDays(7)->format('Y-m-d'))
+        ->set('options', [['labelEu' => 'Bai', 'labelEs' => 'Sí']])
+        ->call('saveVoting')
+        ->assertSet('showCreateForm', false);
+
+    $voting = Voting::query()->where('name_eu', 'GENERAL_ADMIN Bozketa')->firstOrFail();
+    expect($voting->locations()->count())->toBe(0);
+
+    Livewire::actingAs($generalAdmin)
+        ->test(Votings::class)
+        ->call('editVoting', $voting->id)
+        ->set('nameEu', 'GENERAL_ADMIN Bozketa Eguneratua')
+        ->call('saveVoting')
+        ->assertSet('showCreateForm', false);
+
+    expect($voting->fresh()->name_eu)->toBe('GENERAL_ADMIN Bozketa Eguneratua');
+
+    Livewire::actingAs($generalAdmin)
+        ->test(Votings::class)
+        ->call('confirmDeleteVoting', $voting->id)
+        ->call('deleteVoting')
+        ->assertSet('showDeleteModal', false);
+
+    expect(Voting::query()->whereKey($voting->id)->exists())->toBeFalse();
+});
+
+it('hides owner names in census and voters modals for general admin users', function () {
+    app()->setLocale('es');
+
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    $owner = Owner::factory()->create(['coprop1_name' => 'Propietaria General Oculta']);
+    $location = Location::factory()->portal()->create(['code' => 'GA-999']);
+    $property = Property::factory()->create(['location_id' => $location->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create(['is_published' => true, 'name_es' => 'Votacion Global Privada']);
+    // No locations → global voting visible to GENERAL_ADMIN
+
+    $option = VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $ballot = VotingBallot::factory()->create([
+        'voting_id' => $voting->id,
+        'owner_id' => $owner->id,
+        'cast_by_user_id' => $generalAdmin->id,
+    ]);
+
+    VotingSelection::factory()->create([
+        'voting_id' => $voting->id,
+        'owner_id' => $owner->id,
+        'voting_ballot_id' => $ballot->id,
+        'voting_option_id' => $option->id,
+    ]);
+
+    Livewire::actingAs($generalAdmin)
+        ->test(Votings::class)
+        ->call('openCensus', $voting->id)
+        ->assertDontSee('Propietaria General Oculta')
+        ->assertSee('—')
+        ->call('openVoters', $voting->id)
+        ->assertDontSee('Propietaria General Oculta')
+        ->assertSee('—');
+});
+
+it('allows community admin to create edit and delete managed location votings', function () {
+    $communityAdmin = User::factory()->create();
+    $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
+
+    $managedLocation = Location::factory()->portal()->create(['code' => 'CA-CRUD']);
+    $communityAdmin->managedLocations()->sync([$managedLocation->id]);
+
+    Livewire::actingAs($communityAdmin)
+        ->test(Votings::class)
+        ->call('createVoting')
+        ->set('nameEu', 'COMMUNITY_ADMIN Bozketa')
+        ->set('questionEu', 'COMMUNITY_ADMIN galdera?')
+        ->set('startsAt', now()->addDay()->format('Y-m-d'))
+        ->set('endsAt', now()->addDays(7)->format('Y-m-d'))
+        ->set('options', [['labelEu' => 'Bai', 'labelEs' => 'Sí']])
+        ->set('selectedLocations', [(string) $managedLocation->id])
+        ->call('saveVoting')
+        ->assertSet('showCreateForm', false);
+
+    $voting = Voting::query()->where('name_eu', 'COMMUNITY_ADMIN Bozketa')->firstOrFail();
+    expect($voting->locations()->count())->toBe(1);
+
+    Livewire::actingAs($communityAdmin)
+        ->test(Votings::class)
+        ->call('editVoting', $voting->id)
+        ->set('nameEu', 'COMMUNITY_ADMIN Bozketa Eguneratua')
+        ->call('saveVoting')
+        ->assertSet('showCreateForm', false);
+
+    expect($voting->fresh()->name_eu)->toBe('COMMUNITY_ADMIN Bozketa Eguneratua');
+
+    Livewire::actingAs($communityAdmin)
+        ->test(Votings::class)
+        ->call('confirmDeleteVoting', $voting->id)
+        ->call('deleteVoting')
+        ->assertSet('showDeleteModal', false);
+
+    expect(Voting::query()->whereKey($voting->id)->exists())->toBeFalse();
+});
+
+it('persists bilingual questions and allows creating a second voting', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->call('createVoting')
+        ->set('nameEu', 'Lehen bozketa')
+        ->set('questionEu', '<p>Lehen galdera EU</p>')
+        ->set('questionEs', '<p>Primera pregunta ES</p>')
+        ->set('startsAt', now()->addDay()->format('Y-m-d'))
+        ->set('endsAt', now()->addDays(7)->format('Y-m-d'))
+        ->set('options', [['labelEu' => 'Bai', 'labelEs' => 'Si']])
+        ->call('saveVoting')
+        ->assertHasNoErrors()
+        ->assertSet('showCreateForm', false)
+        ->call('createVoting')
+        ->set('nameEu', 'Bigarren bozketa')
+        ->set('questionEu', '<p>Bigarren galdera EU</p>')
+        ->set('questionEs', '<p>Segunda pregunta ES</p>')
+        ->set('startsAt', now()->addDays(2)->format('Y-m-d'))
+        ->set('endsAt', now()->addDays(8)->format('Y-m-d'))
+        ->set('options', [['labelEu' => 'Ez', 'labelEs' => 'No']])
+        ->call('saveVoting')
+        ->assertHasNoErrors()
+        ->assertSet('showCreateForm', false);
+
+    $firstVoting = Voting::query()->where('name_eu', 'Lehen bozketa')->firstOrFail();
+    $secondVoting = Voting::query()->where('name_eu', 'Bigarren bozketa')->firstOrFail();
+
+    expect($firstVoting->question_eu)->toBe('<p>Lehen galdera EU</p>')
+        ->and($firstVoting->question_es)->toBe('<p>Primera pregunta ES</p>')
+        ->and($secondVoting->question_eu)->toBe('<p>Bigarren galdera EU</p>')
+        ->and($secondVoting->question_es)->toBe('<p>Segunda pregunta ES</p>');
 });

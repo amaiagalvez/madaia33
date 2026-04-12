@@ -568,3 +568,137 @@ it('allows delegated-vote users to select in-person owner from public votings sc
         ->call('startInPersonVote', $inPersonOwner->id)
         ->assertRedirect(route('votings.eu'));
 });
+
+it('hides delegated action buttons when delegated mode is active', function () {
+    $delegatedUser = User::factory()->create();
+    $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+
+    $delegatedOwner = Owner::factory()->create([
+        'coprop1_name' => 'Delegazio Moduko Jabea',
+    ]);
+
+    $portal = Location::factory()->portal()->create(['code' => '33-J']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $delegatedOwner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    test()->actingAs($delegatedUser)
+        ->withSession([PublicVotingController::DELEGATED_OWNER_SESSION_KEY => $delegatedOwner->id]);
+
+    Livewire::actingAs($delegatedUser)
+        ->test(PublicVotings::class)
+        ->assertSet('isDelegated', true)
+        ->assertDontSee(__('votings.front.in_person_vote_button'))
+        ->assertDontSee(__('votings.front.delegated_vote_button'))
+        ->assertSee(__('votings.front.leave_delegated_mode'));
+});
+
+it('allows privileged roles to cast direct vote when they also have property owner role', function (string $extraRole) {
+    Mail::fake();
+
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $user = $owner->user()->firstOrFail();
+    $user->assignRole(Role::PROPERTY_OWNER);
+    $user->assignRole($extraRole);
+
+    $portal = Location::factory()->portal()->create(['code' => '33-ROL-' . strtoupper(substr($extraRole, 0, 2))]);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+        'is_anonymous' => false,
+    ]);
+
+    $option = VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    Livewire::actingAs($user)
+        ->test(PublicVotings::class)
+        ->assertSet('canCastVotes', true)
+        ->set("selectedOptions.{$voting->id}", $option->id)
+        ->call('vote', $voting->id)
+        ->assertHasNoErrors();
+
+    expect(VotingBallot::query()
+        ->where('voting_id', $voting->id)
+        ->where('owner_id', $owner->id)
+        ->whereNull('cast_by_user_id')
+        ->exists())->toBeTrue();
+})->with([
+    'general_admin + property_owner' => Role::GENERAL_ADMIN,
+    'community_admin + property_owner' => Role::COMMUNITY_ADMIN,
+    'delegated_vote + property_owner' => Role::DELEGATED_VOTE,
+]);
+
+it('blocks direct vote when privileged roles are missing property owner role', function (string $role) {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $user = $owner->user()->firstOrFail();
+    $user->assignRole($role);
+
+    $portal = Location::factory()->portal()->create(['code' => '33-NO-PO-' . strtoupper(substr($role, 0, 2))]);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    $option = VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    Livewire::actingAs($user)
+        ->test(PublicVotings::class)
+        ->assertSet('canCastVotes', false)
+        ->set("selectedOptions.{$voting->id}", $option->id)
+        ->call('vote', $voting->id)
+        ->assertHasErrors(["selectedOptions.{$voting->id}"]);
+
+    expect(VotingBallot::query()
+        ->where('voting_id', $voting->id)
+        ->where('owner_id', $owner->id)
+        ->exists())->toBeFalse();
+})->with([
+    'general_admin without property_owner' => Role::GENERAL_ADMIN,
+    'community_admin without property_owner' => Role::COMMUNITY_ADMIN,
+    'delegated_vote without property_owner' => Role::DELEGATED_VOTE,
+]);

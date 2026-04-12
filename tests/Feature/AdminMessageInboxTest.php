@@ -3,9 +3,36 @@
 // Feature: community-web, Task 11: Admin panel — Message inbox
 // Validates: Requirements 14.1–14.8
 
+use App\Models\Role;
 use App\Models\User;
 use Livewire\Livewire;
 use App\Models\ContactMessage;
+
+it('allows general admin to access messages route', function () {
+    Role::query()->firstOrCreate(['name' => Role::GENERAL_ADMIN]);
+
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    test()->actingAs($generalAdmin)
+        ->get(route('admin.messages'))
+        ->assertOk();
+});
+
+it('forbids message deletion for general admin users', function () {
+    Role::query()->firstOrCreate(['name' => Role::GENERAL_ADMIN]);
+
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    $message = ContactMessage::factory()->create();
+
+    Livewire::actingAs($generalAdmin)
+        ->test('admin-message-inbox')
+        ->assertDontSeeHtml('data-admin-action="delete"')
+        ->call('confirmDelete', $message->id)
+        ->assertForbidden();
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Property 14: Message inbox completeness
@@ -13,7 +40,7 @@ use App\Models\ContactMessage;
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('all messages appear in inbox when all filter is active', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $read = ContactMessage::factory()->read()->create();
     $unread = ContactMessage::factory()->unread()->create();
 
@@ -32,7 +59,7 @@ it('all messages appear in inbox when all filter is active', function () {
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('read toggle is reversible', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $message = ContactMessage::factory()->unread()->create();
 
     $component = Livewire::actingAs($user)->test('admin-message-inbox');
@@ -51,7 +78,7 @@ it('read toggle is reversible', function () {
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('abrir un mensaje lo marca automáticamente como leído', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $message = ContactMessage::factory()->unread()->create();
 
     Livewire::actingAs($user)
@@ -64,7 +91,7 @@ it('abrir un mensaje lo marca automáticamente como leído', function () {
 });
 
 it('abrir un mensaje ya leído no cambia read_at', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $readAt = now()->subHour();
     $message = ContactMessage::factory()->read()->create(['read_at' => $readAt]);
 
@@ -77,7 +104,7 @@ it('abrir un mensaje ya leído no cambia read_at', function () {
 });
 
 it('opening the same message twice closes detail', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $message = ContactMessage::factory()->unread()->create();
 
     Livewire::actingAs($user)
@@ -89,7 +116,7 @@ it('opening the same message twice closes detail', function () {
 });
 
 it('delete with confirmation removes message', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $message = ContactMessage::factory()->create();
 
     Livewire::actingAs($user)
@@ -101,7 +128,7 @@ it('delete with confirmation removes message', function () {
 });
 
 it('renders reusable delete row action', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     ContactMessage::factory()->create();
 
     Livewire::actingAs($user)
@@ -110,7 +137,7 @@ it('renders reusable delete row action', function () {
 });
 
 it('renders reusable filter input and filter toggle group', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     ContactMessage::factory()->create();
 
     Livewire::actingAs($user)
@@ -125,7 +152,7 @@ it('renders reusable filter input and filter toggle group', function () {
 });
 
 it('confirm delete stores id and deleting clears selection and open detail', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $message = ContactMessage::factory()->create();
 
     Livewire::actingAs($user)
@@ -142,7 +169,7 @@ it('confirm delete stores id and deleting clears selection and open detail', fun
 });
 
 it('cancel delete does not remove message', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $message = ContactMessage::factory()->create();
 
     Livewire::actingAs($user)
@@ -154,7 +181,7 @@ it('cancel delete does not remove message', function () {
 });
 
 it('ordenar por created_at desc produce orden correcto', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $old = ContactMessage::factory()->create(['created_at' => now()->subDays(2)]);
     $new = ContactMessage::factory()->create(['created_at' => now()]);
 
@@ -168,7 +195,7 @@ it('ordenar por created_at desc produce orden correcto', function () {
 });
 
 it('uses created_at desc as fallback when requested order is invalid', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $old = ContactMessage::factory()->create(['created_at' => now()->subDays(2)]);
     $new = ContactMessage::factory()->create(['created_at' => now()]);
 
@@ -183,7 +210,7 @@ it('uses created_at desc as fallback when requested order is invalid', function 
 });
 
 it('unread messages have visual differentiation class in HTML', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     ContactMessage::factory()->unread()->create(['subject' => 'Unread subject test']);
 
     Livewire::actingAs($user)
@@ -193,7 +220,7 @@ it('unread messages have visual differentiation class in HTML', function () {
 });
 
 it('read status action uses modal confirmation flow', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $message = ContactMessage::factory()->unread()->create();
 
     Livewire::actingAs($user)
@@ -210,7 +237,7 @@ it('read status action uses modal confirmation flow', function () {
 });
 
 it('toggles direction when sorting same column and resets when column changes', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
 
     Livewire::actingAs($user)
         ->test('admin-message-inbox')
@@ -226,7 +253,7 @@ it('toggles direction when sorting same column and resets when column changes', 
 });
 
 it('deleteMessage does nothing if there is no active confirmation', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     $message = ContactMessage::factory()->create();
 
     Livewire::actingAs($user)
@@ -238,7 +265,7 @@ it('deleteMessage does nothing if there is no active confirmation', function () 
 });
 
 it('inbox shows all messages by default', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     ContactMessage::factory()->read()->create();
     $unreadMessage = ContactMessage::factory()->unread()->create();
 
@@ -250,7 +277,7 @@ it('inbox shows all messages by default', function () {
 });
 
 it('allows searching by any textual message field', function () {
-    $user = User::factory()->create();
+    $user = adminUser();
     ContactMessage::factory()->read()->create([
         'name' => 'Ane Iruretagoiena',
         'email' => 'ane-search@example.com',

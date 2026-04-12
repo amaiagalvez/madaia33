@@ -6,7 +6,6 @@ namespace App\Models;
 use App\SupportedLocales;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
-use Database\Factories\UserFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -23,7 +22,7 @@ use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes, TwoFactorAuthenticatable;
 
     /**
@@ -56,7 +55,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 
@@ -168,7 +167,6 @@ class User extends Authenticatable
     {
         return $this->hasAnyRole([
             Role::SUPER_ADMIN,
-            Role::GENERAL_ADMIN,
         ]);
     }
 
@@ -191,6 +189,15 @@ class User extends Authenticatable
     }
 
     public function canManageNotices(): bool
+    {
+        return $this->hasAnyRole([
+            Role::SUPER_ADMIN,
+            Role::GENERAL_ADMIN,
+            Role::COMMUNITY_ADMIN,
+        ]);
+    }
+
+    public function canManageAdminVotings(): bool
     {
         return $this->hasAnyRole([
             Role::SUPER_ADMIN,
@@ -238,8 +245,8 @@ class User extends Authenticatable
     public function syncRoleNames(array $roles): void
     {
         $normalizedRoles = collect($roles)
-            ->filter(static fn (string $role): bool => in_array($role, Role::names(), true))
-            ->reject(fn (string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
+            ->filter(static fn(string $role): bool => in_array($role, Role::names(), true))
+            ->reject(fn(string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
             ->unique()
             ->values();
 

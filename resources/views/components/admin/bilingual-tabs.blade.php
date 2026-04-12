@@ -56,7 +56,43 @@
     ];
 @endphp
 
-<div x-data="{ tab: '{{ $initialTab }}' }" class="space-y-6 rounded-lg border border-gray-200 bg-stone-50 p-4"
+<div x-data="{
+    tab: '{{ $initialTab }}',
+    format(field, command) {
+        const editor = this.$refs[field];
+        if (!editor) {
+            return;
+        }
+
+        editor.focus();
+        document.execCommand(command, false, null);
+        this.sync(field);
+    },
+    link(field) {
+        const editor = this.$refs[field];
+        if (!editor) {
+            return;
+        }
+
+        const url = window.prompt('{{ __('admin.settings_form.editor_link_prompt') }}', 'https://');
+        if (!url) {
+            return;
+        }
+
+        editor.focus();
+        document.execCommand('createLink', false, url);
+        this.sync(field);
+    },
+    sync(field) {
+        const editor = this.$refs[field];
+        if (!editor) {
+            return;
+        }
+
+        const html = editor.innerHTML.trim();
+        this.$wire.set(field, html === '<br>' ? '' : html);
+    },
+}" class="space-y-6 rounded-lg border border-gray-200 bg-stone-50 p-4"
     data-bilingual-field="{{ $rootField }}">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <p class="text-sm font-semibold text-stone-800">

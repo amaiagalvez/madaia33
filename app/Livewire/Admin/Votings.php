@@ -12,14 +12,17 @@ use Carbon\CarbonInterface;
 use App\Models\VotingOption;
 use Livewire\WithPagination;
 use App\Models\VotingLocation;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Support\VotingCensusCalculator;
 use App\Support\VotingEligibilityService;
+use Illuminate\Database\Eloquent\Builder;
 use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Livewire\Admin\Concerns\HandlesVotingOwnerModals;
 
+/** @SuppressWarnings("PHPMD.ExcessiveClassLength") */
 class Votings extends Component
 {
     use BuildsLocaleFieldConfigs;
@@ -120,6 +123,8 @@ class Votings extends Component
 
     public function createVoting(): void
     {
+        abort_unless($this->canManageAdminVotings(), 403);
+
         $this->resetForm();
         $this->showCreateForm = true;
     }
@@ -132,6 +137,8 @@ class Votings extends Component
             ->with(['options', 'locations'])
             ->findOrFail($votingId);
 
+        abort_unless($this->canAccessVoting($voting), 403);
+
         $this->editingVotingId = $voting->id;
         $this->editingVotingBallotCount = $voting->ballots()->count();
         $this->nameEu = $voting->name_eu;
@@ -143,7 +150,7 @@ class Votings extends Component
         $this->isPublished = (bool) $voting->is_published;
         $this->isAnonymous = (bool) $voting->is_anonymous;
         $this->selectedLocations = $voting->locations
-            ->map(static fn (VotingLocation $location): string => (string) $location->location_id)
+            ->map(static fn(VotingLocation $location): string => (string) $location->location_id)
             ->values()
             ->all();
 
@@ -193,7 +200,7 @@ class Votings extends Component
             return;
         }
 
-        DB::transaction(fn () => $this->persistVoting($normalizedOptions));
+        DB::transaction(fn() => $this->persistVoting($normalizedOptions));
 
         $this->resetForm();
         $this->showCreateForm = false;
@@ -209,6 +216,10 @@ class Votings extends Component
     public function confirmDeleteVoting(int $votingId): void
     {
         abort_unless($this->canManageAdminVotings(), 403);
+
+        $voting = Voting::query()->findOrFail($votingId);
+
+        abort_unless($this->canAccessVoting($voting), 403);
 
         $this->confirmingDeleteVotingId = $votingId;
         $this->showDeleteModal = true;
@@ -232,6 +243,8 @@ class Votings extends Component
             ->withCount('ballots')
             ->findOrFail($this->confirmingDeleteVotingId);
 
+        abort_unless($this->canAccessVoting($voting), 403);
+
         if ($voting->ballots_count > 0) {
             session()->flash('error', __('votings.admin.delete_blocked_with_votes'));
             $this->cancelDeleteVoting();
@@ -252,6 +265,29 @@ class Votings extends Component
 
     private function validateVotingForm(): void
     {
+        $user = $this->currentUser();
+
+        abort_unless($user !== null, 403);
+
+        $selectedLocationsRule = ['array'];
+
+        if ($user->hasRole(Role::GENERAL_ADMIN)) {
+            $this->selectedLocations = [];
+        }
+
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
+            $allowedLocationIds = $this->managedLocationIds($user)
+                ->map(static fn(int $locationId): string => (string) $locationId)
+                ->all();
+
+            $this->selectedLocations = collect($this->selectedLocations)
+                ->filter(static fn(string $locationId): bool => in_array($locationId, $allowedLocationIds, true))
+                ->values()
+                ->all();
+
+            $selectedLocationsRule = ['required', 'array', 'min:1'];
+        }
+
         $this->validate([
             'nameEu' => ['required', 'string', 'max:255'],
             'nameEs' => ['nullable', 'string', 'max:255'],
@@ -261,7 +297,7 @@ class Votings extends Component
             'endsAt' => ['required', 'date', 'after_or_equal:startsAt'],
             'isPublished' => ['boolean'],
             'isAnonymous' => ['boolean'],
-            'selectedLocations' => ['array'],
+            'selectedLocations' => $selectedLocationsRule,
             'selectedLocations.*' => ['exists:locations,id'],
             'options' => ['required', 'array', 'min:1'],
             'options.*.labelEu' => ['nullable', 'string', 'max:255'],
@@ -281,7 +317,7 @@ class Votings extends Component
                     'label_es' => trim((string) $option['labelEs']),
                 ];
             })
-            ->filter(fn (array $option): bool => $option['label_eu'] !== '')
+            ->filter(fn(array $option): bool => $option['label_eu'] !== '')
             ->values()
             ->all();
     }
@@ -304,6 +340,8 @@ class Votings extends Component
 
         if ($this->editingVotingId !== null) {
             $voting = Voting::query()->findOrFail($this->editingVotingId);
+            abort_unless($this->canAccessVoting($voting), 403);
+
             $voting->update($votingPayload);
 
             $voting->options()->delete();
@@ -327,7 +365,7 @@ class Votings extends Component
     private function syncVotingLocations(Voting $voting): void
     {
         $locationIds = collect(array_unique($this->selectedLocations))
-            ->map(static fn (string $locationId): int => (int) $locationId)
+            ->map(static fn(string $locationId): int => (int) $locationId)
             ->values()
             ->all();
 
@@ -411,7 +449,7 @@ class Votings extends Component
 
     public function render(): View
     {
-        $votings = Voting::query()
+        $votings = $this->votingsQueryForCurrentUser()
             ->with(['locations.location'])
             ->withCount('ballots')
             ->orderByDesc('starts_at')
@@ -422,12 +460,12 @@ class Votings extends Component
         return view('livewire.admin.votings.index', [
             'votings' => $votings,
             'censusCounts' => $censusCounts,
-            'locations' => Location::query()
+            'locations' => $this->availableLocationQueryForCurrentUser()
                 ->whereIn('type', ['portal', 'local', 'garage'])
                 ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 ELSE 3 END")
                 ->orderBy('code')
                 ->get()
-                ->map(static fn (Location $l): array => [
+                ->map(static fn(Location $l): array => [
                     'id' => (string) $l->id,
                     'label' => __('admin.locations.types.' . $l->type) . ' ' . $l->code,
                 ])
@@ -465,9 +503,122 @@ class Votings extends Component
 
     private function canManageAdminVotings(): bool
     {
+        $user = $this->currentUser();
+
+        return $user?->hasAnyRole([Role::SUPER_ADMIN, Role::GENERAL_ADMIN, Role::COMMUNITY_ADMIN]) ?? false;
+    }
+
+    private function canAccessVoting(Voting $voting): bool
+    {
+        $user = $this->currentUser();
+
+        if ($user === null) {
+            return false;
+        }
+
+        if ($user->hasRole(Role::SUPER_ADMIN)) {
+            return true;
+        }
+
+        if ($user->hasRole(Role::GENERAL_ADMIN)) {
+            return ! $voting->locations()->exists();
+        }
+
+        if (! $user->hasRole(Role::COMMUNITY_ADMIN)) {
+            return false;
+        }
+
+        $managedLocationIds = $this->managedLocationIds($user)->all();
+
+        if ($managedLocationIds === []) {
+            return false;
+        }
+
+        return $voting->locations()->whereIn('location_id', $managedLocationIds)->exists();
+    }
+
+    private function canSeeOwnerNamesInVotingModals(): bool
+    {
+        return $this->currentUser()?->hasRole(Role::SUPER_ADMIN) ?? false;
+    }
+
+    private function canManageInPersonAndDelegatedSessions(): bool
+    {
+        return $this->currentUser()?->hasRole(Role::SUPER_ADMIN) ?? false;
+    }
+
+    /**
+     * @return Builder<Voting>
+     */
+    private function votingsQueryForCurrentUser()
+    {
+        $user = $this->currentUser();
+
+        abort_unless($user !== null, 403);
+
+        $query = Voting::query();
+
+        if ($user->hasRole(Role::SUPER_ADMIN)) {
+            return $query;
+        }
+
+        if ($user->hasRole(Role::GENERAL_ADMIN)) {
+            return $query->whereDoesntHave('locations');
+        }
+
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
+            $managedLocationIds = $this->managedLocationIds($user)->all();
+
+            if ($managedLocationIds === []) {
+                return $query->whereRaw('1 = 0');
+            }
+
+            return $query->whereHas('locations', function ($locationsQuery) use ($managedLocationIds): void {
+                $locationsQuery->whereIn('location_id', $managedLocationIds);
+            });
+        }
+
+        return $query->whereRaw('1 = 0');
+    }
+
+    /**
+     * @return Builder<Location>
+     */
+    private function availableLocationQueryForCurrentUser()
+    {
+        $user = $this->currentUser();
+
+        abort_unless($user !== null, 403);
+
+        $query = Location::query();
+
+        if ($user->hasRole(Role::GENERAL_ADMIN)) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
+            return $query->whereIn('id', $this->managedLocationIds($user));
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return Collection<int, int>
+     */
+    private function managedLocationIds(User $user)
+    {
+        return $user->managedLocations()
+            ->pluck('locations.id')
+            ->map(static fn(int $locationId): int => $locationId)
+            ->values();
+    }
+
+    private function currentUser(): ?User
+    {
         /** @var User|null $user */
         $user = Auth::user();
 
-        return $user?->hasAnyRole([Role::SUPER_ADMIN]) ?? false;
+        return $user;
     }
 }

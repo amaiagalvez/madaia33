@@ -4,7 +4,16 @@
 // Validates: Requirements 6.5, 6.6
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+
+beforeEach(function () {
+    foreach (Role::names() as $roleName) {
+        Role::query()->firstOrCreate([
+            'name' => $roleName,
+        ]);
+    }
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Login correcto → redirige al dashboard admin
@@ -14,14 +23,14 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 it('login with correct credentials redirects to admin dashboard', function () {
     $user = User::factory()->create();
 
-    $this->withoutMiddleware(PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ])
         ->assertRedirect(route('admin.dashboard'));
 
-    $this->assertAuthenticated();
+    test()->assertAuthenticated();
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -32,14 +41,14 @@ it('login with correct credentials redirects to admin dashboard', function () {
 it('login with incorrect credentials shows error and denies access', function () {
     $user = User::factory()->create();
 
-    $this->withoutMiddleware(PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'contraseña-incorrecta',
         ])
         ->assertSessionHasErrors();
 
-    $this->assertGuest();
+    test()->assertGuest();
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -48,6 +57,24 @@ it('login with incorrect credentials shows error and denies access', function ()
 // ─────────────────────────────────────────────────────────────────────────────
 
 it('accessing /admin without authentication redirects to login', function () {
-    $this->get(route('admin.dashboard'))
+    test()->get(route('admin.dashboard'))
         ->assertRedirect(route('login'));
+});
+
+it('redirects delegated vote user without admin roles to home when accessing admin panel', function () {
+    $user = User::factory()->create();
+    $user->assignRole(Role::DELEGATED_VOTE);
+
+    test()->actingAs($user)
+        ->get(route('admin.dashboard'))
+        ->assertRedirect(route('home.eu'));
+});
+
+it('redirects property owner user without admin roles to home when accessing admin panel', function () {
+    $user = User::factory()->create();
+    $user->assignRole(Role::PROPERTY_OWNER);
+
+    test()->actingAs($user)
+        ->get(route('admin.dashboard'))
+        ->assertRedirect(route('home.eu'));
 });

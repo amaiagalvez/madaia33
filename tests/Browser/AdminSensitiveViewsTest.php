@@ -56,7 +56,7 @@ test('admin top user menu dropdown opens from the desktop header', function () {
             ->visit('/admin')
             ->waitFor('[data-test="sidebar-menu-button"]', 5)
             ->click('[data-test="sidebar-menu-button"]')
-            ->waitUntil("document.querySelector('[data-test=\"logout-button\"]') !== null", 5)
+            ->waitUntil("(() => { const el = document.querySelector('[data-test=\"logout-button\"]'); return !!el && el.offsetParent !== null; })()", 5)
             ->assertPresent('[data-test="logout-button"]')
             ->assertSee($admin->name);
     });

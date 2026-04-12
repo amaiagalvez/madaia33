@@ -52,7 +52,9 @@
                 </x-admin.table-header-cell>
 
                 <x-admin.table-header-cell class="relative">
-                    <span class="sr-only">{{ __('general.buttons.delete') }}</span>
+                    @if ($canDeleteMessages)
+                        <span class="sr-only">{{ __('general.buttons.delete') }}</span>
+                    @endif
                 </x-admin.table-header-cell>
             </tr>
         </thead>
@@ -80,10 +82,12 @@
                         {{ $msg->created_at->format('d/m/Y H:i') }}
                     </td>
                     <td class="px-6 py-4 text-right text-sm font-medium" wire:click.stop>
-                        <x-admin.table-row-actions>
-                            <x-admin.icon-button-delete
-                                wire:click="confirmDelete({{ $msg->id }})" />
-                        </x-admin.table-row-actions>
+                        @if ($canDeleteMessages)
+                            <x-admin.table-row-actions>
+                                <x-admin.icon-button-delete
+                                    wire:click="confirmDelete({{ $msg->id }})" />
+                            </x-admin.table-row-actions>
+                        @endif
                     </td>
                 </tr>
 

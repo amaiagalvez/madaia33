@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Owner;
-use App\Models\Setting;
 use App\Models\Voting;
-use App\Models\OwnerAuditLog;
-use App\Support\OwnerAuditFieldLabel;
-use App\Support\VotingEligibilityService;
+use App\Models\Setting;
 use App\SupportedLocales;
 use Illuminate\View\View;
 use App\Models\VotingBallot;
 use Illuminate\Http\Request;
+use App\Models\OwnerAuditLog;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use App\Models\UserLoginSession;
 use Illuminate\Support\Collection;
+use App\Support\OwnerAuditFieldLabel;
 use Illuminate\Http\RedirectResponse;
+use App\Support\VotingEligibilityService;
 
 class ProfileController extends Controller
 {
@@ -38,7 +38,7 @@ class ProfileController extends Controller
 
         $activeAssignments = $this->activeAssignments($owner);
         $pendingAssignments = $activeAssignments->filter(
-            static fn($assignment): bool => ! (bool) $assignment->owner_validated,
+            static fn ($assignment): bool => ! (bool) $assignment->owner_validated,
         );
 
         $requiresTermsAcceptance = $owner !== null && $owner->accepted_terms_at === null;
@@ -127,8 +127,8 @@ class ProfileController extends Controller
         abort_if($owner === null, 403);
 
         $assignmentIds = collect((array) $request->input('assignment_ids', []))
-            ->map(static fn(mixed $id): int => (int) $id)
-            ->filter(static fn(int $id): bool => $id > 0)
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
             ->values();
 
         if ($assignmentIds->isEmpty()) {
@@ -163,7 +163,7 @@ class ProfileController extends Controller
         }
 
         return $owner->assignments
-            ->filter(static fn($assignment): bool => $assignment->end_date === null)
+            ->filter(static fn ($assignment): bool => $assignment->end_date === null)
             ->values();
     }
 
@@ -213,7 +213,7 @@ class ProfileController extends Controller
             ->with('voting:id,name_eu,name_es,starts_at,ends_at')
             ->orderByDesc('voted_at')
             ->get(['id', 'voting_id', 'voted_at'])
-            ->map(static fn(VotingBallot $ballot): array => [
+            ->map(static fn (VotingBallot $ballot): array => [
                 'id' => $ballot->id,
                 'voting_name' => $ballot->voting->name,
                 'voted_at' => Carbon::parse($ballot->voted_at),
@@ -232,7 +232,7 @@ class ProfileController extends Controller
         return VotingBallot::query()
             ->where('owner_id', $owner->id)
             ->pluck('voting_id')
-            ->map(static fn(mixed $votingId): int => (int) $votingId)
+            ->map(static fn (mixed $votingId): int => (int) $votingId)
             ->unique()
             ->values();
     }
@@ -249,9 +249,9 @@ class ProfileController extends Controller
 
         return $this->votingEligibilityService
             ->openEligibleVotingsForOwner($owner)
-            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
             ->values()
-            ->map(static fn(Voting $voting): array => [
+            ->map(static fn (Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),
@@ -275,10 +275,10 @@ class ProfileController extends Controller
             ->with('locations.location')
             ->orderByDesc('ends_at')
             ->get(['id', 'name_eu', 'name_es', 'starts_at', 'ends_at'])
-            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
-            ->filter(fn(Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
+            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->filter(fn (Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
             ->values()
-            ->map(static fn(Voting $voting): array => [
+            ->map(static fn (Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),
@@ -305,7 +305,7 @@ class ProfileController extends Controller
                     'field_label' => OwnerAuditFieldLabel::for($log->field),
                     'old_value' => $log->old_value !== '' ? $log->old_value : '—',
                     'new_value' => $log->new_value !== '' ? $log->new_value : '—',
-                    'changed_by' => $log->changedBy?->name ?? __('admin.owners.audit.system'),
+                    'changed_by' => data_get($log, 'changedBy.name') ?? __('admin.owners.audit.system'),
                     'changed_at' => $log->created_at?->format('d/m/Y H:i') ?? '—',
                 ];
             })

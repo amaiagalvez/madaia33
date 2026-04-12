@@ -2,10 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Models\Role;
+use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\ContactMessage;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminMessageInbox extends Component
@@ -31,6 +34,11 @@ class AdminMessageInbox extends Component
     public string $search = '';
 
     public string $readFilter = 'all';
+
+    public function mount(): void
+    {
+        abort_unless($this->canManageInbox(), 403);
+    }
 
     public function openMessage(int $id): void
     {
@@ -111,6 +119,8 @@ class AdminMessageInbox extends Component
 
     public function confirmDelete(int $id): void
     {
+        abort_unless($this->canDeleteMessages(), 403);
+
         $this->confirmingDeleteId = $id;
         $this->showDeleteModal = true;
     }
@@ -123,6 +133,8 @@ class AdminMessageInbox extends Component
 
     public function deleteMessage(): void
     {
+        abort_unless($this->canDeleteMessages(), 403);
+
         if ($this->confirmingDeleteId) {
             ContactMessage::findOrFail($this->confirmingDeleteId)->delete();
 
@@ -164,8 +176,27 @@ class AdminMessageInbox extends Component
 
     public function render(): View
     {
+        abort_unless($this->canManageInbox(), 403);
+
         return view('livewire.admin.message-inbox', [
             'messages' => $this->getMessagesProperty(),
+            'canDeleteMessages' => $this->canDeleteMessages(),
         ]);
+    }
+
+    private function canManageInbox(): bool
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        return $user?->hasAnyRole([Role::SUPER_ADMIN, Role::GENERAL_ADMIN]) ?? false;
+    }
+
+    private function canDeleteMessages(): bool
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        return $user?->hasRole(Role::SUPER_ADMIN) ?? false;
     }
 }

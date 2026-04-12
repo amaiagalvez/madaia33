@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Voting;
 use App\Models\Owner;
+use App\Models\Voting;
 use App\SupportedLocales;
 
 it('shows voting callout on home when an open voting exists', function () {

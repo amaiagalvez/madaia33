@@ -1,7 +1,8 @@
 @php($isImpersonating = session()->has('impersonator_user_id'))
 @php($currentUser = auth()->user())
+@php($profileRoute = route(\App\SupportedLocales::routeName('profile')))
 
-<flux:dropdown position="bottom" align="start" {{ $attributes }}>
+<flux:dropdown class="relative z-[70]" position="bottom" align="end" {{ $attributes }}>
     <button type="button"
         class="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]"
         data-test="sidebar-menu-button">
@@ -24,8 +25,7 @@
         </div>
         <flux:menu.separator />
         <flux:menu.radio.group>
-            <flux:menu.item :href="route(\App\SupportedLocales::routeName('profile'))"
-                icon="user-circle">
+            <flux:menu.item :href="$profileRoute" icon="user-circle">
                 {{ __('profile.title') }}
             </flux:menu.item>
             <form method="POST"

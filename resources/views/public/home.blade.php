@@ -14,7 +14,7 @@
             <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2" data-home-callouts>
                 @if ($hasOpenVotings)
                     <section
-                        class="section-shell overflow-hidden border border-[#d9755b]/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6"
+                        class="section-shell overflow-hidden border border-[#d9755b]/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6 {{ !auth()->check() ? 'lg:col-span-2' : '' }}"
                         data-home-votings-callout>
                         <div
                             class="flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -55,7 +55,7 @@
 
                 @auth
                     <section
-                        class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#d9755b]/10 p-5 sm:p-6"
+                        class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#d9755b]/10 p-5 sm:p-6 {{ !$hasOpenVotings ? 'lg:col-span-2' : '' }}"
                         data-home-profile-callout>
                         <div
                             class="flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

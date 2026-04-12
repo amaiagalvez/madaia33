@@ -14,29 +14,42 @@
             data-section="location-chief-form">
             <div class="flex flex-wrap items-end gap-3">
                 <div class="grow">
-                    <label for="chief-owner-id" class="mb-1 block text-sm font-medium text-stone-700">
-                        {{ __('admin.locations.chief_property') }}
-                    </label>
-                    <select id="chief-owner-id" wire:model="chiefPropertyId"
-                        class="w-full max-w-64 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
-                        data-field="chief-owner-id">
-                        <option value="">
-                            {{ __('admin.locations.chief_property_placeholder') }}
-                        </option>
-                        @foreach ($chiefProperties as $candidateProperty)
-                            <option value="{{ $candidateProperty->id }}">
-                                {{ $candidateProperty->name }}
+                    @if ($canManageChiefAssignment)
+                        <label for="chief-owner-id"
+                            class="mb-1 block text-sm font-medium text-stone-700">
+                            {{ __('admin.locations.chief_property') }}
+                        </label>
+                        <select id="chief-owner-id" wire:model="chiefPropertyId"
+                            class="w-full max-w-64 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
+                            data-field="chief-owner-id">
+                            <option value="">
+                                {{ __('admin.locations.chief_property_placeholder') }}
                             </option>
-                        @endforeach
-                    </select>
+                            @foreach ($chiefProperties as $candidateProperty)
+                                <option value="{{ $candidateProperty->id }}">
+                                    {{ $candidateProperty->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @else
+                        <p class="mb-1 block text-sm font-medium text-stone-700">
+                            {{ __('admin.locations.chief_property') }}
+                        </p>
+                        <p class="w-full max-w-64 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700"
+                            data-field="chief-owner-readonly">
+                            {{ $currentChiefProperty?->name ?? '—' }}
+                        </p>
+                    @endif
                 </div>
 
-                <x-admin.form-footer-actions class="mt-0">
-                    <button type="button" wire:click="saveChiefOwner"
-                        class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                        {{ __('admin.locations.chief_owner_save') }}
-                    </button>
-                </x-admin.form-footer-actions>
+                @if ($canManageChiefAssignment)
+                    <x-admin.form-footer-actions class="mt-0">
+                        <button type="button" wire:click="saveChiefOwner"
+                            class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                            {{ __('admin.locations.chief_owner_save') }}
+                        </button>
+                    </x-admin.form-footer-actions>
+                @endif
             </div>
 
             @error('chiefPropertyId')
@@ -54,11 +67,13 @@
         </div>
     @endif
 
-    <div class="mb-6 flex items-center justify-end">
-        <x-admin.create-record-button wire:click="openAddForm">
-            {{ __('admin.locations.add_property') }}
-        </x-admin.create-record-button>
-    </div>
+    @if ($canManagePropertyCrud)
+        <div class="mb-6 flex items-center justify-end">
+            <x-admin.create-record-button wire:click="openAddForm">
+                {{ __('admin.locations.add_property') }}
+            </x-admin.create-record-button>
+        </div>
+    @endif
 
     @if ($showAddForm)
         <x-admin.side-panel-form section="location-create-form"
@@ -161,11 +176,13 @@
                                 data-assigned="{{ $isAssigned ? 'yes' : 'no' }}" />
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            <x-admin.table-row-actions>
-                                <x-admin.icon-button-edit
-                                    wire:click="startEditing({{ $property->id }})"
-                                    :title="__('general.buttons.edit')" />
-                            </x-admin.table-row-actions>
+                            @if ($canManagePropertyCrud)
+                                <x-admin.table-row-actions>
+                                    <x-admin.icon-button-edit
+                                        wire:click="startEditing({{ $property->id }})"
+                                        :title="__('general.buttons.edit')" />
+                                </x-admin.table-row-actions>
+                            @endif
                         </td>
                     @endif
                 </tr>

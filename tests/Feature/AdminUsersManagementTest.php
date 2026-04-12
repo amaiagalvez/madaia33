@@ -26,6 +26,15 @@ it('forbids users index for users without management role', function () {
         ->assertForbidden();
 });
 
+it('forbids users index for general admin', function () {
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    test()->actingAs($generalAdmin)
+        ->get(route('admin.users.index'))
+        ->assertForbidden();
+});
+
 it('lists users excluding superadmin id 1', function () {
     User::factory()->create([
         'id' => 1,
@@ -33,10 +42,9 @@ it('lists users excluding superadmin id 1', function () {
         'email' => 'superadmin@example.com',
     ]);
 
-    $manager = User::factory()->create([
+    $manager = adminUser([
         'email' => 'manager@example.com',
     ]);
-    $manager->assignRole(Role::GENERAL_ADMIN);
 
     $listedUser = User::factory()->create([
         'name' => 'Managed User',
@@ -50,10 +58,9 @@ it('lists users excluding superadmin id 1', function () {
 });
 
 it('shows assigned managed locations in users list', function () {
-    $manager = User::factory()->create([
+    $manager = adminUser([
         'email' => 'manager-locations@example.com',
     ]);
-    $manager->assignRole(Role::GENERAL_ADMIN);
 
     $communityAdmin = User::factory()->create([
         'name' => 'Community Locations User',
@@ -73,10 +80,9 @@ it('shows assigned managed locations in users list', function () {
 });
 
 it('filters users list by selected role', function () {
-    $manager = User::factory()->create([
+    $manager = adminUser([
         'email' => 'manager-filter-role@example.com',
     ]);
-    $manager->assignRole(Role::GENERAL_ADMIN);
 
     $communityUser = User::factory()->create([
         'name' => 'Community Role User',
@@ -95,9 +101,8 @@ it('filters users list by selected role', function () {
         ->assertDontSee('Delegated Role User');
 });
 
-it('allows admin general to create a community admin with multiple locations', function () {
-    $manager = User::factory()->create();
-    $manager->assignRole(Role::GENERAL_ADMIN);
+it('allows superadmin to create a community admin with multiple locations', function () {
+    $manager = adminUser();
 
     $portal = Location::factory()->portal()->create();
     $garage = Location::factory()->garage()->create();
@@ -128,8 +133,7 @@ it('forbids editing or deleting user id 1 from livewire actions', function () {
     ]);
     $superadmin->assignRole(Role::SUPER_ADMIN);
 
-    $manager = User::factory()->create();
-    $manager->assignRole(Role::GENERAL_ADMIN);
+    $manager = adminUser();
 
     Livewire::actingAs($manager)
         ->test(Users::class)
@@ -189,8 +193,7 @@ it('returns from impersonated session back to original user', function () {
 });
 
 it('builds owner profile link with editOwner query param from users form', function () {
-    $manager = User::factory()->create();
-    $manager->assignRole(Role::GENERAL_ADMIN);
+    $manager = adminUser();
 
     $managedUser = User::factory()->create([
         'email' => 'owner-link@example.com',
@@ -207,8 +210,7 @@ it('builds owner profile link with editOwner query param from users form', funct
 });
 
 it('uses shared admin styling components in users list and side panel form', function () {
-    $manager = User::factory()->create();
-    $manager->assignRole(Role::GENERAL_ADMIN);
+    $manager = adminUser();
 
     User::factory()->create([
         'name' => 'Styled User',
@@ -228,8 +230,7 @@ it('uses shared admin styling components in users list and side panel form', fun
 });
 
 it('prevents deleting a user when related owner has already voted', function () {
-    $manager = User::factory()->create();
-    $manager->assignRole(Role::GENERAL_ADMIN);
+    $manager = adminUser();
 
     $targetUser = User::factory()->create([
         'email' => 'cannot-delete-voted@example.com',
@@ -257,8 +258,7 @@ it('prevents deleting a user when related owner has already voted', function () 
 });
 
 it('prevents deleting a user when related owner has assignment history even if inactive', function () {
-    $manager = User::factory()->create();
-    $manager->assignRole(Role::GENERAL_ADMIN);
+    $manager = adminUser();
 
     $targetUser = User::factory()->create([
         'email' => 'cannot-delete-assigned@example.com',

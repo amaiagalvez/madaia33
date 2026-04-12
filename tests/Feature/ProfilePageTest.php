@@ -3,9 +3,9 @@
 use App\Models\User;
 use App\Models\Owner;
 use App\Models\Voting;
-use App\Models\OwnerAuditLog;
 use App\Models\Property;
 use App\Models\VotingBallot;
+use App\Models\OwnerAuditLog;
 use App\Models\UserLoginSession;
 use App\Models\PropertyAssignment;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;

@@ -51,6 +51,7 @@ class Locations extends Component
         $user = Auth::user();
 
         abort_unless($user instanceof User && $user->canAccessAdminPanel(), 403);
+        $this->assertSuperAdmin($user);
 
         $query = Location::query();
 
@@ -72,6 +73,7 @@ class Locations extends Component
         $user = Auth::user();
 
         abort_unless($user instanceof User && $user->canAccessAdminPanel(), 403);
+        $this->assertSuperAdmin($user);
 
         $this->cancelEditForm();
         $this->showCreateForm = true;
@@ -85,6 +87,7 @@ class Locations extends Component
         $user = Auth::user();
 
         abort_unless($user instanceof User && $user->canAccessAdminPanel(), 403);
+        $this->assertSuperAdmin($user);
 
         $validated = $this->validate([
             'newCode' => ['required', 'string', 'max:10', Rule::unique('locations', 'code')],
@@ -106,6 +109,7 @@ class Locations extends Component
         $user = Auth::user();
 
         abort_unless($user instanceof User && $user->canAccessAdminPanel(), 403);
+        $this->assertSuperAdmin($user);
         abort_unless($this->editingLocationId !== null, 404);
 
         $validated = $this->validate([
@@ -143,6 +147,7 @@ class Locations extends Component
         $user = Auth::user();
 
         abort_unless($user instanceof User && $user->canAccessAdminPanel(), 403);
+        $this->assertSuperAdmin($user);
 
         $query = Location::query();
 
@@ -167,6 +172,7 @@ class Locations extends Component
         $user = Auth::user();
 
         abort_unless($user instanceof User && $user->canAccessAdminPanel(), 403);
+        $this->assertSuperAdmin($user);
 
         if ($this->confirmingDeleteId === null) {
             return;
@@ -216,6 +222,7 @@ class Locations extends Component
 
         return view('livewire.admin.locations.index', [
             'locations' => $locations,
+            'canManageLocationCrud' => $this->canManageLocationCrud($user),
         ]);
     }
 
@@ -270,6 +277,16 @@ class Locations extends Component
     private function canManageAllLocations(User $user): bool
     {
         return $user->canManageAllLocations();
+    }
+
+    private function canManageLocationCrud(User $user): bool
+    {
+        return $user->hasAnyRole([Role::SUPER_ADMIN]);
+    }
+
+    private function assertSuperAdmin(User $user): void
+    {
+        abort_unless($user->hasAnyRole([Role::SUPER_ADMIN]), 403);
     }
 
     /**

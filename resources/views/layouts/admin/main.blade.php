@@ -126,7 +126,7 @@
                     </a>
                 @endif
 
-                @if (auth()->user()?->isSuperadmin())
+                @if (auth()->user()?->canManageAdminVotings())
                     <a href="{{ route('admin.votings') }}"
                         class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.votings') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                         <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
@@ -251,7 +251,7 @@
                             <a href="{{ route('admin.owners.index') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.owners.menu') }}</a>
                         @endif
-                        @if (auth()->user()?->isSuperadmin())
+                        @if (auth()->user()?->canManageAdminVotings())
                             <a href="{{ route('admin.votings') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.votings.menu') }}</a>
                         @endif
@@ -289,8 +289,9 @@
         {{-- Main content area --}}
         <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
             <header
-                class="hidden lg:flex h-16 items-center justify-end border-b border-stone-200 bg-stone-50 px-6">
-                <nav class="flex items-center gap-4" aria-label="{{ __('admin.dashboard') }}">
+                class="relative z-[60] hidden overflow-visible lg:flex h-16 items-center justify-end border-b border-stone-200 bg-stone-50 px-6">
+                <nav class="relative z-[60] flex items-center gap-4"
+                    aria-label="{{ __('admin.dashboard') }}">
                     <x-shared.desktop-user-menu />
                 </nav>
             </header>
@@ -307,6 +308,8 @@
             </main>
         </div>
     </div>
+
+    @fluxScripts
 
 </body>
 

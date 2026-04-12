@@ -81,6 +81,26 @@ test('dev seeder creates owners, role users and seeded voting ballots', function
             ->exists()
     )->toBeTrue();
 
+    $combinedAdmin = User::query()
+        ->where('email', 'admin.konbinatua@madaia33.eus')
+        ->first();
+
+    expect($combinedAdmin)->not->toBeNull();
+    expect($combinedAdmin->hasRole(Role::GENERAL_ADMIN))->toBeTrue();
+    expect($combinedAdmin->hasRole(Role::COMMUNITY_ADMIN))->toBeTrue();
+    expect($combinedAdmin->hasRole(Role::DELEGATED_VOTE))->toBeTrue();
+    expect($combinedAdmin->managedLocations()->count())->toBeGreaterThan(0);
+
+    $ownerDelegated = User::query()
+        ->where('email', 'propietaria.delegada@madaia33.eus')
+        ->first();
+
+    expect($ownerDelegated)->not->toBeNull();
+    expect($ownerDelegated->hasRole(Role::PROPERTY_OWNER))->toBeTrue();
+    expect($ownerDelegated->hasRole(Role::DELEGATED_VOTE))->toBeTrue();
+    expect($ownerDelegated->owner)->not->toBeNull();
+    expect($ownerDelegated->owner->activeAssignments()->count())->toBeGreaterThan(0);
+
     expect(VotingBallot::query()->count())->toBeGreaterThan(0);
     expect(VotingBallot::query()->whereNotNull('cast_by_user_id')->count())->toBeGreaterThan(0);
     expect(VotingSelection::query()->count())->toBeGreaterThan(0);

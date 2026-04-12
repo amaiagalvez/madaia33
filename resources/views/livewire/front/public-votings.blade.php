@@ -28,7 +28,7 @@
 
     <div class="{{ $requiresTermsAcceptance ? 'pointer-events-none select-none blur-sm' : '' }}"
         data-votings-content>
-        @if ($canManageDelegatedVoting)
+        @if ($canManageDelegatedVoting && !$isDelegated && !$isInPersonVoting)
             <div class="mb-6 flex items-center justify-end gap-2" data-votings-delegated-action>
                 <button type="button" wire:click="openInPersonVoteModal"
                     class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
@@ -162,10 +162,13 @@
             @endforeach
         </div>
 
-        @if ($showDelegatedModal)
-            <dialog open
-                class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4">
-                <div class="mx-4 w-full max-w-6xl space-y-4 rounded-xl bg-white p-6 shadow-2xl"
+    </div>
+
+    <template x-teleport="body">
+        <div x-show="$wire.showDelegatedModal">
+            <div class="fixed inset-0 z-[100] bg-black/50" aria-hidden="true"></div>
+            <div class="fixed inset-0 z-[110] grid place-items-center p-4">
+                <div class="w-full max-w-6xl space-y-4 rounded-xl bg-white p-6 shadow-2xl"
                     data-front-delegated-modal>
                     <div class="flex items-start justify-between gap-3">
                         <h3 class="text-base font-semibold text-gray-900">
@@ -250,13 +253,15 @@
                         </table>
                     </div>
                 </div>
-            </dialog>
-        @endif
+            </div>
+        </div>
+    </template>
 
-        @if ($showInPersonModal)
-            <dialog open
-                class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4">
-                <div class="mx-4 w-full max-w-6xl space-y-4 rounded-xl bg-white p-6 shadow-2xl"
+    <template x-teleport="body">
+        <div x-show="$wire.showInPersonModal">
+            <div class="fixed inset-0 z-[100] bg-black/50" aria-hidden="true"></div>
+            <div class="fixed inset-0 z-[110] grid place-items-center p-4">
+                <div class="w-full max-w-6xl space-y-4 rounded-xl bg-white p-6 shadow-2xl"
                     data-front-in-person-modal>
                     <div class="flex items-start justify-between gap-3">
                         <h3 class="text-base font-semibold text-gray-900">
@@ -341,7 +346,7 @@
                         </table>
                     </div>
                 </div>
-            </dialog>
-        @endif
-    </div>
+            </div>
+        </div>
+    </template>
 </div>

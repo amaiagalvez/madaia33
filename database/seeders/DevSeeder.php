@@ -32,6 +32,10 @@ class DevSeeder extends Seeder
 
     private const DELEGATED_VOTE_EMAIL = 'voto.delegado@madaia33.eus';
 
+    private const COMBINED_ADMIN_EMAIL = 'admin.konbinatua@madaia33.eus';
+
+    private const OWNER_DELEGATED_EMAIL = 'propietaria.delegada@madaia33.eus';
+
     public function run(): void
     {
         $this->call([
@@ -215,6 +219,7 @@ class DevSeeder extends Seeder
         $this->seedCommunityAdminUser();
         $this->seedPropertyOwnerUser();
         $this->seedDelegatedVoteUser();
+        $this->seedCombinedRoleUsers();
     }
 
     private function seedUserLoginSessions(): void
@@ -357,6 +362,60 @@ class DevSeeder extends Seeder
             email: self::DELEGATED_VOTE_EMAIL,
             name: 'Voto Delegado Demo',
             roles: [Role::DELEGATED_VOTE],
+        );
+    }
+
+    private function seedCombinedRoleUsers(): void
+    {
+        $combinedAdmin = $this->upsertRoleUser(
+            email: self::COMBINED_ADMIN_EMAIL,
+            name: 'Admin Rol Anitz Demo',
+            roles: [Role::GENERAL_ADMIN, Role::COMMUNITY_ADMIN, Role::DELEGATED_VOTE],
+        );
+
+        $managedLocationIds = Location::query()
+            ->whereIn('type', ['portal', 'local'])
+            ->orderBy('id')
+            ->limit(2)
+            ->pluck('id')
+            ->all();
+
+        $combinedAdmin->managedLocations()->sync($managedLocationIds);
+
+        $ownerDelegatedUser = $this->upsertRoleUser(
+            email: self::OWNER_DELEGATED_EMAIL,
+            name: 'Propietaria Delegada Demo',
+            roles: [Role::PROPERTY_OWNER, Role::DELEGATED_VOTE],
+        );
+
+        $ownerDelegated = Owner::query()->updateOrCreate(
+            ['user_id' => $ownerDelegatedUser->id],
+            [
+                'coprop1_name' => $ownerDelegatedUser->name,
+                'coprop1_dni' => '00000000Z',
+                'coprop1_email' => $ownerDelegatedUser->email,
+                'coprop1_phone' => '600000099',
+            ],
+        );
+
+        $propertyId = Property::query()
+            ->doesntHave('activeAssignments')
+            ->orderBy('id')
+            ->value('id');
+
+        if ($propertyId === null) {
+            return;
+        }
+
+        PropertyAssignment::query()->updateOrCreate(
+            [
+                'owner_id' => $ownerDelegated->id,
+                'property_id' => $propertyId,
+                'end_date' => null,
+            ],
+            [
+                'start_date' => now()->subMonths(2)->format('Y-m-d'),
+            ],
         );
     }
 

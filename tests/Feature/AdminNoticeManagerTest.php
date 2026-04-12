@@ -3,6 +3,8 @@
 // Feature: community-web, Task 9: Admin panel — Notice management
 // Validates: Requirements 6.1, 6.3, 6.4
 
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Notice;
 use Livewire\Livewire;
 use App\Models\Location;
@@ -363,4 +365,59 @@ it('uses published_at desc fallback for invalid notice sorting state', function 
         ->set('sortColumn', 'invalid-column')
         ->set('sortDir', 'sideways')
         ->assertSeeInOrder([$new->title_eu, $old->title_eu]);
+});
+
+it('shows only global notices to general admin users', function () {
+    Role::query()->firstOrCreate(['name' => Role::GENERAL_ADMIN]);
+
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    Notice::factory()->create([
+        'title_eu' => 'Iragarki Orokorra',
+        'title_es' => 'Aviso Global',
+    ]);
+
+    $locatedNotice = Notice::factory()->create([
+        'title_eu' => 'Iragarki Kokapenduna',
+        'title_es' => 'Aviso con ubicacion',
+    ]);
+
+    attachNoticeToLocationCode($locatedNotice, '33-A');
+
+    Livewire::actingAs($generalAdmin)
+        ->test('admin-notice-manager')
+        ->assertSee('Iragarki Orokorra')
+        ->assertDontSee('Iragarki Kokapenduna');
+});
+
+it('shows only managed-location notices to community admin users', function () {
+    Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
+
+    $communityAdmin = User::factory()->create();
+    $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
+
+    $managedLocation = Location::factory()->portal()->create(['code' => 'CA-1']);
+    $otherLocation = Location::factory()->portal()->create(['code' => 'CA-2']);
+    $communityAdmin->managedLocations()->sync([$managedLocation->id]);
+
+    $managedNotice = Notice::factory()->create([
+        'title_eu' => 'Iragarki Kudeatua',
+    ]);
+    $managedNotice->locations()->create(['location_id' => $managedLocation->id]);
+
+    $otherNotice = Notice::factory()->create([
+        'title_eu' => 'Iragarki Kanpokoa',
+    ]);
+    $otherNotice->locations()->create(['location_id' => $otherLocation->id]);
+
+    $globalNotice = Notice::factory()->create([
+        'title_eu' => 'Iragarki Orokor CA',
+    ]);
+
+    Livewire::actingAs($communityAdmin)
+        ->test('admin-notice-manager')
+        ->assertSee('Iragarki Kudeatua')
+        ->assertDontSee('Iragarki Kanpokoa')
+        ->assertDontSee('Iragarki Orokor CA');
 });

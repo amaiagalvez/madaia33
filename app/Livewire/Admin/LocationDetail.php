@@ -63,7 +63,7 @@ class LocationDetail extends Component
 
     public function addProperty(): void
     {
-        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
+        abort_unless($this->canManagePropertyCrud(), 403);
 
         $this->newCommunityPct = $this->normalizeDecimalInput($this->newCommunityPct);
         $this->newLocationPct = $this->normalizeDecimalInput($this->newLocationPct);
@@ -93,7 +93,7 @@ class LocationDetail extends Component
 
     public function startEditing(int $propertyId): void
     {
-        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
+        abort_unless($this->canManagePropertyCrud(), 403);
 
         $property = Property::findOrFail($propertyId);
 
@@ -105,7 +105,7 @@ class LocationDetail extends Component
 
     public function saveProperty(): void
     {
-        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
+        abort_unless($this->canManagePropertyCrud(), 403);
 
         $this->editCommunityPct = $this->normalizeDecimalInput($this->editCommunityPct);
         $this->editLocationPct = $this->normalizeDecimalInput($this->editLocationPct);
@@ -133,7 +133,7 @@ class LocationDetail extends Component
 
     public function openAddForm(): void
     {
-        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
+        abort_unless($this->canManagePropertyCrud(), 403);
 
         $this->showAddForm = true;
         $this->newPropertyName = '';
@@ -161,7 +161,7 @@ class LocationDetail extends Component
 
     public function saveChiefOwner(): void
     {
-        abort_unless($this->currentUser()?->canManageLocation($this->location), 403);
+        abort_unless($this->canManageChiefAssignment(), 403);
 
         if (! $this->supportsChiefOwnerSelection()) {
             return;
@@ -231,6 +231,8 @@ class LocationDetail extends Component
             'isChiefSelectable' => $isChiefSelectable,
             'currentChiefOwnerId' => $currentChiefOwnerId,
             'chiefProperties' => $chiefProperties,
+            'canManageChiefAssignment' => $this->canManageChiefAssignment(),
+            'canManagePropertyCrud' => $this->canManagePropertyCrud(),
             'properties' => $properties,
         ]);
     }
@@ -288,5 +290,15 @@ class LocationDetail extends Component
         $user = Auth::user();
 
         return $user;
+    }
+
+    private function canManagePropertyCrud(): bool
+    {
+        return $this->currentUser()?->hasRole(Role::SUPER_ADMIN) === true;
+    }
+
+    private function canManageChiefAssignment(): bool
+    {
+        return $this->currentUser()?->hasRole(Role::SUPER_ADMIN) === true;
     }
 }
