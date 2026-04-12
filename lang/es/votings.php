@@ -43,6 +43,8 @@ return [
         'vote_as_owner' => 'Votar en su nombre',
         'no_pending_delegations' => 'No hay propietarias pendientes para voto delegado.',
         'in_person_vote' => 'Voto presencial',
+        'download_delegated_pdf' => 'Descargar PDF voto delegado',
+        'download_in_person_pdf' => 'Descargar PDF voto presencial',
         'in_person_modal_title' => 'Propietarias pendientes de votar (presencial)',
         'in_person_search' => 'Buscar en voto presencial',
         'in_person_search_placeholder' => 'Buscar por propietaria, copropietaria, email, teléfono, portal, local o garaje',
@@ -75,6 +77,8 @@ return [
         'delegate_dni_label' => 'DNI de la persona a la que se le ha delegado el voto para verificar la delegación',
         'delegate_dni_placeholder' => 'Ej. 12345678A',
         'in_person_vote_button' => 'Voto presencial',
+        'download_delegated_pdf' => 'Descargar PDF voto delegado',
+        'download_in_person_pdf' => 'Descargar PDF voto presencial',
         'in_person_modal_title' => 'Propietarias pendientes de votar (presencial)',
         'in_person_search' => 'Buscar en voto presencial',
         'in_person_search_placeholder' => 'Buscar por propietaria, copropietaria, email, teléfono, portal, local o garaje',
@@ -93,5 +97,9 @@ return [
         'already_voted' => 'Ya has votado en esta votación.',
         'delegate_dni_required' => 'Debes introducir el DNI para realizar el voto delegado.',
         'option_required' => 'Debes seleccionar una opción para votar.',
+    ],
+    'pdf' => [
+        'filename_delegated' => 'voto-delegado',
+        'filename_in_person' => 'voto-presencial',
     ],
 ];

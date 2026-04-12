@@ -204,6 +204,24 @@ it('stores new owners email configuration in settings', function () {
         ->and(settingValue('owners_welcome_text_es'))->toBe('<p>Texto ES</p>##info##');
 });
 
+it('stores voting pdf texts in votings settings section', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test('admin-settings')
+        ->call('setSection', Setting::SECTION_VOTINGS)
+        ->set('votingsPdfDelegatedTextEu', '<p>Boto delegatua EU</p>')
+        ->set('votingsPdfDelegatedTextEs', '<p>Voto delegado ES</p>')
+        ->set('votingsPdfInPersonTextEu', '<p>Boto presentziala EU</p>')
+        ->set('votingsPdfInPersonTextEs', '<p>Voto presencial ES</p>')
+        ->call('save');
+
+    expect(settingValue('votings_pdf_delegated_text_eu'))->toBe('<p>Boto delegatua EU</p>')
+        ->and(settingValue('votings_pdf_delegated_text_es'))->toBe('<p>Voto delegado ES</p>')
+        ->and(settingValue('votings_pdf_in_person_text_eu'))->toBe('<p>Boto presentziala EU</p>')
+        ->and(settingValue('votings_pdf_in_person_text_es'))->toBe('<p>Voto presencial ES</p>');
+});
+
 it('recaptcha_secret_key field renders as type password', function () {
     $user = adminUser();
 
@@ -351,7 +369,7 @@ it('dashboard shows real statistics', function () {
 it('factory-created settings have valid section', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -43,6 +43,8 @@ return [
         'vote_as_owner' => 'Bere izenean bozkatu',
         'no_pending_delegations' => 'Ez dago boto delegaturik egiteko jaberik.',
         'in_person_vote' => 'Boto presentziala',
+        'download_delegated_pdf' => 'Deskargatu boto delegatuko PDFa',
+        'download_in_person_pdf' => 'Deskargatu boto presentzialeko PDFa',
         'in_person_modal_title' => 'Bozkatu gabe dauden jabeak (presentziala)',
         'in_person_search' => 'Boto presentzialan bilatu',
         'in_person_search_placeholder' => 'Bilatu jabea, ko-jabea, emaila, telefonoa, portal, lokal edo garaje kodea',
@@ -75,6 +77,8 @@ return [
         'delegate_dni_label' => 'Jabeak emandako baimena egiaztatzeko NAN-a',
         'delegate_dni_placeholder' => 'Adib. 12345678A',
         'in_person_vote_button' => 'Boto presentziala',
+        'download_delegated_pdf' => 'Deskargatu boto delegatuko PDFa',
+        'download_in_person_pdf' => 'Deskargatu boto presentzialeko PDFa',
         'in_person_modal_title' => 'Bozkatu gabe dauden jabeak (presentziala)',
         'in_person_search' => 'Boto presentzialan bilatu',
         'in_person_search_placeholder' => 'Bilatu jabea, ko-jabea, emaila, telefonoa, portal, lokal edo garaje kodea',
@@ -93,5 +97,9 @@ return [
         'already_voted' => 'Jada bozkatu duzu bozketa honetan.',
         'delegate_dni_required' => 'Boto delegatua egiteko Delegatuaren NAN-a eman behar duzu.',
         'option_required' => 'Aukera bat hautatu behar duzu bozkatzeko.',
+    ],
+    'pdf' => [
+        'filename_delegated' => 'boto-delegatua',
+        'filename_in_person' => 'boto-presentziala',
     ],
 ];

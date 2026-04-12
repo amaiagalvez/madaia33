@@ -52,23 +52,10 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-
+- Resultado votaciones
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
-- Resultado votaciones
-- Deialdiak sartzeko formularioa
-- bozketak pdf presencial/delegado  
-  en el setting crear un nuevo section "votings" para guardar el texto del pdf para voto delegado, eu y es.
-  en el setting en la section votings, añadir nuevos registros para guardar el texto del pdf para voto presencial, eu y es
-  
-  crear un pdf para el voto delegado con las votaciones activas, a dos columnas, izquierda en euskera y derecha en castellano con loss textos guardados en el settings con los textos de voto delegado.
-  debajo y a ancho completo las votaciones, pregunta y casillas con opciones para pooder marcarlas en el papel con boli. Cada votación debe aparecer una sola vez en los dos idiomas juntos (euskera negrita y castellano en normal)
-  
-  en el comienzo de cada página debe de ir a la izquierda el texto el nombre de la web que está en settings+"Jabeen Erkidegoa" y a la derecha "Comunidad de Propietarios/a" o + el nombre de la web que está en settings. En el medio colocar la imagen del favicon.
-
-  crear un pdf para el voto presencial, igual que el voto delegado pero con los registros del settings correspoondientes. 
-
-  poner los botones para descargar los pdf-s tanto en el listado de votaciones del panel de control como en el front votaciones.
+- Deialdiak sartzeko formularioa + pdf
 
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
@@ -109,3 +96,50 @@ pasar los test con coverage
 - [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
 - [ ] añadir espacio para comercios
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
+
+## Spec: Bozketak PDF presencial/delegado
+
+### Implementation Plan
+
+### Goal
+- [x] Bi PDF deskarga sortzea (delegatua + presentziala), bozketa aktiboekin eta EU/ES edukiarekin, settings-eko testuak erabilita.
+
+### Technical Decisions
+- [x] Settings section berria: `votings`; giltzak: `votings_pdf_delegated_text_eu/es` eta `votings_pdf_in_person_text_eu/es`.
+- [x] PDF logika backendean zentralizatzea service + controller batean, Blade txantiloi espezifikoekin.
+- [x] Goiburukoa: ezkerrean `front_site_name + " Jabeen Erkidegoa"`, erdian favicon irudia, eskuinean `"Comunidad de Propietarios/a " + front_site_name`.
+- [x] Orriko lehen blokea bi zutabekoa: ezker EU, eskuin ES, dagokion settings testuarekin (delegated/in-person).
+- [x] Behean, zabalera osoan, bozketa bakoitza behin: galdera EU (lodian) + ES (normalean), eta aukera bakoitzaren ondoan laukitxo markagarriak.
+
+### Execution Steps
+- [x] 1. `Setting` + `AdminSettings` + validazioak + itzulpenak eguneratu `votings` section berrirako.
+- [x] 2. Admin settings-etan `votings` tab berria gehitu (4 rich text eremu: delegated EU/ES, in-person EU/ES).
+- [x] 3. PDF service/controller/view geruza eraiki, bozketa aktiboak eta branding datuak kargatuta.
+- [x] 4. Deskarga route-ak eta botoiak gehitu admin bozketen zerrendan eta front bozketen pantailan.
+- [x] 5. Testak gehitu/eguneratu (Feature: PDF payload eraikuntza + route sarbidea + edukia).
+- [x] 6. Docker bidez pint + test minimoak exekutatu.
+
+### Work Items
+- [x] app/Models/Setting.php
+- [x] app/Livewire/AdminSettings.php
+- [x] app/Validations/AdminSettingsValidation.php
+- [x] resources/views/livewire/admin/settings.blade.php
+- [x] resources/views/livewire/admin/settings/partials/votings-tab.blade.php (berria)
+- [x] lang/eu/admin.php
+- [x] lang/es/admin.php
+- [x] app/Http/Controllers/VotingPdfController.php (berria)
+- [x] app/Services/VotingPdfBuilder.php (berria)
+- [x] resources/views/pdf/votings/ballot.blade.php (berria)
+- [x] routes/private.php
+- [x] routes/public.php
+- [x] resources/views/livewire/admin/votings/index.blade.php
+- [x] resources/views/livewire/front/public-votings.blade.php
+- [x] tests/Feature/VotingPdfBuilderTest.php
+- [x] tests/Feature/VotingPdfDownloadTest.php
+- [x] tests/Feature/AdminSettingsTest.php
+
+### Validation
+- [x] TDD printzipioarekin: integrazioa behar zuten kasuak Feature testetan estali dira.
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/VotingPdfBuilderTest.php tests/Feature/VotingPdfDownloadTest.php tests/Feature/AdminSettingsTest.php`
+- [ ] Front aldaketek UI fluxua ukitzen badute, Dusk estaldura osagarria exekutatu.

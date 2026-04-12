@@ -53,6 +53,7 @@ class AdminSettingsValidation
             Setting::SECTION_RECAPTCHA => self::recaptchaRules(),
             Setting::SECTION_OWNERS => self::ownerRules(),
             Setting::SECTION_VOTE_DELEGATE => self::voteDelegateRules(),
+            Setting::SECTION_VOTINGS => self::votingsRules(),
             default => [],
         };
     }
@@ -146,6 +147,19 @@ class AdminSettingsValidation
         return [
             'voteDelegateTermsTextEu' => self::richTextRule(5000),
             'voteDelegateTermsTextEs' => self::richTextRule(5000),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function votingsRules(): array
+    {
+        return [
+            'votingsPdfDelegatedTextEu' => self::richTextRule(10000),
+            'votingsPdfDelegatedTextEs' => self::richTextRule(10000),
+            'votingsPdfInPersonTextEu' => self::richTextRule(10000),
+            'votingsPdfInPersonTextEs' => self::richTextRule(10000),
         ];
     }
 

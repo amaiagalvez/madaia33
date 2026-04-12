@@ -70,6 +70,8 @@
                 @include('livewire.admin.settings.partials.owners-tab')
             @elseif ($activeSection === 'vote_delegate')
                 @include('livewire.admin.settings.partials.vote-delegate-tab')
+            @elseif ($activeSection === 'votings')
+                @include('livewire.admin.settings.partials.votings-tab')
             @endif
 
             <div>

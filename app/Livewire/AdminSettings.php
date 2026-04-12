@@ -68,6 +68,12 @@ class AdminSettings extends Component
             'voteDelegateTermsTextEu' => 'vote_delegate_terms_text_eu',
             'voteDelegateTermsTextEs' => 'vote_delegate_terms_text_es',
         ],
+        Setting::SECTION_VOTINGS => [
+            'votingsPdfDelegatedTextEu' => 'votings_pdf_delegated_text_eu',
+            'votingsPdfDelegatedTextEs' => 'votings_pdf_delegated_text_es',
+            'votingsPdfInPersonTextEu' => 'votings_pdf_in_person_text_eu',
+            'votingsPdfInPersonTextEs' => 'votings_pdf_in_person_text_es',
+        ],
     ];
 
     public string $activeSection = '';
@@ -151,6 +157,14 @@ class AdminSettings extends Component
 
     public string $voteDelegateTermsTextEs = '';
 
+    public string $votingsPdfDelegatedTextEu = '';
+
+    public string $votingsPdfDelegatedTextEs = '';
+
+    public string $votingsPdfInPersonTextEu = '';
+
+    public string $votingsPdfInPersonTextEs = '';
+
     public bool $saved = false;
 
     public bool $showTestEmailModal = false;
@@ -216,6 +230,10 @@ class AdminSettings extends Component
         $this->ownersTermsTextEs = $settings['owners_terms_text_es'] ?? '';
         $this->voteDelegateTermsTextEu = $settings['vote_delegate_terms_text_eu'] ?? '';
         $this->voteDelegateTermsTextEs = $settings['vote_delegate_terms_text_es'] ?? '';
+        $this->votingsPdfDelegatedTextEu = $settings['votings_pdf_delegated_text_eu'] ?? '';
+        $this->votingsPdfDelegatedTextEs = $settings['votings_pdf_delegated_text_es'] ?? '';
+        $this->votingsPdfInPersonTextEu = $settings['votings_pdf_in_person_text_eu'] ?? '';
+        $this->votingsPdfInPersonTextEs = $settings['votings_pdf_in_person_text_es'] ?? '';
         $this->ownersWelcomeTextEu = $settings['owners_welcome_text_eu'] ?? '';
         $this->ownersWelcomeTextEs = $settings['owners_welcome_text_es'] ?? '';
         $this->historyTextEu = $settings['home_history_text_eu'] ?? '';

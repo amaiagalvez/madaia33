@@ -85,6 +85,12 @@ return [
         'vote_delegate_terms_text' => 'Erabilera baldintzak (boto delegatua)',
         'vote_delegate_terms_text_eu' => 'Baldintzak (EU)',
         'vote_delegate_terms_text_es' => 'Baldintzak (ES)',
+        'votings_pdf_delegated_text' => 'Boto delegaturako PDF testua',
+        'votings_pdf_delegated_text_eu' => 'Boto delegatuko PDF testua (EU)',
+        'votings_pdf_delegated_text_es' => 'Boto delegatuko PDF testua (ES)',
+        'votings_pdf_in_person_text' => 'Boto presentzialerako PDF testua',
+        'votings_pdf_in_person_text_eu' => 'Boto presentzialeko PDF testua (EU)',
+        'votings_pdf_in_person_text_es' => 'Boto presentzialeko PDF testua (ES)',
     ],
     'stats' => [
         'published_notices' => 'Argitaratutako iragarkiak',
@@ -111,6 +117,7 @@ return [
         'recaptcha' => 'reCAPTCHA',
         'owners' => 'Jabeak',
         'vote_delegate' => 'Boto delegatua',
+        'votings' => 'Bozketen PDF inprimakiak',
     ],
     'test_email' => [
         'button' => 'Bidali proba-eposta',

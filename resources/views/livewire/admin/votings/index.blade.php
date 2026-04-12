@@ -12,6 +12,18 @@
     @endif
 
     <div class="mb-4 flex items-center justify-end gap-2">
+        <a href="{{ route('admin.votings.pdf.delegated') }}"
+            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+            data-action="download-delegated-vote-pdf">
+            {{ __('votings.admin.download_delegated_pdf') }}
+        </a>
+
+        <a href="{{ route('admin.votings.pdf.in_person') }}"
+            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+            data-action="download-in-person-vote-pdf">
+            {{ __('votings.admin.download_in_person_pdf') }}
+        </a>
+
         <x-admin.create-record-button wire:click="createVoting" />
 
         <button type="button" wire:click="openInPersonVoteModal"

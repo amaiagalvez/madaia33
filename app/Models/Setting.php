@@ -32,6 +32,8 @@ class Setting extends Model
 
     public const SECTION_VOTE_DELEGATE = 'vote_delegate';
 
+    public const SECTION_VOTINGS = 'votings';
+
     protected $fillable = [
         'key',
         'value',
@@ -76,6 +78,7 @@ class Setting extends Model
             self::SECTION_RECAPTCHA,
             self::SECTION_OWNERS,
             self::SECTION_VOTE_DELEGATE,
+            self::SECTION_VOTINGS,
         ];
     }
 
@@ -131,9 +134,9 @@ class Setting extends Model
     public static function allStringValues(): array
     {
         /** @var array<string, string> $values */
-        $values = Cache::rememberForever(self::STRING_VALUES_CACHE_KEY, static fn (): array => self::query()
+        $values = Cache::rememberForever(self::STRING_VALUES_CACHE_KEY, static fn(): array => self::query()
             ->pluck('value', 'key')
-            ->map(static fn (mixed $value): string => (string) $value)
+            ->map(static fn(mixed $value): string => (string) $value)
             ->all());
 
         return $values;

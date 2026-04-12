@@ -29,6 +29,20 @@
 
     <div class="{{ $requiresTermsAcceptance ? 'pointer-events-none select-none blur-sm' : '' }}"
         data-votings-content>
+        <div class="mb-6 flex flex-wrap items-center justify-end gap-2" data-votings-pdf-actions>
+            <a href="{{ route(\App\SupportedLocales::routeName('votings.pdf.delegated')) }}"
+                class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
+                data-front-download-delegated-pdf>
+                {{ __('votings.front.download_delegated_pdf') }}
+            </a>
+
+            <a href="{{ route(\App\SupportedLocales::routeName('votings.pdf.in_person')) }}"
+                class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
+                data-front-download-in-person-pdf>
+                {{ __('votings.front.download_in_person_pdf') }}
+            </a>
+        </div>
+
         @if ($canManageDelegatedVoting && !$isDelegated && !$isInPersonVoting)
             <div class="mb-6 flex items-center justify-end gap-2" data-votings-delegated-action>
                 <button type="button" wire:click="openInPersonVoteModal"

@@ -48,6 +48,7 @@ flowchart TD
     R1 --> VPP[public.private]
     R1 --> VPL[public.legal-page]
     R1 --> VPV[public.votings]
+    R1 --> VPDFP[pdf.votings.ballot (front delegated/in-person)]
     R1 --> VE404[errors.404]
     R1 --> VE500[errors.500]
 
@@ -92,6 +93,7 @@ flowchart TD
     R2 --> VAOI[admin.owners.index]
     R2 --> VAOS[admin.owners.show]
     R2 --> VAV[admin.votings]
+    R2 --> VPDFA[pdf.votings.ballot (admin delegated/in-person)]
     R2 --> VAU[admin.users.index]
 
     VAD --> LA[layouts.admin.main]

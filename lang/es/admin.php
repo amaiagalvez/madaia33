@@ -85,6 +85,12 @@ return [
         'vote_delegate_terms_text' => 'Condiciones de uso (voto delegado)',
         'vote_delegate_terms_text_eu' => 'Condiciones (EU)',
         'vote_delegate_terms_text_es' => 'Condiciones (ES)',
+        'votings_pdf_delegated_text' => 'Texto PDF para voto delegado',
+        'votings_pdf_delegated_text_eu' => 'Texto PDF voto delegado (EU)',
+        'votings_pdf_delegated_text_es' => 'Texto PDF voto delegado (ES)',
+        'votings_pdf_in_person_text' => 'Texto PDF para voto presencial',
+        'votings_pdf_in_person_text_eu' => 'Texto PDF voto presencial (EU)',
+        'votings_pdf_in_person_text_es' => 'Texto PDF voto presencial (ES)',
     ],
     'stats' => [
         'published_notices' => 'Avisos publicados',
@@ -111,6 +117,7 @@ return [
         'recaptcha' => 'reCAPTCHA',
         'owners' => 'Propietarias',
         'vote_delegate' => 'Voto delegado',
+        'votings' => 'Boletines PDF de votaciones',
     ],
     'test_email' => [
         'button' => 'Enviar correo de prueba',
