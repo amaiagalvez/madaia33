@@ -162,3 +162,5 @@
 - After moving methods into traits, re-check phpdoc type names inside the host class (`CarbonInterface`, etc.); missing leading namespace can create fake classes like `App\\Livewire\\Admin\\CarbonInterface` in PHPStan.
 - In profile flows, keep controller/view data types aligned: if Blade uses `->count()`/`->isEmpty()`, return `Collection`; if returning arrays, use `count(...)`/`=== []` in Blade to avoid runtime errors for non-owner users.
 - In Dusk tests, avoid brittle selectors tied to replaced form controls (e.g., old select IDs); target stable `data-*` markers from shared components and prefer DOM-presence waits for Flux dropdown items over strict visibility waits.
+- Profile Mis Votaciones tests: when asserting tab-specific voting content, open `?tab=votings`; default tab resolution can switch to owner and hide rows, causing false negatives.
+- In Dusk link assertions, prefer `endsWith('/locale/path')` over exact href equality because test env often renders absolute URLs (`http://dusk-app:8000/...`) and exact-path checks become flaky.

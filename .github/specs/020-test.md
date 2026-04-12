@@ -1,10 +1,8 @@
-# tests suit
-**IMPORTANT**
-comprobar si hay un test que cubre el caso y si no añadirlo
-si se puede, preferiblemente que sea unit sin base de datos
-si es del front, añadir un dusk-test también
-
 ## Roles
+Comprobar que se cumplen todas estas condiciones para cada rol, si no hay un test que lo compruebe añadelo. Crea los seeders necesarios den DevSeeder para tenga diferentes usuario con diferentes opciones.
+
+**IMPORTANTE** si encuentras otras funcionalidades que no están en la lista y no sabes qué permisos asignarle, primero preguntame antes de hacer nada y escribe abajo de este listado todos los casos con dudas que hayas encontrado
+
 1. SUPER_ADMIN
 2. GENERAL_ADMIN
 3. COMMUNITY_ADMIN (+locations)
@@ -32,19 +30,10 @@ Un community_admin puede tener asingadas varias propiedades, tambien puede que s
 
 ### PROPERTY_OWNER (Jon Ander e Irati)
 - [ ] una propietaria n puede tener activa (sin fehca de fin) una propiedad que otra propietaria ya tenga activa
+- [ ] una propietaria puede votar solo en las votaciones que le correspondan por sus propiedades asignadas activas
 
 ### DELEGATED_VOTE (Rebeca Trabajadora Asesoria, Idoia)
 - [ ] FRONT - VOTACIONES: puede veer la vista de votaciones en el front, pero si no tiene ninguna propiedad activa asignada no puede votar. Puede ver los botones "Voto presencial" y "Voto Delegado"
 - [ ] FRONT - VOTO PRESENCIAL: tiene persmiso para utilizar el voto pressencial
 - [ ] FRONT - VOTO DELEGADO: tiene permiso para utilizar el boto delegado
 
-**IMPORTANT**
-Si hay alguna acción del panel de control que no está en este listado (si tener el cuenta el superadmin), es que el usuario logueado no tiene permiso para realizarla.
-tratalo y escribe aquí las funcionalidades que hayas encontrado que no estén en esta lista (sin tener en cuenta el superadmin).
-
-
-
-profila. al pinchar en Jabearen fitxa, no dupliquess el formulario. Reutiliza el mismo formulario que se enseña en el panel en la lista de propietarios al pinchar en el botón edit.
-
-
-al entrar en la vista de bozketak del front, si el propietario no ha aceptado las condicioones, mostrar el modal como en el profil para que no pueda hacer nada hasta que no acepte las condiciones.

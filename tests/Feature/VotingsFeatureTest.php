@@ -29,10 +29,54 @@ it('requires authentication to access public votings page', function () {
         ->assertRedirect(route('login'));
 });
 
+it('shows terms blocking modal in front votings when owner has not accepted terms', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => null,
+    ]);
+    $portal = Location::factory()->portal()->create(['code' => '33-T']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+        'is_anonymous' => false,
+    ]);
+
+    $option = VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+        'label_eu' => 'Bai',
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    createSetting('owners_terms_text_eu', '<p>Baldintzak bozketetan</p>');
+
+    Livewire::actingAs($owner->user)
+        ->test(PublicVotings::class)
+        ->assertSet('requiresTermsAcceptance', true)
+        ->assertSeeHtml('data-votings-terms-modal')
+        ->set("selectedOptions.{$voting->id}", $option->id)
+        ->call('vote', $voting->id)
+        ->assertHasErrors(["selectedOptions.{$voting->id}"]);
+
+    expect(VotingBallot::query()
+        ->where('voting_id', $voting->id)
+        ->where('owner_id', $owner->id)
+        ->count())->toBe(0);
+});
+
 it('allows an eligible owner to vote once and stores auditable rows', function () {
     Mail::fake();
 
-    $owner = Owner::factory()->create();
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
     $portal = Location::factory()->portal()->create(['code' => '33-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
@@ -98,7 +142,9 @@ it('allows an eligible owner to vote once and stores auditable rows', function (
 it('shows already voted notice and hides voting options when owner already voted', function () {
     Mail::fake();
 
-    $owner = Owner::factory()->create();
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
     $portal = Location::factory()->portal()->create(['code' => '33-AV']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
@@ -134,7 +180,9 @@ it('shows already voted notice and hides voting options when owner already voted
 it('does not store option selections for anonymous votings', function () {
     Mail::fake();
 
-    $owner = Owner::factory()->create();
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
     $portal = Location::factory()->portal()->create(['code' => '33-B']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 

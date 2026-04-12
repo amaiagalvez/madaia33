@@ -27,6 +27,10 @@ return [
     'votings_title' => 'Hay votaciones activas pendientes',
     'votings_summary' => 'Accede al area de votaciones y registra tu voto antes del cierre.',
     'votings_cta' => 'Ir a votaciones',
+    'profile_badge' => 'Tu perfil',
+    'profile_title' => 'Consulta tu perfil siempre que lo necesites',
+    'profile_summary' => 'Entra en tu perfil para revisar tus datos, sesiones y resumen de votaciones.',
+    'profile_cta' => 'Ver perfil',
     'promises' => [
         'informed_title' => 'Mantenerse al día',
         'informed_body' => 'Los avisos recientes y la información útil aparecen en primer plano.',

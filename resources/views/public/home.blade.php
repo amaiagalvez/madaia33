@@ -10,30 +10,90 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 class="sr-only">{{ __('home.title') }}</h1>
 
-        @if ($hasOpenVotings)
-            <section
-                class="section-shell mb-6 overflow-hidden border border-[#d9755b]/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6"
-                data-home-votings-callout>
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
-                            {{ __('home.votings_badge') }}
-                        </p>
-                        <h2 class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
-                            {{ __('home.votings_title') }}
-                        </h2>
-                        <p class="mt-1.5 text-sm text-gray-600">
-                            {{ __('home.votings_summary') }}
-                        </p>
-                    </div>
+        @if ($hasOpenVotings || auth()->check())
+            <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2" data-home-callouts>
+                @if ($hasOpenVotings)
+                    <section
+                        class="section-shell overflow-hidden border border-[#d9755b]/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6"
+                        data-home-votings-callout>
+                        <div
+                            class="flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#d9755b]/25 bg-gradient-to-br from-[#f1bd4d]/35 via-white to-[#edd2c7]/60 text-[#793d3d] shadow-sm ring-4 ring-white/40">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3Zm2.25 4.5h6m-6 3h6m-6 3h3" />
+                                    </svg>
+                                    <span
+                                        class="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 rounded-full bg-[#d9755b]"></span>
+                                </div>
+                                <div>
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                                        {{ __('home.votings_badge') }}
+                                    </p>
+                                    <h2
+                                        class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
+                                        {{ __('home.votings_title') }}
+                                    </h2>
+                                    <p class="mt-1.5 text-sm text-gray-600">
+                                        {{ __('home.votings_summary') }}
+                                    </p>
+                                </div>
+                            </div>
 
-                    <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
-                        class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap"
-                        data-home-votings-cta>
-                        {{ __('home.votings_cta') }}
-                    </a>
-                </div>
-            </section>
+                            <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
+                                class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap"
+                                data-home-votings-cta>
+                                {{ __('home.votings_cta') }}
+                            </a>
+                        </div>
+                    </section>
+                @endif
+
+                @auth
+                    <section
+                        class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#d9755b]/10 p-5 sm:p-6"
+                        data-home-profile-callout>
+                        <div
+                            class="flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#793d3d]/20 bg-gradient-to-br from-[#edd2c7]/60 via-white to-[#d9755b]/25 text-[#793d3d] shadow-sm ring-4 ring-white/40">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm-7.5 8.25a7.5 7.5 0 0 1 15 0" />
+                                    </svg>
+                                    <span
+                                        class="pointer-events-none absolute -left-1.5 -bottom-1.5 h-3.5 w-3.5 rounded-full bg-[#f1bd4d]"></span>
+                                </div>
+                                <div>
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                                        {{ __('home.profile_badge') }}
+                                    </p>
+                                    <h2
+                                        class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
+                                        {{ __('home.profile_title') }}
+                                    </h2>
+                                    <p class="mt-1.5 text-sm text-gray-600">
+                                        {{ __('home.profile_summary') }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <a href="{{ route(\App\SupportedLocales::routeName('profile')) }}"
+                                class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap"
+                                data-home-profile-cta>
+                                {{ __('home.profile_cta') }}
+                            </a>
+                        </div>
+                    </section>
+                @endauth
+            </div>
         @endif
 
         <div class="grid gap-6 lg:grid-cols-12 lg:items-start">
@@ -143,8 +203,8 @@
                 <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
                     class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                     <div class="page-icon-amber shrink-0 h-10 w-10 rounded-lg">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" aria-hidden="true">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                         </svg>
@@ -159,8 +219,8 @@
                         </p>
                     </div>
                     <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
-                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                        aria-hidden="true">
+                        fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>
@@ -168,8 +228,8 @@
                 <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
                     class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/20 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                     <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" aria-hidden="true">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                         </svg>

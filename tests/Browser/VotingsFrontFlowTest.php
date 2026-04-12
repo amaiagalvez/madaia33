@@ -13,7 +13,9 @@ use App\Models\VotingOption;
 use App\Models\PropertyAssignment;
 
 test('open voting callout redirects guest to private login and then to votings page', function () {
-    $owner = Owner::factory()->create();
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
     $portal = Location::factory()->portal()->create(['code' => '66-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
@@ -50,8 +52,31 @@ test('open voting callout redirects guest to private login and then to votings p
     });
 });
 
+test('authenticated owner sees profile and voting callouts on home and can open profile from callout', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner) {
+        $browser->loginAs($owner->user)
+            ->visit('/eu')
+            ->assertPresent('[data-home-votings-callout]')
+            ->assertPresent('[data-home-profile-callout]')
+            ->click('[data-home-profile-cta]')
+            ->waitForLocation('/eu/profila')
+            ->assertPresent('[data-profile-panel="overview"]');
+    });
+});
+
 test('eligible owner can vote from front and ballot is stored as auditable record', function () {
-    $owner = Owner::factory()->create();
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
     $portal = Location::factory()->portal()->create(['code' => '77-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
@@ -92,6 +117,45 @@ test('eligible owner can vote from front and ballot is stored as auditable recor
 
     expect($ballot)->not->toBeNull()
         ->and($ballot->cast_by_user_id)->toBeNull();
+});
+
+test('owner without accepted terms sees blocking modal in front votings until accepting', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => null,
+    ]);
+    $portal = Location::factory()->portal()->create(['code' => '77-T']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+        'label_eu' => 'Bai',
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner) {
+        $browser->loginAs($owner->user)
+            ->visit('/eu/bozketak')
+            ->waitFor('[data-votings-terms-modal]', 5)
+            ->assertPresent('[data-votings-terms-modal]')
+            ->assertPresent('[data-votings-terms-accept-button]')
+            ->click('[data-votings-terms-accept-button]')
+            ->waitForLocation('/eu/bozketak', 5)
+            ->waitUntilMissing('[data-votings-terms-modal]', 5)
+            ->assertPresent('[data-voting-card]');
+    });
 });
 
 test('superadmin can open votings front in read only mode', function () {

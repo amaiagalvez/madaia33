@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Owner;
 use Livewire\Component;
 use App\SupportedLocales;
+use App\Support\OwnerAuditFieldLabel;
 use Livewire\WithPagination;
 use App\Models\OwnerAuditLog;
 use Illuminate\Contracts\View\View;
@@ -317,28 +318,8 @@ class Owners extends Component
         $this->resetValidation();
     }
 
-    /**
-     * @return array<string, string>
-     */
-    private function ownerAuditFieldLabels(): array
-    {
-        return [
-            'coprop1_name' => __('admin.owners.form.coprop1_name'),
-            'coprop1_dni' => __('admin.owners.form.coprop1_dni'),
-            'coprop1_phone' => __('admin.owners.form.coprop1_phone'),
-            'coprop1_email' => __('admin.owners.form.coprop1_email'),
-            'language' => __('admin.owners.form.language'),
-            'coprop2_name' => __('admin.owners.form.coprop2_name'),
-            'coprop2_dni' => __('admin.owners.form.coprop2_dni'),
-            'coprop2_phone' => __('admin.owners.form.coprop2_phone'),
-            'coprop2_email' => __('admin.owners.form.coprop2_email'),
-        ];
-    }
-
     private function loadEditOwnerAuditLogs(Owner $owner): void
     {
-        $fieldLabels = $this->ownerAuditFieldLabels();
-
         $logsQuery = $owner->auditLogs()->with('changedBy:id,name')->latest();
 
         $this->editOwnerAuditLogCount = (clone $logsQuery)->count();
@@ -346,11 +327,11 @@ class Owners extends Component
         $this->editOwnerAuditLogs = $logsQuery
             ->limit(25)
             ->get()
-            ->map(function (OwnerAuditLog $log) use ($fieldLabels): array {
+            ->map(function (OwnerAuditLog $log): array {
                 $changedByUser = $log->changedBy;
 
                 return [
-                    'field_label' => $fieldLabels[$log->field] ?? $log->field,
+                    'field_label' => OwnerAuditFieldLabel::for($log->field),
                     'old_value' => $log->old_value !== '' ? $log->old_value : '—',
                     'new_value' => $log->new_value !== '' ? $log->new_value : '—',
                     'changed_by' => $changedByUser instanceof User

@@ -10,75 +10,11 @@
                 <flux:heading size="lg" class="mb-4">{{ __('admin.owners.edit_owner') }}
                 </flux:heading>
 
-                <div class="grid gap-4 lg:grid-cols-2">
-                    <div class="rounded-lg border border-zinc-200 p-4">
-                        <flux:heading size="sm" class="mb-3 text-zinc-800">
-                            {{ __('admin.owners.columns.coprop1') }}
-                        </flux:heading>
-                        <div class="grid gap-3">
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop1_name') }}</flux:label>
-                                <flux:input wire:model="editCoprop1Name" />
-                                <flux:error name="editCoprop1Name" />
-                            </flux:field>
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop1_dni') }}</flux:label>
-                                <flux:input wire:model="editCoprop1Dni" />
-                                <flux:error name="editCoprop1Dni" />
-                            </flux:field>
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop1_phone') }}</flux:label>
-                                <flux:input wire:model="editCoprop1Phone" />
-                                <flux:error name="editCoprop1Phone" />
-                            </flux:field>
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop1_email') }}</flux:label>
-                                <flux:input wire:model="editCoprop1Email" type="email" />
-                                <flux:error name="editCoprop1Email" />
-                            </flux:field>
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.language') }}</flux:label>
-                                <flux:select wire:model="editLanguage">
-                                    <flux:select.option value="eu">
-                                        {{ __('general.language.eu') }}</flux:select.option>
-                                    <flux:select.option value="es">
-                                        {{ __('general.language.es') }}</flux:select.option>
-                                </flux:select>
-                                <flux:error name="editLanguage" />
-                            </flux:field>
-                        </div>
-                    </div>
-
-                    <div class="rounded-lg border border-zinc-200 p-4">
-                        <flux:heading size="sm" class="mb-3 text-zinc-800">
-                            {{ __('admin.owners.columns.coprop2') }}
-                        </flux:heading>
-                        <div class="grid gap-3">
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop2_name') }}</flux:label>
-                                <flux:input wire:model="editCoprop2Name" />
-                                <flux:error name="editCoprop2Name" />
-                            </flux:field>
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop2_dni') }}</flux:label>
-                                <flux:input wire:model="editCoprop2Dni" />
-                                <flux:error name="editCoprop2Dni" />
-                            </flux:field>
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop2_phone') }}
-                                </flux:label>
-                                <flux:input wire:model="editCoprop2Phone" />
-                                <flux:error name="editCoprop2Phone" />
-                            </flux:field>
-                            <flux:field>
-                                <flux:label>{{ __('admin.owners.form.coprop2_email') }}
-                                </flux:label>
-                                <flux:input wire:model="editCoprop2Email" type="email" />
-                                <flux:error name="editCoprop2Email" />
-                            </flux:field>
-                        </div>
-                    </div>
-                </div>
+                <x-admin.owner-shared-fields mode="wire" coprop1-name-model="editCoprop1Name"
+                    coprop1-dni-model="editCoprop1Dni" coprop1-phone-model="editCoprop1Phone"
+                    coprop1-email-model="editCoprop1Email" language-model="editLanguage"
+                    coprop2-name-model="editCoprop2Name" coprop2-dni-model="editCoprop2Dni"
+                    coprop2-phone-model="editCoprop2Phone" coprop2-email-model="editCoprop2Email" />
 
                 <details class="mt-6 rounded-lg border border-zinc-200 bg-gray-50"
                     data-section="owner-audit-log">
@@ -455,8 +391,7 @@
                         <x-admin.table-row-actions>
                             <x-admin.icon-button-edit
                                 wire:click="openEditOwnerForm({{ $owner->id }})"
-                                :title="__('admin.owners.edit_owner')"
-                                data-action="edit-owner-{{ $owner->id }}" />
+                                :title="__('admin.owners.edit_owner')" data-action="edit-owner-{{ $owner->id }}" />
                             <button type="button"
                                 wire:click="toggleOwnerRow({{ $owner->id }})"
                                 title="{{ __('admin.owners.view_properties') }}"

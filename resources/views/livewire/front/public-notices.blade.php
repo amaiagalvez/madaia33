@@ -1,5 +1,5 @@
 <div>
-    <x-front.public-page-header hero="notices" :title="__('notices.title')" :subtitle="__('notices.subtitle')">
+    <x-front.public-page-header hero="notices" :title="__('notices.title')" :subtitle="__('notices.subtitle')" compact>
         <x-slot:actions>
             <div class="flex flex-wrap items-center justify-start gap-2 lg:justify-end"
                 data-notices-filter>

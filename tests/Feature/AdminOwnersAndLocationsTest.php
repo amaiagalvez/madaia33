@@ -427,7 +427,9 @@ it('uses shared side-panel and footer pattern in owners forms', function () {
         ->call('openEditOwnerForm', $owner->id)
         ->assertSeeHtml('data-section="owner-edit-form"')
         ->assertSeeHtml('data-admin-side-panel-form')
-        ->assertSeeHtml('data-admin-form-footer-actions');
+        ->assertSeeHtml('data-admin-form-footer-actions')
+        ->assertSeeHtml('data-owner-shared-form="true"')
+        ->assertSeeHtml('data-owner-shared-form-mode="wire"');
 });
 
 it('shows a compact owner audit log list in the edit form', function () {

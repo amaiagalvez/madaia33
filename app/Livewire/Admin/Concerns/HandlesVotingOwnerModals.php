@@ -125,10 +125,10 @@ trait HandlesVotingOwnerModals
             'percentage' => $this->eligibilityService->percentageForOwnerAtVotingDate($voting, $owner),
             'vote' => $ballot instanceof VotingBallot ? $this->formatBallotOptionName($ballot) : '',
             'delegated_by' => $ballot instanceof VotingBallot
-              ? ($ballot->is_in_person
+                ? ($ballot->is_in_person
                 ? __('votings.admin.in_person_vote')
                 : ($castByUser instanceof User ? $castByUser->name : '—'))
-              : '—',
+                : '—',
             'delegate_dni' => $ballot instanceof VotingBallot ? ($ballot->cast_delegate_dni ?? '—') : '—',
             'has_voted' => $ballot instanceof VotingBallot,
             'properties' => $owner->activeAssignments

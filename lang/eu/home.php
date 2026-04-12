@@ -27,6 +27,10 @@ return [
     'votings_title' => 'Komunitateko bozketa aktiboak dituzu zain',
     'votings_summary' => 'Sartu bozketa gunera eta eman zure botoa epea amaitu aurretik.',
     'votings_cta' => 'Bozketetara joan',
+    'profile_badge' => 'Zure profila',
+    'profile_title' => 'Nahi duzunean kontsulta dezakezu zure profila',
+    'profile_summary' => 'Sartu profilera eta berrikusi zure datuak, saioak eta bozketen laburpena.',
+    'profile_cta' => 'Profila ikusi',
     'promises' => [
         'informed_title' => 'Eguneratuta egoteko',
         'informed_body' => 'Iragarki berriak eta informazio erabilgarria lehen planoan ikusten dira.',

@@ -25,7 +25,6 @@
 
 Igandea
 =======
-- pasar test a todo 
 - Testak Rolak Panela y Front
 - votaciones pdf
 - votaciones resultados (suma de porcentajes)

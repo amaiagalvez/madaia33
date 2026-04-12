@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\Owner;
 use App\Models\Voting;
+use App\Models\OwnerAuditLog;
 use App\Models\Property;
 use App\Models\VotingBallot;
 use App\Models\UserLoginSession;
@@ -20,23 +21,45 @@ it('shows profile tabs with user voting and session information', function () {
         'accepted_terms_at' => now(),
     ]);
 
-    $property = Property::factory()->create();
+    $property = Property::factory()->create([
+        'community_pct' => 1.25,
+        'location_pct' => 2.50,
+    ]);
 
     PropertyAssignment::factory()->create([
         'owner_id' => $owner->id,
         'property_id' => $property->id,
+        'start_date' => today()->subYears(2)->format('Y-m-d'),
         'end_date' => null,
         'owner_validated' => false,
     ]);
 
-    $voting = Voting::factory()->create();
+    $participatedVoting = Voting::factory()->create([
+        'name_eu' => 'Parte hartutako bozketa',
+        'name_es' => 'Votacion participada',
+    ]);
+
+    $pendingActiveVoting = Voting::factory()->current()->create([
+        'name_eu' => 'Aktibo pendiente bozketa',
+        'name_es' => 'Votacion activa pendiente',
+    ]);
+
+    $missedClosedVoting = Voting::factory()->create([
+        'name_eu' => 'Itxitako bozketa galduta',
+        'name_es' => 'Votacion cerrada perdida',
+        'starts_at' => today()->subDays(14),
+        'ends_at' => today()->subDays(2),
+    ]);
 
     VotingBallot::factory()->create([
-        'voting_id' => $voting->id,
+        'voting_id' => $participatedVoting->id,
         'owner_id' => $owner->id,
         'cast_by_user_id' => $user->id,
         'voted_at' => now()->subHour(),
     ]);
+
+    expect($pendingActiveVoting->id)->not->toBe($participatedVoting->id)
+        ->and($missedClosedVoting->id)->not->toBe($participatedVoting->id);
 
     UserLoginSession::factory()->closed()->create([
         'user_id' => $user->id,
@@ -44,13 +67,20 @@ it('shows profile tabs with user voting and session information', function () {
         'logged_out_at' => now()->subHours(2),
     ]);
 
-    test()->actingAs($user)
-        ->get(route('profile.eu'))
+    $response = test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'votings']))
         ->assertOk()
         ->assertSee(__('profile.tabs.votings'))
         ->assertSee(__('profile.tabs.sessions'))
         ->assertSee(__('profile.tabs.owner'))
-        ->assertSee('Profile User');
+        ->assertSee('Profile User')
+        ->assertSee(__('profile.votings.pending_active_title'))
+        ->assertSee(__('profile.votings.missed_closed_title'))
+        ->assertSee(__('profile.votings.go_to_front'))
+        ->assertSee('data-profile-votings-pending-link', false)
+        ->assertSee(route('votings.eu', [], false))
+        ->assertSee('Aktibo pendiente bozketa')
+        ->assertSee('Itxitako bozketa galduta');
 });
 
 it('renders profile page for users without owner profile', function () {
@@ -154,4 +184,33 @@ it('validates only authenticated owner assignments', function () {
 
     expect($ownedAssignment->refresh()->owner_validated)->toBeTrue()
         ->and($foreignAssignment->refresh()->owner_validated)->toBeFalse();
+});
+
+it('shows owner form actions and latest owner audit changes in owner tab', function () {
+    $user = User::factory()->create();
+
+    $owner = Owner::factory()->for($user)->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    OwnerAuditLog::query()->create([
+        'owner_id' => $owner->id,
+        'changed_by_user_id' => $user->id,
+        'field' => 'accepted_terms_at',
+        'old_value' => '',
+        'new_value' => now()->toDateTimeString(),
+        'created_at' => now()->subMinute(),
+        'updated_at' => now()->subMinute(),
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'owner']))
+        ->assertOk()
+        ->assertSeeHtml('data-profile-owner-form-actions')
+        ->assertSee(__('general.buttons.save'))
+        ->assertSee(__('general.buttons.cancel'))
+        ->assertSeeHtml('data-profile-owner-audit-log')
+        ->assertSee(__('admin.owners.audit.title'))
+        ->assertSee(__('admin.owners.columns.terms_accepted'))
+        ->assertSee('—');
 });
