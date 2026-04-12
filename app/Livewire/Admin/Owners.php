@@ -33,6 +33,8 @@ class Owners extends Component
 
     public bool $showCreateForm = false;
 
+    public string $ownerId = '';
+
     public string $coprop1Name = '';
 
     public string $coprop1Dni = '';
@@ -347,6 +349,7 @@ class Owners extends Component
     public function cancelCreateOwner(): void
     {
         $this->reset([
+            'ownerId',
             'coprop1Name',
             'coprop1Dni',
             'coprop1Phone',

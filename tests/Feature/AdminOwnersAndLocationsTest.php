@@ -607,6 +607,54 @@ it('creates a new owner from the admin owners list', function () {
     expect($owner->assignments()->count())->toBe(1);
 });
 
+it('creates a new owner with a manual id from the admin owners list', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $portal = Location::factory()->portal()->create(['code' => '33-A', 'name' => 'Portal 33-A']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1A']);
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->set('ownerId', '500')
+        ->set('coprop1Name', 'Manual Id Owner')
+        ->set('coprop1Dni', '11223344B')
+        ->set('coprop1Email', 'manual-id@example.com')
+        ->set('coprop1Phone', '600123124')
+        ->set('newAssignments.0.property_id', (string) $property->id)
+        ->set('newAssignments.0.start_date', '2026-01-01')
+        ->call('createOwner')
+        ->assertSet('showCreateForm', false);
+
+    $owner = Owner::query()->find(500);
+
+    expect($owner)->not->toBeNull()
+        ->and($owner->coprop1_email)->toBe('manual-id@example.com');
+});
+
+it('shows validation error when manual owner id is repeated', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $existingOwner = Owner::factory()->create();
+    $portal = Location::factory()->portal()->create(['code' => '33-A', 'name' => 'Portal 33-A']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1A']);
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->set('ownerId', (string) $existingOwner->id)
+        ->set('coprop1Name', 'Repeated Id Owner')
+        ->set('coprop1Dni', '11223344C')
+        ->set('coprop1Email', 'repeated-id@example.com')
+        ->set('coprop1Phone', '600123125')
+        ->set('newAssignments.0.property_id', (string) $property->id)
+        ->set('newAssignments.0.start_date', '2026-01-01')
+        ->call('createOwner')
+        ->assertHasErrors(['ownerId' => 'unique']);
+});
+
 it('shows owners without active properties when using without-properties filter', function () {
     $user = adminUser();
 

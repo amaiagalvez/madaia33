@@ -252,6 +252,7 @@ return [
             'system' => 'Sistema',
         ],
         'form' => [
+            'id' => 'ID (Núm)',
             'coprop1_name' => 'Nombre',
             'coprop1_dni' => 'DNI',
             'coprop1_phone' => 'Teléfono',

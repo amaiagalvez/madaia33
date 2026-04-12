@@ -253,6 +253,7 @@ return [
             'system' => 'Sistema',
         ],
         'form' => [
+            'id' => 'ID (Zbkia)',
             'coprop1_name' => 'Izena',
             'coprop1_dni' => 'NAN',
             'coprop1_phone' => 'Telefonoa',

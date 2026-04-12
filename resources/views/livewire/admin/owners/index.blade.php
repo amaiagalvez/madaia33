@@ -92,6 +92,14 @@
                 <flux:heading size="lg" class="mb-4">{{ __('admin.owners.create') }}
                 </flux:heading>
 
+                <div class="mb-4">
+                    <flux:field>
+                        <flux:label>{{ __('admin.owners.form.id') }}</flux:label>
+                        <flux:input wire:model="ownerId" type="text" inputmode="numeric" />
+                        <flux:error name="ownerId" />
+                    </flux:field>
+                </div>
+
                 <div class="grid gap-4 lg:grid-cols-2">
                     <div class="rounded-lg border border-zinc-200 p-4">
                         <flux:heading size="sm" class="mb-3 text-zinc-800">

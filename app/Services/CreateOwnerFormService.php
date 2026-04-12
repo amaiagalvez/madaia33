@@ -39,7 +39,10 @@ class CreateOwnerFormService
      */
     public function prepareOwnerData(array $validated): array
     {
+        $ownerId = $validated['ownerId'] ?? null;
+
         return [
+            'owner_id' => ($ownerId !== null && $ownerId !== '') ? (int) $ownerId : null,
             'coprop1_name' => $validated['coprop1Name'],
             'coprop1_dni' => $validated['coprop1Dni'],
             'coprop1_phone' => $validated['coprop1Phone'] ?: null,

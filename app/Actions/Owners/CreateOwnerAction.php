@@ -28,7 +28,7 @@ class CreateOwnerAction
     {
         $password = Str::password(16);
 
-        $result = DB::transaction(fn (): array => $this->createOwnerWithAssignments($data, $password));
+        $result = DB::transaction(fn(): array => $this->createOwnerWithAssignments($data, $password));
 
         /** @var Owner $owner */
         $owner = $result['owner'];
@@ -78,7 +78,15 @@ class CreateOwnerAction
      */
     private function createOwner(User $user, array $data): Owner
     {
-        return Owner::create([
+        $ownerId = $data['owner_id'] ?? null;
+
+        if ($ownerId !== null && Owner::withTrashed()->whereKey((int) $ownerId)->exists()) {
+            throw ValidationException::withMessages([
+                'ownerId' => __('validation.unique', ['attribute' => __('admin.owners.form.id')]),
+            ]);
+        }
+
+        $owner = new Owner([
             'user_id' => $user->id,
             'coprop1_name' => $data['coprop1_name'],
             'coprop1_dni' => $data['coprop1_dni'],
@@ -90,6 +98,14 @@ class CreateOwnerAction
             'coprop2_phone' => $data['coprop2_phone'] ?? null,
             'coprop2_email' => $data['coprop2_email'] ?? null,
         ]);
+
+        if ($ownerId !== null) {
+            $owner->id = (int) $ownerId;
+        }
+
+        $owner->save();
+
+        return $owner;
     }
 
     /**
@@ -192,7 +208,7 @@ class CreateOwnerAction
 
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();

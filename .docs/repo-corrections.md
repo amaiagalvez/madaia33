@@ -181,3 +181,4 @@
 - PHPStan generic covariance can still fail when a method declares `Collection<shape>` and one branch returns bare `collect()`; prevent this by returning a typed array (`->values()->all()`) from the helper and collecting only at the presentation boundary when Blade needs collection helpers.
 - For PHPMD complexity limits in controllers, keep the action method linear and move scope normalization/predicate checks into small private helpers; this usually lowers both Cyclomatic and NPath without behavior changes.
 - In front-votings Dusk flows, delegated/in-person action clicks can be intercepted by the terms modal; accept `[data-votings-terms-accept-button]` and wait until `[data-votings-terms-modal]` disappears before clicking vote action buttons.
+- In Livewire create forms with optional numeric inputs (like manual `id`), normalize empty values before casting; otherwise `null`/empty can become `0` and trigger unintended validation or persistence paths.

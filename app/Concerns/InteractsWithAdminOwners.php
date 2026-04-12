@@ -6,7 +6,6 @@ use App\Models\Owner;
 use App\Models\Location;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
 trait InteractsWithAdminOwners
@@ -17,6 +16,7 @@ trait InteractsWithAdminOwners
     private function ownerCreationRules(): array
     {
         return [
+            'ownerId' => ['nullable', 'integer', 'min:1', 'unique:owners,id'],
             'coprop1Name' => ['required', 'string', 'max:255'],
             'coprop1Dni' => ['required', 'string', 'max:20', 'unique:owners,coprop1_dni'],
             'coprop1Phone' => ['nullable', 'string', 'max:20'],
@@ -53,6 +53,7 @@ trait InteractsWithAdminOwners
     private function ownerCreationAttributes(): array
     {
         return [
+            'ownerId' => __('admin.owners.form.id'),
             'coprop1Name' => __('admin.owners.form.coprop1_name'),
             'coprop1Dni' => __('admin.owners.form.coprop1_dni'),
             'coprop1Phone' => __('admin.owners.form.coprop1_phone'),
@@ -71,6 +72,7 @@ trait InteractsWithAdminOwners
     private function resetCreateOwnerFormState(): void
     {
         $this->reset([
+            'ownerId',
             'coprop1Name',
             'coprop1Dni',
             'coprop1Phone',
@@ -118,7 +120,7 @@ trait InteractsWithAdminOwners
     }
 
     /**
-     * @return array{portals: Collection<int, Location>, locals: Collection<int, Location>, garages: Collection<int, Location>, storages: Collection<int, Location>, assignableProperties: Collection<int, Property>}
+     * @return array{portals: \Illuminate\Support\Collection<int, Location>, locals: \Illuminate\Support\Collection<int, Location>, garages: \Illuminate\Support\Collection<int, Location>, storages: \Illuminate\Support\Collection<int, Location>, assignableProperties: \Illuminate\Support\Collection<int, Property>}
      */
     private function loadViewData(): array
     {

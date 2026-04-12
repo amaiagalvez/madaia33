@@ -63,11 +63,13 @@ Para que todo esto sea legal de verdad, asegúrate de:
   
   crear un pdf para el voto delegado con las votaciones activas, a dos columnas, izquierda en euskera y derecha en castellano con loss textos guardados en el settings con los textos de voto delegado.
   debajo y a ancho completo las votaciones, pregunta y casillas con opciones para pooder marcarlas en el papel con boli. Cada votación debe aparecer una sola vez en los dos idiomas juntos (euskera negrita y castellano en normal)
+  
+  en el comienzo de cada página debe de ir a la izquierda el texto el nombre de la web que está en settings+"Jabeen Erkidegoa" y a la derecha "Comunidad de Propietarios/a" o + el nombre de la web que está en settings. En el medio colocar la imagen del favicon.
 
-  crear un pdf para el voto presencial, igual que el voto delegado pero con los registros del settings correspoondientes.
+  crear un pdf para el voto presencial, igual que el voto delegado pero con los registros del settings correspoondientes. 
 
   poner los botones para descargar los pdf-s tanto en el listado de votaciones del panel de control como en el front votaciones.
-  
+
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
 - [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak (aldatu dezakezu migrazioa, ez dago indarrean)
