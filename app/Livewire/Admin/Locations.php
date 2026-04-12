@@ -6,12 +6,12 @@ use App\Models\Role;
 use App\Models\User;
 use Livewire\Component;
 use App\Models\Location;
-use App\Models\PropertyAssignment;
-use Illuminate\Validation\Rule;
 use Livewire\WithPagination;
+use Illuminate\Validation\Rule;
+use App\Models\PropertyAssignment;
 use Illuminate\Contracts\View\View;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class Locations extends Component
 {

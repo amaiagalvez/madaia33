@@ -2,17 +2,17 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use App\Models\Owner;
 use Livewire\Component;
 use App\Models\Location;
 use App\Models\Property;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\View\View;
-use App\Actions\Locations\AssignLocationChiefAction;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use App\Actions\Locations\AssignLocationChiefAction;
 
 class LocationDetail extends Component
 {

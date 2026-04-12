@@ -9,8 +9,8 @@ use App\Models\Location;
 use App\Models\Property;
 use App\Models\VotingBallot;
 use App\Models\VotingOption;
-use App\Models\VotingSelection;
 use App\Livewire\Admin\Votings;
+use App\Models\VotingSelection;
 use App\Models\PropertyAssignment;
 
 beforeEach(function () {

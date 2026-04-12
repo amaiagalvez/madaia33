@@ -9,6 +9,7 @@ use App\Models\Voting;
 use Livewire\Component;
 use App\Models\Location;
 use App\SupportedLocales;
+use Carbon\CarbonInterface;
 use App\Models\VotingBallot;
 use App\Models\VotingOption;
 use Livewire\WithPagination;
@@ -144,7 +145,7 @@ class Votings extends Component
         $this->isPublished = (bool) $voting->is_published;
         $this->isAnonymous = (bool) $voting->is_anonymous;
         $this->selectedLocations = $voting->locations
-            ->map(static fn(VotingLocation $location): string => (string) $location->location_id)
+            ->map(static fn (VotingLocation $location): string => (string) $location->location_id)
             ->values()
             ->all();
 
@@ -194,7 +195,7 @@ class Votings extends Component
             return;
         }
 
-        DB::transaction(fn() => $this->persistVoting($normalizedOptions));
+        DB::transaction(fn () => $this->persistVoting($normalizedOptions));
 
         $this->resetForm();
         $this->showCreateForm = false;
@@ -282,7 +283,7 @@ class Votings extends Component
                     'label_es' => trim((string) $option['labelEs']),
                 ];
             })
-            ->filter(fn(array $option): bool => $option['label_eu'] !== '')
+            ->filter(fn (array $option): bool => $option['label_eu'] !== '')
             ->values()
             ->all();
     }
@@ -328,7 +329,7 @@ class Votings extends Component
     private function syncVotingLocations(Voting $voting): void
     {
         $locationIds = collect(array_unique($this->selectedLocations))
-            ->map(static fn(string $locationId): int => (int) $locationId)
+            ->map(static fn (string $locationId): int => (int) $locationId)
             ->values()
             ->all();
 
@@ -374,7 +375,7 @@ class Votings extends Component
 
     /**
      * @param  array<int, array{label_eu: string, label_es: string}>  $normalizedOptions
-     * @return array<int, array{voting_id: int, label_eu: string, label_es: ?string, position: int, created_at: \Carbon\CarbonInterface, updated_at: \Carbon\CarbonInterface}>
+     * @return array<int, array{voting_id: int, label_eu: string, label_es: ?string, position: int, created_at: CarbonInterface, updated_at: CarbonInterface}>
      */
     private function votingOptionRows(Voting $voting, array $normalizedOptions): array
     {
@@ -394,7 +395,7 @@ class Votings extends Component
     }
 
     /**
-     * @return array<int, array{voting_id: int, location_id: int, created_at: \Carbon\CarbonInterface, updated_at: \Carbon\CarbonInterface}>
+     * @return array<int, array{voting_id: int, location_id: int, created_at: CarbonInterface, updated_at: CarbonInterface}>
      */
     private function votingLocationRows(Voting $voting): array
     {
@@ -431,12 +432,12 @@ class Votings extends Component
         $this->ownersModalIsAnonymous = (bool) $voting->is_anonymous;
 
         $this->ownersModalRows = $owners
-            ->map(fn(Owner $owner): array => [
+            ->map(fn (Owner $owner): array => [
                 'name' => $owner->coprop1_name,
                 'has_voted' => isset($votedOwnerIds[$owner->id]),
                 'vote' => $votesByOwner[$owner->id] ?? '',
                 'properties' => $owner->activeAssignments
-                    ->map(fn(PropertyAssignment $a): string => trim(($a->property?->location?->code ?? '') . ' ' . ($a->property?->name ?? '')))
+                    ->map(fn (PropertyAssignment $a): string => trim(($a->property?->location?->code ?? '') . ' ' . ($a->property?->name ?? '')))
                     ->filter()
                     ->join(', '),
                 'percentage' => $this->eligibilityService->percentageForOwnerAtVotingDate($voting, $owner),
@@ -497,7 +498,7 @@ class Votings extends Component
     private function formatBallotVote(VotingBallot $ballot): string
     {
         return $ballot->selections
-            ->sortBy(static fn($selection) => $selection->option?->position ?? PHP_INT_MAX)
+            ->sortBy(static fn ($selection) => $selection->option?->position ?? PHP_INT_MAX)
             ->map(static function ($selection): string {
                 $label = $selection->option?->label ?? '';
 
@@ -516,7 +517,7 @@ class Votings extends Component
     private function formatBallotOptionName(VotingBallot $ballot): string
     {
         return $ballot->selections
-            ->sortBy(static fn($selection) => $selection->option?->position ?? PHP_INT_MAX)
+            ->sortBy(static fn ($selection) => $selection->option?->position ?? PHP_INT_MAX)
             ->map(static function ($selection): string {
                 $position = $selection->option?->position;
 
@@ -550,7 +551,7 @@ class Votings extends Component
             'delegate_dni' => $ballot instanceof VotingBallot ? ($ballot->cast_delegate_dni ?? '—') : '—',
             'has_voted' => $ballot instanceof VotingBallot,
             'properties' => $owner->activeAssignments
-                ->map(fn(PropertyAssignment $assignment): string => trim(($assignment->property?->location?->code ?? '') . ' ' . ($assignment->property?->name ?? '')))
+                ->map(fn (PropertyAssignment $assignment): string => trim(($assignment->property?->location?->code ?? '') . ' ' . ($assignment->property?->name ?? '')))
                 ->filter()
                 ->join(', '),
         ];
@@ -614,7 +615,7 @@ class Votings extends Component
                 ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 ELSE 3 END")
                 ->orderBy('code')
                 ->get()
-                ->map(static fn(Location $l): array => [
+                ->map(static fn (Location $l): array => [
                     'id' => (string) $l->id,
                     'label' => __('admin.locations.types.' . $l->type) . ' ' . $l->code,
                 ])
@@ -676,7 +677,7 @@ class Votings extends Component
         abort_unless($this->canManageAdminVotings(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn(array $row): int => $row['owner']->id)
+            ->map(static fn (array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -709,7 +710,7 @@ class Votings extends Component
 
         $filtered = array_values(array_filter(
             $rows,
-            static fn(array $row): bool => str_contains($row['search_index'], $search)
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
         ));
 
         if ($type === 'delegated') {

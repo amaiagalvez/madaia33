@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use App\Models\Owner;
-use App\Models\OwnerAuditLog;
 use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
+use App\Models\OwnerAuditLog;
 use App\Livewire\Admin\Owners;
 use App\Mail\OwnerWelcomeMail;
 use App\Livewire\Admin\Locations;

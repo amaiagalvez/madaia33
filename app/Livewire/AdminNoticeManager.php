@@ -107,7 +107,7 @@ class AdminNoticeManager extends Component
         $this->contentEs = $notice->content_es ?? '';
         $this->isPublic = $notice->is_public;
         $this->selectedLocations = $notice->locations
-            ->map(fn(NoticeLocation $location): ?string => $location->location_code)
+            ->map(fn (NoticeLocation $location): ?string => $location->location_code)
             ->filter()
             ->values()
             ->all();
@@ -122,7 +122,7 @@ class AdminNoticeManager extends Component
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->filter(static fn (string $code): bool => in_array($code, $allowedLocationCodes, true))
                 ->values()
                 ->all();
         }
@@ -145,7 +145,7 @@ class AdminNoticeManager extends Component
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->filter(static fn (string $code): bool => in_array($code, $allowedLocationCodes, true))
                 ->values()
                 ->all();
         }
@@ -370,7 +370,7 @@ class AdminNoticeManager extends Component
             ->get();
 
         return $locations
-            ->map(fn(Location $location): array => [
+            ->map(fn (Location $location): array => [
                 'code' => $location->code,
                 'type' => $location->type,
                 'label' => $this->locationLabel($location) . $location->code,
@@ -412,7 +412,7 @@ class AdminNoticeManager extends Component
     private function allowedLocationCodes(): array
     {
         return collect($this->allLocationOptions())
-            ->map(static fn(array $location): string => $location['code'])
+            ->map(static fn (array $location): string => $location['code'])
             ->values()
             ->all();
     }
