@@ -212,7 +212,7 @@
 }
 
 [data-flux-label] {
-    @apply mb-0 ! leading-tight !;
+    @apply mb-0 leading-tight;
 }
 
 /* Keep owner side-panel form controls readable regardless of inherited dark/light variables. */

@@ -186,3 +186,4 @@
 - If focused `phpstan analyse <files>` reports `unused` members in a Livewire class that are consumed from a trait, verify with a full-project analyse before refactoring; file-scoped runs can produce misleading dead-code signals.
 - For PHPMD `ExcessiveMethodLength` in Livewire/services, keep behavior unchanged and extract setup/mapping chunks into small private helpers; then validate with the same Docker `phpmd` command used by quality.
 - In idempotent dev seeders, never `return` just because no unassigned property exists; for role-critical demo users first reuse their existing active assignment, then allocate free property, then create a fallback property so Feature assertions stay deterministic.
+- In Tailwind v4 CSS, `@apply` cannot contain standalone `!` tokens; remove them (or use valid important utility syntax) because Vite build fails with `Cannot apply unknown utility class '!'`.
