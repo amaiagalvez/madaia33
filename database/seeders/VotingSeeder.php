@@ -90,6 +90,25 @@ class VotingSeeder extends Seeder
             ],
             locationCodes: [],
         );
+
+        $this->seedVoting(
+            attributes: [
+                'name_eu' => 'Igogailua berriztea - 2026',
+                'name_es' => 'Renovacion del ascensor - 2026',
+                'question_eu' => 'Zein enpresa kontratatzen dugu igogailua berrizteko?',
+                'question_es' => 'Que empresa contratamos para renovar el ascensor?',
+                'starts_at' => today()->subMonths(2),
+                'ends_at' => today()->subMonth()->subDays(5),
+                'is_published' => true,
+                'is_anonymous' => false,
+            ],
+            options: [
+                ['label_eu' => 'Otis', 'label_es' => 'Otis'],
+                ['label_eu' => 'Kone', 'label_es' => 'Kone'],
+                ['label_eu' => 'Schindler', 'label_es' => 'Schindler'],
+            ],
+            locationCodes: [],
+        );
     }
 
     /**

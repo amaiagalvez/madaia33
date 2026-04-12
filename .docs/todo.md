@@ -50,7 +50,12 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
+
 - Resultado votaciones
+añadir un botón de resultados en la misma linea de los botones del pdf para descargar los resultados de las votaciones.
+al pinchar en el PDF de los resultados, descargar un informe con el resultado de las votaciones, número de personas que han votado, el número total de votos por cada opcióon de la votación (votes_count) y la suma total de los porcentajes que han elegido cada opción (pct_total)
+añadir gráficos.
+
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
 - Deialdiak sartzeko formularioa + pdf

@@ -11,6 +11,10 @@ use App\Models\Voting;
 use App\Models\Setting;
 use App\Models\Location;
 use App\Models\Property;
+use App\Models\VotingBallot;
+use App\Models\VotingOption;
+use App\Models\VotingSelection;
+use App\Models\VotingOptionTotal;
 use Illuminate\Support\Str;
 use App\Models\ContactMessage;
 use App\Models\NoticeLocation;
@@ -51,6 +55,7 @@ class DevSeeder extends Seeder
         $this->seedUserLoginSessions();
         $this->call(VotingSeeder::class);
         $this->seedVotingBallots();
+        $this->seedPastVotingBallots();
         $this->seedContactMessages();
     }
 
@@ -462,7 +467,7 @@ class DevSeeder extends Seeder
                 }
 
                 $delegatedOwner = $eligibleOwners->first(
-                    fn (Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
+                    fn(Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
                 );
 
                 if (! $delegatedOwner instanceof Owner || ! $delegatedUser instanceof User) {
@@ -477,6 +482,99 @@ class DevSeeder extends Seeder
                     $delegatedOption->id,
                     $delegatedUser,
                 );
+
+                $votedIds = collect([$selfVotingOwner?->id, $delegatedOwner->id])->filter()->values();
+
+                $eligibleOwners
+                    ->reject(fn(Owner $owner): bool => $votedIds->contains($owner->id))
+                    ->take(4)
+                    ->each(function (Owner $owner) use ($castVotingBallotAction, $voting): void {
+                        if ($owner->user === null) {
+                            return;
+                        }
+
+                        $castVotingBallotAction->execute(
+                            $voting,
+                            $owner,
+                            $voting->options->random()->id,
+                            $owner->user,
+                        );
+                    });
+            });
+    }
+
+    private function seedPastVotingBallots(): void
+    {
+        /** @var VotingEligibilityService $eligibilityService */
+        $eligibilityService = app(VotingEligibilityService::class);
+
+        Voting::query()
+            ->with(['options', 'locations.location'])
+            ->where('is_published', true)
+            ->whereDate('ends_at', '<', today())
+            ->orderBy('id')
+            ->get()
+            ->each(function (Voting $voting) use ($eligibilityService): void {
+                if ($voting->options->isEmpty()) {
+                    return;
+                }
+
+                $eligibleOwners = $eligibilityService->eligibleOwners($voting)->values()->take(8);
+
+                foreach ($eligibleOwners as $owner) {
+                    $alreadyVoted = VotingBallot::query()
+                        ->where('voting_id', $voting->id)
+                        ->where('owner_id', $owner->id)
+                        ->exists();
+
+                    if ($alreadyVoted) {
+                        continue;
+                    }
+
+                    $option = $voting->options->random();
+
+                    $owner->loadMissing('activeAssignments.property');
+                    $ownerPct = $owner->activeAssignments
+                        ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+
+                    $ballot = VotingBallot::create([
+                        'voting_id' => $voting->id,
+                        'owner_id' => $owner->id,
+                        'cast_by_user_id' => null,
+                        'cast_ip_address' => null,
+                        'cast_latitude' => null,
+                        'cast_longitude' => null,
+                        'cast_delegate_dni' => null,
+                        'is_in_person' => false,
+                        'voted_at' => fake()->dateTimeBetween($voting->starts_at, $voting->ends_at),
+                    ]);
+
+                    if (! $voting->is_anonymous) {
+                        VotingSelection::create([
+                            'voting_id' => $voting->id,
+                            'voting_ballot_id' => $ballot->id,
+                            'owner_id' => $owner->id,
+                            'voting_option_id' => $option->id,
+                        ]);
+                    }
+
+                    $total = VotingOptionTotal::query()
+                        ->where('voting_id', $voting->id)
+                        ->where('voting_option_id', $option->id)
+                        ->first();
+
+                    if ($total === null) {
+                        VotingOptionTotal::create([
+                            'voting_id' => $voting->id,
+                            'voting_option_id' => $option->id,
+                            'votes_count' => 1,
+                            'pct_total' => $ownerPct,
+                        ]);
+                    } else {
+                        $total->increment('votes_count');
+                        $total->increment('pct_total', $ownerPct);
+                    }
+                }
             });
     }
 
