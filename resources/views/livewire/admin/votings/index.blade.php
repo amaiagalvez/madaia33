@@ -12,17 +12,17 @@
     @endif
 
     <div class="mb-4 flex items-center justify-end gap-2">
-        <a href="{{ route('admin.votings.pdf.delegated') }}"
+        <button type="button" wire:click="downloadDelegatedPdf"
             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
             data-action="download-delegated-vote-pdf">
             {{ __('votings.admin.download_delegated_pdf') }}
-        </a>
+        </button>
 
-        <a href="{{ route('admin.votings.pdf.in_person') }}"
+        <button type="button" wire:click="downloadInPersonPdf"
             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
             data-action="download-in-person-vote-pdf">
             {{ __('votings.admin.download_in_person_pdf') }}
-        </a>
+        </button>
 
         <x-admin.create-record-button wire:click="createVoting" />
 
@@ -127,6 +127,9 @@
     <x-admin.panel-table table-class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr>
+                <x-admin.table-header-cell class="w-12">
+                    <span class="sr-only">{{ __('votings.admin.select_for_pdf') }}</span>
+                </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
                     {{ __('votings.admin.name') }}
                 </x-admin.table-header-cell>
@@ -159,6 +162,12 @@
         <tbody class="divide-y divide-gray-200 bg-white">
             @forelse ($votings as $voting)
                 <tr wire:key="voting-row-{{ $voting->id }}">
+                    <td class="px-4 py-4 text-sm text-gray-700">
+                        <input type="checkbox" wire:model="selectedVotingIds"
+                            value="{{ $voting->id }}"
+                            aria-label="{{ __('votings.admin.select_for_pdf') }}"
+                            class="h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]">
+                    </td>
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $voting->name }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
@@ -217,7 +226,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('votings.admin.empty') }}</td>
                 </tr>
             @endforelse

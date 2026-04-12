@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Models\Voting;
 use Livewire\Component;
 use App\Models\Location;
-use Carbon\CarbonInterface;
 use App\Models\VotingOption;
 use Livewire\WithPagination;
 use App\Models\VotingLocation;
@@ -16,6 +15,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use App\Support\VotingCensusCalculator;
 use App\Support\VotingEligibilityService;
 use Illuminate\Database\Eloquent\Builder;
@@ -64,6 +64,11 @@ class Votings extends Component
      * @var array<int, string>
      */
     public array $selectedLocations = [];
+
+    /**
+     * @var array<int, string>
+     */
+    public array $selectedVotingIds = [];
 
     public bool $showOwnersModal = false;
 
@@ -261,6 +266,47 @@ class Votings extends Component
 
         session()->flash('message', __('general.messages.deleted'));
         $this->cancelDeleteVoting();
+    }
+
+    public function downloadDelegatedPdf(): void
+    {
+        $this->redirectToPdf('admin.votings.pdf.delegated');
+    }
+
+    public function downloadInPersonPdf(): void
+    {
+        $this->redirectToPdf('admin.votings.pdf.in_person');
+    }
+
+    public function updatingPage(): void
+    {
+        $this->selectedVotingIds = [];
+    }
+
+    private function redirectToPdf(string $routeName): void
+    {
+        $selectedIds = $this->normalizedSelectedVotingIds();
+
+        if ($selectedIds === []) {
+            session()->flash('error', __('votings.admin.select_for_pdf_required'));
+
+            return;
+        }
+
+        $this->redirect(URL::route($routeName, ['voting_ids' => $selectedIds]), navigate: false);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function normalizedSelectedVotingIds(): array
+    {
+        return collect($this->selectedVotingIds)
+            ->map(static fn (string|int $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
     }
 
     private function validateVotingForm(): void

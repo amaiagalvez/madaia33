@@ -47,3 +47,42 @@ it('builds in-person intro text from in-person settings keys', function () {
         ->and($payload['introEuHtml'])->toBe('<p>Presentzial EU</p>')
         ->and($payload['introEsHtml'])->toBe('<p>Presencial ES</p>');
 });
+
+it('filters payload votings by selected voting ids', function () {
+    $firstVoting = Voting::factory()->current()->create([
+        'name_eu' => 'Lehen bozketa',
+    ]);
+    $secondVoting = Voting::factory()->current()->create([
+        'name_eu' => 'Bigarren bozketa',
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $firstVoting->id,
+        'position' => 1,
+    ]);
+    VotingOption::factory()->create([
+        'voting_id' => $secondVoting->id,
+        'position' => 1,
+    ]);
+
+    $payload = app(VotingPdfBuilder::class)->build('delegated', [$secondVoting->id]);
+
+    expect($payload['votings'])->toHaveCount(1)
+        ->and($payload['votings'][0]['name_eu'])->toBe('Bigarren bozketa');
+});
+
+it('includes selected closed voting ids in payload', function () {
+    $closedVoting = Voting::factory()->future()->unpublished()->create([
+        'name_eu' => 'Itxitako bozketa',
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $closedVoting->id,
+        'position' => 1,
+    ]);
+
+    $payload = app(VotingPdfBuilder::class)->build('delegated', [$closedVoting->id]);
+
+    expect($payload['votings'])->toHaveCount(1)
+        ->and($payload['votings'][0]['name_eu'])->toBe('Itxitako bozketa');
+});

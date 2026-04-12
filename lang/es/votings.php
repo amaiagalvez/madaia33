@@ -45,6 +45,8 @@ return [
         'in_person_vote' => 'Voto presencial',
         'download_delegated_pdf' => 'Descargar PDF voto delegado',
         'download_in_person_pdf' => 'Descargar PDF voto presencial',
+        'select_for_pdf' => 'Seleccionar para PDF',
+        'select_for_pdf_required' => 'Debes seleccionar al menos una votación para descargar el PDF.',
         'in_person_modal_title' => 'Propietarias pendientes de votar (presencial)',
         'in_person_search' => 'Buscar en voto presencial',
         'in_person_search_placeholder' => 'Buscar por propietaria, copropietaria, email, teléfono, portal, local o garaje',

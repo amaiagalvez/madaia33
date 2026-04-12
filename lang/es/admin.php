@@ -117,7 +117,7 @@ return [
         'recaptcha' => 'reCAPTCHA',
         'owners' => 'Propietarias',
         'vote_delegate' => 'Voto delegado',
-        'votings' => 'Boletines PDF de votaciones',
+        'votings' => 'Votaciones',
     ],
     'test_email' => [
         'button' => 'Enviar correo de prueba',

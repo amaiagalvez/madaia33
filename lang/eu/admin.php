@@ -117,7 +117,7 @@ return [
         'recaptcha' => 'reCAPTCHA',
         'owners' => 'Jabeak',
         'vote_delegate' => 'Boto delegatua',
-        'votings' => 'Bozketen PDF inprimakiak',
+        'votings' => 'Bozketak',
     ],
     'test_email' => [
         'button' => 'Bidali proba-eposta',

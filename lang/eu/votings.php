@@ -45,6 +45,8 @@ return [
         'in_person_vote' => 'Boto presentziala',
         'download_delegated_pdf' => 'Deskargatu boto delegatuko PDFa',
         'download_in_person_pdf' => 'Deskargatu boto presentzialeko PDFa',
+        'select_for_pdf' => 'PDFerako hautatu',
+        'select_for_pdf_required' => 'Gutxienez bozketa bat hautatu behar duzu PDFa deskargatzeko.',
         'in_person_modal_title' => 'Bozkatu gabe dauden jabeak (presentziala)',
         'in_person_search' => 'Boto presentzialan bilatu',
         'in_person_search_placeholder' => 'Bilatu jabea, ko-jabea, emaila, telefonoa, portal, lokal edo garaje kodea',

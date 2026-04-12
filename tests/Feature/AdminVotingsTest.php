@@ -33,6 +33,30 @@ it('allows superadmin id 1 to access admin votings route', function () {
         ->assertOk();
 });
 
+it('redirects admin pdf download with selected voting ids', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    $firstVoting = Voting::factory()->current()->create();
+    $secondVoting = Voting::factory()->current()->create();
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->set('selectedVotingIds', [(string) $firstVoting->id, (string) $secondVoting->id])
+        ->call('downloadDelegatedPdf')
+        ->assertRedirect(route('admin.votings.pdf.delegated', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
+});
+
+it('shows an error when downloading admin pdf without selecting votings', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->call('downloadDelegatedPdf')
+        ->assertSee(__('votings.admin.select_for_pdf_required'));
+});
+
 it('allows general admin to access admin votings route', function () {
     $generalAdmin = User::factory()->create();
     $generalAdmin->assignRole(Role::GENERAL_ADMIN);
