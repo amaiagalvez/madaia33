@@ -94,6 +94,113 @@ it('shows delegated terms blocking modal when delegated-vote user has not accept
         ->assertSee('Boto delegatuaren baldintzak');
 });
 
+it('shows votings explanation card text from settings in front votings', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $portal = Location::factory()->portal()->create(['code' => '33-E']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    createSetting('votings_explanation_text_eu', '<p>Bozketen azalpen pertsonalizatua</p>');
+
+    Livewire::actingAs($owner->user)
+        ->test(PublicVotings::class)
+        ->assertSeeHtml('data-votings-explanation-card')
+        ->assertSee('Bozketen azalpen pertsonalizatua');
+});
+
+it('shows votings explanation text for the active locale in front votings', function () {
+    app()->setLocale('es');
+
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $portal = Location::factory()->portal()->create(['code' => '33-ES']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    createSetting('votings_explanation_text_eu', '<p>Testu euskalduna</p>');
+    createSetting('votings_explanation_text_es', '<p>Texto castellano</p>');
+
+    Livewire::actingAs($owner->user)
+        ->test(PublicVotings::class)
+        ->assertSeeHtml('data-votings-explanation-card')
+        ->assertSee('Texto castellano')
+        ->assertDontSee('Testu euskalduna');
+});
+
+it('shows votings explanation text from session locale key on front route', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $owner->user->forceFill(['language' => 'eu'])->save();
+
+    $portal = Location::factory()->portal()->create(['code' => '33-SES']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    createSetting('votings_explanation_text_eu', '<p>Testu euskalduna</p>');
+    createSetting('votings_explanation_text_es', '<p>Texto castellano</p>');
+
+    app()->setLocale('eu');
+
+    test()->actingAs($owner->user)
+        ->withSession(['locale' => 'es'])
+        ->get(route('votings.es'))
+        ->assertSuccessful()
+        ->assertSee('Texto castellano')
+        ->assertDontSee('Testu euskalduna');
+});
+
 it('blocks delegated vote actions until delegated terms are accepted', function () {
     $delegatedUser = User::factory()->create();
     $delegatedUser->assignRole(Role::DELEGATED_VOTE);

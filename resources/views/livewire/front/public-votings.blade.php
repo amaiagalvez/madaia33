@@ -43,6 +43,16 @@
             </a>
         </div>
 
+        <article class="mb-6 rounded-xl border border-[#edd2c7] bg-white p-5 shadow-sm"
+            data-votings-explanation-card>
+            <h2 class="text-base font-semibold text-[#793d3d]">
+                {{ __('votings.front.explanation_title') }}
+            </h2>
+            <div class="prose prose-sm mt-3 max-w-none text-gray-700">
+                {!! $votingsExplanationHtml !!}
+            </div>
+        </article>
+
         @if ($canManageDelegatedVoting && !$isDelegated && !$isInPersonVoting)
             <div class="mb-6 flex items-center justify-end gap-2" data-votings-delegated-action>
                 <button type="button" wire:click="openInPersonVoteModal"

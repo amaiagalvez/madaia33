@@ -12,6 +12,7 @@ use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\Facades\Storage;
@@ -214,12 +215,34 @@ it('stores voting pdf texts in votings settings section', function () {
         ->set('votingsPdfDelegatedTextEs', '<p>Voto delegado ES</p>')
         ->set('votingsPdfInPersonTextEu', '<p>Boto presentziala EU</p>')
         ->set('votingsPdfInPersonTextEs', '<p>Voto presencial ES</p>')
+        ->set('votingsExplanationTextEu', '<p>Azalpena EU</p>')
+        ->set('votingsExplanationTextEs', '<p>Explicacion ES</p>')
         ->call('save');
 
     expect(settingValue('votings_pdf_delegated_text_eu'))->toBe('<p>Boto delegatua EU</p>')
         ->and(settingValue('votings_pdf_delegated_text_es'))->toBe('<p>Voto delegado ES</p>')
         ->and(settingValue('votings_pdf_in_person_text_eu'))->toBe('<p>Boto presentziala EU</p>')
-        ->and(settingValue('votings_pdf_in_person_text_es'))->toBe('<p>Voto presencial ES</p>');
+        ->and(settingValue('votings_pdf_in_person_text_es'))->toBe('<p>Voto presencial ES</p>')
+        ->and(settingValue('votings_explanation_text_eu'))->toBe('<p>Azalpena EU</p>')
+        ->and(settingValue('votings_explanation_text_es'))->toBe('<p>Explicacion ES</p>');
+});
+
+it('loads votings explanation EU and ES values in settings even with stale cache', function () {
+    $user = adminUser();
+
+    createSetting('votings_explanation_text_eu', '<p>Azalpen cache gabekoa EU</p>');
+    createSetting('votings_explanation_text_es', '<p>Explicacion sin cache ES</p>');
+
+    Cache::forever('settings:string-values', [
+        'votings_explanation_text_eu' => '',
+        'votings_explanation_text_es' => '',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(AdminSettings::class)
+        ->call('setSection', Setting::SECTION_VOTINGS)
+        ->assertSet('votingsExplanationTextEu', '<p>Azalpen cache gabekoa EU</p>')
+        ->assertSet('votingsExplanationTextEs', '<p>Explicacion sin cache ES</p>');
 });
 
 it('recaptcha_secret_key field renders as type password', function () {

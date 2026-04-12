@@ -85,6 +85,8 @@ return [
         'in_person_search' => 'Boto presentzialan bilatu',
         'in_person_search_placeholder' => 'Bilatu jabea, ko-jabea, emaila, telefonoa, portal, lokal edo garaje kodea',
         'in_person_mode' => 'Boto presentzialan zaude: :owner jabe gisa bozkatu duzu.',
+        'explanation_title' => 'Nola funtzionatzen dute bozketek',
+        'explanation_default_text' => 'Hemen bozketak kontsultatu eta bakoitzean zure botoa eman dezakezu.',
     ],
     'mail' => [
         'subject' => 'Votaciones Comunidad',

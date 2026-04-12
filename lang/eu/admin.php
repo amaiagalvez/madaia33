@@ -91,6 +91,9 @@ return [
         'votings_pdf_in_person_text' => 'Boto presentzialerako PDF testua',
         'votings_pdf_in_person_text_eu' => 'Boto presentzialeko PDF testua (EU)',
         'votings_pdf_in_person_text_es' => 'Boto presentzialeko PDF testua (ES)',
+        'votings_explanation_text' => 'Bozketen funtzionamenduaren azalpena',
+        'votings_explanation_text_eu' => 'Bozketen azalpena (EU)',
+        'votings_explanation_text_es' => 'Bozketen azalpena (ES)',
     ],
     'stats' => [
         'published_notices' => 'Argitaratutako iragarkiak',

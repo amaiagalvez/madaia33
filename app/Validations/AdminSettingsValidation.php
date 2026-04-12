@@ -160,6 +160,8 @@ class AdminSettingsValidation
             'votingsPdfDelegatedTextEs' => self::richTextRule(10000),
             'votingsPdfInPersonTextEu' => self::richTextRule(10000),
             'votingsPdfInPersonTextEs' => self::richTextRule(10000),
+            'votingsExplanationTextEu' => self::richTextRule(10000),
+            'votingsExplanationTextEs' => self::richTextRule(10000),
         ];
     }
 

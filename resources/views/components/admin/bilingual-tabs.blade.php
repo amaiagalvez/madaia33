@@ -56,7 +56,7 @@
     ];
 @endphp
 
-<div x-data="{
+<div wire:key="bilingual-tabs-{{ $rootField }}" x-data="{
     tab: '{{ $initialTab }}',
     syncTimers: {},
     format(field, command) {
@@ -101,7 +101,8 @@
             this.$wire.set(field, payload);
         }, 160);
     },
-}" class="space-y-6 rounded-lg border border-gray-200 bg-stone-50 p-4"
+}"
+    class="space-y-6 rounded-lg border border-gray-200 bg-stone-50 p-4"
     data-bilingual-field="{{ $rootField }}">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <p class="text-sm font-semibold text-stone-800">

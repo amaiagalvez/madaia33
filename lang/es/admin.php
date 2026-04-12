@@ -91,6 +91,9 @@ return [
         'votings_pdf_in_person_text' => 'Texto PDF para voto presencial',
         'votings_pdf_in_person_text_eu' => 'Texto PDF voto presencial (EU)',
         'votings_pdf_in_person_text_es' => 'Texto PDF voto presencial (ES)',
+        'votings_explanation_text' => 'Explicacion del funcionamiento de votaciones',
+        'votings_explanation_text_eu' => 'Explicacion votaciones (EU)',
+        'votings_explanation_text_es' => 'Explicacion votaciones (ES)',
     ],
     'stats' => [
         'published_notices' => 'Avisos publicados',

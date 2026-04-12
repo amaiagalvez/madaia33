@@ -26,7 +26,6 @@
 Igandea
 =======
 - votaciones resultados (suma de porcentajes)
-- azalpena bozketak front-ean gehitzeko
 - spec kiro pendientes
 - unificar terminologia
 

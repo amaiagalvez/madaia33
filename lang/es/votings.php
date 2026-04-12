@@ -85,6 +85,8 @@ return [
         'in_person_search' => 'Buscar en voto presencial',
         'in_person_search_placeholder' => 'Buscar por propietaria, copropietaria, email, teléfono, portal, local o garaje',
         'in_person_mode' => 'Modo presencial activo: estás votando como :owner.',
+        'explanation_title' => 'Como funcionan las votaciones',
+        'explanation_default_text' => 'Aqui puedes consultar las votaciones activas y emitir tu voto en cada una.',
     ],
     'mail' => [
         'subject' => 'Votaciones Comunidad',

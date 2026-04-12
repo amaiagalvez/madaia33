@@ -73,6 +73,8 @@ class AdminSettings extends Component
             'votingsPdfDelegatedTextEs' => 'votings_pdf_delegated_text_es',
             'votingsPdfInPersonTextEu' => 'votings_pdf_in_person_text_eu',
             'votingsPdfInPersonTextEs' => 'votings_pdf_in_person_text_es',
+            'votingsExplanationTextEu' => 'votings_explanation_text_eu',
+            'votingsExplanationTextEs' => 'votings_explanation_text_es',
         ],
     ];
 
@@ -165,6 +167,10 @@ class AdminSettings extends Component
 
     public string $votingsPdfInPersonTextEs = '';
 
+    public string $votingsExplanationTextEu = '';
+
+    public string $votingsExplanationTextEs = '';
+
     public bool $saved = false;
 
     public bool $showTestEmailModal = false;
@@ -234,6 +240,8 @@ class AdminSettings extends Component
         $this->votingsPdfDelegatedTextEs = $settings['votings_pdf_delegated_text_es'] ?? '';
         $this->votingsPdfInPersonTextEu = $settings['votings_pdf_in_person_text_eu'] ?? '';
         $this->votingsPdfInPersonTextEs = $settings['votings_pdf_in_person_text_es'] ?? '';
+        $this->votingsExplanationTextEu = $settings['votings_explanation_text_eu'] ?? '';
+        $this->votingsExplanationTextEs = $settings['votings_explanation_text_es'] ?? '';
         $this->ownersWelcomeTextEu = $settings['owners_welcome_text_eu'] ?? '';
         $this->ownersWelcomeTextEs = $settings['owners_welcome_text_es'] ?? '';
         $this->historyTextEu = $settings['home_history_text_eu'] ?? '';
@@ -301,7 +309,11 @@ class AdminSettings extends Component
     public function mount(): void
     {
         $allKeys = collect($this->sectionFieldMap())->flatten()->values()->all();
-        $settings = Setting::stringValues($allKeys);
+        $settings = Setting::query()
+            ->whereIn('key', $allKeys)
+            ->pluck('value', 'key')
+            ->map(static fn(mixed $value): string => (string) $value)
+            ->all();
 
         $this->assignSettingValues($settings);
 
