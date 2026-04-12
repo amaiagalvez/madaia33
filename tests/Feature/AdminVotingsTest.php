@@ -47,6 +47,20 @@ it('redirects admin pdf download with selected voting ids', function () {
         ->assertRedirect(route('admin.votings.pdf.delegated', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
 });
 
+it('redirects admin results pdf download with selected voting ids', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    $firstVoting = Voting::factory()->current()->create();
+    $secondVoting = Voting::factory()->current()->create();
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->set('selectedVotingIds', [(string) $firstVoting->id, (string) $secondVoting->id])
+        ->call('downloadResultsPdf')
+        ->assertRedirect(route('admin.votings.pdf.results', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
+});
+
 it('shows an error when downloading admin pdf without selecting votings', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::SUPER_ADMIN);

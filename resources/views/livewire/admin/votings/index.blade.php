@@ -11,32 +11,42 @@
         </div>
     @endif
 
-    <div class="mb-4 flex items-center justify-end gap-2">
-        <button type="button" wire:click="downloadDelegatedPdf"
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
-            data-action="download-delegated-vote-pdf">
-            {{ __('votings.admin.download_delegated_pdf') }}
-        </button>
+    <div class="mb-4 flex flex-col gap-2">
+        <div class="flex items-center justify-end gap-2">
+            <x-admin.create-record-button wire:click="createVoting" />
 
-        <button type="button" wire:click="downloadInPersonPdf"
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
-            data-action="download-in-person-vote-pdf">
-            {{ __('votings.admin.download_in_person_pdf') }}
-        </button>
+            <button type="button" wire:click="openInPersonVoteModal"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                data-action="open-in-person-vote">
+                {{ __('votings.admin.in_person_vote') }}
+            </button>
 
-        <x-admin.create-record-button wire:click="createVoting" />
+            <button type="button" wire:click="openDelegatedVoteModal"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                data-action="open-delegated-vote">
+                {{ __('votings.admin.delegated_vote') }}
+            </button>
+        </div>
 
-        <button type="button" wire:click="openInPersonVoteModal"
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
-            data-action="open-in-person-vote">
-            {{ __('votings.admin.in_person_vote') }}
-        </button>
+        <div class="flex items-center justify-end gap-2">
+            <button type="button" wire:click="downloadDelegatedPdf"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                data-action="download-delegated-vote-pdf">
+                {{ __('votings.admin.download_delegated_pdf') }}
+            </button>
 
-        <button type="button" wire:click="openDelegatedVoteModal"
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
-            data-action="open-delegated-vote">
-            {{ __('votings.admin.delegated_vote') }}
-        </button>
+            <button type="button" wire:click="downloadInPersonPdf"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                data-action="download-in-person-vote-pdf">
+                {{ __('votings.admin.download_in_person_pdf') }}
+            </button>
+
+            <button type="button" wire:click="downloadResultsPdf"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                data-action="download-voting-results-pdf">
+                {{ __('votings.admin.download_results_pdf') }}
+            </button>
+        </div>
     </div>
 
     @if ($showCreateForm)
@@ -128,7 +138,15 @@
         <thead class="bg-gray-50">
             <tr>
                 <x-admin.table-header-cell class="w-12">
-                    <span class="sr-only">{{ __('votings.admin.select_for_pdf') }}</span>
+                    <input type="checkbox" x-data="{
+                        pageIds: @js($votingPageIds),
+                        get allSelected() {
+                            return this.pageIds.length > 0 && this.pageIds.every(id => $wire.selectedVotingIds.map(String).includes(String(id)));
+                        }
+                    }" :checked="allSelected"
+                        @change="allSelected ? $wire.deselectAllOnPage(pageIds) : $wire.selectAllOnPage(pageIds)"
+                        aria-label="{{ __('votings.admin.select_all_for_pdf') }}"
+                        class="h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]">
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
                     {{ __('votings.admin.name') }}

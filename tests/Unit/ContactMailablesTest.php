@@ -72,3 +72,42 @@ it('builds VotingConfirmationMail with expected envelope and view', function () 
         ->and($mailable->envelope()->subject)->toBe(__('votings.mail.subject'))
         ->and($mailable->content()->view)->toBe('mail.voting-confirmation');
 });
+
+it('localizes VotingConfirmationMail subject by active locale', function (string $locale, string $expectedSubject) {
+    app()->setLocale($locale);
+
+    $owner = new Owner(['coprop1_name' => 'Miren Etxeberria', 'coprop1_email' => 'miren@example.com']);
+    $voting = new Voting(['name_eu' => 'Boto-ematea', 'name_es' => 'Votacion']);
+
+    $mailable = new VotingConfirmationMail($owner, $voting);
+
+    expect($mailable->envelope()->subject)->toBe($expectedSubject);
+})->with([
+    ['es', 'Votaciones Comunidad'],
+    ['eu', 'Komunitateko bozketak'],
+]);
+
+it('resolves voting confirmation mail body translations by locale', function (string $locale, array $expected) {
+    app()->setLocale($locale);
+
+    expect(__('votings.mail.greeting', ['name' => 'Ane']))->toBe($expected['greeting'])
+        ->and(__('votings.mail.body', ['voting' => 'Asanblada']))->toBe($expected['body'])
+        ->and(__('votings.mail.thanks'))->toBe($expected['thanks']);
+})->with([
+    [
+        'es',
+        [
+            'greeting' => 'Hola Ane,',
+            'body' => 'Hemos registrado tu voto en la votación Asanblada.',
+            'thanks' => 'Gracias por participar.',
+        ],
+    ],
+    [
+        'eu',
+        [
+            'greeting' => 'Kaixo Ane,',
+            'body' => 'Asanblada bozketan zure botoa jaso dugu.',
+            'thanks' => 'Eskerrik asko parte hartzeagatik.',
+        ],
+    ],
+]);

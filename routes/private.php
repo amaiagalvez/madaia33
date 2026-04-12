@@ -71,6 +71,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/votaciones/pdf/presencial', [VotingPdfController::class, 'adminInPerson'])
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings.pdf.in_person');
+    Route::get('/votaciones/pdf/resultados', [VotingPdfController::class, 'adminResults'])
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('votings.pdf.results');
     Route::get('/usuarios', fn() => view('admin.users.index'))
         ->middleware('role:superadmin')
         ->name('users.index');

@@ -37,6 +37,24 @@ class VotingPdfController extends Controller
         );
     }
 
+    public function adminResults(Request $request, VotingPdfBuilder $builder): StreamedResponse
+    {
+        $this->ensureAdminAccess($request->user());
+
+        $selectedVotingIds = $this->selectedVotingIdsFromRequest($request);
+        $payload = $builder->buildResults($selectedVotingIds);
+        $pdf = Pdf::loadView('pdf.votings.results', $payload)->setPaper('a4');
+        $filename = $this->localizedFilename('results', $request->user());
+
+        return response()->streamDownload(
+            static function () use ($pdf): void {
+                echo $pdf->output();
+            },
+            $filename,
+            ['Content-Type' => 'application/pdf']
+        );
+    }
+
     public function publicDelegated(Request $request, VotingPdfBuilder $builder): StreamedResponse
     {
         $this->ensurePublicAccess($request->user());
@@ -88,8 +106,8 @@ class VotingPdfController extends Controller
         }
 
         return collect($rawIds)
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->filter(static fn (int $id): bool => $id > 0)
+            ->map(static fn(mixed $id): int => (int) $id)
+            ->filter(static fn(int $id): bool => $id > 0)
             ->unique()
             ->values()
             ->all();
@@ -98,9 +116,11 @@ class VotingPdfController extends Controller
     private function localizedFilename(string $type, ?User $user): string
     {
         $locale = SupportedLocales::normalize($user?->language ?? app()->getLocale());
-        $translationKey = $type === 'in_person'
-            ? 'votings.pdf.filename_in_person'
-            : 'votings.pdf.filename_delegated';
+        $translationKey = match ($type) {
+            'in_person' => 'votings.pdf.filename_in_person',
+            'results' => 'votings.pdf.filename_results',
+            default => 'votings.pdf.filename_delegated',
+        };
 
         $baseName = (string) __($translationKey, [], $locale);
         $slug = Str::slug($baseName);
