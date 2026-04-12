@@ -18,6 +18,54 @@ class AdminSettings extends Component
     use BuildsLocaleFieldConfigs;
     use WithFileUploads;
 
+    private const SECTION_FIELD_MAP = [
+        Setting::SECTION_CONTACT_FORM => [
+            'adminEmail' => 'admin_email',
+            'legalCheckboxTextEu' => 'legal_checkbox_text_eu',
+            'legalCheckboxTextEs' => 'legal_checkbox_text_es',
+            'contactFormSubjectEu' => 'contact_form_subject_eu',
+            'contactFormSubjectEs' => 'contact_form_subject_es',
+        ],
+        Setting::SECTION_EMAIL_CONFIGURATION => [
+            'emailFromAddress' => 'from_address',
+            'emailFromName' => 'from_name',
+            'smtpHost' => 'smtp_host',
+            'smtpPort' => 'smtp_port',
+            'smtpUsername' => 'smtp_username',
+            'smtpPassword' => 'smtp_password',
+            'smtpEncryption' => 'smtp_encryption',
+            'emailLegalTextEu' => 'legal_text_eu',
+            'emailLegalTextEs' => 'legal_text_es',
+        ],
+        Setting::SECTION_FRONT => [
+            'historyTextEu' => 'home_history_text_eu',
+            'historyTextEs' => 'home_history_text_es',
+            'privacyContentEu' => 'legal_page_privacy_policy_eu',
+            'privacyContentEs' => 'legal_page_privacy_policy_es',
+            'legalNoticeContentEu' => 'legal_page_legal_notice_eu',
+            'legalNoticeContentEs' => 'legal_page_legal_notice_es',
+            'cookiePolicyContentEu' => 'legal_page_cookie_policy_eu',
+            'cookiePolicyContentEs' => 'legal_page_cookie_policy_es',
+            'frontPhotoRequestTextEu' => 'front_photo_request_text_eu',
+            'frontPhotoRequestTextEs' => 'front_photo_request_text_es',
+            'frontPrimaryEmail' => 'front_primary_email',
+            'frontSiteName' => 'front_site_name',
+            'frontLogoImagePath' => 'front_logo_image_path',
+        ],
+        Setting::SECTION_RECAPTCHA => [
+            'recaptchaSiteKey' => 'recaptcha_site_key',
+            'recaptchaSecretKey' => 'recaptcha_secret_key',
+        ],
+        Setting::SECTION_OWNERS => [
+            'ownersWelcomeSubjectEu' => 'owners_welcome_subject_eu',
+            'ownersWelcomeSubjectEs' => 'owners_welcome_subject_es',
+            'ownersWelcomeTextEu' => 'owners_welcome_text_eu',
+            'ownersWelcomeTextEs' => 'owners_welcome_text_es',
+            'ownersTermsTextEu' => 'owners_terms_text_eu',
+            'ownersTermsTextEs' => 'owners_terms_text_es',
+        ],
+    ];
+
     public string $activeSection = '';
 
     /** @var array<int, string> */
@@ -114,53 +162,7 @@ class AdminSettings extends Component
      */
     private function sectionFieldMap(): array
     {
-        return [
-            Setting::SECTION_CONTACT_FORM => [
-                'adminEmail' => 'admin_email',
-                'legalCheckboxTextEu' => 'legal_checkbox_text_eu',
-                'legalCheckboxTextEs' => 'legal_checkbox_text_es',
-                'contactFormSubjectEu' => 'contact_form_subject_eu',
-                'contactFormSubjectEs' => 'contact_form_subject_es',
-            ],
-            Setting::SECTION_EMAIL_CONFIGURATION => [
-                'emailFromAddress' => 'from_address',
-                'emailFromName' => 'from_name',
-                'smtpHost' => 'smtp_host',
-                'smtpPort' => 'smtp_port',
-                'smtpUsername' => 'smtp_username',
-                'smtpPassword' => 'smtp_password',
-                'smtpEncryption' => 'smtp_encryption',
-                'emailLegalTextEu' => 'legal_text_eu',
-                'emailLegalTextEs' => 'legal_text_es',
-            ],
-            Setting::SECTION_FRONT => [
-                'historyTextEu' => 'home_history_text_eu',
-                'historyTextEs' => 'home_history_text_es',
-                'privacyContentEu' => 'legal_page_privacy_policy_eu',
-                'privacyContentEs' => 'legal_page_privacy_policy_es',
-                'legalNoticeContentEu' => 'legal_page_legal_notice_eu',
-                'legalNoticeContentEs' => 'legal_page_legal_notice_es',
-                'cookiePolicyContentEu' => 'legal_page_cookie_policy_eu',
-                'cookiePolicyContentEs' => 'legal_page_cookie_policy_es',
-                'frontPhotoRequestTextEu' => 'front_photo_request_text_eu',
-                'frontPhotoRequestTextEs' => 'front_photo_request_text_es',
-                'frontPrimaryEmail' => 'front_primary_email',
-                'frontSiteName' => 'front_site_name',
-                'frontLogoImagePath' => 'front_logo_image_path',
-            ],
-            Setting::SECTION_RECAPTCHA => [
-                'recaptchaSiteKey' => 'recaptcha_site_key',
-                'recaptchaSecretKey' => 'recaptcha_secret_key',
-            ],
-            Setting::SECTION_OWNERS => [
-                'ownersWelcomeSubjectEu' => 'owners_welcome_subject_eu',
-                'ownersWelcomeSubjectEs' => 'owners_welcome_subject_es',
-                'ownersWelcomeTextEu' => 'owners_welcome_text_eu',
-                'ownersWelcomeTextEs' => 'owners_welcome_text_es',
-                'ownersTermsTextEu' => 'owners_terms_text_eu',
-                'ownersTermsTextEs' => 'owners_terms_text_es',
-            ],
-        ];
+        return self::SECTION_FIELD_MAP;
     }
 
     /**

@@ -5,9 +5,11 @@ namespace App\Support;
 use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\VotingBallot;
+use Illuminate\Support\Carbon;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class VotingEligibilityService
 {
@@ -57,6 +59,21 @@ class VotingEligibilityService
             ->get();
     }
 
+    /**
+     * @return Collection<int, Owner>
+     */
+    public function eligibleOwnersAtVotingDate(Voting $voting): Collection
+    {
+        $referenceDate = $this->votingReferenceDate($voting);
+
+        return $this->eligibleOwnersQueryAtDate($voting, $referenceDate)
+            ->orderBy('coprop1_name')
+            ->get()
+            ->each(static function (Owner $owner): void {
+                $owner->setRelation('activeAssignments', $owner->assignments);
+            });
+    }
+
     public function ownerCanVote(Voting $voting, Owner $owner): bool
     {
         $owner->loadMissing('activeAssignments.property.location');
@@ -67,7 +84,13 @@ class VotingEligibilityService
     public function percentageForOwner(Voting $voting, Owner $owner): float
     {
         return (float) $this->eligibleAssignments($voting, $owner)
-            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+            ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+    }
+
+    public function percentageForOwnerAtVotingDate(Voting $voting, Owner $owner): float
+    {
+        return (float) $this->eligibleAssignmentsAtDate($voting, $owner, $this->votingReferenceDate($voting))
+            ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
     }
 
     /**
@@ -82,7 +105,7 @@ class VotingEligibilityService
             ->publishedOpen()
             ->orderBy('starts_at')
             ->get()
-            ->filter(fn (Voting $voting): bool => $this->ownerCanVote($voting, $owner));
+            ->filter(fn(Voting $voting): bool => $this->ownerCanVote($voting, $owner));
     }
 
     /**
@@ -99,35 +122,9 @@ class VotingEligibilityService
             return collect();
         }
 
-        $ballotsByOwner = VotingBallot::query()
-            ->whereIn('voting_id', $openVotings->pluck('id'))
-            ->get(['owner_id', 'voting_id'])
-            ->groupBy('owner_id')
-            ->map(fn (Collection $ballots): Collection => $ballots->pluck('voting_id'));
-
-        $eligibleOwnerIdsByVoting = $openVotings
-            ->mapWithKeys(function (Voting $voting): array {
-                return [
-                    $voting->id => $this->eligibleOwnersQuery($voting)
-                        ->pluck('owners.id')
-                        ->map(static fn ($ownerId): int => (int) $ownerId)
-                        ->all(),
-                ];
-            });
-
-        $pendingByOwner = [];
-
-        foreach ($openVotings as $voting) {
-            $eligibleOwnerIds = $eligibleOwnerIdsByVoting->get($voting->id, []);
-
-            foreach ($eligibleOwnerIds as $ownerId) {
-                if ($ballotsByOwner->get($ownerId, collect())->contains($voting->id)) {
-                    continue;
-                }
-
-                $pendingByOwner[$ownerId] = ($pendingByOwner[$ownerId] ?? 0) + 1;
-            }
-        }
+        $ballotsByOwner = $this->ballotsByOwner($openVotings);
+        $eligibleOwnerIdsByVoting = $this->eligibleOwnerIdsByVoting($openVotings);
+        $pendingByOwner = $this->pendingVotingsByOwner($openVotings, $ballotsByOwner, $eligibleOwnerIdsByVoting);
 
         if ($pendingByOwner === []) {
             return collect();
@@ -138,58 +135,156 @@ class VotingEligibilityService
             ->with('activeAssignments.property.location')
             ->orderBy('coprop1_name')
             ->get()
-            ->map(function (Owner $owner) use ($pendingByOwner): array {
-                $portalCodes = $owner->activeAssignments
-                    ->pluck('property.location')
-                    ->filter(static fn ($location): bool => $location !== null && $location->type === 'portal')
-                    ->pluck('code')
-                    ->map(static fn ($code): string => (string) $code)
-                    ->unique()
-                    ->sort()
-                    ->values();
-
-                $garageCodes = $owner->activeAssignments
-                    ->pluck('property.location')
-                    ->filter(static fn ($location): bool => $location !== null && $location->type === 'garage')
-                    ->pluck('code')
-                    ->map(static fn ($code): string => (string) $code)
-                    ->unique()
-                    ->sort()
-                    ->values();
-
-                $localCodes = $owner->activeAssignments
-                    ->pluck('property.location')
-                    ->filter(static fn ($location): bool => $location !== null && $location->type === 'local')
-                    ->pluck('code')
-                    ->map(static fn ($code): string => (string) $code)
-                    ->unique()
-                    ->sort()
-                    ->values();
-
-                $searchTerms = [
-                    $owner->coprop1_name,
-                    $owner->coprop1_dni,
-                    $owner->coprop1_email,
-                    $owner->coprop1_phone,
-                    $owner->coprop2_name,
-                    $owner->coprop2_dni,
-                    $owner->coprop2_email,
-                    $owner->coprop2_phone,
-                    $portalCodes->implode(' '),
-                    $localCodes->implode(' '),
-                    $garageCodes->implode(' '),
-                ];
-
-                return [
-                    'owner' => $owner,
-                    'pending_votings' => $pendingByOwner[$owner->id] ?? 0,
-                    'portal_codes' => $portalCodes->implode(', '),
-                    'local_codes' => $localCodes->implode(', '),
-                    'garage_codes' => $garageCodes->implode(', '),
-                    'search_index' => mb_strtolower(implode(' ', array_filter($searchTerms))),
-                ];
-            })
+            ->map(fn(Owner $owner): array => $this->delegationSummary($owner, $pendingByOwner))
             ->values();
+    }
+
+    /**
+     * @param  Collection<int, Voting>  $openVotings
+     * @return array<int, array<int, int>>
+     */
+    private function ballotsByOwner(Collection $openVotings): array
+    {
+        return VotingBallot::query()
+            ->whereIn('voting_id', $openVotings->pluck('id'))
+            ->get(['owner_id', 'voting_id'])
+            ->groupBy('owner_id')
+            ->map(fn(Collection $ballots): array => $ballots
+                ->pluck('voting_id')
+                ->map(static fn($votingId): int => (int) $votingId)
+                ->values()
+                ->all())
+            ->all();
+    }
+
+    /**
+     * @param  Collection<int, Voting>  $openVotings
+     * @return array<int, array<int, int>>
+     */
+    private function eligibleOwnerIdsByVoting(Collection $openVotings): array
+    {
+        return $openVotings->mapWithKeys(function (Voting $voting): array {
+            return [
+                $voting->id => $this->eligibleOwnersQuery($voting)
+                    ->pluck('owners.id')
+                    ->map(static fn($ownerId): int => (int) $ownerId)
+                    ->all(),
+            ];
+        })->all();
+    }
+
+    /**
+     * @param  Collection<int, Voting>  $openVotings
+     * @param  array<int, array<int, int>>  $ballotsByOwner
+     * @param  array<int, array<int, int>>  $eligibleOwnerIdsByVoting
+     * @return array<int, int>
+     */
+    private function pendingVotingsByOwner(Collection $openVotings, array $ballotsByOwner, array $eligibleOwnerIdsByVoting): array
+    {
+        $pendingByOwner = [];
+
+        foreach ($openVotings as $voting) {
+            foreach ($eligibleOwnerIdsByVoting[$voting->id] ?? [] as $ownerId) {
+                if (in_array($voting->id, $ballotsByOwner[$ownerId] ?? [], true)) {
+                    continue;
+                }
+
+                $pendingByOwner[$ownerId] = ($pendingByOwner[$ownerId] ?? 0) + 1;
+            }
+        }
+
+        return $pendingByOwner;
+    }
+
+    /**
+     * @param  array<int, int>  $pendingByOwner
+     * @return array{owner: Owner, pending_votings: int, portal_codes: string, local_codes: string, garage_codes: string, search_index: string}
+     */
+    private function delegationSummary(Owner $owner, array $pendingByOwner): array
+    {
+        $portalCodes = $this->ownerLocationCodes($owner, 'portal');
+        $localCodes = $this->ownerLocationCodes($owner, 'local');
+        $garageCodes = $this->ownerLocationCodes($owner, 'garage');
+
+        return [
+            'owner' => $owner,
+            'pending_votings' => $pendingByOwner[$owner->id] ?? 0,
+            'portal_codes' => $portalCodes->implode(', '),
+            'local_codes' => $localCodes->implode(', '),
+            'garage_codes' => $garageCodes->implode(', '),
+            'search_index' => $this->delegationSearchIndex($owner, $portalCodes, $localCodes, $garageCodes),
+        ];
+    }
+
+    /**
+     * @return Collection<int, string>
+     */
+    private function ownerLocationCodes(Owner $owner, string $type): Collection
+    {
+        return $owner->activeAssignments
+            ->filter(static fn(PropertyAssignment $assignment): bool => $assignment->property?->location?->type === $type)
+            ->map(fn(PropertyAssignment $assignment): string => $this->propertyLabelWithCommunityPct($assignment))
+            ->unique()
+            ->sort()
+            ->values();
+    }
+
+    private function propertyLabelWithCommunityPct(PropertyAssignment $assignment): string
+    {
+        $code = (string) ($assignment->property?->location?->code ?? '');
+        $name = (string) ($assignment->property?->name ?? '');
+        $communityPct = $assignment->property?->community_pct;
+
+        $label = trim($code . ' ' . $name);
+
+        if ($communityPct === null) {
+            return $label;
+        }
+
+        return trim($label . ' (' . number_format((float) $communityPct, 2, ',', '.') . '%)');
+    }
+
+    /**
+     * @param  Collection<int, string>  $portalCodes
+     * @param  Collection<int, string>  $localCodes
+     * @param  Collection<int, string>  $garageCodes
+     */
+    private function delegationSearchIndex(Owner $owner, Collection $portalCodes, Collection $localCodes, Collection $garageCodes): string
+    {
+        $searchTerms = [
+            $owner->coprop1_name,
+            $owner->coprop1_dni,
+            $owner->coprop1_email,
+            $owner->coprop1_phone,
+            $owner->coprop2_name,
+            $owner->coprop2_dni,
+            $owner->coprop2_email,
+            $owner->coprop2_phone,
+            $portalCodes->implode(' '),
+            $localCodes->implode(' '),
+            $garageCodes->implode(' '),
+        ];
+
+        return mb_strtolower(implode(' ', array_filter($searchTerms)));
+    }
+
+    /**
+     * @return Builder<Owner>
+     */
+    private function eligibleOwnersQueryAtDate(Voting $voting, Carbon $referenceDate): Builder
+    {
+        [$residentialIds, $garageIds] = $this->allowedLocationIds($voting);
+
+        return Owner::query()
+            ->with([
+                'user',
+                'assignments' => function (HasMany $assignmentQuery) use ($referenceDate, $residentialIds, $garageIds): void {
+                    $this->applyEligibleAssignmentQueryConstraints($assignmentQuery, $referenceDate, $residentialIds, $garageIds);
+                },
+            ])
+            ->whereHas('assignments', function (Builder $assignmentQuery) use ($referenceDate, $residentialIds, $garageIds): void {
+                $this->applyEligibleAssignmentQueryConstraints($assignmentQuery, $referenceDate, $residentialIds, $garageIds);
+            });
     }
 
     /**
@@ -200,16 +295,60 @@ class VotingEligibilityService
         $voting->loadMissing('locations.location');
 
         $residentialIds = $voting->locations
-            ->filter(fn ($votingLocation): bool => in_array($votingLocation->location?->type, ['portal', 'local'], true))
+            ->filter(fn($votingLocation): bool => in_array($votingLocation->location?->type, ['portal', 'local'], true))
             ->pluck('location_id')
             ->all();
 
         $garageIds = $voting->locations
-            ->filter(fn ($votingLocation): bool => $votingLocation->location?->type === 'garage')
+            ->filter(fn($votingLocation): bool => $votingLocation->location?->type === 'garage')
             ->pluck('location_id')
             ->all();
 
         return [$residentialIds, $garageIds];
+    }
+
+    private function votingReferenceDate(Voting $voting): Carbon
+    {
+        return $voting->starts_at instanceof Carbon
+            ? $voting->starts_at->copy()
+            : Carbon::parse($voting->starts_at ?? today());
+    }
+
+    /**
+     * @param  array<int, int>  $residentialIds
+     * @param  array<int, int>  $garageIds
+     */
+    private function applyEligibleAssignmentQueryConstraints(Builder|HasMany $assignmentQuery, Carbon $referenceDate, array $residentialIds, array $garageIds): void
+    {
+        $assignmentQuery
+            ->with('property.location')
+            ->whereDate('start_date', '<=', $referenceDate)
+            ->where(function (Builder $dateQuery) use ($referenceDate): void {
+                $dateQuery
+                    ->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', $referenceDate);
+            })
+            ->when($residentialIds !== [] || $garageIds !== [], function (Builder $filteredQuery) use ($residentialIds, $garageIds): void {
+                $filteredQuery->whereHas('property.location', function (Builder $locationQuery) use ($residentialIds, $garageIds): void {
+                    $locationQuery->where(function (Builder $nestedQuery) use ($residentialIds, $garageIds): void {
+                        if ($residentialIds !== []) {
+                            $nestedQuery->orWhere(function (Builder $residentialQuery) use ($residentialIds): void {
+                                $residentialQuery
+                                    ->whereIn('type', ['portal', 'local'])
+                                    ->whereIn('id', $residentialIds);
+                            });
+                        }
+
+                        if ($garageIds !== []) {
+                            $nestedQuery->orWhere(function (Builder $garageQuery) use ($garageIds): void {
+                                $garageQuery
+                                    ->where('type', 'garage')
+                                    ->whereIn('id', $garageIds);
+                            });
+                        }
+                    });
+                });
+            });
     }
 
     /**
@@ -220,6 +359,42 @@ class VotingEligibilityService
         [$residentialIds, $garageIds] = $this->allowedLocationIds($voting);
 
         return $owner->activeAssignments
+            ->filter(function (PropertyAssignment $assignment) use ($residentialIds, $garageIds): bool {
+                $location = $assignment->property?->location;
+
+                if ($location === null) {
+                    return false;
+                }
+
+                if ($residentialIds === [] && $garageIds === []) {
+                    return true;
+                }
+
+                if (in_array($location->type, ['portal', 'local'], true) && in_array($location->id, $residentialIds, true)) {
+                    return true;
+                }
+
+                return $location->type === 'garage' && in_array($location->id, $garageIds, true);
+            })
+            ->values();
+    }
+
+    /**
+     * @return Collection<int, PropertyAssignment>
+     */
+    private function eligibleAssignmentsAtDate(Voting $voting, Owner $owner, Carbon $referenceDate): Collection
+    {
+        [$residentialIds, $garageIds] = $this->allowedLocationIds($voting);
+
+        if (! $owner->relationLoaded('assignments')) {
+            $owner->load([
+                'assignments' => function (Builder $assignmentQuery) use ($referenceDate, $residentialIds, $garageIds): void {
+                    $this->applyEligibleAssignmentQueryConstraints($assignmentQuery, $referenceDate, $residentialIds, $garageIds);
+                },
+            ]);
+        }
+
+        return $owner->assignments
             ->filter(function (PropertyAssignment $assignment) use ($residentialIds, $garageIds): bool {
                 $location = $assignment->property?->location;
 

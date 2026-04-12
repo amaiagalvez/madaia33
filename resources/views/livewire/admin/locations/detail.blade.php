@@ -1,75 +1,109 @@
 <div>
+    @if ($isChiefSelectable)
+        @php
+            $currentChiefProperty = $chiefProperties->firstWhere('id', (int) $chiefPropertyId);
+            $currentChiefAssignment = $currentChiefProperty?->activeAssignments?->firstWhere(
+                'owner_id',
+                $currentChiefOwnerId,
+            );
+            $currentChief = $currentChiefAssignment?->owner;
+        @endphp
+
+        <div id="location-chief-form"
+            class="mb-6 rounded-lg border border-[#edd2c7] bg-[#edd2c7]/20 p-4"
+            data-section="location-chief-form">
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="grow">
+                    <label for="chief-owner-id" class="mb-1 block text-sm font-medium text-stone-700">
+                        {{ __('admin.locations.chief_property') }}
+                    </label>
+                    <select id="chief-owner-id" wire:model="chiefPropertyId"
+                        class="w-full max-w-64 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
+                        data-field="chief-owner-id">
+                        <option value="">
+                            {{ __('admin.locations.chief_property_placeholder') }}
+                        </option>
+                        @foreach ($chiefProperties as $candidateProperty)
+                            <option value="{{ $candidateProperty->id }}">
+                                {{ $candidateProperty->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <x-admin.form-footer-actions class="mt-0">
+                    <button type="button" wire:click="saveChiefOwner"
+                        class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                        {{ __('admin.locations.chief_owner_save') }}
+                    </button>
+                </x-admin.form-footer-actions>
+            </div>
+
+            @error('chiefPropertyId')
+                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+            @enderror
+            <p class="mt-2 text-xs text-stone-600">
+                {{ __('admin.locations.chief_property_help') }}</p>
+
+            @if ($currentChief !== null)
+                <p class="mt-3 text-sm text-stone-700"
+                    data-chief-owner-current="{{ $currentChief->id }}">
+                    {{ __('admin.locations.chief_owner_current', ['name' => $currentChief->coprop1_name]) }}
+                </p>
+            @endif
+        </div>
+    @endif
+
     <div class="mb-6 flex items-center justify-end">
-        <flux:button variant="primary" wire:click="$set('showAddForm', true)" icon="plus">
+        <x-admin.create-record-button wire:click="openAddForm">
             {{ __('admin.locations.add_property') }}
-        </flux:button>
+        </x-admin.create-record-button>
     </div>
 
     @if ($showAddForm)
-        <div class="fixed inset-0 z-40" data-section="location-create-form">
-            <button type="button" wire:click="$set('showAddForm', false)"
-                class="admin-slideover-backdrop absolute inset-0 bg-black/30"
-                aria-label="{{ __('general.buttons.cancel') }}"></button>
+        <x-admin.side-panel-form section="location-create-form"
+            card-id="admin-location-property-form-card" cancel-action="cancelAddForm">
+            <form wire:submit="addProperty" novalidate>
+                <h2 class="mb-4 text-lg font-semibold text-stone-900">
+                    {{ __('admin.locations.new_property') }}
+                </h2>
 
-            <div
-                class="admin-slideover-panel absolute inset-y-0 right-0 z-50 h-full w-full max-w-2xl overflow-y-auto bg-white p-6 shadow-2xl">
-                <flux:heading size="lg" class="mb-4">{{ __('admin.locations.new_property') }}
-                </flux:heading>
                 <div class="grid gap-4 md:grid-cols-2">
-                    <flux:field>
-                        <flux:label>{{ __('admin.locations.property_name') }}</flux:label>
-                        <flux:input wire:model="newPropertyName"
-                            :placeholder="__('admin.locations.property_placeholder')"
-                            data-field="new-property-name" />
-                        <flux:error name="newPropertyName" />
-                    </flux:field>
+                    <x-admin.form-input name="newPropertyName" model="newPropertyName"
+                        :label="__('admin.locations.property_name')" class="md:col-span-2" data-field="new-property-name" />
 
-                    <flux:field>
-                        <flux:label>{{ __('admin.locations.community_pct') }}</flux:label>
-                        <flux:input wire:model="newCommunityPct" type="text"
-                            inputmode="decimal" />
-                        <flux:error name="newCommunityPct" />
-                    </flux:field>
+                    <x-admin.form-input name="newCommunityPct" model="newCommunityPct"
+                        :label="__('admin.locations.community_pct')" />
 
-                    <flux:field class="md:col-span-2">
-                        <flux:label>{{ __('admin.locations.location_pct') }}</flux:label>
-                        <flux:input wire:model="newLocationPct" type="text"
-                            inputmode="decimal" />
-                        <flux:error name="newLocationPct" />
-                    </flux:field>
+                    <x-admin.form-input name="newLocationPct" model="newLocationPct"
+                        :label="__('admin.locations.location_pct')" />
                 </div>
 
-                <div
-                    class="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 pt-4">
-                    <button type="button" wire:click="addProperty"
-                        class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                        {{ __('general.buttons.save') }}
-                    </button>
-                    <flux:button variant="ghost" wire:click="$set('showAddForm', false)">
-                        {{ __('general.buttons.cancel') }}</flux:button>
-                </div>
-            </div>
-        </div>
+                <x-admin.form-footer-actions show-default-buttons
+                    class="mt-6 justify-end border-t border-zinc-200 pt-4" :is-editing="true"
+                    cancel-action="cancelAddForm" :save-label="__('general.buttons.save')" />
+            </form>
+        </x-admin.side-panel-form>
     @endif
 
     <x-admin.panel-table>
         <thead class="bg-gray-50">
             <tr>
-                <th scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('admin.locations.property') }}</th>
-                <th scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('admin.locations.community_pct') }}</th>
-                <th scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('admin.locations.location_pct') }}</th>
-                <th scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('admin.locations.assigned') }}</th>
-                <th scope="col" class="relative px-6 py-3">
+                <x-admin.table-header-cell>
+                    {{ __('admin.locations.property') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('admin.locations.community_pct') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('admin.locations.location_pct') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('admin.locations.assigned') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell class="relative">
                     <span class="sr-only">{{ __('general.buttons.edit') }}</span>
-                </th>
+                </x-admin.table-header-cell>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
@@ -82,22 +116,29 @@
                     data-property-id="{{ $property->id }}">
                     @if ($editingPropertyId === $property->id)
                         <td class="px-6 py-4 text-sm">
-                            <flux:input wire:model="editName" size="sm"
+                            <input type="text" wire:model="editName"
+                                class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
                                 data-field="edit-name" />
-                            <flux:error name="editName" />
+                            @error('editName')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </td>
                         <td class="px-6 py-4 text-sm">
-                            <flux:input wire:model="editCommunityPct" type="text"
-                                inputmode="decimal" size="sm" />
-                            <flux:error name="editCommunityPct" />
+                            <input type="text" wire:model="editCommunityPct" inputmode="decimal"
+                                class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
+                            @error('editCommunityPct')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </td>
                         <td class="px-6 py-4 text-sm">
-                            <flux:input wire:model="editLocationPct" type="text"
-                                inputmode="decimal" size="sm" />
-                            <flux:error name="editLocationPct" />
+                            <input type="text" wire:model="editLocationPct" inputmode="decimal"
+                                class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
+                            @error('editLocationPct')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </td>
                         <td class="px-6 py-4 text-sm" colspan="2">
-                            <div class="flex gap-2">
+                            <x-admin.form-footer-actions class="mt-0">
                                 <button type="button" wire:click="saveProperty"
                                     class="inline-flex items-center rounded-md bg-[#d9755b] px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
                                     {{ __('general.buttons.save') }}
@@ -106,7 +147,7 @@
                                     wire:click="cancelEditing">
                                     {{ __('general.buttons.cancel') }}
                                 </flux:button>
-                            </div>
+                            </x-admin.form-footer-actions>
                         </td>
                     @else
                         <td class="px-6 py-4 text-sm font-medium text-gray-900">
@@ -116,16 +157,15 @@
                         <td class="px-6 py-4 text-sm text-gray-500">
                             %{{ number_format($property->location_pct ?? 0, 2, ',', '.') }}</td>
                         <td class="px-6 py-4 text-sm">
-                            <flux:badge :color="$isAssigned ? 'green' : 'zinc'"
-                                data-assigned="{{ $isAssigned ? 'yes' : 'no' }}">
-                                {{ $isAssigned ? __('admin.common.yes') : __('admin.common.no') }}
-                            </flux:badge>
+                            <x-admin.status-indicator :active="$isAssigned"
+                                data-assigned="{{ $isAssigned ? 'yes' : 'no' }}" />
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            <flux:button variant="ghost" size="sm"
-                                wire:click="startEditing({{ $property->id }})" icon="pencil">
-                                {{ __('general.buttons.edit') }}
-                            </flux:button>
+                            <x-admin.table-row-actions>
+                                <x-admin.icon-button-edit
+                                    wire:click="startEditing({{ $property->id }})"
+                                    :title="__('general.buttons.edit')" />
+                            </x-admin.table-row-actions>
                         </td>
                     @endif
                 </tr>

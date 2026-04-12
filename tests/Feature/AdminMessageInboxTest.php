@@ -100,6 +100,30 @@ it('delete with confirmation removes message', function () {
     expect(ContactMessage::find($message->id))->toBeNull();
 });
 
+it('renders reusable delete row action', function () {
+    $user = User::factory()->create();
+    ContactMessage::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->assertSeeHtml('data-admin-action="delete"');
+});
+
+it('renders reusable filter input and filter toggle group', function () {
+    $user = User::factory()->create();
+    ContactMessage::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->assertSeeHtml('data-admin-table-header')
+        ->assertSeeHtml('data-admin-action-link="confirm"')
+        ->assertSeeHtml('data-admin-filter-input')
+        ->assertSeeHtml('data-admin-filter-group')
+        ->assertSeeHtml('data-admin-filter-button="read"')
+        ->assertSeeHtml('data-admin-filter-button="unread"')
+        ->assertSeeHtml('data-admin-filter-button="all"');
+});
+
 it('confirm delete stores id and deleting clears selection and open detail', function () {
     $user = User::factory()->create();
     $message = ContactMessage::factory()->create();
@@ -108,6 +132,7 @@ it('confirm delete stores id and deleting clears selection and open detail', fun
         ->test('admin-message-inbox')
         ->call('openMessage', $message->id)
         ->call('confirmDelete', $message->id)
+        ->assertSeeHtml('data-admin-form-footer-actions')
         ->assertSet('confirmingDeleteId', $message->id)
         ->call('deleteMessage')
         ->assertSet('confirmingDeleteId', null)
@@ -150,7 +175,7 @@ it('uses created_at desc as fallback when requested order is invalid', function 
     $component = Livewire::actingAs($user)
         ->test('admin-message-inbox')
         ->call('setReadFilter', 'all')
-        ->set('sortBy', 'invalid-column')
+        ->set('sortColumn', 'invalid-column')
         ->set('sortDir', 'sideways');
 
     $ids = $component->messages->pluck('id')->toArray();
@@ -167,19 +192,36 @@ it('unread messages have visual differentiation class in HTML', function () {
         ->assertSeeHtml('bg-[#edd2c7]/20');
 });
 
+it('read status action uses modal confirmation flow', function () {
+    $user = User::factory()->create();
+    $message = ContactMessage::factory()->unread()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-message-inbox')
+        ->call('setReadFilter', 'all')
+        ->call('confirmReadToggle', $message->id, true)
+        ->assertSet('showReadModal', true)
+        ->assertSet('readAction', 'read')
+        ->call('doReadToggle')
+        ->assertSet('showReadModal', false)
+        ->assertSet('readAction', '');
+
+    expect(ContactMessage::find($message->id)?->is_read)->toBeTrue();
+});
+
 it('toggles direction when sorting same column and resets when column changes', function () {
     $user = User::factory()->create();
 
     Livewire::actingAs($user)
         ->test('admin-message-inbox')
-        ->assertSet('sortBy', 'created_at')
+        ->assertSet('sortColumn', 'created_at')
         ->assertSet('sortDir', 'desc')
         ->call('sortBy', 'created_at')
         ->assertSet('sortDir', 'asc')
         ->call('sortBy', 'created_at')
         ->assertSet('sortDir', 'desc')
         ->call('sortBy', 'is_read')
-        ->assertSet('sortBy', 'is_read')
+        ->assertSet('sortColumn', 'is_read')
         ->assertSet('sortDir', 'desc');
 });
 

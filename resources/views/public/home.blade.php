@@ -1,4 +1,4 @@
-<x-layouts::front.main :title="__('home.title')">
+<x-layouts::front.main :title="__('home.title')" :show-votings-link="$hasOpenVotings">
     @push('meta')
         <meta name="description" content="{{ __('home.seo_description') }}">
     @endpush

@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration {
@@ -10,9 +8,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            $table->timestamp('accepted_terms_at')->nullable()->after('language');
-        });
+        // No-op: accepted_terms_at belongs to owners table.
     }
 
     /**
@@ -20,8 +16,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            $table->dropColumn('accepted_terms_at');
-        });
+        // No-op: accepted_terms_at belongs to owners table.
     }
 };

@@ -51,6 +51,8 @@ return [
         'unread' => 'No leído',
         'mark_read' => 'Marcar como leído',
         'mark_unread' => 'Marcar como no leído',
+        'confirm_mark_read' => '¿Seguro que quieres marcar este mensaje como leído?',
+        'confirm_mark_unread' => '¿Seguro que quieres marcar este mensaje como no leído?',
         'search' => 'Buscar en cualquier campo del mensaje',
         'confirm_delete' => '¿Estás seguro de que quieres eliminar este mensaje?',
     ],

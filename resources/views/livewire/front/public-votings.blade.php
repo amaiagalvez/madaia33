@@ -172,7 +172,7 @@
                                     {{ __('votings.admin.pending_votings') }}</th>
                                 <th
                                     class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    {{ __('votings.admin.action') }}</th>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
@@ -262,7 +262,7 @@
                                     {{ __('votings.admin.pending_votings') }}</th>
                                 <th
                                     class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    {{ __('votings.admin.action') }}</th>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">

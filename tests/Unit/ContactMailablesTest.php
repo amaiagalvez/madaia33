@@ -3,6 +3,7 @@
 use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\ContactMessage;
+use App\Support\ContactMailData;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
 use App\Mail\VotingConfirmationMail;
@@ -15,12 +16,14 @@ const CONTACT_MAIL_FROM_NAME = 'Madaia 33';
 
 it('builds ContactConfirmation with expected payload, envelope, and view', function () {
     $mailable = new ContactConfirmation(
-        visitorName: CONTACT_MAIL_VISITOR_NAME,
-        messageSubject: CONTACT_MAIL_SUBJECT,
-        messageBody: CONTACT_MAIL_BODY,
-        legalText: '<p>Testu legala</p>',
-        fromAddress: CONTACT_MAIL_FROM_ADDRESS,
-        fromName: CONTACT_MAIL_FROM_NAME,
+        new ContactMailData(
+            visitorName: CONTACT_MAIL_VISITOR_NAME,
+            messageSubject: CONTACT_MAIL_SUBJECT,
+            messageBody: CONTACT_MAIL_BODY,
+            legalText: '<p>Testu legala</p>',
+        ),
+        CONTACT_MAIL_FROM_ADDRESS,
+        CONTACT_MAIL_FROM_NAME,
     );
 
     expect($mailable->visitorName)->toBe(CONTACT_MAIL_VISITOR_NAME)

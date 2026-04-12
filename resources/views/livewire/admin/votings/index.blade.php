@@ -5,6 +5,12 @@
         </div>
     @endif
 
+    @if (session()->has('error'))
+        <div class="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-800">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="mb-4 flex items-center justify-end gap-2">
         <x-admin.create-record-button wire:click="createVoting" />
 
@@ -22,165 +28,129 @@
     </div>
 
     @if ($showCreateForm)
-        <div class="fixed inset-0 z-40" data-section="voting-create-form">
-            <button type="button" wire:click="$set('showCreateForm', false)"
-                class="admin-slideover-backdrop absolute inset-0 bg-black/30"
-                aria-label="{{ __('general.buttons.cancel') }}"></button>
+        <x-admin.side-panel-form section="voting-create-form" card-id="admin-voting-form-card"
+            cancel-action="cancelVoting">
+            <form wire:submit="saveVoting" novalidate>
+                <div class="grid grid-cols-1 gap-4">
+                    <x-admin.bilingual-rich-text-tabs :title="__('votings.admin.name')" :locale-configs="$this->localeConfigsFor('name', 'votings.admin.name')"
+                        mode="plain" :required-primary="true" />
 
-            <div
-                class="admin-slideover-panel absolute inset-y-0 right-0 z-50 h-full w-full max-w-4xl overflow-y-auto bg-white p-6 shadow-2xl">
-                <form wire:submit="saveVoting" novalidate>
-                    <div class="grid gap-4">
-                        <x-admin.bilingual-rich-text-tabs :title="__('votings.admin.name')" :locale-configs="$this->localeConfigsFor('name', 'votings.admin.name')"
-                            mode="plain" :required-primary="true" />
+                    <x-admin.bilingual-rich-text-tabs :title="__('votings.admin.question')" :locale-configs="$this->localeConfigsFor('question', 'votings.admin.question')"
+                        :required-primary="true" />
 
-                        <x-admin.bilingual-rich-text-tabs :title="__('votings.admin.question')" :locale-configs="$this->localeConfigsFor('question', 'votings.admin.question')"
-                            mode="plain" type="textarea" :rows="4" :required-primary="true" />
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <x-admin.form-date-input :label="__('votings.admin.starts_at')" model="startsAt" />
+                        <x-admin.form-date-input :label="__('votings.admin.ends_at')" model="endsAt" />
+                    </div>
 
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label for="startsAt"
-                                    class="block text-sm font-medium text-gray-700">{{ __('votings.admin.starts_at') }}</label>
-                                <input id="startsAt" type="date" wire:model="startsAt"
-                                    class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
-                                @error('startsAt')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <x-admin.form-boolean-toggle :label="__('votings.admin.is_published')" model="isPublished"
+                            :value="$isPublished" :true-label="__('admin.common.yes')" :false-label="__('admin.common.no')" />
 
-                            <div>
-                                <label for="endsAt"
-                                    class="block text-sm font-medium text-gray-700">{{ __('votings.admin.ends_at') }}</label>
-                                <input id="endsAt" type="date" wire:model="endsAt"
-                                    class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
-                                @error('endsAt')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
+                        <x-admin.form-boolean-toggle :label="__('votings.admin.is_anonymous')" model="isAnonymous"
+                            :value="$isAnonymous" :true-label="__('admin.common.yes')" :false-label="__('admin.common.no')" />
+                    </div>
 
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <label class="flex items-center gap-2 text-sm text-gray-700">
-                                <input type="checkbox" wire:model="isPublished"
-                                    class="h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]">
-                                {{ __('votings.admin.is_published') }}
-                            </label>
+                    <x-admin.form-multi-checkbox-pills :legend="__('votings.admin.locations')" :options="$locations"
+                        model="selectedLocations" value-key="id" label-key="label" />
 
-                            <label class="flex items-center gap-2 text-sm text-gray-700">
-                                <input type="checkbox" wire:model="isAnonymous"
-                                    class="h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]">
-                                {{ __('votings.admin.is_anonymous') }}
-                            </label>
-                        </div>
-
-                        <div>
-                            <p class="text-sm font-medium text-gray-700">
-                                {{ __('votings.admin.locations') }}</p>
-                            <div class="mt-2 flex flex-wrap gap-2">
-                                @foreach ($locations as $location)
-                                    <label class="cursor-pointer select-none">
-                                        <input type="checkbox" wire:model="selectedLocations"
-                                            value="{{ $location->id }}" class="sr-only peer" />
-                                        <span
-                                            class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:border-[#d9755b] border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">
-                                            {{ __('admin.locations.types.' . $location->type) }}
-                                            {{ $location->code }}
-                                        </span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="rounded-lg border border-gray-200 p-4">
-                            <div class="mb-3 flex items-center justify-between">
-                                <p class="text-sm font-semibold text-gray-800">
-                                    {{ __('votings.admin.options') }}</p>
+                    <div class="rounded-lg border border-gray-200 p-4">
+                        <div class="mb-3 flex items-center justify-between">
+                            <p class="text-sm font-semibold text-stone-800">
+                                {{ __('votings.admin.options') }}</p>
+                            @if ($editingVotingBallotCount === 0)
                                 <button type="button" wire:click="addOption"
                                     class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
                                     {{ __('votings.admin.add_option') }}
                                 </button>
-                            </div>
+                            @endif
+                        </div>
 
-                            <div class="space-y-3">
-                                @foreach ($options as $index => $option)
-                                    <div wire:key="option-row-{{ $index }}"
-                                        class="grid gap-3 md:grid-cols-12 md:items-end">
-                                        <div class="md:col-span-5">
-                                            <label class="block text-xs font-medium text-gray-600"
-                                                for="optionEu{{ $index }}">{{ __('votings.admin.option_eu') }}</label>
-                                            <input id="optionEu{{ $index }}" type="text"
-                                                wire:model="options.{{ $index }}.labelEu"
-                                                class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
-                                            @error('options.' . $index . '.labelEu')
-                                                <p class="mt-1 text-xs text-red-600">
-                                                    {{ $message }}</p>
-                                            @enderror
-                                        </div>
+                        <div class="space-y-3">
+                            @foreach ($options as $index => $option)
+                                <div wire:key="option-row-{{ $index }}"
+                                    class="grid gap-3 md:grid-cols-12 md:items-end">
+                                    <div class="md:col-span-5">
+                                        <label class="block text-xs font-medium text-stone-700"
+                                            for="optionEu{{ $index }}">{{ __('votings.admin.option_eu') }}</label>
+                                        <input id="optionEu{{ $index }}" type="text"
+                                            wire:model="options.{{ $index }}.labelEu"
+                                            class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                                        @error('options.' . $index . '.labelEu')
+                                            <p class="mt-1 text-xs text-red-600">{{ $message }}
+                                            </p>
+                                        @enderror
+                                    </div>
 
-                                        <div class="md:col-span-5">
-                                            <label class="block text-xs font-medium text-gray-600"
-                                                for="optionEs{{ $index }}">{{ __('votings.admin.option_es') }}</label>
-                                            <input id="optionEs{{ $index }}" type="text"
-                                                wire:model="options.{{ $index }}.labelEs"
-                                                class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
-                                        </div>
+                                    <div class="md:col-span-5">
+                                        <label class="block text-xs font-medium text-stone-700"
+                                            for="optionEs{{ $index }}">{{ __('votings.admin.option_es') }}</label>
+                                        <input id="optionEs{{ $index }}" type="text"
+                                            wire:model="options.{{ $index }}.labelEs"
+                                            class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                                    </div>
 
-                                        <div class="md:col-span-2 md:text-right">
+                                    <div class="md:col-span-2 md:text-right">
+                                        @if ($editingVotingBallotCount === 0)
                                             <button type="button"
                                                 wire:click="removeOption({{ $index }})"
                                                 class="rounded-full border border-transparent p-2 text-gray-400 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-500"
                                                 title="{{ __('general.buttons.delete') }}">
                                                 <flux:icon.trash class="size-4" />
                                             </button>
-                                        </div>
+                                        @endif
                                     </div>
-                                @endforeach
-                            </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-6 flex gap-3">
-                        <button type="submit"
-                            class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                            {{ __('general.buttons.save') }}
-                        </button>
-                        <button type="button" wire:click="$set('showCreateForm', false)"
-                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
-                            {{ __('general.buttons.cancel') }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <x-admin.form-footer-actions show-default-buttons :is-editing="(bool) $editingVotingId"
+                    cancel-action="cancelVoting" />
+            </form>
+        </x-admin.side-panel-form>
     @endif
 
-    <x-admin.panel-table>
+    <x-admin.panel-table table-class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr>
-                <th
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('votings.admin.name') }}</th>
-                <th
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('votings.admin.starts_at') }}</th>
-                <th
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('votings.admin.ends_at') }}</th>
-                <th
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('votings.admin.is_published') }}</th>
-                <th
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('votings.admin.census') }}</th>
-                <th
-                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    {{ __('votings.admin.votes') }}</th>
+                <x-admin.table-header-cell>
+                    {{ __('votings.admin.name') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('votings.admin.locations') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('votings.admin.starts_at') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('votings.admin.ends_at') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('votings.admin.is_published') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('votings.admin.is_anonymous') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('votings.admin.census') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('votings.admin.voters') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell class="relative">
+                    <span class="sr-only">{{ __('general.buttons.edit') }}</span>
+                </x-admin.table-header-cell>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
             @forelse ($votings as $voting)
                 <tr wire:key="voting-row-{{ $voting->id }}">
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $voting->name }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {{ $voting->locations->map(fn($vl) => $vl->location?->code)->filter()->join(', ') }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600">
                         {{ $voting->starts_at?->format('Y-m-d') }}</td>
@@ -193,13 +163,21 @@
                             <flux:icon.x-circle class="size-4 text-red-500" />
                         @endif
                     </td>
+                    <td class="px-6 py-4 text-sm">
+                        @if ($voting->is_anonymous)
+                            <flux:icon.check-circle class="size-4 text-green-600" />
+                        @else
+                            <flux:icon.x-circle class="size-4 text-red-500" />
+                        @endif
+                    </td>
                     <td class="px-6 py-4 text-sm text-gray-700">
                         <div class="flex items-center gap-2">
                             <span>{{ $censusCounts[$voting->id] ?? 0 }}</span>
                             <button type="button" wire:click="openCensus({{ $voting->id }})"
-                                class="rounded-full border border-transparent p-1.5 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
+                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
                                 title="{{ __('votings.admin.open_census') }}">
-                                <flux:icon.bars-3 class="size-4" />
+                                <flux:icon.users class="size-4" />
+                                <span class="sr-only">{{ __('votings.admin.open_census') }}</span>
                             </button>
                         </div>
                     </td>
@@ -207,16 +185,27 @@
                         <div class="flex items-center gap-2">
                             <span>{{ $voting->ballots_count }}</span>
                             <button type="button" wire:click="openVoters({{ $voting->id }})"
-                                class="rounded-full border border-transparent p-1.5 text-gray-400 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
+                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
                                 title="{{ __('votings.admin.open_voters') }}">
-                                <flux:icon.bars-3 class="size-4" />
+                                <flux:icon.list-bullet class="size-4" />
+                                <span class="sr-only">{{ __('votings.admin.open_voters') }}</span>
                             </button>
                         </div>
+                    </td>
+                    <td class="px-6 py-4 text-right text-sm font-medium">
+                        @if ($voting->ballots_count === 0)
+                            <x-admin.table-row-actions>
+                                <x-admin.icon-button-edit
+                                    wire:click="editVoting({{ $voting->id }})" />
+                                <x-admin.icon-button-delete
+                                    wire:click="confirmDeleteVoting({{ $voting->id }})" />
+                            </x-admin.table-row-actions>
+                        @endif
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="9" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('votings.admin.empty') }}</td>
                 </tr>
             @endforelse
@@ -229,17 +218,54 @@
         </div>
     @endif
 
+    @if ($showDeleteModal)
+        <dialog open
+            class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4"
+            aria-labelledby="voting-delete-modal-title">
+            <div class="mx-4 w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+                <div class="flex items-start gap-3">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100">
+                        <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 id="voting-delete-modal-title"
+                            class="text-base font-semibold text-gray-900">
+                            {{ __('votings.admin.delete_title') }}
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            {{ __('votings.admin.confirm_delete') }}</p>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" wire:click="cancelDeleteVoting"
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                        {{ __('general.buttons.cancel') }}
+                    </button>
+                    <button type="button" wire:click="deleteVoting"
+                        class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        {{ __('general.buttons.delete') }}
+                    </button>
+                </div>
+            </div>
+        </dialog>
+    @endif
+
     @if ($showOwnersModal)
         <dialog open
             class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4">
-            <div class="mx-4 w-full max-w-2xl space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+            <div class="mx-4 w-full max-w-7xl space-y-4 rounded-xl bg-white p-6 shadow-2xl">
                 <div class="flex items-start justify-between gap-3">
                     <h3 class="text-base font-semibold text-gray-900">{{ $ownersModalTitle }}</h3>
                     <button type="button" wire:click="closeOwnersModal"
                         class="text-sm text-gray-500 hover:text-gray-700">{{ __('general.close') }}</button>
                 </div>
 
-                <div class="max-h-96 overflow-auto rounded-lg border border-gray-200">
+                <div class="max-h-[70vh] overflow-auto rounded-lg border border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
@@ -248,29 +274,51 @@
                                     {{ __('votings.admin.owner') }}</th>
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.properties') }}</th>
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                     {{ __('votings.admin.percentage') }}</th>
+                                @unless ($ownersModalIsAnonymous)
+                                    <th
+                                        class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        {{ __('votings.admin.vote') }}</th>
+                                @endunless
+                                <th
+                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    {{ __('votings.admin.delegated_vote') }}</th>
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                     {{ __('votings.admin.delegated_by') }}</th>
-                                <th
-                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    {{ __('votings.admin.delegate_dni') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
                             @forelse ($ownersModalRows as $row)
                                 <tr>
-                                    <td class="px-4 py-2 text-gray-800">{{ $row['name'] }}</td>
-                                    <td class="px-4 py-2 text-gray-600">
-                                        %{{ number_format($row['percentage'], 2, ',', '.') }}%</td>
-                                    <td class="px-4 py-2 text-gray-600">{{ $row['delegated_by'] }}
+                                    <td class="px-4 py-2 text-gray-800">
+                                        <div class="flex items-center gap-2">
+                                            @if ($row['has_voted'] ?? false)
+                                                <flux:icon.check-circle
+                                                    class="size-4 shrink-0 text-green-600" />
+                                            @endif
+                                            {{ $row['name'] }}
+                                        </div>
                                     </td>
+                                    <td class="px-4 py-2 text-gray-600">
+                                        {{ $row['properties'] ?? '—' }}</td>
+                                    <td class="px-4 py-2 text-gray-600">
+                                        {{ number_format($row['percentage'], 2, ',', '.') }}%</td>
+                                    @unless ($ownersModalIsAnonymous)
+                                        <td class="px-4 py-2 text-gray-600">{{ $row['vote'] ?: '—' }}
+                                        </td>
+                                    @endunless
                                     <td class="px-4 py-2 text-gray-600">{{ $row['delegate_dni'] }}
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">{{ $row['delegated_by'] }}
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4"
+                                    <td colspan="{{ $ownersModalIsAnonymous ? 5 : 6 }}"
                                         class="px-4 py-6 text-center text-gray-500">
                                         {{ __('votings.admin.empty') }}</td>
                                 </tr>
@@ -323,7 +371,7 @@
                                     {{ __('votings.admin.pending_votings') }}</th>
                                 <th
                                     class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    {{ __('votings.admin.action') }}</th>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
@@ -410,7 +458,7 @@
                                     {{ __('votings.admin.pending_votings') }}</th>
                                 <th
                                     class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    {{ __('votings.admin.action') }}</th>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">

@@ -10,10 +10,10 @@ use App\Models\PropertyAssignment;
 
 /**
  * Validates sensitive admin views:
- * - Owner detail (personal data + assignment controls)
+ * - Owner index inline panel (assignment controls)
  * - Location detail (editable property/validation state)
  */
-test('admin can access owner detail sensitive view and sees assignment controls', function () {
+test('admin can access owner sensitive inline controls from index', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
     $owner = Owner::factory()->create([
@@ -36,12 +36,29 @@ test('admin can access owner detail sensitive view and sees assignment controls'
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $owner) {
         $browser->loginAs($admin)
-            ->visit('/admin/propietarias/' . $owner->id)
-            ->waitFor('[data-assignment-id]', 5)
-            ->assertPresent('[data-assignment-id]')
-            ->assertPresent('[data-assignment-admin-validated-toggle]')
-            ->assertPresent('[data-assignment-owner-validated-toggle]')
+            ->visit('/admin/propietarias')
+            ->waitFor('[data-owner-id="' . $owner->id . '"]', 5)
+            ->assertPresent('[data-owner-id="' . $owner->id . '"]')
+            ->click('[data-action="toggle-owner-inline-' . $owner->id . '"]')
+            ->waitFor('[data-owner-inline-panel="' . $owner->id . '"]', 5)
+            ->assertPresent('[data-owner-inline-panel="' . $owner->id . '"]')
+            ->assertPresent('[data-owner-inline-create="' . $owner->id . '"]')
             ->assertMissing('[data-action="deactivate-owner"]');
+    });
+});
+
+test('admin top user menu dropdown opens from the desktop header', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin) {
+        $browser->loginAs($admin)
+            ->visit('/admin')
+            ->waitFor('[data-test="sidebar-menu-button"]', 5)
+            ->click('[data-test="sidebar-menu-button"]')
+            ->waitFor('[data-test="logout-button"]', 5)
+            ->assertPresent('[data-test="logout-button"]')
+            ->assertSee($admin->email);
     });
 });
 
@@ -68,17 +85,18 @@ test('admin can access location detail sensitive view and sees editable property
 });
 
 test('guest cannot access sensitive owner and location admin views', function () {
-    $owner = Owner::factory()->create();
     $location = Location::factory()->create();
 
     /** @var DuskTestCase $this */
-    $this->browse(function (Browser $browser) use ($owner, $location) {
+    $this->browse(function (Browser $browser) use ($location) {
         $browser->visit('/_dusk/logout')
-            ->visit('/admin/propietarias/' . $owner->id)
-            ->waitForLocation('/eu/pribatua')
-            ->assertPathIs('/eu/pribatua')
+            ->visit('/admin/propietarias')
+            ->waitFor('[data-test="login-button"]', 10)
+            ->assertPresent('[data-test="login-button"]')
+            ->assertPathBeginsWith('/eu/pribatua')
             ->visit('/admin/ubicaciones/' . $location->id)
-            ->waitForLocation('/eu/pribatua')
-            ->assertPathIs('/eu/pribatua');
+            ->waitFor('[data-test="login-button"]', 10)
+            ->assertPresent('[data-test="login-button"]')
+            ->assertPathBeginsWith('/eu/pribatua');
     });
 });

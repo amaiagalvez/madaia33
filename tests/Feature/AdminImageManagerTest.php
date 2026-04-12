@@ -85,6 +85,8 @@ it('shows alt texts in both languages and tag in admin images list', function ()
         ->assertSee('Atari nagusia')
         ->assertSee('Portal principal')
         ->assertSee(__('gallery.filter.history'))
+        ->assertSeeHtml('data-admin-form-file-input')
+        ->assertSeeHtml('data-admin-field="single-radio-pills"')
         ->assertSee('data-image-alt-eu="' . $image->id . '"', false)
         ->assertSee('data-image-alt-es="' . $image->id . '"', false)
         ->assertSee('data-image-tag="' . $image->id . '"', false);

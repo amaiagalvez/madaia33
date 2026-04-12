@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Database\Factories\VotingOptionTotalFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class VotingOptionTotal extends Model
 {
+    /** @use HasFactory<VotingOptionTotalFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
@@ -16,6 +18,11 @@ class VotingOptionTotal extends Model
         'voting_option_id',
         'votes_count',
     ];
+
+    protected static function newFactory(): VotingOptionTotalFactory
+    {
+        return VotingOptionTotalFactory::new();
+    }
 
     /**
      * @return BelongsTo<Voting, $this>

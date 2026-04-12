@@ -22,6 +22,7 @@ class Owner extends Model
         'coprop1_phone',
         'coprop1_email',
         'language',
+        'accepted_terms_at',
         'coprop2_name',
         'coprop2_dni',
         'coprop2_phone',
@@ -42,6 +43,7 @@ class Owner extends Model
     {
         return [
             'language' => 'string',
+            'accepted_terms_at' => 'datetime',
         ];
     }
 

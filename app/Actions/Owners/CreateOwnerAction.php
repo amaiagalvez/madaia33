@@ -28,63 +28,7 @@ class CreateOwnerAction
     {
         $password = Str::password(16);
 
-        $result = DB::transaction(function () use ($data, $password): array {
-            $user = User::create([
-                'name' => $data['coprop1_name'],
-                'email' => $data['coprop1_email'],
-                'password' => Hash::make($password),
-                'is_active' => true,
-                'language' => $data['language'] ?? SupportedLocales::default(),
-            ]);
-
-            $owner = Owner::create([
-                'user_id' => $user->id,
-                'coprop1_name' => $data['coprop1_name'],
-                'coprop1_dni' => $data['coprop1_dni'],
-                'coprop1_phone' => $data['coprop1_phone'] ?? null,
-                'coprop1_email' => $data['coprop1_email'],
-                'language' => $data['language'] ?? SupportedLocales::default(),
-                'coprop2_name' => $data['coprop2_name'] ?? null,
-                'coprop2_dni' => $data['coprop2_dni'] ?? null,
-                'coprop2_phone' => $data['coprop2_phone'] ?? null,
-                'coprop2_email' => $data['coprop2_email'] ?? null,
-            ]);
-
-            $assignments = $data['assignments'] ?? [];
-
-            foreach ($assignments as $assignment) {
-                $propertyId = (int) $assignment['property_id'];
-                $endDate = $assignment['end_date'] ?? null;
-
-                if ($endDate === null) {
-                    $hasActiveAssignment = PropertyAssignment::query()
-                        ->where('property_id', $propertyId)
-                        ->whereNull('end_date')
-                        ->lockForUpdate()
-                        ->exists();
-
-                    if ($hasActiveAssignment) {
-                        throw ValidationException::withMessages([
-                            'assignments' => __('La propiedad ya tiene una propietaria activa. Cierra la asignación anterior antes de asignar una nueva.'),
-                        ]);
-                    }
-                }
-
-                PropertyAssignment::create([
-                    'property_id' => $propertyId,
-                    'owner_id' => $owner->id,
-                    'start_date' => $assignment['start_date'],
-                    'end_date' => $endDate,
-                    'admin_validated' => false,
-                    'owner_validated' => false,
-                ]);
-            }
-
-            return [
-                'owner' => $owner,
-                'user' => $user,
-            ];
-        });
+        $result = DB::transaction(fn (): array => $this->createOwnerWithAssignments($data, $password));
 
         /** @var Owner $owner */
         $owner = $result['owner'];
@@ -93,6 +37,109 @@ class CreateOwnerAction
 
         $user->assignRole(Role::PROPERTY_OWNER);
 
+        $this->sendWelcomeMail($user, $data);
+
+        return $owner;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array{owner: Owner, user: User}
+     */
+    private function createOwnerWithAssignments(array $data, string $password): array
+    {
+        $user = $this->createUser($data, $password);
+        $owner = $this->createOwner($user, $data);
+
+        $this->createAssignments($owner, $data['assignments'] ?? []);
+
+        return [
+            'owner' => $owner,
+            'user' => $user,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function createUser(array $data, string $password): User
+    {
+        return User::create([
+            'name' => $data['coprop1_name'],
+            'email' => $data['coprop1_email'],
+            'password' => Hash::make($password),
+            'is_active' => true,
+            'language' => $data['language'] ?? SupportedLocales::default(),
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function createOwner(User $user, array $data): Owner
+    {
+        return Owner::create([
+            'user_id' => $user->id,
+            'coprop1_name' => $data['coprop1_name'],
+            'coprop1_dni' => $data['coprop1_dni'],
+            'coprop1_phone' => $data['coprop1_phone'] ?? null,
+            'coprop1_email' => $data['coprop1_email'],
+            'language' => $data['language'] ?? SupportedLocales::default(),
+            'coprop2_name' => $data['coprop2_name'] ?? null,
+            'coprop2_dni' => $data['coprop2_dni'] ?? null,
+            'coprop2_phone' => $data['coprop2_phone'] ?? null,
+            'coprop2_email' => $data['coprop2_email'] ?? null,
+        ]);
+    }
+
+    /**
+     * @param  array<int, array{property_id: int|string, start_date: string, end_date?: string|null}>  $assignments
+     */
+    private function createAssignments(Owner $owner, array $assignments): void
+    {
+        foreach ($assignments as $assignment) {
+            $propertyId = (int) $assignment['property_id'];
+            $endDate = $assignment['end_date'] ?? null;
+
+            $this->ensurePropertyCanBeAssigned($propertyId, $endDate);
+
+            PropertyAssignment::create([
+                'property_id' => $propertyId,
+                'owner_id' => $owner->id,
+                'start_date' => $assignment['start_date'],
+                'end_date' => $endDate,
+                'admin_validated' => false,
+                'owner_validated' => false,
+            ]);
+        }
+    }
+
+    private function ensurePropertyCanBeAssigned(int $propertyId, ?string $endDate): void
+    {
+        if ($endDate !== null) {
+            return;
+        }
+
+        $hasActiveAssignment = PropertyAssignment::query()
+            ->where('property_id', $propertyId)
+            ->whereNull('end_date')
+            ->lockForUpdate()
+            ->exists();
+
+        if (! $hasActiveAssignment) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'assignments' => __('La propiedad ya tiene una propietaria activa. Cierra la asignación anterior antes de asignar una nueva.'),
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function sendWelcomeMail(User $user, array $data): void
+    {
         $settings = Setting::stringValues([
             'from_address',
             'from_name',
@@ -129,8 +176,6 @@ class CreateOwnerAction
             $bodyHtml,
             $resetUrl,
         ));
-
-        return $owner;
     }
 
     /**

@@ -18,7 +18,13 @@ class AdminMessageInbox extends Component
 
     public bool $showDeleteModal = false;
 
-    public string $sortBy = 'created_at';
+    public ?int $confirmingReadId = null;
+
+    public string $readAction = '';
+
+    public bool $showReadModal = false;
+
+    public string $sortColumn = 'created_at';
 
     public string $sortDir = 'desc';
 
@@ -52,12 +58,36 @@ class AdminMessageInbox extends Component
         }
     }
 
+    public function confirmReadToggle(int $id, bool $markRead): void
+    {
+        $this->confirmingReadId = $id;
+        $this->readAction = $markRead ? 'read' : 'unread';
+        $this->showReadModal = true;
+    }
+
+    public function doReadToggle(): void
+    {
+        if ($this->confirmingReadId === null) {
+            return;
+        }
+
+        $this->toggleRead($this->confirmingReadId);
+        $this->cancelReadToggle();
+    }
+
+    public function cancelReadToggle(): void
+    {
+        $this->confirmingReadId = null;
+        $this->readAction = '';
+        $this->showReadModal = false;
+    }
+
     public function sortBy(string $column): void
     {
-        if ($this->sortBy === $column) {
+        if ($this->sortColumn === $column) {
             $this->sortDir = $this->sortDir === 'asc' ? 'desc' : 'asc';
         } else {
-            $this->sortBy = $column;
+            $this->sortColumn = $column;
             $this->sortDir = 'desc';
         }
 
@@ -111,12 +141,12 @@ class AdminMessageInbox extends Component
     public function getMessagesProperty(): LengthAwarePaginator
     {
         $allowedSortColumns = ['created_at', 'is_read'];
-        $sortBy = in_array($this->sortBy, $allowedSortColumns) ? $this->sortBy : 'created_at';
+        $sortBy = in_array($this->sortColumn, $allowedSortColumns) ? $this->sortColumn : 'created_at';
         $sortDir = in_array($this->sortDir, ['asc', 'desc']) ? $this->sortDir : 'desc';
 
         return ContactMessage::query()
-            ->when($this->readFilter === 'read', fn ($query) => $query->where('is_read', true))
-            ->when($this->readFilter === 'unread', fn ($query) => $query->where('is_read', false))
+            ->when($this->readFilter === 'read', fn($query) => $query->where('is_read', true))
+            ->when($this->readFilter === 'unread', fn($query) => $query->where('is_read', false))
             ->when(trim($this->search) !== '', function ($query): void {
                 $term = '%' . trim($this->search) . '%';
 

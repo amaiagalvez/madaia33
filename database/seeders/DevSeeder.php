@@ -328,6 +328,27 @@ class DevSeeder extends Seeder
                 'start_date' => now()->subMonths(6)->format('Y-m-d'),
             ],
         );
+
+        $secondaryPropertyId = Property::query()
+            ->doesntHave('activeAssignments')
+            ->where('id', '!=', $propertyId)
+            ->orderBy('id')
+            ->value('id');
+
+        if ($secondaryPropertyId === null) {
+            return;
+        }
+
+        PropertyAssignment::query()->updateOrCreate(
+            [
+                'owner_id' => $owner->id,
+                'property_id' => $secondaryPropertyId,
+                'end_date' => null,
+            ],
+            [
+                'start_date' => now()->subMonths(3)->format('Y-m-d'),
+            ],
+        );
     }
 
     private function seedDelegatedVoteUser(): void

@@ -30,94 +30,19 @@ class CastVotingBallotAction
         Owner $owner,
         int $optionId,
         User $authenticatedUser,
-        ?string $castIpAddress = null,
-        ?float $castLatitude = null,
-        ?float $castLongitude = null,
-        ?string $castDelegateDni = null,
-        bool $isInPerson = false,
+        ?CastVotingData $castData = null,
     ): VotingBallot {
-        if (! $authenticatedUser->isSuperadmin() && ! $authenticatedUser->canVoteInVotings() && ! $authenticatedUser->canUseDelegatedVoting()) {
-            throw ValidationException::withMessages([
-                'vote' => __('votings.errors.not_allowed'),
-            ]);
-        }
+        $this->validateUserPermissions($authenticatedUser);
+        $castData ??= CastVotingData::fromInputs();
 
-        $castIpAddress = $castIpAddress ?? request()->ip();
-
-        $ballot = DB::transaction(function () use ($voting, $owner, $optionId, $authenticatedUser, $castIpAddress, $castLatitude, $castLongitude, $castDelegateDni, $isInPerson): VotingBallot {
-            $lockedVoting = Voting::query()
-                ->with(['options', 'locations.location'])
-                ->lockForUpdate()
-                ->findOrFail($voting->id);
-
-            if (! $lockedVoting->is_published || ! $lockedVoting->isOpen()) {
-                throw ValidationException::withMessages([
-                    'vote' => __('votings.errors.closed'),
-                ]);
-            }
-
-            if (! $this->eligibilityService->ownerCanVote($lockedVoting, $owner)) {
-                throw ValidationException::withMessages([
-                    'vote' => __('votings.errors.not_allowed'),
-                ]);
-            }
-
+        $ballot = DB::transaction(function () use ($voting, $owner, $optionId, $authenticatedUser, $castData): VotingBallot {
+            $lockedVoting = $this->lockAndValidateVoting($voting, $owner, $optionId);
             $option = $lockedVoting->options->firstWhere('id', $optionId);
 
-            if (! $option instanceof VotingOption) {
-                throw ValidationException::withMessages([
-                    'vote' => __('votings.errors.invalid_option'),
-                ]);
-            }
+            $this->validateOption($option);
+            $this->validateNotAlreadyVoted($lockedVoting, $owner);
 
-            $alreadyVoted = VotingBallot::query()
-                ->where('voting_id', $lockedVoting->id)
-                ->where('owner_id', $owner->id)
-                ->lockForUpdate()
-                ->exists();
-
-            if ($alreadyVoted) {
-                throw ValidationException::withMessages([
-                    'vote' => __('votings.errors.already_voted'),
-                ]);
-            }
-
-            $ballot = VotingBallot::create([
-                'voting_id' => $lockedVoting->id,
-                'owner_id' => $owner->id,
-                'cast_by_user_id' => $authenticatedUser->id === $owner->user_id ? null : $authenticatedUser->id,
-                'cast_ip_address' => $castIpAddress,
-                'cast_latitude' => $castLatitude,
-                'cast_longitude' => $castLongitude,
-                'cast_delegate_dni' => $isInPerson ? null : $castDelegateDni,
-                'is_in_person' => $isInPerson,
-                'voted_at' => now(),
-            ]);
-
-            if (! $lockedVoting->is_anonymous) {
-                VotingSelection::create([
-                    'voting_id' => $lockedVoting->id,
-                    'voting_ballot_id' => $ballot->id,
-                    'owner_id' => $owner->id,
-                    'voting_option_id' => $option->id,
-                ]);
-            }
-
-            $total = VotingOptionTotal::query()
-                ->where('voting_id', $lockedVoting->id)
-                ->where('voting_option_id', $option->id)
-                ->lockForUpdate()
-                ->first();
-
-            if ($total === null) {
-                VotingOptionTotal::create([
-                    'voting_id' => $lockedVoting->id,
-                    'voting_option_id' => $option->id,
-                    'votes_count' => 1,
-                ]);
-            } else {
-                $total->increment('votes_count');
-            }
+            $ballot = $this->createBallot($lockedVoting, $owner, $authenticatedUser, $option, $castData);
 
             return $ballot;
         });
@@ -125,6 +50,113 @@ class CastVotingBallotAction
         $this->sendConfirmationMail($owner, $voting);
 
         return $ballot;
+    }
+
+    private function validateUserPermissions(User $user): void
+    {
+        if (! $user->isSuperadmin() && ! $user->canVoteInVotings() && ! $user->canUseDelegatedVoting()) {
+            throw ValidationException::withMessages([
+                'vote' => __('votings.errors.not_allowed'),
+            ]);
+        }
+    }
+
+    private function lockAndValidateVoting(Voting $voting, Owner $owner, int $optionId): Voting
+    {
+        $lockedVoting = Voting::query()
+            ->with(['options', 'locations.location'])
+            ->lockForUpdate()
+            ->findOrFail($voting->id);
+
+        if (! $lockedVoting->is_published || ! $lockedVoting->isOpen()) {
+            throw ValidationException::withMessages([
+                'vote' => __('votings.errors.closed'),
+            ]);
+        }
+
+        if (! $this->eligibilityService->ownerCanVote($lockedVoting, $owner)) {
+            throw ValidationException::withMessages([
+                'vote' => __('votings.errors.not_allowed'),
+            ]);
+        }
+
+        return $lockedVoting;
+    }
+
+    private function validateOption(?VotingOption $option): void
+    {
+        if (! $option instanceof VotingOption) {
+            throw ValidationException::withMessages([
+                'vote' => __('votings.errors.invalid_option'),
+            ]);
+        }
+    }
+
+    private function validateNotAlreadyVoted(Voting $voting, Owner $owner): void
+    {
+        $alreadyVoted = VotingBallot::query()
+            ->where('voting_id', $voting->id)
+            ->where('owner_id', $owner->id)
+            ->lockForUpdate()
+            ->exists();
+
+        if ($alreadyVoted) {
+            throw ValidationException::withMessages([
+                'vote' => __('votings.errors.already_voted'),
+            ]);
+        }
+    }
+
+    private function createBallot(
+        Voting $voting,
+        Owner $owner,
+        User $authenticatedUser,
+        VotingOption $option,
+        CastVotingData $castData,
+    ): VotingBallot {
+        $ballot = VotingBallot::create([
+            'voting_id' => $voting->id,
+            'owner_id' => $owner->id,
+            'cast_by_user_id' => $authenticatedUser->id === $owner->user_id ? null : $authenticatedUser->id,
+            'cast_ip_address' => $castData->ipAddress,
+            'cast_latitude' => $castData->latitude,
+            'cast_longitude' => $castData->longitude,
+            'cast_delegate_dni' => $castData->isInPerson ? null : $castData->delegateDni,
+            'is_in_person' => $castData->isInPerson,
+            'voted_at' => now(),
+        ]);
+
+        if (! $voting->is_anonymous) {
+            VotingSelection::create([
+                'voting_id' => $voting->id,
+                'voting_ballot_id' => $ballot->id,
+                'owner_id' => $owner->id,
+                'voting_option_id' => $option->id,
+            ]);
+        }
+
+        $this->incrementVotingTotal($voting, $option);
+
+        return $ballot;
+    }
+
+    private function incrementVotingTotal(Voting $voting, VotingOption $option): void
+    {
+        $total = VotingOptionTotal::query()
+            ->where('voting_id', $voting->id)
+            ->where('voting_option_id', $option->id)
+            ->lockForUpdate()
+            ->first();
+
+        if ($total === null) {
+            VotingOptionTotal::create([
+                'voting_id' => $voting->id,
+                'voting_option_id' => $option->id,
+                'votes_count' => 1,
+            ]);
+        } else {
+            $total->increment('votes_count');
+        }
     }
 
     private function sendConfirmationMail(Owner $owner, Voting $voting): void

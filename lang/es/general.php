@@ -23,7 +23,7 @@ return [
         'back' => 'Volver',
         'send' => 'Enviar',
         'create' => 'Crear',
-        'create_new' => 'Crear nuevo',
+        'create_new' => '+ Nuevo',
         'all' => 'Todos',
         'confirm' => 'Confirmar',
     ],

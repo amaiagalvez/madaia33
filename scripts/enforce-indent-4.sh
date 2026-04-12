@@ -26,6 +26,7 @@ mapfile -d '' FILES < <(
         -not -path '*/public/build/*' \
         -not -path '*/dc-data/*' \
         -not -path '*/.git/*' \
+        -not -path '*/.github/workflows/*' \
         -print0
 )
 
@@ -95,3 +96,7 @@ fi
 
 echo
 echo "Done. Updated $changed file(s) out of $checked checked."
+
+echo
+echo "Running Pint via Docker..."
+docker compose run --rm --user "${DC_UID:-1000}:${DC_GID:-1000}" madaia33 vendor/bin/pint --dirty

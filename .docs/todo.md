@@ -10,13 +10,13 @@
 - [ ] componente para inputs del formulario
 
 # Code
-- [ ] user hizkuntza, berdin du front-ekoa
-
+- [ ] reepasar estatistikak home
+- [ ] añadir papelera para poder reestaurarr los borrrados
+- [ ] tipo votaciones, una persona un voto / por poorcentajes de participación
+- [ ] 
 - [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
 - [ ] configurar el sentry
 - [ ] añadir debugbar y algo para ver los logs
-- [ ] components field text
-- [ ] components tables
 - [ ] datatables
 - [ ] seo
 - [ ] acceesibilidad
@@ -37,8 +37,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-- [ ] Hay que marcar quien es la persona jefa de portal o de planta de garaje (puede haber una o varias)
-
+- en el profil, añadir un formulario para que si alguien tiene propblmas con sus datos mande un mensaje.
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
@@ -51,16 +50,18 @@ Para que todo esto sea legal de verdad, asegúrate de:
 - [ ] Bidalketak. Todos los mensajes que se envían guardalos en una tabla "receivers" con el user_id de a quien se le ha enviado, el email al que se ha enviado, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje
 - [ ] Trackea los mensajes para que se pueda saber quien lo ha habierto y quien ha pinchado en los enlaces del mensaje si los hubiera
 
-
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 
 # nohizbehinka egiteko 2026-04-11
 - [ ] Repasa los feature test y los que se pueedan convertir en unit pasalos
 - [ ] Repasa la suit de test y completa los que falten
-- [ ] dentro de la carpeta madaia33 buscar todos los ficheros y carpetas que sean del usuario root y ponerles amaia:amaia
-sudo find /home/amaia/Dokumentuak/madaia33 -user root -exec chown amaia:amaia {} +
 - [ ] con el agente sorgina repasar el código y proponer mejoras
-- [ ] pint pasa guztira
+
+- [ ] sudo find /home/amaia/Dokumentuak/madaia33 -user root -exec chown amaia:amaia {} +
+- [ ] bash scripts/enforce-indent-4.sh 
+- [ ] docker => reformat eta quality
+- [ ] docker => pentest
+- [ ] dusk-test
 
 ## manual de usuaria
 crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación
@@ -76,5 +77,4 @@ pasar los test con coverage
 - [ ] en settings en la seccion email_configuration, ocultar todos los campos menos el nombre (ponerlos como si fueran tipo password), añadir botón para modificarlos y que pida contraseña antes de modicarlos
 - [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
 - [ ] añadir espacio para comercios
-- [ ] en el aginte-panela añade estadísticas de las tablas que falta
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)

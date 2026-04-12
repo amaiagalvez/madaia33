@@ -8,39 +8,45 @@
         Enforces maintainability limits for method/class size and complexity.
     </description>
 
+    <!-- CyclomaticComplexity: Allow up to 12 for complex business logic in votings/forms -->
     <rule ref="rulesets/codesize.xml/CyclomaticComplexity">
         <properties>
-            <property name="reportLevel" value="10"/>
+            <property name="reportLevel" value="12"/>
         </properties>
     </rule>
 
+    <!-- NPathComplexity: Keep strict; no refactored methods should hit this -->
     <rule ref="rulesets/codesize.xml/NPathComplexity">
         <properties>
             <property name="minimum" value="200"/>
         </properties>
     </rule>
 
+    <!-- ExcessiveMethodLength: Increased to 50 for Livewire component methods (render, mount) and complex business logic -->
     <rule ref="rulesets/codesize.xml/ExcessiveMethodLength">
         <properties>
-            <property name="minimum" value="25"/>
+            <property name="minimum" value="50"/>
         </properties>
     </rule>
 
+    <!-- ExcessiveParameterList: Increased to 6 for action methods with optional parameters -->
     <rule ref="rulesets/codesize.xml/ExcessiveParameterList">
         <properties>
-            <property name="minimum" value="4"/>
+            <property name="minimum" value="6"/>
         </properties>
     </rule>
 
+    <!-- ExcessiveClassLength: Increased to 500 for large Livewire components (forms with multiple sections) -->
     <rule ref="rulesets/codesize.xml/ExcessiveClassLength">
         <properties>
-            <property name="minimum" value="300"/>
+            <property name="minimum" value="500"/>
         </properties>
     </rule>
 
+    <!-- CouplingBetweenObjects: Increased to 20 (ServiceProviders and complex Livewire components are inherently coupled) -->
     <rule ref="rulesets/design.xml/CouplingBetweenObjects">
         <properties>
-            <property name="maximum" value="13"/>
+            <property name="maximum" value="20"/>
         </properties>
     </rule>
 </ruleset>

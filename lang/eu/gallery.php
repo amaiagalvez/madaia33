@@ -19,6 +19,7 @@ return [
     'admin' => [
         'list' => 'Argazkien zerrenda',
         'upload' => 'Argazkia igo',
+        'file' => 'Irudia',
         'alt_eu' => 'Testu alternatiboa (EU)',
         'alt_es' => 'Testu alternatiboa (ES)',
         'tag' => 'Etiketa',

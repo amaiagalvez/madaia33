@@ -29,7 +29,7 @@ describe('CreateOwnerAction', function () {
             ->and($owner->coprop1_email)->toBe('miren@example.com');
     });
 
-    it('creates a user linked to the owner with DNI as name', function () {
+    it('creates a user linked to the owner with the primary owner name', function () {
         Mail::fake();
 
         $action = new CreateOwnerAction;
@@ -42,7 +42,7 @@ describe('CreateOwnerAction', function () {
         $user = User::find($owner->user_id);
 
         expect($user)->not->toBeNull()
-            ->and($user->name)->toBe('12345678Z')
+            ->and($user->name)->toBe('Miren Etxeberria')
             ->and($user->email)->toBe('miren@example.com')
             ->and($user->is_active)->toBeTrue();
     });

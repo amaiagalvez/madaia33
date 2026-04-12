@@ -36,6 +36,6 @@ test('authenticated users see their name and logout button in front header', fun
         $browser->loginAs($user)
             ->visit('/eu')
             ->assertSee('Header User')
-            ->assertSee('Saioa itxi');
+            ->assertPresent('[data-test="logout-button"]');
     });
 });

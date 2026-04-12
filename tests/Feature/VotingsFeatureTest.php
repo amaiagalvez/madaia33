@@ -95,6 +95,42 @@ it('allows an eligible owner to vote once and stores auditable rows', function (
         ->count())->toBe(1);
 });
 
+it('shows already voted notice and hides voting options when owner already voted', function () {
+    Mail::fake();
+
+    $owner = Owner::factory()->create();
+    $portal = Location::factory()->portal()->create(['code' => '33-AV']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    $option = VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+        'label_eu' => 'Bai',
+        'label_es' => 'Si',
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    Livewire::actingAs($owner->user)
+        ->test(PublicVotings::class)
+        ->set("selectedOptions.{$voting->id}", $option->id)
+        ->call('vote', $voting->id)
+        ->assertHasNoErrors()
+        ->assertSee(__('votings.front.already_voted'))
+        ->assertDontSee(__('votings.front.vote_button'))
+        ->assertDontSee('Bai');
+});
+
 it('does not store option selections for anonymous votings', function () {
     Mail::fake();
 

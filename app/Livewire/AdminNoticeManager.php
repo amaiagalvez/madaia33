@@ -47,11 +47,15 @@ class AdminNoticeManager extends Component
 
     public bool $showPublishModal = false;
 
+    public string $sortColumn = 'published_at';
+
+    public string $sortDir = 'desc';
+
     // UI state
     public bool $showForm = false;
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     protected function rules(): array
     {
@@ -103,22 +107,22 @@ class AdminNoticeManager extends Component
         $this->contentEs = $notice->content_es ?? '';
         $this->isPublic = $notice->is_public;
         $this->selectedLocations = $notice->locations
-            ->map(fn (NoticeLocation $location): ?string => $location->location_code)
+            ->map(fn(NoticeLocation $location): ?string => $location->location_code)
             ->filter()
             ->values()
             ->all();
 
         $user = $this->currentUser();
 
-        if ($user?->hasRole(Role::GENERAL_ADMIN)) {
+        if ($user->hasRole(Role::GENERAL_ADMIN)) {
             $this->selectedLocations = [];
         }
 
-        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn (string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
                 ->values()
                 ->all();
         }
@@ -133,15 +137,15 @@ class AdminNoticeManager extends Component
 
         $user = $this->currentUser();
 
-        if ($user?->hasRole(Role::GENERAL_ADMIN)) {
+        if ($user->hasRole(Role::GENERAL_ADMIN)) {
             $this->selectedLocations = [];
         }
 
-        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn (string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
                 ->values()
                 ->all();
         }
@@ -285,6 +289,18 @@ class AdminNoticeManager extends Component
         $this->showForm = false;
     }
 
+    public function sortBy(string $column): void
+    {
+        if ($this->sortColumn === $column) {
+            $this->sortDir = $this->sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortColumn = $column;
+            $this->sortDir = 'desc';
+        }
+
+        $this->resetPage();
+    }
+
     private function resetForm(): void
     {
         $this->editingId = null;
@@ -354,7 +370,7 @@ class AdminNoticeManager extends Component
             ->get();
 
         return $locations
-            ->map(fn (Location $location): array => [
+            ->map(fn(Location $location): array => [
                 'code' => $location->code,
                 'type' => $location->type,
                 'label' => $this->locationLabel($location) . $location->code,
@@ -368,7 +384,6 @@ class AdminNoticeManager extends Component
             'portal' => __('admin.locations.types.portal') . ' ',
             'local' => __('admin.locations.types.local') . ' ',
             'garage' => __('admin.locations.types.garage') . ' ',
-            'storage' => __('admin.locations.types.storage') . ' ',
             default => '',
         };
     }
@@ -377,7 +392,13 @@ class AdminNoticeManager extends Component
     {
         abort_unless($this->currentUser()?->canManageNotices(), 403);
 
-        $notices = Notice::with(['locations.location'])->latest()->paginate(12);
+        $allowedSortColumns = ['created_at', 'is_public', 'published_at'];
+        $sortColumn = in_array($this->sortColumn, $allowedSortColumns, true) ? $this->sortColumn : 'published_at';
+        $sortDir = in_array($this->sortDir, ['asc', 'desc'], true) ? $this->sortDir : 'desc';
+
+        $notices = Notice::with(['locations.location'])
+            ->orderBy($sortColumn, $sortDir)
+            ->paginate(12);
 
         return view('livewire.admin.notice-manager', [
             'notices' => $notices,
@@ -391,7 +412,7 @@ class AdminNoticeManager extends Component
     private function allowedLocationCodes(): array
     {
         return collect($this->allLocationOptions())
-            ->map(static fn (array $location): string => $location['code'])
+            ->map(static fn(array $location): string => $location['code'])
             ->values()
             ->all();
     }

@@ -95,6 +95,28 @@ it('deleting notice removes it from admin list', function () {
     expect(Notice::find($notice->id))->toBeNull();
 });
 
+it('renders reusable edit and delete row actions', function () {
+    $user = adminUser();
+    Notice::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->assertSeeHtml('data-admin-table-header')
+        ->assertSeeHtml('data-admin-action-link="confirm"')
+        ->assertSeeHtml('data-admin-action="edit"')
+        ->assertSeeHtml('data-admin-action="delete"');
+});
+
+it('renders reusable side panel and form footer when form is open', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('createNotice')
+        ->assertSeeHtml('data-admin-side-panel-form')
+        ->assertSeeHtml('data-admin-form-footer-actions');
+});
+
 it('opens and closes delete confirmation', function () {
     $user = adminUser();
     $notice = Notice::factory()->create();
@@ -186,6 +208,7 @@ it('renders multilingual notice fields with language tabs', function () {
     Livewire::actingAs($user)
         ->test('admin-notice-manager')
         ->call('createNotice')
+        ->assertSeeHtml('data-admin-field="boolean-toggle"')
         ->assertSeeHtml('data-bilingual-field="titleEu"')
         ->assertSeeHtml('data-bilingual-tab="eu"')
         ->assertSeeHtml('data-bilingual-tab="es"')
@@ -198,6 +221,7 @@ it('renders multilingual notice fields with language tabs', function () {
 
 it('shows only locations in form location selector', function () {
     $user = adminUser();
+    $propertyName = 'Property Name Not In Location Selector';
 
     $location = Location::factory()->create([
         'type' => 'portal',
@@ -207,7 +231,7 @@ it('shows only locations in form location selector', function () {
 
     Property::factory()->create([
         'location_id' => $location->id,
-        'name' => '1A',
+        'name' => $propertyName,
     ]);
 
     Location::factory()->create([
@@ -219,8 +243,9 @@ it('shows only locations in form location selector', function () {
     Livewire::actingAs($user)
         ->test('admin-notice-manager')
         ->call('createNotice')
+        ->assertSeeHtml('data-admin-field="multi-checkbox-pills"')
         ->assertSee('33-A')
-        ->assertDontSee('1A')
+        ->assertDontSee($propertyName)
         ->assertDontSee('TR-99');
 });
 
@@ -303,4 +328,39 @@ it('when editing and keeping private, it preserves existing published_at', funct
 
     expect($notice->published_at?->toDateTimeString())->toBe($originalPublishedAt)
         ->and($notice->is_public)->toBeFalse();
+});
+
+it('toggles sort direction for published columns and resets on column change', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->assertSet('sortColumn', 'published_at')
+        ->assertSet('sortDir', 'desc')
+        ->call('sortBy', 'is_public')
+        ->assertSet('sortColumn', 'is_public')
+        ->assertSet('sortDir', 'desc')
+        ->call('sortBy', 'is_public')
+        ->assertSet('sortDir', 'asc')
+        ->call('sortBy', 'published_at')
+        ->assertSet('sortColumn', 'published_at')
+        ->assertSet('sortDir', 'desc');
+});
+
+it('uses published_at desc fallback for invalid notice sorting state', function () {
+    $user = adminUser();
+    $old = Notice::factory()->create([
+        'title_eu' => 'Old Notice',
+        'published_at' => now()->subDays(2),
+    ]);
+    $new = Notice::factory()->create([
+        'title_eu' => 'New Notice',
+        'published_at' => now(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->set('sortColumn', 'invalid-column')
+        ->set('sortDir', 'sideways')
+        ->assertSeeInOrder([$new->title_eu, $old->title_eu]);
 });

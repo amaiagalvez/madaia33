@@ -2,9 +2,13 @@
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
+use App\Models\Voting;
 use Livewire\Livewire;
 use App\Models\Location;
+use App\Models\VotingBallot;
 use App\Livewire\Admin\Users;
+use App\Models\PropertyAssignment;
 
 beforeEach(function () {
     foreach (Role::names() as $roleName) {
@@ -66,6 +70,29 @@ it('shows assigned managed locations in users list', function () {
         ->assertSee('Community Locations User')
         ->assertSee('L-PORTAL-01')
         ->assertSee('L-GARAGE-01');
+});
+
+it('filters users list by selected role', function () {
+    $manager = User::factory()->create([
+        'email' => 'manager-filter-role@example.com',
+    ]);
+    $manager->assignRole(Role::GENERAL_ADMIN);
+
+    $communityUser = User::factory()->create([
+        'name' => 'Community Role User',
+    ]);
+    $communityUser->assignRole(Role::COMMUNITY_ADMIN);
+
+    $delegatedUser = User::factory()->create([
+        'name' => 'Delegated Role User',
+    ]);
+    $delegatedUser->assignRole(Role::DELEGATED_VOTE);
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->set('roleFilter', Role::COMMUNITY_ADMIN)
+        ->assertSee('Community Role User')
+        ->assertDontSee('Delegated Role User');
 });
 
 it('allows admin general to create a community admin with multiple locations', function () {
@@ -159,4 +186,97 @@ it('returns from impersonated session back to original user', function () {
 
     test()->assertAuthenticatedAs($superadmin);
     expect(session()->has('impersonator_user_id'))->toBeFalse();
+});
+
+it('builds owner profile link with editOwner query param from users form', function () {
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::GENERAL_ADMIN);
+
+    $managedUser = User::factory()->create([
+        'email' => 'owner-link@example.com',
+    ]);
+
+    $owner = Owner::factory()->create([
+        'user_id' => $managedUser->id,
+    ]);
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('editUser', $managedUser->id)
+        ->assertSee(route('admin.owners.index', ['editOwner' => $owner->id], false), false);
+});
+
+it('uses shared admin styling components in users list and side panel form', function () {
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::GENERAL_ADMIN);
+
+    User::factory()->create([
+        'name' => 'Styled User',
+        'email' => 'styled-user@example.com',
+    ]);
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->assertSeeHtml('data-admin-table-header')
+        ->assertSeeHtml('data-admin-action="edit"')
+        ->assertSeeHtml('data-admin-action="delete"')
+        ->call('createUser')
+        ->assertSeeHtml('data-admin-side-panel-form')
+        ->assertSeeHtml('data-admin-form-footer-actions')
+        ->assertSeeHtml('data-admin-form-input')
+        ->assertSeeHtml('data-admin-field="multi-checkbox-pills"');
+});
+
+it('prevents deleting a user when related owner has already voted', function () {
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::GENERAL_ADMIN);
+
+    $targetUser = User::factory()->create([
+        'email' => 'cannot-delete-voted@example.com',
+    ]);
+
+    $owner = Owner::factory()->create([
+        'user_id' => $targetUser->id,
+    ]);
+
+    $voting = Voting::factory()->create();
+
+    VotingBallot::factory()->create([
+        'voting_id' => $voting->id,
+        'owner_id' => $owner->id,
+        'cast_by_user_id' => null,
+    ]);
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('confirmDelete', $targetUser->id)
+        ->call('deleteUser')
+        ->assertSee(__('admin.users.delete_blocked_has_votes'));
+
+    expect(User::query()->whereKey($targetUser->id)->exists())->toBeTrue();
+});
+
+it('prevents deleting a user when related owner has assignment history even if inactive', function () {
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::GENERAL_ADMIN);
+
+    $targetUser = User::factory()->create([
+        'email' => 'cannot-delete-assigned@example.com',
+    ]);
+
+    $owner = Owner::factory()->create([
+        'user_id' => $targetUser->id,
+    ]);
+
+    PropertyAssignment::factory()->closed()->create([
+        'owner_id' => $owner->id,
+    ]);
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('confirmDelete', $targetUser->id)
+        ->call('deleteUser')
+        ->assertSee(__('admin.users.delete_blocked_has_assignments'));
+
+    expect(User::query()->whereKey($targetUser->id)->exists())->toBeTrue();
 });

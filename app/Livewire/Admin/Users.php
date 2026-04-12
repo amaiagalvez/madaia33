@@ -4,8 +4,10 @@ namespace App\Livewire\Admin;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
 use Livewire\Component;
 use App\Models\Location;
+use App\Models\VotingBallot;
 use App\SupportedLocales;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
@@ -44,6 +46,8 @@ class Users extends Component
 
     public string $search = '';
 
+    public string $roleFilter = 'all';
+
     public ?int $editingOwnerId = null;
 
     /**
@@ -57,6 +61,11 @@ class Users extends Component
     }
 
     public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingRoleFilter(): void
     {
         $this->resetPage();
     }
@@ -84,7 +93,7 @@ class Users extends Component
         $this->editingOwnerId = $user->owner?->id;
         $this->isActive = (bool) $user->is_active;
         $this->selectedRoles = $user->roleNames()->all();
-        $this->selectedManagedLocations = $user->managedLocations()->pluck('locations.id')->map(static fn ($id): string => (string) $id)->all();
+        $this->selectedManagedLocations = $user->managedLocations()->pluck('locations.id')->map(static fn($id): string => (string) $id)->all();
         $this->loadEditingUserSessions($user->id);
         $this->showForm = true;
     }
@@ -151,11 +160,41 @@ class Users extends Component
 
         abort_if($this->confirmingDeleteUserId === 1, 403);
 
-        $user = User::query()->findOrFail($this->confirmingDeleteUserId);
+        $user = User::query()->with('owner')->findOrFail($this->confirmingDeleteUserId);
+
+        if (! $this->canDeleteUser($user)) {
+            $this->confirmingDeleteUserId = null;
+
+            return;
+        }
+
         $user->delete();
 
         $this->confirmingDeleteUserId = null;
         $this->resetPage();
+    }
+
+    private function canDeleteUser(User $user): bool
+    {
+        $owner = $user->owner;
+
+        if (! $owner instanceof Owner) {
+            return true;
+        }
+
+        if (VotingBallot::query()->where('owner_id', $owner->id)->exists()) {
+            session()->flash('error', __('admin.users.delete_blocked_has_votes'));
+
+            return false;
+        }
+
+        if ($owner->assignments()->exists()) {
+            session()->flash('error', __('admin.users.delete_blocked_has_assignments'));
+
+            return false;
+        }
+
+        return true;
     }
 
     public function loginAs(int $userId): void
@@ -166,7 +205,7 @@ class Users extends Component
         $user = User::query()->where('id', '!=', 1)->findOrFail($userId);
 
         if (! session()->has('impersonator_user_id')) {
-            session()->put('impersonator_user_id', $this->currentUser()?->id);
+            session()->put('impersonator_user_id', $this->currentUser()->id);
         }
 
         Auth::login($user);
@@ -191,7 +230,7 @@ class Users extends Component
             $emailRule = $emailRule->ignore($this->editingUserId);
         }
 
-        $roleRule = Rule::in(array_values(array_filter(Role::names(), static fn (string $name): bool => $name !== Role::SUPER_ADMIN)));
+        $roleRule = Rule::in(array_values(array_filter(Role::names(), static fn(string $name): bool => $name !== Role::SUPER_ADMIN)));
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
@@ -218,7 +257,7 @@ class Users extends Component
     private function syncUserRolesAndLocations(User $user): void
     {
         $roleNames = collect($this->selectedRoles)
-            ->filter(static fn (string $role): bool => $role !== Role::SUPER_ADMIN)
+            ->filter(static fn(string $role): bool => $role !== Role::SUPER_ADMIN)
             ->unique()
             ->values()
             ->all();
@@ -232,7 +271,7 @@ class Users extends Component
         }
 
         $locationIds = collect($this->selectedManagedLocations)
-            ->map(static fn (string $locationId): int => (int) $locationId)
+            ->map(static fn(string $locationId): int => (int) $locationId)
             ->unique()
             ->values()
             ->all();
@@ -265,8 +304,8 @@ class Users extends Component
                 return [
                     'id' => (string) $session->id,
                     'ip_address' => $session->ip_address,
-                    'logged_in_at' => $session->logged_in_at?->format('Y-m-d H:i:s'),
-                    'logged_out_at' => $session->logged_out_at?->format('Y-m-d H:i:s'),
+                    'logged_in_at' => $session->logged_in_at,
+                    'logged_out_at' => $session->logged_out_at,
                 ];
             })
             ->all();
@@ -286,20 +325,39 @@ class Users extends Component
                         ->orWhere('email', 'like', '%' . $this->search . '%');
                 });
             })
+            ->when($this->roleFilter !== 'all', function ($query): void {
+                $query->whereHas('roles', function ($rolesQuery): void {
+                    $rolesQuery->where('name', $this->roleFilter);
+                });
+            })
             ->orderBy('name')
             ->paginate(12);
 
         return view('livewire.admin.users.index', [
             'users' => $users,
             'roles' => collect(Role::names())
-                ->reject(static fn (string $name): bool => $name === Role::SUPER_ADMIN)
+                ->reject(static fn(string $name): bool => $name === Role::SUPER_ADMIN)
                 ->values()
                 ->all(),
-            'communityLocations' => Location::query()
+            'roleOptions' => collect(Role::names())
+                ->reject(static fn(string $name): bool => $name === Role::SUPER_ADMIN)
+                ->map(static fn(string $name): array => [
+                    'value' => $name,
+                    'label' => __('admin.users.roles_labels.' . $name),
+                ])
+                ->values()
+                ->all(),
+            'communityLocationOptions' => Location::query()
                 ->whereIn('type', ['portal', 'local', 'garage'])
                 ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 WHEN type = 'garage' THEN 3 ELSE 4 END")
                 ->orderBy('code')
-                ->get(['id', 'code', 'type']),
+                ->get(['id', 'code', 'type'])
+                ->map(static fn(Location $location): array => [
+                    'id' => (string) $location->id,
+                    'label' => __('admin.locations.types.' . $location->type) . ' ' . $location->code,
+                ])
+                ->values()
+                ->all(),
         ]);
     }
 

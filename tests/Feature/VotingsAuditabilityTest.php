@@ -11,6 +11,7 @@ use App\Livewire\PublicVotings;
 use App\Models\PropertyAssignment;
 use App\Mail\VotingConfirmationMail;
 use Illuminate\Support\Facades\Mail;
+use App\Actions\Votings\CastVotingData;
 use Illuminate\Validation\ValidationException;
 use App\Actions\Votings\CastVotingBallotAction;
 use App\Http\Controllers\PublicVotingController;
@@ -41,7 +42,7 @@ it('sends a confirmation email after a successful vote', function () {
     $voting->locations()->create(['location_id' => $portal->id]);
 
     $action = app(CastVotingBallotAction::class);
-    $action->execute($voting, $owner, $option->id, $owner->user);
+    $action->execute($voting, $owner, $option->id, $owner->user, CastVotingData::fromInputs());
 
     Mail::assertSent(VotingConfirmationMail::class, function (VotingConfirmationMail $mail) use ($owner): bool {
         return $mail->hasTo($owner->user->email);
@@ -76,7 +77,7 @@ it('rejects vote attempts when owner does not belong to the allowed locations', 
 
     $action = app(CastVotingBallotAction::class);
 
-    expect(fn () => $action->execute($voting, $owner, $option->id, $owner->user))
+    expect(fn () => $action->execute($voting, $owner, $option->id, $owner->user, CastVotingData::fromInputs()))
         ->toThrow(ValidationException::class);
 
     expect(VotingBallot::query()

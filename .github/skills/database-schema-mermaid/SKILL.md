@@ -127,6 +127,7 @@ erDiagram
         string coprop1_name
         string coprop1_dni
         string coprop1_email
+        timestamp accepted_terms_at
         datetime deleted_at
     }
 

@@ -6,6 +6,7 @@ use App\Models\Setting;
 use Livewire\Component;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
+use App\Support\ContactMailData;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
 use Illuminate\Contracts\View\View;
@@ -135,12 +136,14 @@ class ContactForm extends Component
             $mailSubject = Setting::localizedStringFrom($emailSettings, 'contact_form_subject', $this->subject);
 
             Mail::to($this->email)->send(new ContactConfirmation(
-                visitorName: $this->name,
-                messageSubject: (string) $mailSubject,
-                messageBody: $this->message,
-                legalText: $legalText,
-                fromAddress: $fromAddress,
-                fromName: $fromName,
+                new ContactMailData(
+                    visitorName: $this->name,
+                    messageSubject: (string) $mailSubject,
+                    messageBody: $this->message,
+                    legalText: $legalText,
+                ),
+                $fromAddress,
+                $fromName,
             ));
 
             Mail::to($adminEmail)->send(new ContactNotification($contactMessage, $legalText, $fromAddress, $fromName));

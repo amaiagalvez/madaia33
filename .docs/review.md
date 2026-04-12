@@ -38,4 +38,7 @@ Lee la spec 003-estrucutura-votaciones-1 con mis especificaciones y crea un plan
 🧙‍♀️ sorgina
 Repasa los ficheros que están sin commitear
 
+## styles
+añadir estilo acorde al proyecto con los componenetes adecuados a la lista admin/votaciones tomando como base el listado de avisoos
+
 ## kiro para especificar feature nuevas complejass

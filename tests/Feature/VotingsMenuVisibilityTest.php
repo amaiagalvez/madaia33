@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\Property;
 use App\SupportedLocales;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
     foreach (Role::names() as $roleName) {
@@ -19,10 +20,20 @@ beforeEach(function () {
 
 dataset('nav_locales', SupportedLocales::all());
 
-it('hides votings menu link when user is not authenticated', function (string $locale) {
+it('hides votings menu link when user is not authenticated and there are no open votings', function (string $locale) {
     test()->get(route(SupportedLocales::routeName('home', $locale)))
         ->assertSuccessful()
         ->assertDontSee(__('general.nav.votings'));
+})->with('nav_locales');
+
+it('shows votings menu link when user is not authenticated and open votings exist', function (string $locale) {
+    Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    test()->get(route(SupportedLocales::routeName('home', $locale)))
+        ->assertSuccessful()
+        ->assertSee(__('general.nav.votings'));
 })->with('nav_locales');
 
 it('hides votings menu link when authenticated but no open votings and no pending delegations', function (string $locale) {
@@ -53,7 +64,7 @@ it('shows votings menu link when authenticated and open votings exist', function
         ->assertSee(__('general.nav.votings'));
 })->with('nav_locales');
 
-it('shows votings menu link when authenticated and eligible to vote with pending delegations', function (string $locale) {
+it('shows votings menu link when authenticated and open votings exist even with pending delegations context', function (string $locale) {
     $owner1 = Owner::factory()->create();
     $owner2 = Owner::factory()->create();
 

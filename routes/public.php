@@ -38,6 +38,7 @@ Route::prefix('eu')->group(function () use ($privatePageHandler) {
     Route::get('/bozketak', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.eu');
     Route::get('/profila', [ProfileController::class, 'show'])->middleware('auth')->name('profile.eu');
     Route::post('/profila/baldintzak-onartu', [ProfileController::class, 'acceptTerms'])->middleware('auth')->name('profile.terms.accept.eu');
+    Route::post('/profila/jabearen-datuak-eguneratu', [ProfileController::class, 'updateOwner'])->middleware('auth')->name('profile.owner.update.eu');
     Route::post('/profila/jabetzak-balidatu', [ProfileController::class, 'validateAssignments'])->middleware('auth')->name('profile.properties.validate.eu');
 });
 
@@ -60,6 +61,7 @@ Route::prefix('es')->group(function () use ($privatePageHandler) {
     Route::get('/votaciones', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.es');
     Route::get('/perfil', [ProfileController::class, 'show'])->middleware('auth')->name('profile.es');
     Route::post('/perfil/aceptar-condiciones', [ProfileController::class, 'acceptTerms'])->middleware('auth')->name('profile.terms.accept.es');
+    Route::post('/perfil/actualizar-datos-propietaria', [ProfileController::class, 'updateOwner'])->middleware('auth')->name('profile.owner.update.es');
     Route::post('/perfil/validar-propiedades', [ProfileController::class, 'validateAssignments'])->middleware('auth')->name('profile.properties.validate.es');
 });
 

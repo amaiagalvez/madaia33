@@ -19,6 +19,7 @@ return [
     'admin' => [
         'list' => 'Lista de imágenes',
         'upload' => 'Subir imagen',
+        'file' => 'Imagen',
         'alt_eu' => 'Texto alternativo (EU)',
         'alt_es' => 'Texto alternativo (ES)',
         'tag' => 'Etiqueta',
