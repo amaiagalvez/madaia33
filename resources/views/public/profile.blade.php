@@ -6,11 +6,18 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-page="profile-page">
         <header
             class="mb-8 rounded-2xl border border-[#d9755b]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#f1bd4d]/15 p-6">
-            <p class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
-                {{ __('profile.kicker') }}</p>
-            <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">
-                {{ __('profile.heading') }}</h1>
-            <p class="mt-2 text-sm text-gray-600">{{ __('profile.summary') }}</p>
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                        {{ __('profile.kicker') }}</p>
+                    <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">
+                        {{ __('profile.heading') }}</h1>
+                    <p class="mt-2 text-sm text-gray-600">{{ __('profile.summary') }}</p>
+                </div>
+                <div class="shrink-0 self-center">
+                    @livewire('profile-contact-modal')
+                </div>
+            </div>
         </header>
 
         @if (session('status'))
@@ -52,7 +59,7 @@
             <nav class="mb-6 overflow-x-auto" aria-label="{{ __('profile.tabs_aria') }}">
                 <ul
                     class="flex min-w-max items-center gap-2 rounded-xl border border-gray-200 bg-white p-2">
-                    @php($tabs = $requiresTermsAcceptance ? ['owner'] : ['overview', 'votings', 'sessions', 'owner'])
+                    @php($tabs = $requiresTermsAcceptance ? ['owner'] : ['overview', 'votings', 'sessions', 'messages', 'owner'])
                     @foreach ($tabs as $tab)
                         <li>
                             <a href="{{ route(\App\SupportedLocales::routeName('profile'), ['tab' => $tab]) }}"
@@ -298,6 +305,62 @@
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $session['ip_address'] ?? '—' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </section>
+            @endif
+
+            @if ($activeTab === 'messages')
+                <section class="rounded-2xl border border-gray-200 bg-white p-6"
+                    data-profile-panel="messages">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        {{ __('profile.messages.title') }}
+                    </h2>
+
+                    @if ($userMessages->isEmpty())
+                        <div class="mt-4 rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center"
+                            data-profile-messages-empty>
+                            <p class="text-sm text-gray-500">{{ __('profile.messages.empty') }}
+                            </p>
+                        </div>
+                    @else
+                        <div class="mt-4 overflow-x-auto rounded-xl border border-gray-200"
+                            data-profile-messages-table>
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                            {{ __('profile.messages.subject') }}</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                            {{ __('profile.messages.message') }}</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                            {{ __('profile.messages.sent_at') }}</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                            {{ __('profile.messages.status') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    @foreach ($userMessages as $userMessage)
+                                        <tr data-profile-message-row>
+                                            <td
+                                                class="px-4 py-3 text-sm font-medium text-gray-800">
+                                                {{ $userMessage['subject'] }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">
+                                                {{ $userMessage['message'] }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">
+                                                {{ $userMessage['created_at']->format('Y-m-d H:i:s') }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">
+                                                {{ $userMessage['is_read'] ? __('profile.messages.read') : __('profile.messages.pending') }}
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>

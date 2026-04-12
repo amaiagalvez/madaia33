@@ -11,6 +11,7 @@ return [
         'overview' => 'Laburpena',
         'votings' => 'Nire bozketak',
         'sessions' => 'Saioak',
+        'messages' => 'Bidalitako mezuak',
         'owner' => 'Jabearen fitxa',
     ],
     'overview' => [
@@ -45,6 +46,16 @@ return [
         'active' => 'Aktibo',
         'in_progress' => 'Martxan',
     ],
+    'messages' => [
+        'title' => 'Bidalitako mezuak',
+        'empty' => 'Oraindik ez duzu mezurik bidali.',
+        'subject' => 'Gaia',
+        'message' => 'Mezua',
+        'sent_at' => 'Bidalketa data',
+        'status' => 'Egoera',
+        'read' => 'Irakurrita',
+        'pending' => 'Irakurri gabe',
+    ],
     'owner' => [
         'title' => 'Jabearen fitxa eta jabetzak',
         'no_owner' => 'Ez dago zure erabiltzaileari lotutako jabearen fitxarik.',
@@ -63,6 +74,19 @@ return [
         'validation_selection_required' => 'Gutxienez jabetza bat hautatu behar duzu.',
         'validation_done' => ':count jabetza balidatu dira.',
         'profile_updated' => 'Jabearen datuak eguneratu dira.',
+    ],
+    'contact_modal' => [
+        'button' => 'Mezua bidali',
+        'title' => 'Mezua bidali administrazioari',
+        'description' => 'Zure datuekin arazorik baduzu, deskribatu hemen eta harremanetan jarriko gara.',
+        'message_label' => 'Mezua',
+        'success' => 'Zure mezua jasoa izan da. Laster harremanetan jarriko gara.',
+        'email_error' => 'Mezua gorde da baina emaila bidaltzean errore bat gertatu da.',
+        'validation' => [
+            'message_required' => 'Mezua derrigorrezkoa da.',
+            'message_max' => 'Mezuak gehienez 5000 karaktere izan ditzake.',
+        ],
+        'message_subject' => 'PROFILA. ARAZOAK DATUEKIN'
     ],
     'terms' => [
         'title' => 'Erabilera baldintzak onartu behar dituzu',

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\User;
 use App\Models\Setting;
 use Livewire\Component;
 use App\SupportedLocales;
@@ -119,9 +120,23 @@ class ContactForm extends Component
         return ContactMessage::create([
             'name' => $this->name,
             'email' => $this->email,
+            'user_id' => $this->matchingUserIdByEmail(),
             'subject' => $this->subject,
             'message' => $this->message,
         ]);
+    }
+
+    private function matchingUserIdByEmail(): ?int
+    {
+        $normalizedEmail = mb_strtolower(trim($this->email));
+
+        if ($normalizedEmail === '') {
+            return null;
+        }
+
+        return User::query()
+            ->whereRaw('LOWER(email) = ?', [$normalizedEmail])
+            ->value('id');
     }
 
     private function sendContactEmails(ContactMessage $contactMessage): bool
@@ -193,10 +208,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn (mixed $timestamp): int => (int) $timestamp)
+            ->map(fn(mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 

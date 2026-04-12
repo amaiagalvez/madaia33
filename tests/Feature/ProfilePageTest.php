@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\Property;
+use App\Models\ContactMessage;
 use App\Models\VotingBallot;
 use App\Models\OwnerAuditLog;
 use App\Models\UserLoginSession;
@@ -72,6 +73,7 @@ it('shows profile tabs with user voting and session information', function () {
         ->assertOk()
         ->assertSee(__('profile.tabs.votings'))
         ->assertSee(__('profile.tabs.sessions'))
+        ->assertSee(__('profile.tabs.messages'))
         ->assertSee(__('profile.tabs.owner'))
         ->assertSee('Profile User')
         ->assertSee(__('profile.votings.pending_active_title'))
@@ -92,7 +94,38 @@ it('renders profile page for users without owner profile', function () {
         ->get(route('profile.eu'))
         ->assertOk()
         ->assertSee(__('profile.overview.title'))
+        ->assertSee(__('profile.tabs.messages'))
         ->assertSee(__('profile.tabs.owner'));
+});
+
+it('shows only messages sent by logged user in messages tab', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    ContactMessage::create([
+        'user_id' => $user->id,
+        'name' => 'Profile User',
+        'email' => 'profile@example.com',
+        'subject' => 'Mezu nagusia',
+        'message' => 'Nire mezua profiletik bidalia.',
+    ]);
+
+    ContactMessage::create([
+        'user_id' => $otherUser->id,
+        'name' => 'Other User',
+        'email' => 'other@example.com',
+        'subject' => 'Beste erabiltzailearen mezua',
+        'message' => 'Hau ez da agertu behar.',
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'messages']))
+        ->assertOk()
+        ->assertSee(__('profile.messages.title'))
+        ->assertSee('Mezu nagusia')
+        ->assertSee('Nire mezua profiletik bidalia.')
+        ->assertDontSee('Beste erabiltzailearen mezua')
+        ->assertDontSee('Hau ez da agertu behar.');
 });
 
 it('accepts owner terms from profile page', function () {

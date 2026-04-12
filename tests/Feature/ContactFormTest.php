@@ -161,6 +161,31 @@ it('happy path: stores ContactMessage and dispatches both emails', function () {
     Mail::assertSent(ContactConfirmation::class);
     Mail::assertSent(ContactNotification::class);
     $component->assertSet('statusType', 'success');
+
+    $storedMessage = ContactMessage::query()->firstOrFail();
+    expect($storedMessage->user_id)->toBeNull();
+});
+
+it('stores matching user_id when submitted email belongs to an existing user', function () {
+    Mail::fake();
+
+    $matchingUser = User::factory()->create([
+        'email' => CONTACT_FORM_VISITOR_EMAIL,
+    ]);
+
+    Livewire::test('contact-form')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
+        ->set('subject', 'Gaia')
+        ->set('message', CONTACT_FORM_SHORT_MESSAGE)
+        ->set('legalAccepted', true)
+        ->set('recaptchaToken', 'skip')
+        ->call('submit')
+        ->assertSet('statusType', 'success');
+
+    $storedMessage = ContactMessage::query()->firstOrFail();
+
+    expect($storedMessage->user_id)->toBe($matchingUser->id);
 });
 
 it('prevents duplicate submissions when the same payload is repeated quickly', function () {
@@ -275,7 +300,7 @@ it('treats SQL-like payload as plain text in admin inbox', function () {
 
     expect($message->message)->toBe($payload);
 
-    Livewire::actingAs(User::factory()->create())
+    Livewire::actingAs(adminUser())
         ->test('admin-message-inbox')
         ->call('setReadFilter', 'all')
         ->call('openMessage', $message->id)

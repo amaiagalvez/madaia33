@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\Setting;
+use App\Models\ContactMessage;
 use App\SupportedLocales;
 use Illuminate\View\View;
 use App\Models\VotingBallot;
@@ -38,12 +39,12 @@ class ProfileController extends Controller
 
         $activeAssignments = $this->activeAssignments($owner);
         $pendingAssignments = $activeAssignments->filter(
-            static fn ($assignment): bool => ! (bool) $assignment->owner_validated,
+            static fn($assignment): bool => ! (bool) $assignment->owner_validated,
         );
 
         $requiresTermsAcceptance = $owner !== null && $owner->accepted_terms_at === null;
 
-        $tabs = ['overview', 'votings', 'sessions', 'owner'];
+        $tabs = ['overview', 'votings', 'sessions', 'messages', 'owner'];
         $requestedTab = (string) $request->query('tab', '');
         $activeTab = in_array($requestedTab, $tabs, true)
             ? $requestedTab
@@ -68,6 +69,7 @@ class ProfileController extends Controller
             'requiresTermsAcceptance' => $requiresTermsAcceptance,
             'termsHtml' => $termsHtml,
             'userBallots' => $this->userBallots($user?->id),
+            'userMessages' => $this->userMessages($user?->id),
         ]);
     }
 
@@ -127,8 +129,8 @@ class ProfileController extends Controller
         abort_if($owner === null, 403);
 
         $assignmentIds = collect((array) $request->input('assignment_ids', []))
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->filter(static fn (int $id): bool => $id > 0)
+            ->map(static fn(mixed $id): int => (int) $id)
+            ->filter(static fn(int $id): bool => $id > 0)
             ->values();
 
         if ($assignmentIds->isEmpty()) {
@@ -163,7 +165,7 @@ class ProfileController extends Controller
         }
 
         return $owner->assignments
-            ->filter(static fn ($assignment): bool => $assignment->end_date === null)
+            ->filter(static fn($assignment): bool => $assignment->end_date === null)
             ->values();
     }
 
@@ -213,10 +215,33 @@ class ProfileController extends Controller
             ->with('voting:id,name_eu,name_es,starts_at,ends_at')
             ->orderByDesc('voted_at')
             ->get(['id', 'voting_id', 'voted_at'])
-            ->map(static fn (VotingBallot $ballot): array => [
+            ->map(static fn(VotingBallot $ballot): array => [
                 'id' => $ballot->id,
                 'voting_name' => $ballot->voting->name,
                 'voted_at' => Carbon::parse($ballot->voted_at),
+            ]);
+    }
+
+    /**
+     * @return Collection<int, array{id: int, subject: string, message: string, is_read: bool, created_at: Carbon, read_at: ?Carbon}>
+     */
+    private function userMessages(?int $userId): Collection
+    {
+        if ($userId === null) {
+            return collect();
+        }
+
+        return ContactMessage::query()
+            ->where('user_id', $userId)
+            ->orderByDesc('created_at')
+            ->get(['id', 'subject', 'message', 'is_read', 'created_at', 'read_at'])
+            ->map(static fn(ContactMessage $message): array => [
+                'id' => $message->id,
+                'subject' => $message->subject,
+                'message' => $message->message,
+                'is_read' => (bool) $message->is_read,
+                'created_at' => Carbon::parse($message->created_at),
+                'read_at' => $message->read_at !== null ? Carbon::parse($message->read_at) : null,
             ]);
     }
 
@@ -232,7 +257,7 @@ class ProfileController extends Controller
         return VotingBallot::query()
             ->where('owner_id', $owner->id)
             ->pluck('voting_id')
-            ->map(static fn (mixed $votingId): int => (int) $votingId)
+            ->map(static fn(mixed $votingId): int => (int) $votingId)
             ->unique()
             ->values();
     }
@@ -249,9 +274,9 @@ class ProfileController extends Controller
 
         return $this->votingEligibilityService
             ->openEligibleVotingsForOwner($owner)
-            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
             ->values()
-            ->map(static fn (Voting $voting): array => [
+            ->map(static fn(Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),
@@ -275,10 +300,10 @@ class ProfileController extends Controller
             ->with('locations.location')
             ->orderByDesc('ends_at')
             ->get(['id', 'name_eu', 'name_es', 'starts_at', 'ends_at'])
-            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
-            ->filter(fn (Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
+            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->filter(fn(Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
             ->values()
-            ->map(static fn (Voting $voting): array => [
+            ->map(static fn(Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),

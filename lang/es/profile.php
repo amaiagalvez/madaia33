@@ -11,6 +11,7 @@ return [
         'overview' => 'Resumen',
         'votings' => 'Mis votaciones',
         'sessions' => 'Sesiones',
+        'messages' => 'Mensajes enviados',
         'owner' => 'Ficha de propietaria',
     ],
     'overview' => [
@@ -45,6 +46,16 @@ return [
         'active' => 'Activa',
         'in_progress' => 'En curso',
     ],
+    'messages' => [
+        'title' => 'Mensajes enviados',
+        'empty' => 'Todavia no has enviado mensajes.',
+        'subject' => 'Asunto',
+        'message' => 'Mensaje',
+        'sent_at' => 'Fecha de envio',
+        'status' => 'Estado',
+        'read' => 'Leido',
+        'pending' => 'Sin leer',
+    ],
     'owner' => [
         'title' => 'Ficha de propietaria y propiedades',
         'no_owner' => 'No hay una ficha de propietaria asociada a tu usuario.',
@@ -63,6 +74,19 @@ return [
         'validation_selection_required' => 'Debes seleccionar al menos una propiedad.',
         'validation_done' => 'Se han validado :count propiedades.',
         'profile_updated' => 'Se han actualizado los datos de la propietaria.',
+    ],
+    'contact_modal' => [
+        'button' => 'Enviar mensaje',
+        'title' => 'Enviar mensaje a la administracion',
+        'description' => 'Si tienes algun problema con tus datos, describelo aqui y nos pondremos en contacto contigo.',
+        'message_label' => 'Mensaje',
+        'success' => 'Tu mensaje ha sido recibido. Nos pondremos en contacto contigo pronto.',
+        'email_error' => 'El mensaje se ha guardado pero ha habido un error al enviar el email.',
+        'validation' => [
+            'message_required' => 'El mensaje es obligatorio.',
+            'message_max' => 'El mensaje no puede superar los 5000 caracteres.',
+        ],
+        'message_subject' => 'PERFIL. PROBLEMAS CON LOS DATOS'
     ],
     'terms' => [
         'title' => 'Debes aceptar las condiciones de uso',
