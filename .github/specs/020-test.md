@@ -1,3 +1,22 @@
+## Status
+
+✅ **PASSED**: 506 tests × 1596 assertions — 103.31s
+
+### Hotfix: Flux assets in admin layout
+
+**Issue**: AdminSettingsTest asserted `/flux/flux.js` not present, but it was loading.
+
+**Fix**:
+	1. Removed `@fluxAppearance` from `resources/views/layouts/admin/main.blade.php` (line 17)
+	2. Removed `@fluxScripts` from admin layout footer (line 313)
+	3. Flux CSS still imported in `resources/css/app.css` (needed for Tailwind integration)
+
+**Validation**:
+	- ✅ AdminSettingsTest::it does not load flux or external fonts in admin settings view — PASS
+	- ✅ All 506 tests pass
+	- ✅ Pint formatting fixed (ProfileController.php unary operator spacing)
+	- ✅ composer quality: all checks pass
+
 # tests suit
 **IMPORTANT**
 comprobar si hay un test que cubre el caso y si no añadirlo
