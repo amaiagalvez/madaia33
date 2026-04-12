@@ -29,7 +29,7 @@ return [
     'votings_cta' => 'Bozketetara joan',
     'profile_badge' => 'Zure profila',
     'profile_title' => 'Nahi duzunean kontsulta dezakezu zure profila',
-    'profile_summary' => 'Sartu profilera eta berrikusi zure datuak, saioak eta bozketen laburpena.',
+    'profile_summary' => 'Sartu profilera eta berrikusi zure datuak, saioak, mezuak eta bozketen laburpena.',
     'profile_cta' => 'Profila ikusi',
     'promises' => [
         'informed_title' => 'Eguneratuta egoteko',

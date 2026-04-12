@@ -29,7 +29,7 @@ return [
     'votings_cta' => 'Ir a votaciones',
     'profile_badge' => 'Tu perfil',
     'profile_title' => 'Consulta tu perfil siempre que lo necesites',
-    'profile_summary' => 'Entra en tu perfil para revisar tus datos, sesiones y resumen de votaciones.',
+    'profile_summary' => 'Entra en tu perfil para revisar tus datos, sesiones, mensajes y resumen de votaciones.',
     'profile_cta' => 'Ver perfil',
     'promises' => [
         'informed_title' => 'Mantenerse al día',

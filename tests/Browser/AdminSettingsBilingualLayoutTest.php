@@ -13,7 +13,7 @@ use Laravel\Dusk\Browser;
 test('bilingual settings blocks keep the same height when switching between EUS and CAS', function () {
     $basqueLocale = SupportedLocales::BASQUE;
     $spanishLocale = SupportedLocales::SPANISH;
-    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'example@email.eus')->firstOrFail();
 
     Setting::query()->updateOrCreate(
         ['key' => 'legal_page_privacy_policy_eu'],
@@ -33,7 +33,7 @@ test('bilingual settings blocks keep the same height when switching between EUS 
     );
     Setting::query()->updateOrCreate(
         ['key' => 'admin_email'],
-        ['value' => 'info@madaia33.eus', 'section' => Setting::SECTION_CONTACT_FORM],
+        ['value' => 'example@email.eus', 'section' => Setting::SECTION_CONTACT_FORM],
     );
 
     /** @var DuskTestCase $this */

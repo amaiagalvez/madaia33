@@ -35,7 +35,7 @@ class ImageGallery extends Component
 
     public function render(): View
     {
-        $frontPrimaryEmail = Setting::stringValue('front_primary_email', 'info@madaia33.eus');
+        $frontPrimaryEmail = Setting::stringValue('front_primary_email', '');
         $photoRequestText = Setting::localizedString('front_photo_request_text', __('home.history_photos_summary', ['email' => $frontPrimaryEmail]));
 
         return view('livewire.front.image-gallery', [

@@ -41,7 +41,7 @@ class PublicHomeController extends Controller
             ->values();
 
         $historySummary = Setting::localizedString('home_history_text', __('home.history_summary'));
-        $frontPrimaryEmail = Setting::stringValue('front_primary_email', 'info@madaia33.eus');
+        $frontPrimaryEmail = Setting::stringValue('front_primary_email', '');
         $photoRequestText = Setting::localizedString('front_photo_request_text', __('home.history_photos_summary', ['email' => $frontPrimaryEmail]));
 
         return view('public.home', [

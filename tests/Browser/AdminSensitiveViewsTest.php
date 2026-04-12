@@ -14,7 +14,7 @@ use App\Models\PropertyAssignment;
  * - Location detail (editable property/validation state)
  */
 test('admin can access owner sensitive inline controls from index', function () {
-    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'example@email.eus')->firstOrFail();
 
     $owner = Owner::factory()->create([
         'coprop1_name' => 'Dusk Owner',
@@ -48,7 +48,7 @@ test('admin can access owner sensitive inline controls from index', function () 
 });
 
 test('admin top user menu dropdown opens from the desktop header', function () {
-    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'example@email.eus')->firstOrFail();
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin) {
@@ -63,7 +63,7 @@ test('admin top user menu dropdown opens from the desktop header', function () {
 });
 
 test('admin can access location detail sensitive view and sees editable property rows', function () {
-    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'example@email.eus')->firstOrFail();
 
     $location = Location::factory()->portal()->create();
 

@@ -13,7 +13,7 @@
             data-auth-shell>
             <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
                 class="mb-8 flex flex-col items-center gap-2 font-medium" wire:navigate>
-                <img src="{{ $publicLogoUrl ?? asset('storage/madaia33/madaia33.png') }}"
+                <img src="{{ $publicLogoUrl }}"
                     alt="{{ $publicSiteName ?? config('app.name', 'Madaia 33') }}"
                     class="h-14 w-14 rounded-2xl border border-gray-200 bg-white object-contain p-1 shadow-sm" />
                 <span class="sr-only">{{ $publicSiteName ?? config('app.name', 'Laravel') }}</span>

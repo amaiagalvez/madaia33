@@ -17,7 +17,7 @@ class BrandingSettingsComposer
 
         $view->with([
             'publicSiteName' => $siteName !== '' ? $siteName : config('app.name', 'Madaia 33'),
-            'publicPrimaryEmail' => $frontEmail !== '' ? $frontEmail : 'info@madaia33.eus',
+            'publicPrimaryEmail' => $frontEmail,
             'publicLogoUrl' => $this->resolveLogoUrl($logoPath),
         ]);
     }
@@ -37,7 +37,7 @@ class BrandingSettingsComposer
     private function resolveLogoUrl(string $logoPath): string
     {
         if ($logoPath === '') {
-            return asset('storage/madaia33/madaia33.png');
+            return '';
         }
 
         if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
