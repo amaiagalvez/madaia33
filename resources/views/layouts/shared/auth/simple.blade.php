@@ -14,9 +14,9 @@
             <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
                 class="mb-8 flex flex-col items-center gap-2 font-medium" wire:navigate>
                 <img src="{{ $publicLogoUrl }}"
-                    alt="{{ $publicSiteName ?? config('app.name', 'Madaia 33') }}"
+                    alt="{{ $publicSiteName ?? config('app.name', '-') }}"
                     class="h-14 w-14 rounded-2xl border border-gray-200 bg-white object-contain p-1 shadow-sm" />
-                <span class="sr-only">{{ $publicSiteName ?? config('app.name', 'Laravel') }}</span>
+                <span class="sr-only">{{ $publicSiteName ?? config('app.name', '-') }}</span>
             </a>
 
             <div class="mx-auto flex w-full max-w-lg flex-col gap-6">

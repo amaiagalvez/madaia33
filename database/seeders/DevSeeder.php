@@ -27,17 +27,17 @@ use App\Actions\Votings\CastVotingBallotAction;
 
 class DevSeeder extends Seeder
 {
-    private const GENERAL_ADMIN_EMAIL = 'admin.general@madaia33.eus';
+    private const GENERAL_ADMIN_EMAIL = 'admin.general@email.eus';
 
-    private const COMMUNITY_ADMIN_EMAIL = 'admin.comunidad@madaia33.eus';
+    private const COMMUNITY_ADMIN_EMAIL = 'admin.comunidad@email.eus';
 
-    private const PROPERTY_OWNER_EMAIL = 'propietaria@madaia33.eus';
+    private const PROPERTY_OWNER_EMAIL = 'propietaria@email.eus';
 
-    private const DELEGATED_VOTE_EMAIL = 'voto.delegado@madaia33.eus';
+    private const DELEGATED_VOTE_EMAIL = 'voto.delegado@email.eus';
 
-    private const COMBINED_ADMIN_EMAIL = 'admin.konbinatua@madaia33.eus';
+    private const COMBINED_ADMIN_EMAIL = 'admin.konbinatua@email.eus';
 
-    private const OWNER_DELEGATED_EMAIL = 'propietaria.delegada@madaia33.eus';
+    private const OWNER_DELEGATED_EMAIL = 'propietaria.delegada@email.eus';
 
     public function run(): void
     {
@@ -64,8 +64,8 @@ class DevSeeder extends Seeder
     {
         // Configure for mailhog in local development
         Setting::upsert([
-            ['key' => 'from_address', 'value' => 'madaia33@mailhog.local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'from_name', 'value' => 'Madaia 33 Local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+            ['key' => 'from_address', 'value' => 'info@mailhog.local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+            ['key' => 'from_name', 'value' => 'Komunitatea Local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
             ['key' => 'smtp_host', 'value' => 'mailhog', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
             ['key' => 'smtp_port', 'value' => '1025', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
             ['key' => 'smtp_username', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
@@ -628,7 +628,7 @@ class DevSeeder extends Seeder
                 'alt_eu' => 'Komunitate-etxea',
                 'alt_es' => 'Casa de la comunidad',
                 'colors' => ['#0f172a', '#155e75'],
-                'tag' => Image::TAG_MADAIA,
+                'tag' => Image::TAG_COMUNITY,
             ],
             [
                 'alt_eu' => '33-A atariko sarrera',
@@ -652,7 +652,7 @@ class DevSeeder extends Seeder
                 'alt_eu' => 'Lorategia',
                 'alt_es' => 'Jardín comunitario',
                 'colors' => ['#14532d', '#16a34a'],
-                'tag' => Image::TAG_MADAIA,
+                'tag' => Image::TAG_COMUNITY,
             ],
         ];
 

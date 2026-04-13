@@ -14,7 +14,7 @@ return [
         'label' => 'Filtrar por ubicación',
         'all' => 'Todos',
         'history' => 'Historia',
-        'madaia' => 'Madaya',
+        'comunity' => 'Comunidad',
     ],
     'admin' => [
         'list' => 'Lista de imágenes',

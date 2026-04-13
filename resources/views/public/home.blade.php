@@ -151,9 +151,9 @@
                         </div>
                     @endforeach
                 </div>
-                <p class="mt-4 text-sm leading-relaxed text-gray-600">
+                <div class="mt-4 text-sm leading-relaxed text-gray-600 rich-content">
                     {!! $historySummary !!}
-                </p>
+                </div>
 
                 <a href="mailto:{{ $frontPrimaryEmail }}"
                     class="elevated-card mt-4 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 lg:mt-auto"

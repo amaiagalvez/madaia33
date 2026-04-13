@@ -14,7 +14,7 @@ return [
         'label' => 'Iragazi kokapenaren arabera',
         'all' => 'Guztiak',
         'history' => 'Historia',
-        'madaia' => 'Madaia',
+        'comunity' => 'Komunitatea',
     ],
     'admin' => [
         'list' => 'Argazkien zerrenda',

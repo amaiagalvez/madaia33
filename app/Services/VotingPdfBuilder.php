@@ -71,7 +71,7 @@ class VotingPdfBuilder
         $siteName = trim((string) ($settings['front_site_name'] ?? ''));
 
         if ($siteName === '') {
-            return (string) config('app.name', 'Madaia 33');
+            return (string) config('app.name', '-');
         }
 
         return $siteName;

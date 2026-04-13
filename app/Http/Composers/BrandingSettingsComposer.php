@@ -16,7 +16,7 @@ class BrandingSettingsComposer
         $logoPath = trim((string) ($settings['front_logo_image_path'] ?? ''));
 
         $view->with([
-            'publicSiteName' => $siteName !== '' ? $siteName : config('app.name', 'Madaia 33'),
+            'publicSiteName' => $siteName !== '' ? $siteName : config('app.name', '-'),
             'publicPrimaryEmail' => $frontEmail,
             'publicLogoUrl' => $this->resolveLogoUrl($logoPath),
         ]);

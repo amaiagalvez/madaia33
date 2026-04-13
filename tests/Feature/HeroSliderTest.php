@@ -7,29 +7,29 @@ use App\Livewire\HeroSlider;
 
 describe('HeroSlider image loading', function () {
     test('loads latest images on mount', function () {
-        Image::factory()->count(5)->madaia()->create();
+        Image::factory()->count(5)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->assertViewHas('images');
     });
 
     test('loads maximum 10 images', function () {
-        Image::factory()->count(15)->madaia()->create();
+        Image::factory()->count(15)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->assertCount('images', 10);
     });
 
-    test('loads only madaia tagged images and excludes historia images', function () {
-        $olderMadaia = Image::factory()->madaia()->create(['created_at' => now()->subMinutes(2)]);
-        $historiaImage = Image::factory()->history()->create(['created_at' => now()->subMinute()]);
-        $latestMadaia = Image::factory()->madaia()->create(['created_at' => now()]);
+    test('loads only comunity tagged images and excludes history images', function () {
+        $olderComunity = Image::factory()->comunity()->create(['created_at' => now()->subMinutes(2)]);
+        $historyImage = Image::factory()->history()->create(['created_at' => now()->subMinute()]);
+        $latestComunity = Image::factory()->comunity()->create(['created_at' => now()]);
 
         $component = Livewire::test(HeroSlider::class);
 
         expect(collect($component->get('images'))->pluck('id')->all())
-            ->toBe([$latestMadaia->id, $olderMadaia->id])
-            ->not->toContain($historiaImage->id);
+            ->toBe([$latestComunity->id, $olderComunity->id])
+            ->not->toContain($historyImage->id);
     });
 
     test('handles empty images gracefully', function () {
@@ -38,7 +38,7 @@ describe('HeroSlider image loading', function () {
     });
 
     test('current index starts at zero', function () {
-        Image::factory()->count(3)->madaia()->create();
+        Image::factory()->count(3)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->assertSet('currentIndex', 0);
@@ -51,7 +51,7 @@ describe('HeroSlider image loading', function () {
     });
 
     test('currentImage returns first image payload when images exist', function () {
-        $image = Image::factory()->madaia()->create();
+        $image = Image::factory()->comunity()->create();
         $component = Livewire::test(HeroSlider::class);
 
         expect($component->instance()->currentImage())
@@ -63,7 +63,7 @@ describe('HeroSlider image loading', function () {
 
 describe('HeroSlider navigation', function () {
     test('next image increments current index', function () {
-        Image::factory()->count(5)->madaia()->create();
+        Image::factory()->count(5)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->call('nextImage')
@@ -73,7 +73,7 @@ describe('HeroSlider navigation', function () {
     });
 
     test('next image wraps to zero at end', function () {
-        Image::factory()->count(3)->madaia()->create();
+        Image::factory()->count(3)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->call('nextImage')
@@ -83,7 +83,7 @@ describe('HeroSlider navigation', function () {
     });
 
     test('previous image decrements current index', function () {
-        Image::factory()->count(5)->madaia()->create();
+        Image::factory()->count(5)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->call('nextImage')
@@ -93,7 +93,7 @@ describe('HeroSlider navigation', function () {
     });
 
     test('previous image wraps to end', function () {
-        Image::factory()->count(3)->madaia()->create();
+        Image::factory()->count(3)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->call('previousImage')
@@ -101,7 +101,7 @@ describe('HeroSlider navigation', function () {
     });
 
     test('go to image sets specific index', function () {
-        Image::factory()->count(5)->madaia()->create();
+        Image::factory()->count(5)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->call('goToImage', 2)
@@ -111,7 +111,7 @@ describe('HeroSlider navigation', function () {
     });
 
     test('go to image validates bounds', function () {
-        Image::factory()->count(5)->madaia()->create();
+        Image::factory()->count(5)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->call('goToImage', -1)
@@ -121,7 +121,7 @@ describe('HeroSlider navigation', function () {
     });
 
     test('toggle autoplay works', function () {
-        Image::factory()->count(5)->madaia()->create();
+        Image::factory()->count(5)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->assertSet('autoplayEnabled', true)
@@ -140,7 +140,7 @@ describe('HeroSlider navigation', function () {
     });
 
     test('renders hero slider component', function () {
-        Image::factory()->count(3)->madaia()->create();
+        Image::factory()->count(3)->comunity()->create();
 
         Livewire::test(HeroSlider::class)
             ->assertViewIs('livewire.front.hero-slider')

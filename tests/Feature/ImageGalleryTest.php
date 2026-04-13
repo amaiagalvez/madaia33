@@ -112,35 +112,35 @@ it('includes advanced responsive lightbox controls', function (string $locale) {
     $response->assertSee('@touchmove="handleTouchMove($event)"', false);
 })->with('supported_locales');
 
-it('filters gallery by historia tag', function () {
+it('filters gallery by history tag', function () {
     $historyImage = Image::factory()->history()->create();
-    Image::factory()->madaia()->create();
+    Image::factory()->comunity()->create();
 
     $component = Livewire::test('image-gallery')
-        ->call('setTagFilter', 'historia');
+        ->call('setTagFilter', 'history');
 
     expect($component->images)->toHaveCount(1)
         ->and($component->images->first()->id)->toBe($historyImage->id);
 });
 
-it('filters gallery by madaia tag', function () {
+it('filters gallery by comunity tag', function () {
     Image::factory()->history()->create();
-    $madaiaImage = Image::factory()->madaia()->create();
+    $comunityImage = Image::factory()->comunity()->create();
 
     $component = Livewire::test('image-gallery')
-        ->call('setTagFilter', 'madaia');
+        ->call('setTagFilter', 'comunity');
 
     expect($component->images)->toHaveCount(1)
-        ->and($component->images->first()->id)->toBe($madaiaImage->id);
+        ->and($component->images->first()->id)->toBe($comunityImage->id);
 });
 
 it('resets filter when tag is invalid', function () {
     Image::factory()->history()->create();
-    Image::factory()->madaia()->create();
+    Image::factory()->comunity()->create();
 
     $component = Livewire::test('image-gallery')
-        ->call('setTagFilter', 'historia')
-        ->call('setTagFilter', 'etiqueta-invalida');
+        ->call('setTagFilter', 'history')
+        ->call('setTagFilter', 'invalid-tag');
 
     expect($component->activeTag)->toBe('')
         ->and($component->images)->toHaveCount(2);
