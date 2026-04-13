@@ -26,23 +26,12 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           tools: composer:v2
           coverage: none
 
       - name: Install PHP dependencies (production)
         run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Build frontend assets
-        run: |
-          npm ci
-          npm run build
 
       - name: Normalize FTP server directory
         id: ftp_dir
@@ -163,13 +152,12 @@ jobs:
             set ftp:prefer-epsv false;
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftps://$FTP_SERVER';
             echo 'Connected with FTPS';
-            mirror -R --delete --verbose --ignore-time \
-              --exclude-glob 'composer.phar' \
-              --exclude-glob '.docs/**' \
+            mirror -R --delete --verbose --ignore-time \              
               --exclude-glob '.git*' \
               --exclude-glob '.github/**' \
-              --exclude-glob '.githooks/**' \
+              --exclude-glob '.docs/**' \
               --exclude-glob '.kiro/**' \
+              --exclude-glob '.specify/**' \
               --exclude-glob '.vscode/**' \
               --exclude-glob 'node_modules/**' \
               --exclude-glob 'tests/**' \
@@ -180,6 +168,9 @@ jobs:
               --exclude-glob 'storage/framework/cache/*' \
               --exclude-glob 'storage/framework/sessions/*' \
               --exclude-glob 'storage/framework/views/*' \
+              --exclude 'storage/**' \
+              --exclude 'composer.phar' \
+              --exclude 'public/build/**' \
               . '$FTP_SERVER_DIR';
             bye
           "
@@ -209,12 +200,11 @@ jobs:
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$fallback_port' 'ftp://$FTP_SERVER';
             echo 'Connected with FTP fallback';
             mirror -R --delete --verbose --ignore-time \
-              --exclude-glob 'composer.phar' \
-              --exclude-glob '.docs/**' \
               --exclude-glob '.git*' \
               --exclude-glob '.github/**' \
-              --exclude-glob '.githooks/**' \
+              --exclude-glob '.docs/**' \
               --exclude-glob '.kiro/**' \
+              --exclude-glob '.specify/**' \
               --exclude-glob '.vscode/**' \
               --exclude-glob 'node_modules/**' \
               --exclude-glob 'tests/**' \
@@ -225,6 +215,9 @@ jobs:
               --exclude-glob 'storage/framework/cache/*' \
               --exclude-glob 'storage/framework/sessions/*' \
               --exclude-glob 'storage/framework/views/*' \
+              --exclude 'storage/**' \
+              --exclude 'composer.phar' \
+              --exclude 'public/build/**' \
               . '$FTP_SERVER_DIR';
             bye
           "
