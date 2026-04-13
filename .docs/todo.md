@@ -41,7 +41,44 @@ owners => Propietarias
 - [ ] Cookies sartu
 - [ ] legeak.html begiratu
 
+
+- [x] en el slider solo mostrar las imagenes que tengan la etiqueta madaia, no mostrar los que tengan la etiketa historia
+
+## Implementation Plan — Hero slider iragazkia
+
+### Goal
+
+- [x] Hero sliderrean `madaia` etiketa duten irudiak bakarrik erakustea, `historia` etiketadunak baztertuta.
+
+### Technical Decisions
+
+- [x] Iragazkia `App\Livewire\HeroSlider` osagaiko kargan aplikatu, Blade-n edo home controllerrean logika bikoiztu gabe.
+- [x] `Image::TAG_MADAIA` konstantea erabili, testu literala ez gogortzeko eta dagoen eredua jarraitzeko.
+- [x] Erregresio-proba azkarra gehitu `tests/Feature/HeroSliderTest.php` fitxategian, sliderrean `historia` irudiak ez direla sartzen egiaztatzeko.
+
+### Execution Steps
+
+- [x] 1. `HeroSlider` osagaiaren `loadImages()` metodoa berrikusi eta `madaia` etiketa bidezko query-iragazkia txertatu.
+- [x] 2. Hero sliderreko testak eguneratu, `madaia` eta `historia` irudien nahasketa batekin espero den portaera egiaztatzeko.
+- [x] 3. Docker barruan Pint eta hero sliderrarekin lotutako test minimoak exekutatu.
+
+### Work Items
+
+- [x] `app/Livewire/HeroSlider.php`
+- [x] `tests/Feature/HeroSliderTest.php`
+
+### Validation
+
+- [x] TDD ahalik eta gehien aplikatu
+- [x] `vendor/bin/pint` Docker barruan
+- [x] `php artisan test --compact tests/Feature/HeroSliderTest.php` Docker barruan
+
+- [ ] deploy
+  - [ ] se boorran las carpetas del storage
+  - [ ] no se sube la carpeta build
+  - [ ] se pierde el storage link
 - [ ] config email, recaptcha, analitics
+- [ ] historia fgfuentehttps://www.euskadi.eus/madaya-fondo-pascual/web01-a2kulonz/eu/
 
 https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
 
