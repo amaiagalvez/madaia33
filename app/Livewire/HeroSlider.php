@@ -34,6 +34,7 @@ class HeroSlider extends Component
     private function loadImages(): void
     {
         $this->images = Image::latest()
+            ->where('tag', Image::TAG_MADAIA)
             ->limit(10)
             ->get()
             ->toArray();
