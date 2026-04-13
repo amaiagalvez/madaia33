@@ -421,7 +421,7 @@ it('dashboard uses the front logo configured in settings', function () {
 it('factory-created settings have valid section', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -281,7 +281,7 @@ return [
         ],
         'email' => [
             'default_subject' => 'Madaia 33 - Confirmación de propiedad',
-            'default_body' => '<p>Hola,</p><p>Se te han asignado las siguientes propiedades:</p>##info##',
+            'default_body' => '<p>Hola ##izena##,</p><p>Se te han asignado las siguientes propiedades:</p>##info##',
             'no_properties' => 'No hay propiedades asignadas.',
             'reset_action' => 'Configurar contraseña',
         ],

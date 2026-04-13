@@ -32,6 +32,21 @@
 
     $initialTab = $tabs[0]['key'] ?? \App\SupportedLocales::default();
     $rootField = $tabs[0]['field'] ?? '';
+    $tabErrors = collect($tabs)
+        ->map(function (array $tabConfig) use ($validationErrors): ?array {
+            if (!$validationErrors->has($tabConfig['field'])) {
+                return null;
+            }
+
+            return [
+                'field' => $tabConfig['field'],
+                'tabLabel' => $tabConfig['tabLabel'],
+                'message' => $validationErrors->first($tabConfig['field']),
+            ];
+        })
+        ->filter()
+        ->values()
+        ->all();
 
     $toolbarActions = [
         [
@@ -136,7 +151,7 @@
         <div x-cloak x-show="tab === '{{ $tabConfig['key'] }}'"
             x-bind:hidden="tab !== '{{ $tabConfig['key'] }}'"
             data-bilingual-pane="{{ $tabConfig['key'] }}"
-            class="{{ $mode === 'rich-text' ? 'grid h-64 grid-rows-[1fr_auto] gap-1 overflow-hidden' : 'space-y-2' }}">
+            class="space-y-2">
             @if ($mode === 'rich-text')
                 <p id="{{ $tabConfig['field'] }}Label"
                     class="mb-1 block text-sm font-medium text-gray-700">
@@ -191,14 +206,15 @@
                         ]) />
                 @endif
             @endif
-
-            <div class="{{ $mode === 'rich-text' ? 'min-h-5' : '' }}">
-                @if ($validationErrors->has($tabConfig['field']))
-                    <p
-                        class="{{ $mode === 'rich-text' ? 'mt-1 text-sm' : 'text-xs' }} text-red-600">
-                        {{ $validationErrors->first($tabConfig['field']) }}</p>
-                @endif
-            </div>
         </div>
     @endforeach
+
+    <div class="space-y-1" data-bilingual-errors @if ($tabErrors === []) hidden @endif>
+        @foreach ($tabErrors as $tabError)
+            <p class="text-sm text-red-600" data-bilingual-error="{{ $tabError['field'] }}">
+                <span class="font-semibold">{{ $tabError['tabLabel'] }}:</span>
+                {{ $tabError['message'] }}
+            </p>
+        @endforeach
+    </div>
 </div>

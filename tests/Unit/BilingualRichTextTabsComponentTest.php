@@ -39,3 +39,43 @@ it('renders the same toolbar controls for both bilingual editor panes', function
         ->and(substr_count($html, 'role="toolbar"'))->toBe(2)
         ->and(substr_count($html, 'wire:ignore'))->toBe(2);
 });
+
+it('renders shared multilingual validation container outside language panes', function () {
+    $localeConfigs = [
+        SupportedLocales::BASQUE => [
+            'field' => 'privacyContentEu',
+            'fieldLabel' => 'Lege testua',
+            'value' => '<p>Euskarazko edukia</p>',
+        ],
+        SupportedLocales::SPANISH => [
+            'field' => 'privacyContentEs',
+            'fieldLabel' => 'Texto legal',
+            'value' => '<p>Contenido en castellano</p>',
+        ],
+    ];
+
+    $richTextView = test()->blade(
+        '<x-admin.bilingual-rich-text-tabs
+            title="Legal text"
+            :locale-configs="$localeConfigs"
+        />',
+        ['errors' => new ViewErrorBag, 'localeConfigs' => $localeConfigs]
+    );
+
+    $richTextView->assertSee('data-bilingual-errors', false);
+    $richTextView->assertSee('hidden', false);
+
+    $fieldView = test()->blade(
+        '<x-admin.bilingual-tabs
+            title="Contact subject"
+            :locale-configs="$localeConfigs"
+            mode="field"
+            type="text"
+            :required-primary="true"
+        />',
+        ['errors' => new ViewErrorBag, 'localeConfigs' => $localeConfigs]
+    );
+
+    $fieldView->assertSee('data-bilingual-errors', false);
+    $fieldView->assertSee('hidden', false);
+});

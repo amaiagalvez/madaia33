@@ -3,12 +3,12 @@
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
-use App\Notifications\Auth\ResetPasswordNotification;
 use App\SupportedLocales;
 use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\Lang;
 use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\Notification;
+use App\Notifications\Auth\ResetPasswordNotification;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 dataset('supported_locales', SupportedLocales::all());

@@ -51,7 +51,7 @@ describe('CreateOwnerAction', function () {
         Mail::fake();
 
         createSetting('owners_welcome_subject_eu', 'Ongi etorri Madaia 33ra');
-        createSetting('owners_welcome_text_eu', '<p>Kaixo</p>##info##');
+        createSetting('owners_welcome_text_eu', '<p>Kaixo ##izena##</p>##info##');
 
         $portal = Location::factory()->portal()->create(['code' => '33-A']);
         $property = Property::factory()->create([
@@ -76,6 +76,7 @@ describe('CreateOwnerAction', function () {
         Mail::assertSent(OwnerWelcomeMail::class, function (OwnerWelcomeMail $mail): bool {
             return $mail->hasTo('miren@example.com')
                 && $mail->subjectLine === 'Ongi etorri Madaia 33ra'
+                && str_contains($mail->bodyHtml, 'Kaixo Miren Etxeberria')
                 && str_contains($mail->bodyHtml, '33-A 1A');
         });
     });
@@ -157,7 +158,7 @@ describe('CreateOwnerAction', function () {
 
         $action = new CreateOwnerAction;
 
-        expect(fn () => $action->execute([
+        expect(fn() => $action->execute([
             'coprop1_name' => 'Miren Etxeberria',
             'coprop1_dni' => '12345678Z',
             'coprop1_email' => 'miren@example.com',

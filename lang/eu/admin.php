@@ -282,7 +282,7 @@ return [
         ],
         'email' => [
             'default_subject' => 'Madaia 33 - Jabetza baieztapena',
-            'default_body' => '<p>Kaixo,</p><p>Ondoko jabetzak esleitu zaizkizu:</p>##info##',
+            'default_body' => '<p>Kaixo ##izena##,</p><p>Ondoko jabetzak esleitu zaizkizu:</p>##info##',
             'no_properties' => 'Ez dago esleitutako jabetzarik.',
             'reset_action' => 'Pasahitza ezarri',
         ],

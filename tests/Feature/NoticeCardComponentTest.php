@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Notice;
-use Illuminate\Support\Str;
 
 const DEFAULT_NOTICE_CARD_TEMPLATE = '<x-notice-card :notice="$notice" />';
 

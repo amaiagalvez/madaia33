@@ -4,9 +4,9 @@ namespace App\Mail;
 
 use App\Models\Owner;
 use App\Models\Voting;
-use App\Support\EmailLegalText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use App\Support\EmailLegalText;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;

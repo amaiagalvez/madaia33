@@ -12,36 +12,73 @@
     <title>{{ $siteName }}</title>
 </head>
 
-<body
-    style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: Arial, Helvetica, sans-serif; color: #1f2937;">
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; color: #3b1f1f;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-        style="background-color: #f5f5f5; margin: 0; padding: 24px 0;">
+        style="margin: 0; padding: 32px 0;">
         <tr>
-            <td align="center" style="padding: 0 12px;">
+            <td align="center" style="padding: 0 16px;">
+
+                {{-- Card --}}
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
                     border="0"
-                    style="max-width: 640px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                    style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(121,61,61,0.10);">
+
+                    {{-- Header --}}
                     <tr>
-                        <td
-                            style="padding: 24px 24px 12px 24px; font-size: 22px; line-height: 28px; font-weight: 700; color: #111827;">
-                            {{ $siteName }}
+                        <td style="background-color: #9e5252; padding: 28px 32px 20px 32px;">
+                            <p
+                                style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: #ffffff; font-family: Arial, Helvetica, sans-serif;">
+                                {{ $siteName }}
+                            </p>
                         </td>
                     </tr>
+
+                    {{-- Golden accent line --}}
                     <tr>
                         <td
-                            style="padding: 8px 24px 24px 24px; font-size: 16px; line-height: 24px; color: #1f2937;">
+                            style="background-color: #3b1f1f; height: 3px; font-size: 0; line-height: 0;">
+                            &nbsp;</td>
+                    </tr>
+
+                    {{-- Body --}}
+                    <tr>
+                        <td
+                            style="padding: 32px 32px 28px 32px; font-size: 15px; line-height: 24px; color: #3b1f1f; font-family: Arial, Helvetica, sans-serif;">
                             {{ $slot }}
                         </td>
                     </tr>
+
                     @if (!empty($legalText))
+                        {{-- Legal divider --}}
+                        <tr>
+                            <td style="padding: 0 32px;">
+                                <div
+                                    style="border-top: 1px solid #edd2c7; font-size: 0; line-height: 0;">
+                                    &nbsp;</div>
+                            </td>
+                        </tr>
+                        {{-- Legal text --}}
                         <tr>
                             <td
-                                style="padding: 16px 24px 24px 24px; border-top: 1px solid #e5e7eb; font-size: 12px; line-height: 18px; color: #6b7280;">
+                                style="padding: 16px 32px 24px 32px; font-size: 11px; line-height: 17px; color: #b9a7a5; font-family: Arial, Helvetica, sans-serif;">
                                 {!! $legalText !!}
                             </td>
                         </tr>
                     @endif
+
                 </table>
+
+                {{-- Footer spacer --}}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                    border="0" style="max-width: 600px;">
+                    <tr>
+                        <td align="center"
+                            style="padding: 16px 0 8px 0; font-size: 11px; color: #b9a7a5; font-family: Arial, Helvetica, sans-serif;">
+                            {{ $siteName }}
+                        </td>
+                    </tr>
+                </table>
+
             </td>
         </tr>
     </table>

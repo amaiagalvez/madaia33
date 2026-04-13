@@ -28,7 +28,7 @@ class CreateOwnerAction
     {
         $password = Str::password(16);
 
-        $result = DB::transaction(fn (): array => $this->createOwnerWithAssignments($data, $password));
+        $result = DB::transaction(fn(): array => $this->createOwnerWithAssignments($data, $password));
 
         /** @var Owner $owner */
         $owner = $result['owner'];
@@ -177,7 +177,11 @@ class CreateOwnerAction
             __('admin.owners.email.default_body'),
         ) ?? __('admin.owners.email.default_body'));
 
-        $bodyHtml = str_replace('##info##', $this->buildAssignmentsInfoHtml($data), $bodyTemplate);
+        $bodyHtml = str_replace(
+            ['##izena##', '##info##'],
+            [(string) ($data['coprop1_name'] ?? $user->name), $this->buildAssignmentsInfoHtml($data)],
+            $bodyTemplate,
+        );
 
         $resetToken = Password::createToken($user);
         $resetUrl = route('password.reset', [
@@ -208,7 +212,7 @@ class CreateOwnerAction
 
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
