@@ -44,11 +44,13 @@ class CreateOwnerFormService
         return [
             'owner_id' => ($ownerId !== null && $ownerId !== '') ? (int) $ownerId : null,
             'coprop1_name' => $validated['coprop1Name'],
+            'coprop1_surname' => $validated['coprop1Surname'] ?: null,
             'coprop1_dni' => $validated['coprop1Dni'],
             'coprop1_phone' => $validated['coprop1Phone'] ?: null,
             'coprop1_email' => $validated['coprop1Email'],
             'language' => $validated['language'],
             'coprop2_name' => $validated['coprop2Name'] ?: null,
+            'coprop2_surname' => $validated['coprop2Surname'] ?: null,
             'coprop2_dni' => $validated['coprop2Dni'] ?: null,
             'coprop2_phone' => $validated['coprop2Phone'] ?: null,
             'coprop2_email' => $validated['coprop2Email'] ?: null,

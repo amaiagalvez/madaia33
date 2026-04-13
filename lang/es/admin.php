@@ -270,11 +270,13 @@ return [
         'form' => [
             'id' => 'ID (Núm)',
             'coprop1_name' => 'Nombre',
+            'coprop1_surname' => 'Apellidos',
             'coprop1_dni' => 'DNI',
             'coprop1_phone' => 'Teléfono',
             'coprop1_email' => 'Email',
             'language' => 'Idioma',
             'coprop2_name' => 'Nombre',
+            'coprop2_surname' => 'Apellidos',
             'coprop2_dni' => 'DNI',
             'coprop2_phone' => 'Teléfono',
             'coprop2_email' => 'Email',

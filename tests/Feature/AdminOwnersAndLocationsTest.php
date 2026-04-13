@@ -392,9 +392,11 @@ it('shows email and phone in owners coproprietary columns', function () {
 
     Owner::factory()->create([
         'coprop1_name' => 'Leire Nagusi',
+        'coprop1_surname' => 'Goienetxe',
         'coprop1_email' => 'leire@example.com',
         'coprop1_phone' => '600111222',
         'coprop2_name' => 'Mikel Bigarren',
+        'coprop2_surname' => 'Arregi',
         'coprop2_email' => 'mikel@example.com',
         'coprop2_phone' => '600333444',
     ]);
@@ -403,9 +405,11 @@ it('shows email and phone in owners coproprietary columns', function () {
         ->test(Owners::class)
         ->set('filterStatus', 'all')
         ->assertSee('Leire Nagusi')
+        ->assertSee('Goienetxe')
         ->assertSee('leire@example.com')
         ->assertSee('600111222')
         ->assertSee('Mikel Bigarren')
+        ->assertSee('Arregi')
         ->assertSee('mikel@example.com')
         ->assertSee('600333444');
 });
@@ -584,6 +588,7 @@ it('creates a new owner from the admin owners list', function () {
         ->test(Owners::class)
         ->set('filterStatus', 'all')
         ->set('coprop1Name', 'Irati Lasa')
+        ->set('coprop1Surname', 'Etxaniz')
         ->set('coprop1Dni', '11223344A')
         ->set('coprop1Email', 'irati@example.com')
         ->set('coprop1Phone', '600123123')
@@ -595,6 +600,7 @@ it('creates a new owner from the admin owners list', function () {
     $owner = Owner::query()->where('coprop1_dni', '11223344A')->first();
 
     expect($owner)->not->toBeNull();
+    expect($owner->coprop1_surname)->toBe('Etxaniz');
 
     $createdUser = User::query()->where('email', 'irati@example.com')->first();
 

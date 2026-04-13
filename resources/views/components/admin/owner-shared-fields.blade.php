@@ -2,11 +2,13 @@
     'mode' => 'http',
     'owner' => null,
     'coprop1NameModel' => 'editCoprop1Name',
+    'coprop1SurnameModel' => 'editCoprop1Surname',
     'coprop1DniModel' => 'editCoprop1Dni',
     'coprop1PhoneModel' => 'editCoprop1Phone',
     'coprop1EmailModel' => 'editCoprop1Email',
     'languageModel' => 'editLanguage',
     'coprop2NameModel' => 'editCoprop2Name',
+    'coprop2SurnameModel' => 'editCoprop2Surname',
     'coprop2DniModel' => 'editCoprop2Dni',
     'coprop2PhoneModel' => 'editCoprop2Phone',
     'coprop2EmailModel' => 'editCoprop2Email',
@@ -30,6 +32,11 @@
                     <flux:label>{{ __('admin.owners.form.coprop1_name') }}</flux:label>
                     <flux:input wire:model="{{ $coprop1NameModel }}" />
                     <flux:error name="{{ $coprop1NameModel }}" />
+                </flux:field>
+                <flux:field>
+                    <flux:label>{{ __('admin.owners.form.coprop1_surname') }}</flux:label>
+                    <flux:input wire:model="{{ $coprop1SurnameModel }}" />
+                    <flux:error name="{{ $coprop1SurnameModel }}" />
                 </flux:field>
                 <flux:field>
                     <flux:label>{{ __('admin.owners.form.coprop1_dni') }}</flux:label>
@@ -61,6 +68,12 @@
                     {{ __('admin.owners.form.coprop1_name') }}
                     <input type="text" name="coprop1_name"
                         value="{{ old('coprop1_name', $owner?->coprop1_name) }}"
+                        class="{{ $inputClass }}">
+                </label>
+                <label class="text-sm font-medium text-gray-700">
+                    {{ __('admin.owners.form.coprop1_surname') }}
+                    <input type="text" name="coprop1_surname"
+                        value="{{ old('coprop1_surname', $owner?->coprop1_surname) }}"
                         class="{{ $inputClass }}">
                 </label>
                 <label class="text-sm font-medium text-gray-700">
@@ -106,6 +119,11 @@
                     <flux:error name="{{ $coprop2NameModel }}" />
                 </flux:field>
                 <flux:field>
+                    <flux:label>{{ __('admin.owners.form.coprop2_surname') }}</flux:label>
+                    <flux:input wire:model="{{ $coprop2SurnameModel }}" />
+                    <flux:error name="{{ $coprop2SurnameModel }}" />
+                </flux:field>
+                <flux:field>
                     <flux:label>{{ __('admin.owners.form.coprop2_dni') }}</flux:label>
                     <flux:input wire:model="{{ $coprop2DniModel }}" />
                     <flux:error name="{{ $coprop2DniModel }}" />
@@ -125,6 +143,12 @@
                     {{ __('admin.owners.form.coprop2_name') }}
                     <input type="text" name="coprop2_name"
                         value="{{ old('coprop2_name', $owner?->coprop2_name) }}"
+                        class="{{ $inputClass }}">
+                </label>
+                <label class="text-sm font-medium text-gray-700">
+                    {{ __('admin.owners.form.coprop2_surname') }}
+                    <input type="text" name="coprop2_surname"
+                        value="{{ old('coprop2_surname', $owner?->coprop2_surname) }}"
                         class="{{ $inputClass }}">
                 </label>
                 <label class="text-sm font-medium text-gray-700">

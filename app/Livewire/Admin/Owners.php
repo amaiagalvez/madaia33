@@ -37,6 +37,8 @@ class Owners extends Component
 
     public string $coprop1Name = '';
 
+    public string $coprop1Surname = '';
+
     public string $coprop1Dni = '';
 
     public string $coprop1Phone = '';
@@ -46,6 +48,8 @@ class Owners extends Component
     public string $language = SupportedLocales::BASQUE;
 
     public string $coprop2Name = '';
+
+    public string $coprop2Surname = '';
 
     public string $coprop2Dni = '';
 
@@ -74,6 +78,8 @@ class Owners extends Component
 
     public string $editCoprop1Name = '';
 
+    public string $editCoprop1Surname = '';
+
     public string $editCoprop1Dni = '';
 
     public string $editCoprop1Phone = '';
@@ -83,6 +89,8 @@ class Owners extends Component
     public string $editLanguage = SupportedLocales::BASQUE;
 
     public string $editCoprop2Name = '';
+
+    public string $editCoprop2Surname = '';
 
     public string $editCoprop2Dni = '';
 
@@ -246,11 +254,13 @@ class Owners extends Component
 
         $this->editingOwnerId = $ownerId;
         $this->editCoprop1Name = $owner->coprop1_name;
+        $this->editCoprop1Surname = $owner->coprop1_surname ?? '';
         $this->editCoprop1Dni = $owner->coprop1_dni;
         $this->editCoprop1Phone = $owner->coprop1_phone ?? '';
         $this->editCoprop1Email = $owner->coprop1_email;
         $this->editLanguage = $owner->language ?? SupportedLocales::BASQUE;
         $this->editCoprop2Name = $owner->coprop2_name ?? '';
+        $this->editCoprop2Surname = $owner->coprop2_surname ?? '';
         $this->editCoprop2Dni = $owner->coprop2_dni ?? '';
         $this->editCoprop2Phone = $owner->coprop2_phone ?? '';
         $this->editCoprop2Email = $owner->coprop2_email ?? '';
@@ -263,21 +273,25 @@ class Owners extends Component
     {
         $this->validate([
             'editCoprop1Name' => ['required', 'string', 'max:255'],
+            'editCoprop1Surname' => ['nullable', 'string', 'max:255'],
             'editCoprop1Dni' => ['required', 'string', 'max:20'],
             'editCoprop1Phone' => ['nullable', 'string', 'max:20'],
             'editCoprop1Email' => ['required', 'email', 'max:255'],
             'editLanguage' => ['required', 'string', 'in:eu,es'],
             'editCoprop2Name' => ['nullable', 'string', 'max:255'],
+            'editCoprop2Surname' => ['nullable', 'string', 'max:255'],
             'editCoprop2Dni' => ['nullable', 'string', 'max:20'],
             'editCoprop2Phone' => ['nullable', 'string', 'max:20'],
             'editCoprop2Email' => ['nullable', 'email', 'max:255'],
         ], [], [
             'editCoprop1Name' => __('admin.owners.form.coprop1_name'),
+            'editCoprop1Surname' => __('admin.owners.form.coprop1_surname'),
             'editCoprop1Dni' => __('admin.owners.form.coprop1_dni'),
             'editCoprop1Phone' => __('admin.owners.form.coprop1_phone'),
             'editCoprop1Email' => __('admin.owners.form.coprop1_email'),
             'editLanguage' => __('admin.owners.form.language'),
             'editCoprop2Name' => __('admin.owners.form.coprop2_name'),
+            'editCoprop2Surname' => __('admin.owners.form.coprop2_surname'),
             'editCoprop2Dni' => __('admin.owners.form.coprop2_dni'),
             'editCoprop2Phone' => __('admin.owners.form.coprop2_phone'),
             'editCoprop2Email' => __('admin.owners.form.coprop2_email'),
@@ -287,11 +301,13 @@ class Owners extends Component
 
         $owner->update([
             'coprop1_name' => $this->editCoprop1Name,
+            'coprop1_surname' => $this->editCoprop1Surname ?: null,
             'coprop1_dni' => $this->editCoprop1Dni,
             'coprop1_phone' => $this->editCoprop1Phone ?: null,
             'coprop1_email' => $this->editCoprop1Email,
             'language' => $this->editLanguage,
             'coprop2_name' => $this->editCoprop2Name ?: null,
+            'coprop2_surname' => $this->editCoprop2Surname ?: null,
             'coprop2_dni' => $this->editCoprop2Dni ?: null,
             'coprop2_phone' => $this->editCoprop2Phone ?: null,
             'coprop2_email' => $this->editCoprop2Email ?: null,
@@ -306,11 +322,13 @@ class Owners extends Component
         $this->editingOwnerId = null;
         $this->reset([
             'editCoprop1Name',
+            'editCoprop1Surname',
             'editCoprop1Dni',
             'editCoprop1Phone',
             'editCoprop1Email',
             'editLanguage',
             'editCoprop2Name',
+            'editCoprop2Surname',
             'editCoprop2Dni',
             'editCoprop2Phone',
             'editCoprop2Email',
@@ -351,10 +369,12 @@ class Owners extends Component
         $this->reset([
             'ownerId',
             'coprop1Name',
+            'coprop1Surname',
             'coprop1Dni',
             'coprop1Phone',
             'coprop1Email',
             'coprop2Name',
+            'coprop2Surname',
             'coprop2Dni',
             'coprop2Phone',
             'coprop2Email',

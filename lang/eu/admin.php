@@ -271,11 +271,13 @@ return [
         'form' => [
             'id' => 'ID (Zbkia)',
             'coprop1_name' => 'Izena',
+            'coprop1_surname' => 'Abizenak',
             'coprop1_dni' => 'NAN',
             'coprop1_phone' => 'Telefonoa',
             'coprop1_email' => 'Emaila',
             'language' => 'Hizkuntza',
             'coprop2_name' => 'Izena',
+            'coprop2_surname' => 'Abizenak',
             'coprop2_dni' => 'NAN',
             'coprop2_phone' => 'Telefonoa',
             'coprop2_email' => 'Emaila',

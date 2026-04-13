@@ -18,6 +18,7 @@ describe('CreateOwnerAction', function () {
         $action = new CreateOwnerAction;
         $owner = $action->execute([
             'coprop1_name' => 'Miren Etxeberria',
+            'coprop1_surname' => 'Lertxundi',
             'coprop1_dni' => '12345678Z',
             'coprop1_phone' => '600111222',
             'coprop1_email' => 'miren@example.com',
@@ -25,6 +26,7 @@ describe('CreateOwnerAction', function () {
 
         expect($owner)->toBeInstanceOf(Owner::class)
             ->and($owner->coprop1_name)->toBe('Miren Etxeberria')
+            ->and($owner->coprop1_surname)->toBe('Lertxundi')
             ->and($owner->coprop1_dni)->toBe('12345678Z')
             ->and($owner->coprop1_email)->toBe('miren@example.com');
     });
@@ -90,11 +92,13 @@ describe('CreateOwnerAction', function () {
             'coprop1_dni' => '12345678Z',
             'coprop1_email' => 'miren@example.com',
             'coprop2_name' => 'Jon Etxeberria',
+            'coprop2_surname' => 'Lasa',
             'coprop2_dni' => '87654321X',
             'coprop2_email' => 'jon@example.com',
         ]);
 
         expect($owner->coprop2_name)->toBe('Jon Etxeberria')
+            ->and($owner->coprop2_surname)->toBe('Lasa')
             ->and($owner->coprop2_dni)->toBe('87654321X');
     });
 

@@ -150,8 +150,7 @@
     @foreach ($tabs as $tabConfig)
         <div x-cloak x-show="tab === '{{ $tabConfig['key'] }}'"
             x-bind:hidden="tab !== '{{ $tabConfig['key'] }}'"
-            data-bilingual-pane="{{ $tabConfig['key'] }}"
-            class="space-y-2">
+            data-bilingual-pane="{{ $tabConfig['key'] }}" class="space-y-2">
             @if ($mode === 'rich-text')
                 <p id="{{ $tabConfig['field'] }}Label"
                     class="mb-1 block text-sm font-medium text-gray-700">
