@@ -59,13 +59,13 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Password::defaults(
-            fn (): ?Password => app()->isProduction()
+            fn(): ?Password => app()->isProduction()
                 ? Password::min(12)
-                    ->mixedCase()
-                    ->letters()
-                    ->numbers()
-                    ->symbols()
-                    ->uncompromised()
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised()
                 : null,
         );
     }
@@ -118,6 +118,8 @@ class AppServiceProvider extends ServiceProvider
         View::composer([
             'components.front.public-brand-link',
             'front.public-brand-link',
+            'components.layouts.admin.main',
+            'components.layouts.front.main',
             'layouts.front.main',
             'layouts::front.main',
             'layouts.admin.main',

@@ -26,13 +26,8 @@
             class="hidden lg:flex lg:flex-col w-64 bg-stone-50 border-r border-stone-200 fixed inset-y-0 left-0 z-40">
             {{-- Sidebar header --}}
             <div class="flex items-center h-16 px-6 border-b border-stone-200">
-                <a href="{{ route('admin.dashboard') }}"
-                    class="flex items-center gap-3 text-base font-semibold text-stone-900 hover:text-stone-700 transition-colors">
-                    <img src="{{ $publicLogoUrl ?? '' }}"
-                        alt="{{ $publicSiteName ?? config('app.name', 'Laravel') }} logo"
-                        class="h-8 w-8 rounded-xl object-cover" />
-                    {{ $publicSiteName ?? config('app.name', 'Laravel') }}
-                </a>
+                <x-front.public-brand-link href="{{ route('admin.dashboard') }}" :show-subtitle="false"
+                    class="text-base font-semibold text-stone-900 transition-colors hover:text-stone-700 [&_.header-brand-mark]:h-8 [&_.header-brand-mark]:w-8 [&_.header-brand-mark]:rounded-xl [&_.text-lg]:text-base" />
             </div>
 
             {{-- Sidebar navigation --}}
@@ -186,13 +181,8 @@
                         d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
             </button>
-            <div class="flex items-center gap-2">
-                <img src="{{ $publicLogoUrl ?? '' }}"
-                    alt="{{ $publicSiteName ?? config('app.name', 'Madaia') }} logo"
-                    class="h-8 w-8 rounded-xl object-cover" />
-                <span
-                    class="text-base font-semibold text-stone-900">{{ __('admin.dashboard') }}</span>
-            </div>
+            <x-front.public-brand-link href="{{ route('admin.dashboard') }}" :show-subtitle="false"
+                class="min-w-0 flex-1 text-base font-semibold text-stone-900 [&_.header-brand-mark]:h-8 [&_.header-brand-mark]:w-8 [&_.header-brand-mark]:rounded-xl [&_.text-lg]:text-base" />
 
             {{-- Mobile sidebar overlay --}}
             <div x-show="open" x-transition class="fixed inset-0 z-50 flex">
@@ -202,13 +192,9 @@
                     class="relative flex flex-col w-64 bg-stone-50 border-r border-stone-200 h-full overflow-y-auto">
                     <div
                         class="flex items-center justify-between h-16 px-6 border-b border-stone-200">
-                        <span
-                            class="flex items-center gap-2 text-base font-semibold text-gray-900">
-                            <img src="{{ $publicLogoUrl ?? '' }}"
-                                alt="{{ $publicSiteName ?? config('app.name', 'Madaia') }} logo"
-                                class="h-8 w-8 rounded-xl object-cover" />
-                            {{ __('admin.dashboard') }}
-                        </span>
+                        <x-front.public-brand-link href="{{ route('admin.dashboard') }}"
+                            :show-subtitle="false"
+                            class="text-base font-semibold text-gray-900 [&_.header-brand-mark]:h-8 [&_.header-brand-mark]:w-8 [&_.header-brand-mark]:rounded-xl [&_.text-lg]:text-base" />
                         <button type="button" @click="open = false"
                             class="p-1 rounded text-gray-500 hover:text-gray-700">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"

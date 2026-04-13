@@ -403,6 +403,17 @@ it('dashboard shows real statistics', function () {
         ->assertSee('1');  // images and unread messages
 });
 
+it('dashboard uses the front logo configured in settings', function () {
+    $user = adminUser();
+
+    createSetting('front_logo_image_path', 'branding/front-logo.png');
+
+    test()->actingAs($user)
+        ->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertSee('storage/branding/front-logo.png', false);
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // T009 — Section integrity
 // ─────────────────────────────────────────────────────────────────────────────
@@ -410,7 +421,7 @@ it('dashboard shows real statistics', function () {
 it('factory-created settings have valid section', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
