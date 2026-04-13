@@ -11,8 +11,8 @@ it('notices use responsive readable body typography', function (string $locale) 
     $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
 
     $response->assertSuccessful();
-    $response->assertSee('leading-relaxed text-gray-600 text-sm md:text-base lg:text-lg', false);
-    $response->assertSee('leading-relaxed text-gray-600 text-sm md:text-base', false);
+    $response->assertSee('leading-relaxed text-gray-600 [&_p]:m-0 text-sm md:text-base lg:text-lg', false);
+    $response->assertSee('leading-relaxed text-gray-600 [&_p]:m-0 text-sm md:text-base', false);
 })->with('supported_locales');
 
 it('legal pages preserve readable typography and line length', function (string $locale) {

@@ -4,9 +4,9 @@ namespace App\Models;
 
 use App\SupportedLocales;
 use Database\Factories\OwnerFactory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -119,19 +119,25 @@ class Owner extends Model
         return OwnerFactory::new();
     }
 
+    /**
+     * @return Attribute<string, never>
+     */
     protected function fullName1(): Attribute
     {
         return Attribute::make(
-            get: fn(): string => trim(
+            get: fn (): string => trim(
                 (string) $this->coprop1_name . ' ' . (string) $this->coprop1_surname,
             ),
         );
     }
 
+    /**
+     * @return Attribute<string, never>
+     */
     protected function fullName2(): Attribute
     {
         return Attribute::make(
-            get: fn(): string => trim(
+            get: fn (): string => trim(
                 (string) $this->coprop2_name . ' ' . (string) $this->coprop2_surname,
             ),
         );

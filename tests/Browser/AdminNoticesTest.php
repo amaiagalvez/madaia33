@@ -9,7 +9,7 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('admin can create, publish, verify public, unpublish and delete a notice', function () {
-    $admin = User::where('email', 'example@email.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
     $title = 'Dusk Test Iragarkia ' . now()->timestamp;
     $adminNoticesPath = '/admin/avisos';
 

@@ -23,9 +23,8 @@ class OwnerWelcomeMail extends Mailable
         public readonly string $subjectLine,
         public readonly string $bodyHtml,
         public readonly string $resetUrl,
-        ?string $legalText = null,
     ) {
-        $this->legalText = $legalText ?? EmailLegalText::resolve();
+        $this->legalText = EmailLegalText::resolve();
     }
 
     public function envelope(): Envelope

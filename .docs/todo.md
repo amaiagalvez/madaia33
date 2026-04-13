@@ -41,9 +41,9 @@ owners => Propietarias
 - [ ] legeak.html begiratu
 
 - [ ] deploy
-  - [ ] se boorran las carpetas del storage
-  - [ ] no se sube la carpeta build
-  - [ ] se pierde el storage link
+    - [ ] se boorran las carpetas del storage
+    - [ ] no se sube la carpeta build
+    - [ ] se pierde el storage link
 - [ ] config recaptcha, analitics
 
 https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696

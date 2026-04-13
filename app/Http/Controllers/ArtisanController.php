@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
 
 class ArtisanController extends Controller
 {
-    public function clear()
+    public function clear(): RedirectResponse
     {
         Artisan::call('config:clear');
         Artisan::call('cache:clear');
@@ -30,7 +31,7 @@ class ArtisanController extends Controller
         return redirect()->route('admin.dashboard')->with('status', 'Cache cleared + composer.phar update ejecutado.');
     }
 
-    public function migration_and_seeds()
+    public function migration_and_seeds(): RedirectResponse
     {
         Artisan::call('migrate --force');
         Artisan::call('db:seed --force');

@@ -6,6 +6,7 @@ use App\Models\Owner;
 use App\Models\Location;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
 trait InteractsWithAdminOwners
@@ -126,7 +127,7 @@ trait InteractsWithAdminOwners
     }
 
     /**
-     * @return array{portals: \Illuminate\Support\Collection<int, Location>, locals: \Illuminate\Support\Collection<int, Location>, garages: \Illuminate\Support\Collection<int, Location>, storages: \Illuminate\Support\Collection<int, Location>, assignableProperties: \Illuminate\Support\Collection<int, Property>}
+     * @return array{portals: Collection<int, Location>, locals: Collection<int, Location>, garages: Collection<int, Location>, storages: Collection<int, Location>, assignableProperties: Collection<int, Property>}
      */
     private function loadViewData(): array
     {

@@ -39,30 +39,58 @@ class CreateOwnerFormService
      */
     public function prepareOwnerData(array $validated): array
     {
-        $ownerId = $validated['ownerId'] ?? null;
-
         return [
-            'owner_id' => ($ownerId !== null && $ownerId !== '') ? (int) $ownerId : null,
+            'owner_id' => $this->nullableInt($validated['ownerId'] ?? null),
             'coprop1_name' => $validated['coprop1Name'],
-            'coprop1_surname' => $validated['coprop1Surname'] ?: null,
+            'coprop1_surname' => $this->nullableString($validated['coprop1Surname'] ?? null),
             'coprop1_dni' => $validated['coprop1Dni'],
-            'coprop1_phone' => $validated['coprop1Phone'] ?: null,
+            'coprop1_phone' => $this->nullableString($validated['coprop1Phone'] ?? null),
             'coprop1_email' => $validated['coprop1Email'],
             'language' => $validated['language'],
-            'coprop2_name' => $validated['coprop2Name'] ?: null,
-            'coprop2_surname' => $validated['coprop2Surname'] ?: null,
-            'coprop2_dni' => $validated['coprop2Dni'] ?: null,
-            'coprop2_phone' => $validated['coprop2Phone'] ?: null,
-            'coprop2_email' => $validated['coprop2Email'] ?: null,
-            'assignments' => collect(is_array($validated['newAssignments']) ? $validated['newAssignments'] : [])
-                ->map(static function (array $assignment): array {
-                    return [
-                        'property_id' => (int) $assignment['property_id'],
-                        'start_date' => $assignment['start_date'],
-                        'end_date' => $assignment['end_date'] !== '' ? $assignment['end_date'] : null,
-                    ];
-                })
-                ->all(),
+            'coprop2_name' => $this->nullableString($validated['coprop2Name'] ?? null),
+            'coprop2_surname' => $this->nullableString($validated['coprop2Surname'] ?? null),
+            'coprop2_dni' => $this->nullableString($validated['coprop2Dni'] ?? null),
+            'coprop2_phone' => $this->nullableString($validated['coprop2Phone'] ?? null),
+            'coprop2_email' => $this->nullableString($validated['coprop2Email'] ?? null),
+            'assignments' => $this->normalizeAssignments($validated['newAssignments'] ?? []),
         ];
+    }
+
+    private function nullableString(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (string) $value;
+    }
+
+    private function nullableInt(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (int) $value;
+    }
+
+    /**
+     * @return array<int, array{property_id: int, start_date: string, end_date: ?string}>
+     */
+    private function normalizeAssignments(mixed $newAssignments): array
+    {
+        if (! is_array($newAssignments)) {
+            return [];
+        }
+
+        return collect($newAssignments)
+            ->map(static function (array $assignment): array {
+                return [
+                    'property_id' => (int) $assignment['property_id'],
+                    'start_date' => $assignment['start_date'],
+                    'end_date' => $assignment['end_date'] !== '' ? $assignment['end_date'] : null,
+                ];
+            })
+            ->all();
     }
 }

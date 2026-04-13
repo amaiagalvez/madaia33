@@ -52,22 +52,22 @@ test('dev seeder creates owners, role users and seeded voting ballots', function
 
     expect(
         User::query()
-            ->where('email', 'admin.general@madaia33.eus')
-            ->whereHas('roles', fn ($query) => $query->where('name', Role::GENERAL_ADMIN))
+            ->where('email', 'admin.general@email.eus')
+            ->whereHas('roles', fn($query) => $query->where('name', Role::GENERAL_ADMIN))
             ->exists()
     )->toBeTrue();
 
     $communityAdmin = User::query()
-        ->where('email', 'admin.comunidad@madaia33.eus')
-        ->whereHas('roles', fn ($query) => $query->where('name', Role::COMMUNITY_ADMIN))
+        ->where('email', 'admin.comunidad@email.eus')
+        ->whereHas('roles', fn($query) => $query->where('name', Role::COMMUNITY_ADMIN))
         ->first();
 
     expect($communityAdmin)->not->toBeNull();
     expect($communityAdmin->managedLocations()->count())->toBeGreaterThan(0);
 
     $propertyOwner = User::query()
-        ->where('email', 'propietaria@madaia33.eus')
-        ->whereHas('roles', fn ($query) => $query->where('name', Role::PROPERTY_OWNER))
+        ->where('email', 'propietaria@email.eus')
+        ->whereHas('roles', fn($query) => $query->where('name', Role::PROPERTY_OWNER))
         ->first();
 
     expect($propertyOwner)->not->toBeNull();
@@ -76,13 +76,13 @@ test('dev seeder creates owners, role users and seeded voting ballots', function
 
     expect(
         User::query()
-            ->where('email', 'voto.delegado@madaia33.eus')
-            ->whereHas('roles', fn ($query) => $query->where('name', Role::DELEGATED_VOTE))
+            ->where('email', 'voto.delegado@email.eus')
+            ->whereHas('roles', fn($query) => $query->where('name', Role::DELEGATED_VOTE))
             ->exists()
     )->toBeTrue();
 
     $combinedAdmin = User::query()
-        ->where('email', 'admin.konbinatua@madaia33.eus')
+        ->where('email', 'admin.konbinatua@email.eus')
         ->first();
 
     expect($combinedAdmin)->not->toBeNull();
@@ -92,7 +92,7 @@ test('dev seeder creates owners, role users and seeded voting ballots', function
     expect($combinedAdmin->managedLocations()->count())->toBeGreaterThan(0);
 
     $ownerDelegated = User::query()
-        ->where('email', 'propietaria.delegada@madaia33.eus')
+        ->where('email', 'propietaria.delegada@email.eus')
         ->first();
 
     expect($ownerDelegated)->not->toBeNull();
