@@ -78,6 +78,8 @@
 - To prevent duplicate active ownership assignments, combine transactional `lockForUpdate()` checks with a DB-level uniqueness strategy for active rows.
 - When extracting a shared Blade table component, avoid wrapping an already-existing <table> with another <table>; pass table classes via component props and keep a single table element to prevent invalid markup.
 - To truly standardize table UI from a base view, align wrapper and inner table semantics together (`thead`, `tbody`, `th`, `td` classes); changing only the container component leaves visual drift.
+- For global email-template rollouts, resolve legal text through a helper that first checks `settings` table availability; otherwise Unit tests without migrated DB can fail when mailables instantiate settings-backed content.
+- If a broad Feature file has unrelated pre-existing 500s, run focused test filters for the modified behavior and report the unrelated failure source explicitly (with log-backed root cause).
 - In owners list UX, keep all filters in one horizontal row and use horizontal overflow when needed; reserve vertical space for table rows and pair it with pagination to keep dense admin listings usable.
 - For configurable owner-onboarding emails, keep subject/body in settings by locale and replace a stable placeholder like ##info## server-side with assignment data; cover both settings persistence and email rendering in Feature tests.
 - In admin forms, avoid mixed primary button palettes (Flux default + brand). Reuse a shared brand-primary style/component so create/save actions keep a consistent visual hierarchy.

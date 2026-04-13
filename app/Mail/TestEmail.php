@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use App\Support\EmailLegalText;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
@@ -14,10 +15,15 @@ class TestEmail extends Mailable
     use BuildsFromAddress;
     use Queueable, SerializesModels;
 
+    public readonly ?string $legalText;
+
     public function __construct(
         public readonly ?string $fromAddress = null,
         public readonly ?string $fromName = null,
-    ) {}
+        ?string $legalText = null,
+    ) {
+        $this->legalText = $legalText ?? EmailLegalText::resolve();
+    }
 
     public function envelope(): Envelope
     {
@@ -31,6 +37,9 @@ class TestEmail extends Mailable
     {
         return new Content(
             view: 'mail.test-email',
+            with: [
+                'legalText' => $this->legalText,
+            ],
         );
     }
 }

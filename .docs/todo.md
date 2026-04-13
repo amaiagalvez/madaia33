@@ -46,6 +46,10 @@ owners => Propietarias
   - [ ] se pierde el storage link
 - [ ] config recaptcha, analitics
 
+- en los campos multilingue, tanto input simple como text area con mini editor, mostar los avisos de las validaciones fuera de las tabs de idiomas, sino no se pueden ver
+
+
+
 https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
 
 Para que todo esto sea legal de verdad, asegúrate de:

@@ -15,15 +15,16 @@
                     $imageUrl =
                         data_get($image, 'public_url') ??
                         (data_get($image, 'path') ?? asset('favicon.svg'));
-                    $rawImageAlt = data_get($image, 'alt_text') ?: $notice->title;
+                    $fallbackTitle = trim(strip_tags((string) $notice->title));
+                    $rawImageAlt = data_get($image, 'alt_text') ?: $fallbackTitle;
                     $altText = trim(
                         (string) preg_replace(
                             '/\b(image|imagen|irudia)\b/iu',
                             '',
-                            (string) $rawImageAlt,
+                            strip_tags((string) $rawImageAlt),
                         ),
                     );
-                    $altText = $altText !== '' ? $altText : $notice->title;
+                    $altText = $altText !== '' ? $altText : $fallbackTitle;
                 @endphp
                 <div
                     class="relative overflow-hidden bg-gray-100 aspect-video {{ $featured ? 'lg:aspect-auto lg:min-h-80' : '' }}">
@@ -59,16 +60,18 @@
             @endif
 
             {{-- Title --}}
-            <h2
-                class="font-bold text-gray-900 line-clamp-2 {{ $featured ? 'text-xl md:text-2xl lg:text-3xl' : 'text-base md:text-lg' }}">
-                {{ $notice->title }}
-            </h2>
+            <div
+                class="font-bold text-gray-900 line-clamp-2 [&_p]:m-0 {{ $featured ? 'text-xl md:text-2xl lg:text-3xl' : 'text-base md:text-lg' }}"
+                data-notice-title>
+                {!! $notice->title !!}
+            </div>
 
             {{-- Excerpt --}}
-            <p
-                class="leading-relaxed text-gray-600 {{ $featured ? 'text-sm md:text-base lg:text-lg' : 'text-sm md:text-base' }}">
-                {{ $notice->content }}
-            </p>
+            <div
+                class="leading-relaxed text-gray-600 [&_p]:m-0 {{ $featured ? 'text-sm md:text-base lg:text-lg' : 'text-sm md:text-base' }}"
+                data-notice-content>
+                {!! $notice->content !!}
+            </div>
 
             {{-- Location Badges --}}
             @if ($notice->locations && $notice->locations->count() > 0)

@@ -3,12 +3,12 @@
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
+use App\Notifications\Auth\ResetPasswordNotification;
 use App\SupportedLocales;
 use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\Lang;
 use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 dataset('supported_locales', SupportedLocales::all());
@@ -48,7 +48,7 @@ test('reset password link can be requested', function () {
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class);
+    Notification::assertSentTo($user, ResetPasswordNotification::class);
 });
 
 test('reset password link can be requested with coproprietary email 1', function () {
@@ -64,7 +64,7 @@ test('reset password link can be requested with coproprietary email 1', function
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => 'owner1@example.com']);
 
-    Notification::assertSentTo($user, ResetPassword::class);
+    Notification::assertSentTo($user, ResetPasswordNotification::class);
 });
 
 test('reset password link can be requested with coproprietary email 2', function () {
@@ -80,7 +80,7 @@ test('reset password link can be requested with coproprietary email 2', function
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => 'owner2@example.com']);
 
-    Notification::assertSentTo($user, ResetPassword::class);
+    Notification::assertSentTo($user, ResetPasswordNotification::class);
 });
 
 test('password reset flow applies sender configuration from settings', function () {
@@ -101,7 +101,7 @@ test('reset password screen can be rendered', function () {
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+    Notification::assertSentTo($user, ResetPasswordNotification::class, function ($notification) {
         $response = test()->get(route('password.reset', $notification->token));
 
         $response->assertOk()
@@ -123,7 +123,7 @@ test('password reset notification keeps the visitor locale and localized reset l
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification, array $channels, User $notifiable, ?string $sentLocale) use ($locale, $user) {
+    Notification::assertSentTo($user, ResetPasswordNotification::class, function ($notification, array $channels, User $notifiable, ?string $sentLocale) use ($locale, $user) {
         $expectedPath = parse_url(
             route(SupportedLocales::routeName('password.reset', $locale), [
                 'token' => $notification->token,
@@ -157,7 +157,7 @@ test('password can be reset with valid token', function () {
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+    Notification::assertSentTo($user, ResetPasswordNotification::class, function ($notification) use ($user) {
         $response = test()->withoutMiddleware(PreventRequestForgery::class)
             ->post(route('password.update'), [
                 'token' => $notification->token,
@@ -169,6 +169,26 @@ test('password can be reset with valid token', function () {
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('login', absolute: false));
+
+        return true;
+    });
+});
+
+test('password reset notification uses the shared email template and includes legal text', function () {
+    Notification::fake();
+
+    createSetting('legal_text_eu', '<p>Ohar legal orokorra</p>');
+
+    $user = User::factory()->create();
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPasswordNotification::class, function (ResetPasswordNotification $notification) use ($user) {
+        $mailMessage = $notification->toMail($user);
+
+        expect($mailMessage->view)->toBe('mail.auth.reset-password')
+            ->and($mailMessage->viewData['legalText'] ?? null)->toBe('<p>Ohar legal orokorra</p>');
 
         return true;
     });
