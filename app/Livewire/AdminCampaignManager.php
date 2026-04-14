@@ -2,12 +2,12 @@
 
 namespace App\Livewire;
 
-use App\Models\Role;
 use App\Models\User;
 use Livewire\Component;
 use App\Models\Campaign;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\CampaignDocument;
 use App\Models\CampaignTemplate;
 use Illuminate\Contracts\View\View;
@@ -78,9 +78,7 @@ class AdminCampaignManager extends Component
     {
         $this->authorizeViewAny();
 
-        if ($this->currentUser()?->hasRole(Role::COMMUNITY_ADMIN)) {
-            $this->recipientFilter = $this->options()->defaultRecipientFilter();
-        }
+        $this->recipientFilter = $this->options()->defaultRecipientFilter();
 
         $editCampaignId = (int) request()->integer('editCampaign');
 
@@ -436,19 +434,11 @@ class AdminCampaignManager extends Component
         $sortColumn = in_array($this->sortColumn, $allowedSortColumns, true) ? $this->sortColumn : 'created_at';
         $sortDir = in_array($this->sortDir, ['asc', 'desc'], true) ? $this->sortDir : 'desc';
 
-        $campaigns = Campaign::query()
-            ->withCount('recipients')
-            ->when($this->currentUser()?->hasRole(Role::COMMUNITY_ADMIN), function ($query): void {
-                $allowedCodes = $this->options()->allowedManagedLocationCodes();
+        $campaignsQuery = Campaign::query()->withCount('recipients');
 
-                $query->where('recipient_filter', '!=', 'all')
-                    ->where(function ($filterQuery) use ($allowedCodes): void {
-                        foreach ($allowedCodes as $locationCode) {
-                            $filterQuery->orWhere('recipient_filter', 'portal:' . $locationCode)
-                                ->orWhere('recipient_filter', 'garage:' . $locationCode);
-                        }
-                    });
-            })
+        $this->applyCampaignVisibilityScope($campaignsQuery);
+
+        $campaigns = $campaignsQuery
             ->orderBy($sortColumn, $sortDir)
             ->paginate(12);
 
@@ -612,12 +602,7 @@ class AdminCampaignManager extends Component
         $this->storedAttachments = [];
         $this->confirmingDeleteId = null;
         $this->showDeleteModal = false;
-
-        if ($this->currentUser()?->hasRole(Role::COMMUNITY_ADMIN)) {
-            $this->recipientFilter = $this->options()->defaultRecipientFilter();
-        } else {
-            $this->recipientFilter = 'all';
-        }
+        $this->recipientFilter = $this->options()->defaultRecipientFilter();
 
         $this->resetValidation();
         $this->recalculateRecipients();
@@ -627,21 +612,37 @@ class AdminCampaignManager extends Component
     {
         $user = $this->currentUser();
 
-        if ($user === null || ! $user->can('update', $campaign)) {
-            return false;
+        return $user !== null && $user->can('update', $campaign);
+    }
+
+    private function applyCampaignVisibilityScope(Builder $query): void
+    {
+        $accessScope = $this->currentUser()?->campaignAccessScope() ?? 'none';
+
+        if ($accessScope === 'all-only') {
+            $query->where('recipient_filter', 'all');
+
+            return;
         }
 
-        if (! $user->hasRole(Role::COMMUNITY_ADMIN)) {
-            return true;
+        if ($accessScope !== 'managed-locations') {
+            return;
         }
 
-        if (! str_contains((string) $campaign->recipient_filter, ':')) {
-            return false;
+        $allowedCodes = $this->options()->allowedManagedLocationCodes();
+
+        if ($allowedCodes === []) {
+            $query->whereRaw('1 = 0');
+
+            return;
         }
 
-        [, $locationCode] = explode(':', (string) $campaign->recipient_filter, 2);
-
-        return in_array($locationCode, $this->options()->allowedManagedLocationCodes(), true);
+        $query->where(function (Builder $filterQuery) use ($allowedCodes): void {
+            foreach ($allowedCodes as $locationCode) {
+                $filterQuery->orWhere('recipient_filter', 'portal:' . $locationCode)
+                    ->orWhere('recipient_filter', 'garage:' . $locationCode);
+            }
+        });
     }
 
     private function options(): CampaignAdminOptions

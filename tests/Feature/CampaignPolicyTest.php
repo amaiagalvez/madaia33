@@ -24,6 +24,23 @@ it('allows superadmin and admin_general to send campaigns with all filter', func
     Role::GENERAL_ADMIN,
 ]);
 
+it('denies admin_general for location-specific campaigns', function () {
+    $policy = new CampaignPolicy;
+
+    $user = User::factory()->create();
+    Role::query()->firstOrCreate(['name' => Role::GENERAL_ADMIN]);
+    $user->assignRole(Role::GENERAL_ADMIN);
+
+    $campaign = Campaign::factory()->create([
+        'recipient_filter' => 'portal:P-33',
+        'status' => 'draft',
+    ]);
+
+    expect($policy->view($user, $campaign))->toBeFalse()
+        ->and($policy->send($user, $campaign))->toBeFalse()
+        ->and($policy->duplicate($user, $campaign))->toBeFalse();
+});
+
 it('denies admin_comunidad when using all filter', function () {
     $policy = new CampaignPolicy;
 

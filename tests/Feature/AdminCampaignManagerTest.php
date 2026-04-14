@@ -158,6 +158,43 @@ it('shows edit and delete actions only for draft or scheduled campaigns', functi
         ->assertDontSeeHtml('wire:click="confirmDelete(' . $completedCampaign->id . ')"');
 });
 
+it('limits general admins to unfiltered campaigns only', function () {
+    Role::query()->firstOrCreate(['name' => Role::GENERAL_ADMIN]);
+
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    $visibleCampaign = Campaign::factory()->create([
+        'subject_eu' => 'Kanpaina orokorra',
+        'status' => 'draft',
+        'channel' => 'email',
+        'recipient_filter' => 'all',
+    ]);
+
+    $hiddenCampaign = Campaign::factory()->create([
+        'subject_eu' => 'Kanpaina murriztua',
+        'status' => 'draft',
+        'channel' => 'email',
+        'recipient_filter' => 'portal:GA-01',
+    ]);
+
+    Livewire::actingAs($generalAdmin)
+        ->test('admin-campaign-manager')
+        ->call('createCampaign')
+        ->assertSee('Kanpaina orokorra')
+        ->assertDontSee('Kanpaina murriztua')
+        ->assertSeeHtml('value="all"')
+        ->assertDontSee('GA-01');
+
+    test()->actingAs($generalAdmin)
+        ->get(route('admin.campaigns.show', $visibleCampaign))
+        ->assertOk();
+
+    test()->actingAs($generalAdmin)
+        ->get(route('admin.campaigns.show', $hiddenCampaign))
+        ->assertForbidden();
+});
+
 it('hides the all filter option from community admins', function () {
     Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
 
@@ -177,6 +214,20 @@ it('hides the all filter option from community admins', function () {
         ->assertDontSeeHtml('value="all"')
         ->assertSee('CA-33');
 });
+
+it('redirects property owners and delegated vote users away from campaigns', function (string $role) {
+    Role::query()->firstOrCreate(['name' => $role]);
+
+    $user = User::factory()->create();
+    $user->assignRole($role);
+
+    test()->actingAs($user)
+        ->get(route('admin.campaigns'))
+        ->assertRedirect();
+})->with([
+    Role::PROPERTY_OWNER,
+    Role::DELEGATED_VOTE,
+]);
 
 it('saves the current campaign form as a reusable template', function () {
     $user = adminUser();

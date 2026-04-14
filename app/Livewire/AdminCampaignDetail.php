@@ -36,6 +36,7 @@ class AdminCampaignDetail extends Component
     public function mount(Campaign $campaign): void
     {
         $this->authorizeViewAny();
+        $this->authorize('view', $campaign);
 
         $this->campaign = $campaign;
         $this->refreshCampaign();

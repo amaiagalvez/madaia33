@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use App\Models\Role;
 use App\Models\User;
 use App\Models\Location;
 use App\Models\CampaignTemplate;
@@ -50,16 +49,36 @@ class CampaignAdminOptions
      */
     public function recipientFilterOptions(): array
     {
+        $accessScope = $this->user?->campaignAccessScope() ?? 'none';
+
+        if ($accessScope === 'none') {
+            return [];
+        }
+
         $options = [];
 
-        if ($this->user?->hasRole(Role::COMMUNITY_ADMIN) !== true) {
+        if (in_array($accessScope, ['all-filters', 'all-only'], true)) {
             $options[] = ['value' => 'all', 'label' => __('campaigns.admin.filters.all')];
         }
 
+        if ($accessScope === 'all-only') {
+            return $options;
+        }
+
+        $managedLocationIds = $accessScope === 'managed-locations'
+            ? ($this->user?->managedLocations()->pluck('locations.id')->all() ?? [])
+            : null;
+
         $locations = Location::query()
             ->whereIn('type', ['portal', 'garage'])
-            ->when($this->user?->hasRole(Role::COMMUNITY_ADMIN), function ($query): void {
-                $query->whereIn('id', $this->user?->managedLocations()->pluck('locations.id')->all() ?? []);
+            ->when(is_array($managedLocationIds), function ($query) use ($managedLocationIds): void {
+                if ($managedLocationIds === []) {
+                    $query->whereRaw('1 = 0');
+
+                    return;
+                }
+
+                $query->whereIn('id', $managedLocationIds);
             })
             ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
             ->orderBy('code')
@@ -104,10 +123,18 @@ class CampaignAdminOptions
 
     public function defaultRecipientFilter(): string
     {
-        return collect($this->recipientFilterOptions())
+        $firstAllowedFilter = collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->first(fn(mixed $value): bool => is_string($value) && $value !== '')
-            ?? 'all';
+            ->first(fn(mixed $value): bool => is_string($value) && $value !== '');
+
+        if (is_string($firstAllowedFilter) && $firstAllowedFilter !== '') {
+            return $firstAllowedFilter;
+        }
+
+        return match ($this->user?->campaignAccessScope()) {
+            'all-filters', 'all-only' => 'all',
+            default => '',
+        };
     }
 
     public function labelForRecipientFilter(?string $filter): string

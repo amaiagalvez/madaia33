@@ -62,7 +62,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 
@@ -213,6 +213,28 @@ class User extends Authenticatable
         ]);
     }
 
+    public function canManageCampaigns(): bool
+    {
+        return $this->campaignAccessScope() !== 'none';
+    }
+
+    public function campaignAccessScope(): string
+    {
+        if ($this->hasRole(Role::SUPER_ADMIN)) {
+            return 'all-filters';
+        }
+
+        if ($this->hasRole(Role::GENERAL_ADMIN)) {
+            return 'all-only';
+        }
+
+        if ($this->hasRole(Role::COMMUNITY_ADMIN)) {
+            return 'managed-locations';
+        }
+
+        return 'none';
+    }
+
     public function canUseDelegatedVoting(): bool
     {
         return $this->hasRole(Role::DELEGATED_VOTE);
@@ -252,8 +274,8 @@ class User extends Authenticatable
     public function syncRoleNames(array $roles): void
     {
         $normalizedRoles = collect($roles)
-            ->filter(static fn (string $role): bool => in_array($role, Role::names(), true))
-            ->reject(fn (string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
+            ->filter(static fn(string $role): bool => in_array($role, Role::names(), true))
+            ->reject(fn(string $role): bool => $this->isSuperadmin() && $role !== Role::SUPER_ADMIN)
             ->unique()
             ->values();
 
