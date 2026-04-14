@@ -33,7 +33,7 @@ return [
         'sent_at' => 'Fecha de envío',
         'created_at' => 'Fecha de creación',
         'attachments' => 'Adjuntos',
-        'attachments_help' => 'Archivos permitidos: PDF, DOCX, XLSX, JPG y PNG. Máximo 20 MB por archivo.',
+        'attachments_help' => 'Archivos permitidos: PDF, DOCX, XLSX, JPG, JPEG y PNG. Máximo 20 MB por archivo.',
         'valid_recipients' => 'Destinatarias válidas',
         'coprop1' => 'Copropietaria 1',
         'coprop2' => 'Copropietaria 2',

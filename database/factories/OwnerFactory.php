@@ -26,7 +26,6 @@ class OwnerFactory extends Factory
             'coprop1_telegram_id' => null,
             'coprop1_email' => fake()->unique()->safeEmail(),
             'language' => SupportedLocales::default(),
-            'preferred_locale' => null,
             'coprop2_name' => null,
             'coprop2_surname' => null,
             'coprop2_dni' => null,

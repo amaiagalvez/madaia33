@@ -3,6 +3,8 @@
 namespace App\Services\Messaging;
 
 use App\Mail\CampaignMail;
+use App\Models\Setting;
+use App\Support\ConfiguredMailSettings;
 use App\Models\CampaignRecipient;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
@@ -12,6 +14,16 @@ class LaravelMailEmailProvider implements EmailProvider
 {
     public function send(CampaignRecipient $recipient, string $subject, string $body): void
     {
+        app(ConfiguredMailSettings::class)->apply(Setting::stringValues([
+            'from_address',
+            'from_name',
+            'smtp_host',
+            'smtp_port',
+            'smtp_username',
+            'smtp_password',
+            'smtp_encryption',
+        ]));
+
         $trackingPixelUrl = URL::to('/track/open/' . $recipient->tracking_token);
 
         $documents = $recipient->campaign

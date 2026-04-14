@@ -151,5 +151,16 @@ return [
         ],
     ],
 
-    'attributes' => [],
+    'attributes' => [
+        'name' => 'txantiloiaren izena',
+        'subjectEu' => 'gaia euskaraz',
+        'subjectEs' => 'gaia gaztelaniaz',
+        'bodyEu' => 'edukia euskaraz',
+        'bodyEs' => 'edukia gaztelaniaz',
+        'channel' => 'kanala',
+        'recipientFilter' => 'hartzaile-iragazkia',
+        'selectedTemplateId' => 'txantiloia',
+        'scheduledAt' => 'programatutako data',
+        'attachments' => 'eranskinak',
+    ],
 ];

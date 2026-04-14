@@ -44,6 +44,49 @@ it('dispatch campaign job enqueues one send job per resolved recipient', functio
     expect(CampaignRecipient::query()->where('campaign_id', $campaign->id)->count())->toBe(2);
 });
 
+it('uses the owner language field for localized campaign content', function () {
+    $sentPayload = (object) [
+        'subject' => null,
+        'body' => null,
+    ];
+
+    app()->bind(EmailProvider::class, fn () => new class($sentPayload) implements EmailProvider {
+        public function __construct(private object $sentPayload) {}
+
+        public function send(CampaignRecipient $recipient, string $subject, string $body): void
+        {
+            $this->sentPayload->subject = $subject;
+            $this->sentPayload->body = $body;
+        }
+    });
+
+    $owner = Owner::factory()->create([
+        'language' => 'es',
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'email',
+        'subject_eu' => 'Gaia EU',
+        'subject_es' => 'Asunto ES',
+        'body_eu' => 'Edukia EU',
+        'body_es' => 'Contenido ES',
+        'status' => 'sending',
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => 'owner@example.test',
+        'status' => 'pending',
+    ]);
+
+    (new SendCampaignMessageJob($recipient->id))->handle(new MessageVariableResolver, app(EmailProvider::class));
+
+    expect($sentPayload->subject)->toBe('Asunto ES')
+        ->and($sentPayload->body)->toBe('Contenido ES');
+});
+
 it('records tracking event and increments owner counter on failed send', function () {
     app()->bind(EmailProvider::class, fn () => new class implements EmailProvider {
         public function send(CampaignRecipient $recipient, string $subject, string $body): void

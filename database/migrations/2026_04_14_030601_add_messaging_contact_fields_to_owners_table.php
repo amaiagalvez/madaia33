@@ -1,6 +1,5 @@
 <?php
 
-use App\SupportedLocales;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -14,7 +13,6 @@ return new class extends Migration {
         Schema::table('owners', function (Blueprint $table) {
             $table->string('coprop1_telegram_id')->nullable()->after('coprop1_phone');
             $table->string('coprop2_telegram_id')->nullable()->after('coprop2_phone');
-            $table->enum('preferred_locale', SupportedLocales::all())->nullable()->after('coprop2_telegram_id');
 
             $table->unsignedTinyInteger('coprop1_email_error_count')->default(0);
             $table->boolean('coprop1_email_invalid')->default(false);
@@ -39,7 +37,6 @@ return new class extends Migration {
             $table->dropColumn([
                 'coprop1_telegram_id',
                 'coprop2_telegram_id',
-                'preferred_locale',
                 'coprop1_email_error_count',
                 'coprop1_email_invalid',
                 'coprop1_phone_error_count',

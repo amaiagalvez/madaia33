@@ -4,6 +4,7 @@
 // Validates: Requirements 11.6, 12.4, 13.4
 
 use App\Models\Image;
+use Database\Seeders\DevSeeder;
 use App\Models\Notice;
 use Livewire\Livewire;
 use App\Mail\TestEmail;
@@ -154,6 +155,17 @@ it('stores contact subjects by language in contact_form', function () {
 
     expect(settingValue('contact_form_subject_eu'))->toBe('Gaia pertsonalizatua EU')
         ->and(settingValue('contact_form_subject_es'))->toBe('Asunto personalizado ES');
+});
+
+it('dev seeder configures local email settings for mailhog', function () {
+    artisan('db:seed', ['--class' => DevSeeder::class])->assertExitCode(0);
+
+    expect(settingValue('from_address'))->toBe('info@mailhog.local')
+        ->and(settingValue('from_name'))->toBe('Komunitatea Local')
+        ->and(settingValue('smtp_host'))->toBe('mailhog')
+        ->and(settingValue('smtp_port'))->toBe('1025')
+        ->and(settingValue('smtp_username'))->toBe('')
+        ->and(settingValue('smtp_encryption'))->toBe('');
 });
 
 it('stores mail configuration in settings table', function () {
@@ -421,7 +433,7 @@ it('dashboard uses the front logo configured in settings', function () {
 it('factory-created settings have valid section', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

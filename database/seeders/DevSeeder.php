@@ -62,16 +62,39 @@ class DevSeeder extends Seeder
 
     private function seedMailhogSettings(): void
     {
-        // Configure for mailhog in local development
-        Setting::upsert([
-            ['key' => 'from_address', 'value' => 'info@mailhog.local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'from_name', 'value' => 'Komunitatea Local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_host', 'value' => 'mailhog', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_port', 'value' => '1025', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_username', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_password', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_encryption', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-        ], ['key'], ['value', 'section']);
+        $settings = [
+            'from_address' => $this->devMailValue('MAIL_FROM_ADDRESS', 'info@mailhog.local'),
+            'from_name' => $this->devMailValue('MAIL_FROM_NAME', 'Komunitatea Local'),
+            'smtp_host' => $this->devMailValue('MAIL_HOST', 'mailhog'),
+            'smtp_port' => $this->devMailValue('MAIL_PORT', '1025'),
+            'smtp_username' => $this->devMailValue('MAIL_USERNAME', ''),
+            'smtp_password' => $this->devMailValue('MAIL_PASSWORD', ''),
+            'smtp_encryption' => $this->devMailValue('MAIL_ENCRYPTION', ''),
+        ];
+
+        Setting::upsert(
+            collect($settings)
+                ->map(fn(string $value, string $key): array => [
+                    'key' => $key,
+                    'value' => $value,
+                    'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+                ])
+                ->values()
+                ->all(),
+            ['key'],
+            ['value', 'section'],
+        );
+    }
+
+    private function devMailValue(string $key, string $default): string
+    {
+        $value = trim((string) env($key, ''));
+
+        if ($value === '' || strtolower($value) === 'xxxxx') {
+            return $default;
+        }
+
+        return $value;
     }
 
     // -------------------------------------------------------------------------
@@ -488,7 +511,7 @@ class DevSeeder extends Seeder
                 }
 
                 $delegatedOwner = $eligibleOwners->first(
-                    fn (Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
+                    fn(Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
                 );
 
                 if (! $delegatedOwner instanceof Owner || ! $delegatedUser instanceof User) {
@@ -507,7 +530,7 @@ class DevSeeder extends Seeder
                 $votedIds = collect([$selfVotingOwner?->id, $delegatedOwner->id])->filter()->values();
 
                 $eligibleOwners
-                    ->reject(fn (Owner $owner): bool => $votedIds->contains($owner->id))
+                    ->reject(fn(Owner $owner): bool => $votedIds->contains($owner->id))
                     ->take(4)
                     ->each(function (Owner $owner) use ($castVotingBallotAction, $voting): void {
                         if ($owner->user === null) {
@@ -556,7 +579,7 @@ class DevSeeder extends Seeder
 
                     $owner->loadMissing('activeAssignments.property');
                     $ownerPct = $owner->activeAssignments
-                        ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+                        ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
 
                     $ballot = VotingBallot::create([
                         'voting_id' => $voting->id,

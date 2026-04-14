@@ -36,15 +36,18 @@ property_assignments => Propiedades
 owners => Propietarias
 
 # Home
-- [ ] Osatu pribatutasun-politika eta lege-oharrak testuak
 - [ ] Cookies sartu
-- [ ] legeak.html begiratu
-
-- [ ] deploy
-    - [ ] se boorran las carpetas del storage
-    - [ ] no se sube la carpeta build
-    - [ ] se pierde el storage link
 - [ ] config recaptcha, analitics
+
+- [ ] otro botón para poner la cola en marcha php artisan queue:work
+- [ ] no veo el botón de reenviar a los quee no lo han abierto
+- [ ] crear una plantilla con la plantilla que se usa para eenviar el email de welcome 
+- [ ] han fallado el envio de algunos emails y no los ha marcado como que tienen problemas
+- [ ] mover el menu debajo de Mezuak
+- [ ] no se guardan los documentoos añadidos
+- [ ] confirmación en los bootones 
+- [ ] traducciones
+- [ ] al copiar que se abra directamente el formulario de la neuva
 
 https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
 
@@ -55,11 +58,9 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-- [x] para que ese el campo preferred_locale? Si es para el idioma usar language
-
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
-- Deialdiak sartzeko formularioa + pdf + emailez bidali
+- Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
