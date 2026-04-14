@@ -208,10 +208,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn (mixed $timestamp): int => (int) $timestamp)
+            ->map(fn(mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 
@@ -303,13 +303,13 @@ class ContactForm extends Component
     public function render(): View
     {
         $settings = $this->settings();
-
-        $legalText = Setting::localizedStringFrom($settings, 'legal_checkbox_text', __('contact.legal_text'));
-
+        $checkboxLabel = __('contact.legal_text');
+        $legalModalText = Setting::localizedStringFrom($settings, 'legal_checkbox_text', $checkboxLabel);
         $siteKey = $settings['recaptcha_site_key'] ?? '';
 
         return view('livewire.front.contact-form', [
-            'legalText' => $legalText,
+            'checkboxLabel' => $checkboxLabel,
+            'legalModalText' => $legalModalText,
             'siteKey' => $siteKey,
         ]);
     }

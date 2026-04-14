@@ -21,7 +21,7 @@ return [
     'subject' => 'Gaia',
     'message' => 'Mezua',
     'send' => 'Bidali',
-    'legal_text' => 'Pribatutasun-politika irakurri eta onartzen dut.',
+    'legal_text' => 'Pribatutasun politika irakurri eta onartzen dut.',
     'success' => 'Zure mezua bidali da. Eskerrik asko!',
     'success_hint' => 'Laster erantzungo dizugu emandako helbide elektronikora.',
     'error' => 'Errore bat gertatu da. Saiatu berriro.',

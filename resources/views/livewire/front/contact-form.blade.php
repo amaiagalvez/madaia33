@@ -175,17 +175,20 @@
                     {{-- Legal checkbox --}}
                     <div class="mb-6">
                         <div class="flex items-start gap-2">
+                            <label for="contact-legal"
+                                class="sr-only">{{ $checkboxLabel }}</label>
                             <input id="contact-legal" type="checkbox" wire:model="legalAccepted"
                                 class="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]"
                                 aria-describedby="{{ $errors->has('legalAccepted') ? 'contact-legal-error' : '' }}"
                                 aria-invalid="{{ $errors->has('legalAccepted') ? 'true' : 'false' }}">
-                            <label for="contact-legal" class="text-sm text-gray-700">
-                                <button type="button" @click="showLegalModal = true"
-                                    class="underline decoration-[#d9755b]/40 underline-offset-4 hover:text-[#793d3d]">
-                                    {{ strip_tags($legalText) }}
+                            <div class="text-sm text-gray-700">
+                                <button type="button" @click.prevent.stop="showLegalModal = true"
+                                    class="cursor-pointer text-left underline decoration-[#d9755b]/40 underline-offset-4 hover:text-[#793d3d]"
+                                    data-test="contact-legal-modal-trigger">
+                                    {{ $checkboxLabel }}
                                 </button>
                                 <span aria-hidden="true" class="text-red-500">*</span>
-                            </label>
+                            </div>
                         </div>
                         @error('legalAccepted')
                             <p id="contact-legal-error" class="text-red-600 text-sm mt-1">
@@ -215,15 +218,17 @@
                 </form>
 
                 <template x-teleport="body">
-                    <dialog x-cloak x-show="showLegalModal"
-                        x-on:keydown.escape.window="showLegalModal = false" x-transition.opacity
-                        class="fixed inset-0 z-50 m-0 h-full w-full max-h-none max-w-none border-0 bg-transparent p-4 sm:p-6"
-                        aria-modal="true" aria-label="{{ __('general.footer.privacy_policy') }}">
-                        <div class="absolute inset-0 bg-black/50" @click="showLegalModal = false">
+                    <div x-cloak x-show="showLegalModal" x-transition.opacity
+                        x-on:keydown.escape.window="showLegalModal = false"
+                        class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+                        aria-modal="true" role="dialog"
+                        aria-label="{{ __('general.footer.privacy_policy') }}">
+                        <div class="absolute inset-0 bg-black/50" @click="showLegalModal = false"
+                            aria-hidden="true">
                         </div>
 
                         <div class="relative z-10 w-full max-w-3xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl"
-                            @click.stop>
+                            @click.stop data-test="contact-legal-modal">
                             <div
                                 class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
                                 <h2 class="text-lg font-semibold text-gray-900">
@@ -231,7 +236,7 @@
                                 </h2>
                                 <button type="button" @click="showLegalModal = false"
                                     class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                                    aria-label="Cerrar modal">
+                                    aria-label="{{ __('general.buttons.close') }}">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor"
                                         aria-hidden="true">
@@ -241,12 +246,12 @@
                                 </button>
                             </div>
 
-                            <div
-                                class="max-h-[80vh] overflow-y-auto px-5 py-4 text-sm leading-6 text-gray-700">
-                                {!! $legalText !!}
+                            <div class="max-h-[80vh] overflow-y-auto px-5 py-4 text-sm leading-6 text-gray-700"
+                                data-test="contact-legal-modal-content">
+                                {!! $legalModalText !!}
                             </div>
                         </div>
-                    </dialog>
+                    </div>
                 </template>
 
                 @if ($siteKey)

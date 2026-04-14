@@ -10,7 +10,7 @@
         <div class="hero-frame px-5 py-5 sm:px-6">
             <div class="space-y-4 text-base leading-relaxed text-gray-700">
                 @if ($content)
-                    {!! nl2br(e($content)) !!}
+                    {!! $content !!}
                 @else
                     <p class="italic text-gray-500">{{ __($titleKey) }}</p>
                 @endif

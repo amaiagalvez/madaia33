@@ -37,8 +37,8 @@
                 </div>
             @else
                 <div
-                    class="relative flex aspect-video items-center justify-center overflow-hidden bg-linear-to-br from-[#edd2c7]/20 via-gray-100 to-gray-200 {{ $featured ? 'lg:aspect-auto lg:min-h-80' : '' }}">
-                    <svg class="h-10 w-10 text-[#d9755b]/30" fill="none" viewBox="0 0 24 24"
+                    class="relative flex min-h-20 items-center justify-center overflow-hidden bg-linear-to-br from-[#edd2c7]/20 via-gray-100 to-gray-200 {{ $featured ? 'lg:min-h-56' : 'sm:min-h-24' }}">
+                    <svg class="h-8 w-8 text-[#d9755b]/30" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
@@ -60,15 +60,13 @@
             @endif
 
             {{-- Title --}}
-            <div
-                class="font-bold text-gray-900 line-clamp-2 [&_p]:m-0 {{ $featured ? 'text-xl md:text-2xl lg:text-3xl' : 'text-base md:text-lg' }}"
+            <div class="font-bold text-gray-900 line-clamp-2 [&_p]:m-0 {{ $featured ? 'text-xl md:text-2xl lg:text-3xl' : 'text-base md:text-lg' }}"
                 data-notice-title>
                 {!! $notice->title !!}
             </div>
 
             {{-- Excerpt --}}
-            <div
-                class="leading-relaxed text-gray-600 [&_p]:m-0 {{ $featured ? 'text-sm md:text-base lg:text-lg' : 'text-sm md:text-base' }}"
+            <div class="leading-relaxed text-gray-600 [&_p]:m-0 {{ $featured ? 'text-sm md:text-base lg:text-lg' : 'text-sm md:text-base' }}"
                 data-notice-content>
                 {!! $notice->content !!}
             </div>
