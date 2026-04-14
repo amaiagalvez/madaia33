@@ -3,6 +3,7 @@
 return [
     'dashboard' => 'Panel de administración',
     'notices' => 'Avisos',
+    'campaigns' => 'Campañas',
     'gallery' => 'Galería',
     'messages' => 'Mensajes',
     'settings' => 'Configuración',

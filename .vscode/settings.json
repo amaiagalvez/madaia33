@@ -39,7 +39,8 @@
             "matchCommandLine": true
         },
         "docker rm": true,
-        "true": true
+        "true": true,
+        "id": true
     },
     "chat.promptFilesRecommendations": {
         "speckit.constitution": true,

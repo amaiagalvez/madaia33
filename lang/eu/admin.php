@@ -3,6 +3,7 @@
 return [
     'dashboard' => 'Aginte-panela',
     'notices' => 'Iragarkiak',
+    'campaigns' => 'Kanpainak',
     'gallery' => 'Argazki-bilduma',
     'messages' => 'Mezuak',
     'settings' => 'Ezarpenak',

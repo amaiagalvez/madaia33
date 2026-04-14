@@ -53,13 +53,13 @@ test('dev seeder creates owners, role users and seeded voting ballots', function
     expect(
         User::query()
             ->where('email', 'admin.general@email.eus')
-            ->whereHas('roles', fn($query) => $query->where('name', Role::GENERAL_ADMIN))
+            ->whereHas('roles', fn ($query) => $query->where('name', Role::GENERAL_ADMIN))
             ->exists()
     )->toBeTrue();
 
     $communityAdmin = User::query()
         ->where('email', 'admin.comunidad@email.eus')
-        ->whereHas('roles', fn($query) => $query->where('name', Role::COMMUNITY_ADMIN))
+        ->whereHas('roles', fn ($query) => $query->where('name', Role::COMMUNITY_ADMIN))
         ->first();
 
     expect($communityAdmin)->not->toBeNull();
@@ -67,7 +67,7 @@ test('dev seeder creates owners, role users and seeded voting ballots', function
 
     $propertyOwner = User::query()
         ->where('email', 'propietaria@email.eus')
-        ->whereHas('roles', fn($query) => $query->where('name', Role::PROPERTY_OWNER))
+        ->whereHas('roles', fn ($query) => $query->where('name', Role::PROPERTY_OWNER))
         ->first();
 
     expect($propertyOwner)->not->toBeNull();
@@ -77,7 +77,7 @@ test('dev seeder creates owners, role users and seeded voting ballots', function
     expect(
         User::query()
             ->where('email', 'voto.delegado@email.eus')
-            ->whereHas('roles', fn($query) => $query->where('name', Role::DELEGATED_VOTE))
+            ->whereHas('roles', fn ($query) => $query->where('name', Role::DELEGATED_VOTE))
             ->exists()
     )->toBeTrue();
 
