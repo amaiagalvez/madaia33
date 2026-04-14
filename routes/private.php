@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ArtisanController;
 use App\Http\Controllers\VotingPdfController;
 use App\Http\Controllers\PublicVotingController;
 
@@ -77,6 +78,13 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/usuarios', fn () => view('admin.users.index'))
         ->middleware('role:superadmin')
         ->name('users.index');
+
+    Route::post('/artisan/clear', [ArtisanController::class, 'clear'])
+        ->middleware('role:superadmin')
+        ->name('artisan.clear');
+    Route::post('/artisan/migrate-and-seed', [ArtisanController::class, 'migration_and_seeds'])
+        ->middleware('role:superadmin')
+        ->name('artisan.migrate_and_seed');
 });
 
 Route::middleware('auth')->post('/impersonacion/volver-a-mi-usuario', function (Request $request) {

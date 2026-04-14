@@ -2,12 +2,12 @@
     focusForm() {
             const formCard = this.$root.querySelector('#admin-notice-form-card');
             if (formCard) {
-                formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                formCard.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             const titleInput = this.$root.querySelector('#titleEu');
             if (titleInput) {
-                titleInput.focus();
+                titleInput.focus({ preventScroll: true });
             }
         },
         format(field, command) {

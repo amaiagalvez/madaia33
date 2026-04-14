@@ -10,7 +10,7 @@ use Laravel\Dusk\Browser;
 use App\Models\ContactMessage;
 
 test('admin can read a message and it gets marked as read', function () {
-    $admin = User::where('email', 'example@email.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
     $messageBody = 'Dusk test message body.';
 
     $message = ContactMessage::create([
@@ -59,7 +59,7 @@ test('admin can read a message and it gets marked as read', function () {
 });
 
 test('admin can delete a message with confirmation', function () {
-    $admin = User::where('email', 'example@email.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
     $deleteSubject = 'Delete Test Subject';
 
     $message = ContactMessage::create([

@@ -13,8 +13,7 @@
 - [ ] reepasar estatistikak home
 - [ ] añadir papelera para poder reestaurarr los borrrados
 - [ ] tipo votaciones, una persona un voto / por poorcentajes de participación
-- [ ] 
-- [ ] template de email compatible con los diferntes gestores de correo, que se use en el envio de correos. Incluido el texto legal que está configurado en la configuración del email
+
 - [ ] configurar el sentry
 - [ ] añadir debugbar y algo para ver los logs
 - [ ] datatables
@@ -41,7 +40,11 @@ owners => Propietarias
 - [ ] Cookies sartu
 - [ ] legeak.html begiratu
 
-- [ ] config email, recaptcha, analitics
+- [ ] deploy
+    - [ ] se boorran las carpetas del storage
+    - [ ] no se sube la carpeta build
+    - [ ] se pierde el storage link
+- [ ] config recaptcha, analitics
 
 https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
 
@@ -54,7 +57,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 # Panela
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
-- Deialdiak sartzeko formularioa + pdf
+- Deialdiak sartzeko formularioa + pdf + emailez bidali
 
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
@@ -85,6 +88,37 @@ crear una miniweb en html con las instrucciones para usar la aplicación, añade
 añadir una ruta al menú del panel 
 tiene que estar en dos idiomas eu y es
 - [ ] añadir una regla al agente amalur para que lo mantenga actualizado
+
+## Implementation Plan
+
+### Goal
+
+- [Balidazio-mezuak hizkuntza-tabs kanpoan erakustea eremu eleaniztunetan, input sinpleetan zein mini-editorrean, beti ikusgarri izan daitezen.]
+
+### Technical Decisions
+
+- [Konponketa `resources/views/components/admin/bilingual-tabs.blade.php` osagai partekatuan egingo da, inpaktu bera izan dezan `x-admin.bilingual-field-tabs` eta `x-admin.bilingual-rich-text-tabs` erabilera guztietan.]
+- [Tab bakoitzaren pane barruko errore-mezuen ordez, errore laburpen/errendatze komun bat jarriko da tabs bloke nagusiaren azpian, dagozkion locale-field guztietako lehen erroreak ikusgai mantenduz.]
+- [Balidazio-estilo bisualak pane barruko input/editoreetan mantenduko dira (`border-red-*`), baina mezu testuala kanpora aterako da irisgarritasuna eta ikusgarritasuna ez galtzeko.]
+
+### Execution Steps
+
+- [x]   1. `bilingual-tabs` osagaiaren markupa berrantolatu errore-mezuak tabs edukitik kanpo renderizatzeko.
+- [x]   2. Eguneratu edo gehitu Unit test bat osagai partekatuarentzat, errorea tabs kanpoan agertzen dela egiaztatzeko input eta rich-text moduetarako.
+- [x]   3. Exekutatu ukitutako test minimoak eta beharrezko formateoa/egiaztapenak Docker barruan.
+
+### Work Items
+
+- [x] `resources/views/components/admin/bilingual-tabs.blade.php`
+- [x] `tests/Unit/BilingualRichTextTabsComponentTest.php`
+- [ ] Baliteke test osagarri bat behar izatea `bilingual-field-tabs` erabilerarako
+
+### Validation
+
+- [ ] TDD-based implementation when possible
+- [x] Required formatting/lint checks
+- [x] Relevant test suite
+- [ ] Dusk tests when frontend/flow changes exist
 
 ## Txuletak
 /dusk-test pasar los dusk test

@@ -37,7 +37,7 @@ new class extends Component {
             'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
             'altEu' => 'nullable|string|max:255',
             'altEs' => 'nullable|string|max:255',
-            'tag' => 'required|string|in:historia,madaia',
+            'tag' => 'required|string|in:history,comunity',
         ]);
 
         $filename = $this->photo->hashName();
@@ -125,8 +125,8 @@ new class extends Component {
                         'label' => __('gallery.filter.history'),
                     ],
                     [
-                        'value' => \App\Models\Image::TAG_MADAIA,
-                        'label' => __('gallery.filter.madaia'),
+                        'value' => \App\Models\Image::TAG_COMUNITY,
+                        'label' => __('gallery.filter.comunity'),
                     ],
                 ]" />
 
@@ -197,7 +197,7 @@ new class extends Component {
                             </p>
                             <p class="truncate" data-image-tag="{{ $image->id }}">
                                 <span class="font-semibold">{{ __('gallery.admin.tag') }}:</span>
-                                {{ $image->tag === \App\Models\Image::TAG_HISTORY ? __('gallery.filter.history') : ($image->tag === \App\Models\Image::TAG_MADAIA ? __('gallery.filter.madaia') : '-') }}
+                                {{ $image->tag === \App\Models\Image::TAG_HISTORY ? __('gallery.filter.history') : ($image->tag === \App\Models\Image::TAG_COMUNITY ? __('gallery.filter.comunity') : '-') }}
                             </p>
                         </div>
                     </div>

@@ -53,10 +53,10 @@ class ImageFactory extends Factory
         ]);
     }
 
-    public function madaia(): static
+    public function comunity(): static
     {
         return $this->state([
-            'tag' => Image::TAG_MADAIA,
+            'tag' => Image::TAG_COMUNITY,
         ]);
     }
 }

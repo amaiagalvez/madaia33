@@ -118,13 +118,21 @@ class AppServiceProvider extends ServiceProvider
         View::composer([
             'components.front.public-brand-link',
             'front.public-brand-link',
+            'components.layouts.admin.main',
+            'components.layouts.front.main',
             'layouts.front.main',
             'layouts::front.main',
             'layouts.admin.main',
             'layouts::admin.main',
             'layouts.shared.auth.simple',
+            'layouts::shared.auth.simple',
+            '*::shared.auth.simple',
             'layouts.shared.auth.split',
+            'layouts::shared.auth.split',
+            '*::shared.auth.split',
             'layouts.shared.auth.card',
+            'layouts::shared.auth.card',
+            '*::shared.auth.card',
             'partials.shared.head',
         ], BrandingSettingsComposer::class);
     }

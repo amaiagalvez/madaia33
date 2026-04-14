@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use App\Support\EmailLegalText;
 use App\Support\ContactMailData;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
@@ -35,7 +36,7 @@ abstract class AbstractContactMail extends Mailable
         $this->visitorName = $mailData->visitorName;
         $this->messageSubject = $mailData->messageSubject;
         $this->messageBody = $mailData->messageBody;
-        $this->legalText = $mailData->legalText;
+        $this->legalText = $mailData->legalText ?? EmailLegalText::resolve();
         $this->fromAddress = $fromAddress;
         $this->fromName = $fromName;
     }

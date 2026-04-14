@@ -9,7 +9,7 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 
 test('admin can upload an image and it appears in the public gallery', function () {
-    $admin = User::where('email', 'example@email.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
     $altText = 'Dusk test irudia ' . time();
 
     // Create a temporary test image inside the container's temp dir
@@ -32,8 +32,8 @@ test('admin can upload an image and it appears in the public gallery', function 
 
         // Fill alt text and submit
         $browser->type('#altEu', $altText)
-            ->waitFor('[data-admin-pill-option="madaia"]', 5)
-            ->click('[data-admin-pill-option="madaia"]')
+            ->waitFor('[data-admin-pill-option="comunity"]', 5)
+            ->click('[data-admin-pill-option="comunity"]')
             ->press('Argazkia igo')
             ->waitUntil("document.body.innerText.includes('" . addslashes($altText) . "')", 30)
             ->assertScript("return document.body.innerText.includes('" . addslashes($altText) . "');", true);

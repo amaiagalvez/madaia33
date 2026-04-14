@@ -197,19 +197,19 @@ test('home page uses configurable history summary from front settings', function
         ->assertSee($historyByLocale[$locale], false);
 })->with('supported_locales');
 
-test('home page history section shows first three historia images stacked and excludes non-historia', function () {
+test('home page history section shows first three history images stacked and excludes non-history', function () {
     Storage::fake('public');
 
     Storage::disk('public')->put('images/history-test-1.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
     Storage::disk('public')->put('images/history-test-2.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
     Storage::disk('public')->put('images/history-test-3.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
     Storage::disk('public')->put('images/history-test-4.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
-    Storage::disk('public')->put('images/madaia-test.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
+    Storage::disk('public')->put('images/comunity-test.svg', '<svg xmlns="http://www.w3.org/2000/svg" />');
 
     Image::factory()->create([
-        'filename' => 'madaia-test.svg',
-        'path' => 'images/madaia-test.svg',
-        'tag' => Image::TAG_MADAIA,
+        'filename' => 'comunity-test.svg',
+        'path' => 'images/comunity-test.svg',
+        'tag' => Image::TAG_COMUNITY,
     ]);
 
     Image::factory()->create([
@@ -252,5 +252,5 @@ test('home page history section shows first three historia images stacked and ex
         ->toContain('/storage/images/history-test-2.svg')
         ->toContain('/storage/images/history-test-3.svg')
         ->not->toContain('/storage/images/history-test-4.svg')
-        ->not->toContain('/storage/images/madaia-test.svg');
+        ->not->toContain('/storage/images/comunity-test.svg');
 });

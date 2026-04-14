@@ -6,6 +6,7 @@ use App\SupportedLocales;
 use Database\Factories\OwnerFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,12 +19,14 @@ class Owner extends Model
     protected $fillable = [
         'user_id',
         'coprop1_name',
+        'coprop1_surname',
         'coprop1_dni',
         'coprop1_phone',
         'coprop1_email',
         'language',
         'accepted_terms_at',
         'coprop2_name',
+        'coprop2_surname',
         'coprop2_dni',
         'coprop2_phone',
         'coprop2_email',
@@ -109,5 +112,34 @@ class Owner extends Model
     public function auditLogs(): HasMany
     {
         return $this->hasMany(OwnerAuditLog::class);
+    }
+
+    protected static function newFactory(): OwnerFactory
+    {
+        return OwnerFactory::new();
+    }
+
+    /**
+     * @return Attribute<string, never>
+     */
+    protected function fullName1(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => trim(
+                (string) $this->coprop1_name . ' ' . (string) $this->coprop1_surname,
+            ),
+        );
+    }
+
+    /**
+     * @return Attribute<string, never>
+     */
+    protected function fullName2(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => trim(
+                (string) $this->coprop2_name . ' ' . (string) $this->coprop2_surname,
+            ),
+        );
     }
 }

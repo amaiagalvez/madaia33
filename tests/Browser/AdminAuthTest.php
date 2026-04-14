@@ -12,7 +12,7 @@ test('admin can login with valid credentials and is redirected to dashboard', fu
     $this->browse(function (Browser $browser) {
         $browser->visit('/login')
             ->waitFor('input[name=email]', 5)
-            ->type('input[name=email]', 'example@email.eus')
+            ->type('input[name=email]', 'info@madaia33.eus')
             ->type('input[name=password]', 'password')
             ->press('[data-test="login-button"]')
             ->waitForLocation('/admin')
@@ -27,7 +27,7 @@ test('admin login with invalid credentials shows error', function () {
         $browser->visit('/_dusk/logout')
             ->visit('/login')
             ->waitFor('input[name=email]', 5)
-            ->type('input[name=email]', 'example@email.eus')
+            ->type('input[name=email]', 'info@madaia33.eus')
             ->type('input[name=password]', 'wrong-password')
             ->press('[data-test="login-button"]')
             ->pause(2000)

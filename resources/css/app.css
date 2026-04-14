@@ -137,6 +137,24 @@
         background-color: color-mix(in srgb, var(--color-brand-600) 24%, white);
         color: var(--color-brand-900);
     }
+
+    /* Rich-text content from settings: style embedded links with brand palette */
+    .rich-content a {
+        color: var(--color-brand-600);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        transition: color 0.15s ease;
+    }
+
+    .rich-content a:hover {
+        color: var(--color-brand-900);
+    }
+
+    .rich-content a:focus-visible {
+        outline: 2px solid var(--color-brand-600);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
 }
 
 @layer utilities {

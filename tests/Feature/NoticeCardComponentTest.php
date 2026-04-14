@@ -1,22 +1,23 @@
 <?php
 
 use App\Models\Notice;
-use Illuminate\Support\Str;
 
 const DEFAULT_NOTICE_CARD_TEMPLATE = '<x-notice-card :notice="$notice" />';
 
 it('renders notice card component with all content', function () {
     $notice = Notice::factory()->public()->create([
-        'title_eu' => 'Preba iragarkia',
-        'title_es' => 'Aviso de prueba',
-        'content_eu' => 'Hau da preba baten edukia.',
-        'content_es' => 'Este es el contenido de una prueba.',
+        'title_eu' => '<strong>Preba</strong> iragarkia',
+        'title_es' => '<strong>Aviso</strong> de prueba',
+        'content_eu' => '<p>Hau da <em>preba</em> baten edukia.</p>',
+        'content_es' => '<p>Este es el contenido de una <em>prueba</em>.</p>',
     ]);
 
     $view = test()->blade(DEFAULT_NOTICE_CARD_TEMPLATE, ['notice' => $notice]);
 
-    $view->assertSee('Preba iragarkia');
-    $view->assertSee(Str::limit($notice->content, 120, '...'));
+    $view->assertSee('<strong>Preba</strong> iragarkia', false);
+    $view->assertSee('<p>Hau da <em>preba</em> baten edukia.</p>', false);
+    $view->assertDontSee('&lt;strong&gt;Preba&lt;/strong&gt; iragarkia', false);
+    $view->assertDontSee('&lt;p&gt;Hau da &lt;em&gt;preba&lt;/em&gt; baten edukia.&lt;/p&gt;', false);
 });
 
 it('renders placeholder image when showImage is true but no image provided', function () {

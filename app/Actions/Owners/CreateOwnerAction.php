@@ -89,11 +89,13 @@ class CreateOwnerAction
         $owner = new Owner([
             'user_id' => $user->id,
             'coprop1_name' => $data['coprop1_name'],
+            'coprop1_surname' => $data['coprop1_surname'] ?? null,
             'coprop1_dni' => $data['coprop1_dni'],
             'coprop1_phone' => $data['coprop1_phone'] ?? null,
             'coprop1_email' => $data['coprop1_email'],
             'language' => $data['language'] ?? SupportedLocales::default(),
             'coprop2_name' => $data['coprop2_name'] ?? null,
+            'coprop2_surname' => $data['coprop2_surname'] ?? null,
             'coprop2_dni' => $data['coprop2_dni'] ?? null,
             'coprop2_phone' => $data['coprop2_phone'] ?? null,
             'coprop2_email' => $data['coprop2_email'] ?? null,
@@ -177,7 +179,11 @@ class CreateOwnerAction
             __('admin.owners.email.default_body'),
         ) ?? __('admin.owners.email.default_body'));
 
-        $bodyHtml = str_replace('##info##', $this->buildAssignmentsInfoHtml($data), $bodyTemplate);
+        $bodyHtml = str_replace(
+            ['##izena##', '##info##'],
+            [(string) ($data['coprop1_name'] ?? $user->name), $this->buildAssignmentsInfoHtml($data)],
+            $bodyTemplate,
+        );
 
         $resetToken = Password::createToken($user);
         $resetUrl = route('password.reset', [

@@ -11,9 +11,10 @@
                 </flux:heading>
 
                 <x-admin.owner-shared-fields mode="wire" coprop1-name-model="editCoprop1Name"
-                    coprop1-dni-model="editCoprop1Dni" coprop1-phone-model="editCoprop1Phone"
-                    coprop1-email-model="editCoprop1Email" language-model="editLanguage"
-                    coprop2-name-model="editCoprop2Name" coprop2-dni-model="editCoprop2Dni"
+                    coprop1-surname-model="editCoprop1Surname" coprop1-dni-model="editCoprop1Dni"
+                    coprop1-phone-model="editCoprop1Phone" coprop1-email-model="editCoprop1Email"
+                    language-model="editLanguage" coprop2-name-model="editCoprop2Name"
+                    coprop2-dni-model="editCoprop2Dni" coprop2-surname-model="editCoprop2Surname"
                     coprop2-phone-model="editCoprop2Phone" coprop2-email-model="editCoprop2Email" />
 
                 <details class="mt-6 rounded-lg border border-zinc-200 bg-gray-50"
@@ -113,6 +114,12 @@
                                 <flux:error name="coprop1Name" />
                             </flux:field>
                             <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop1_surname') }}
+                                </flux:label>
+                                <flux:input wire:model="coprop1Surname" />
+                                <flux:error name="coprop1Surname" />
+                            </flux:field>
+                            <flux:field>
                                 <flux:label>{{ __('admin.owners.form.coprop1_dni') }}</flux:label>
                                 <flux:input wire:model="coprop1Dni" />
                                 <flux:error name="coprop1Dni" />
@@ -152,6 +159,12 @@
                                 <flux:label>{{ __('admin.owners.form.coprop2_name') }}</flux:label>
                                 <flux:input wire:model="coprop2Name" />
                                 <flux:error name="coprop2Name" />
+                            </flux:field>
+                            <flux:field>
+                                <flux:label>{{ __('admin.owners.form.coprop2_surname') }}
+                                </flux:label>
+                                <flux:input wire:model="coprop2Surname" />
+                                <flux:error name="coprop2Surname" />
                             </flux:field>
                             <flux:field>
                                 <flux:label>{{ __('admin.owners.form.coprop2_dni') }}</flux:label>
@@ -325,7 +338,7 @@
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900">
 
-                        <div class="font-medium"> {{ $owner->coprop1_name }}
+                        <div class="font-medium"> {{ $owner->full_name1 }}
                             <span class="text-xs leading-5 text-gray-500">
                                 [{{ $owner->language }}]
                             </span>
@@ -337,8 +350,9 @@
                             {{ $owner->coprop1_phone }}</div>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
-                        <div class="font-medium text-gray-900">{{ $owner->coprop2_name }}
+                        <div class="font-medium text-gray-900">{{ $owner->full_name2 }}
                         </div>
+
                         <div class="mt-1 text-xs leading-5 text-gray-500">
                             {{ $owner->coprop2_email }}
                         </div>

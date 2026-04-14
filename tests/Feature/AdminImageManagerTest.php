@@ -27,13 +27,13 @@ it('uploading an image makes it appear in public gallery', function () {
         ->set('photo', $file)
         ->set('altEu', 'Argazkia')
         ->set('altEs', 'Imagen')
-        ->set('tag', Image::TAG_MADAIA)
+        ->set('tag', Image::TAG_COMUNITY)
         ->call('uploadImage');
 
     $image = Image::first();
     expect($image)->not->toBeNull();
     expect($image->alt_text_eu)->toBe('Argazkia');
-    expect($image->tag)->toBe(Image::TAG_MADAIA);
+    expect($image->tag)->toBe(Image::TAG_COMUNITY);
 
     expect(Storage::disk('public')->exists($image->path))->toBeTrue();
 

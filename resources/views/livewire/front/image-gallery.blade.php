@@ -13,23 +13,23 @@
                     ])>
                     {{ __('gallery.filter.all') }}
                 </button>
-                <button type="button" wire:click="setTagFilter('historia')"
-                    data-gallery-filter="historia" @class([
+                <button type="button" wire:click="setTagFilter('history')"
+                    data-gallery-filter="history" @class([
                         'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
-                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === 'historia',
+                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === 'history',
                         'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
-                            $activeTag !== 'historia',
+                            $activeTag !== 'history',
                     ])>
                     {{ __('gallery.filter.history') }}
                 </button>
-                <button type="button" wire:click="setTagFilter('madaia')"
-                    data-gallery-filter="madaia" @class([
+                <button type="button" wire:click="setTagFilter('comunity')"
+                    data-gallery-filter="comunity" @class([
                         'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
-                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === 'madaia',
+                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === 'comunity',
                         'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
-                            $activeTag !== 'madaia',
+                            $activeTag !== 'comunity',
                     ])>
-                    {{ __('gallery.filter.madaia') }}
+                    {{ __('gallery.filter.comunity') }}
                 </button>
             </div>
         </x-slot:actions>

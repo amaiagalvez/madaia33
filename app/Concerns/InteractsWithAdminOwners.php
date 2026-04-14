@@ -19,11 +19,13 @@ trait InteractsWithAdminOwners
         return [
             'ownerId' => ['nullable', 'integer', 'min:1', 'unique:owners,id'],
             'coprop1Name' => ['required', 'string', 'max:255'],
-            'coprop1Dni' => ['required', 'string', 'max:20', 'unique:owners,coprop1_dni'],
+            'coprop1Surname' => ['nullable', 'string', 'max:255'],
+            'coprop1Dni' => ['nullable', 'string', 'max:20', 'unique:owners,coprop1_dni'],
             'coprop1Phone' => ['nullable', 'string', 'max:20'],
-            'coprop1Email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'coprop1Email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
             'language' => ['required', 'string', 'in:eu,es'],
             'coprop2Name' => ['nullable', 'string', 'max:255'],
+            'coprop2Surname' => ['nullable', 'string', 'max:255'],
             'coprop2Dni' => ['nullable', 'string', 'max:20'],
             'coprop2Phone' => ['nullable', 'string', 'max:20'],
             'coprop2Email' => ['nullable', 'email', 'max:255'],
@@ -56,11 +58,13 @@ trait InteractsWithAdminOwners
         return [
             'ownerId' => __('admin.owners.form.id'),
             'coprop1Name' => __('admin.owners.form.coprop1_name'),
+            'coprop1Surname' => __('admin.owners.form.coprop1_surname'),
             'coprop1Dni' => __('admin.owners.form.coprop1_dni'),
             'coprop1Phone' => __('admin.owners.form.coprop1_phone'),
             'coprop1Email' => __('admin.owners.form.coprop1_email'),
             'language' => __('admin.owners.form.language'),
             'coprop2Name' => __('admin.owners.form.coprop2_name'),
+            'coprop2Surname' => __('admin.owners.form.coprop2_surname'),
             'coprop2Dni' => __('admin.owners.form.coprop2_dni'),
             'coprop2Phone' => __('admin.owners.form.coprop2_phone'),
             'coprop2Email' => __('admin.owners.form.coprop2_email'),
@@ -75,11 +79,13 @@ trait InteractsWithAdminOwners
         $this->reset([
             'ownerId',
             'coprop1Name',
+            'coprop1Surname',
             'coprop1Dni',
             'coprop1Phone',
             'coprop1Email',
             'language',
             'coprop2Name',
+            'coprop2Surname',
             'coprop2Dni',
             'coprop2Phone',
             'coprop2Email',
@@ -171,10 +177,12 @@ trait InteractsWithAdminOwners
 
             $searchQuery
                 ->where('coprop1_name', 'like', $like)
+                ->orWhere('coprop1_surname', 'like', $like)
                 ->orWhere('coprop1_dni', 'like', $like)
                 ->orWhere('coprop1_phone', 'like', $like)
                 ->orWhere('coprop1_email', 'like', $like)
                 ->orWhere('coprop2_name', 'like', $like)
+                ->orWhere('coprop2_surname', 'like', $like)
                 ->orWhere('coprop2_dni', 'like', $like)
                 ->orWhere('coprop2_phone', 'like', $like)
                 ->orWhere('coprop2_email', 'like', $like)

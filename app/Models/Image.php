@@ -17,9 +17,9 @@ class Image extends Model
     use ResolvesLocalizedAttributes;
     use SoftDeletes;
 
-    public const TAG_HISTORY = 'historia';
+    public const TAG_HISTORY = 'history';
 
-    public const TAG_MADAIA = 'madaia';
+    public const TAG_COMUNITY = 'comunity';
 
     protected $fillable = [
         'filename',
@@ -36,7 +36,7 @@ class Image extends Model
     {
         return [
             self::TAG_HISTORY,
-            self::TAG_MADAIA,
+            self::TAG_COMUNITY,
         ];
     }
 

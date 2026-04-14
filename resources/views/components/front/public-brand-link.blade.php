@@ -4,7 +4,7 @@
 ])
 
 @php
-    $resolvedSiteName = $publicSiteName ?? config('app.name', 'Madaia');
+    $resolvedSiteName = $publicSiteName ?? config('app.name', '-');
     $resolvedLogoUrl = $publicLogoUrl ?? '';
 @endphp
 

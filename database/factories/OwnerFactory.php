@@ -20,11 +20,13 @@ class OwnerFactory extends Factory
         return [
             'user_id' => User::factory(),
             'coprop1_name' => fake()->name(),
+            'coprop1_surname' => fake()->lastName(),
             'coprop1_dni' => strtoupper(fake()->bothify('########?')),
             'coprop1_phone' => fake()->phoneNumber(),
             'coprop1_email' => fake()->unique()->safeEmail(),
             'language' => SupportedLocales::default(),
             'coprop2_name' => null,
+            'coprop2_surname' => null,
             'coprop2_dni' => null,
             'coprop2_phone' => null,
             'coprop2_email' => null,
@@ -35,6 +37,7 @@ class OwnerFactory extends Factory
     {
         return $this->state([
             'coprop2_name' => fake()->name(),
+            'coprop2_surname' => fake()->lastName(),
             'coprop2_dni' => strtoupper(fake()->bothify('########?')),
             'coprop2_phone' => fake()->phoneNumber(),
             'coprop2_email' => fake()->safeEmail(),
