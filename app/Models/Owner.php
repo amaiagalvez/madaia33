@@ -24,6 +24,7 @@ class Owner extends Model
         'coprop1_phone',
         'coprop1_email',
         'language',
+        'welcome',
         'accepted_terms_at',
         'coprop2_name',
         'coprop2_surname',
@@ -46,6 +47,7 @@ class Owner extends Model
     {
         return [
             'language' => 'string',
+            'welcome' => 'boolean',
             'accepted_terms_at' => 'datetime',
         ];
     }
@@ -125,7 +127,7 @@ class Owner extends Model
     protected function fullName1(): Attribute
     {
         return Attribute::make(
-            get: fn (): string => trim(
+            get: fn(): string => trim(
                 (string) $this->coprop1_name . ' ' . (string) $this->coprop1_surname,
             ),
         );
@@ -137,7 +139,7 @@ class Owner extends Model
     protected function fullName2(): Attribute
     {
         return Attribute::make(
-            get: fn (): string => trim(
+            get: fn(): string => trim(
                 (string) $this->coprop2_name . ' ' . (string) $this->coprop2_surname,
             ),
         );

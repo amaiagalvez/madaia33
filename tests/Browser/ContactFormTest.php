@@ -55,7 +55,7 @@ test('contact form ignores a rapid double click on submit', function () {
                         button.click();
                         button.click();");
 
-        $browser->waitUsing(5, 100, fn() => (bool) $browser->script("return document.querySelector('[data-contact-submit]').disabled;")[0])
+        $browser->waitUsing(5, 100, fn () => (bool) $browser->script("return document.querySelector('[data-contact-submit]').disabled;")[0])
             ->assertScript("return document.querySelector('[data-contact-submit]').disabled === true;")
             ->assertScript("return document.querySelectorAll('[role=\"alert\"]').length <= 1;")
             ->waitForText('Zure mezua bidali da', 10)

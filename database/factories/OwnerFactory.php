@@ -25,6 +25,7 @@ class OwnerFactory extends Factory
             'coprop1_phone' => fake()->phoneNumber(),
             'coprop1_email' => fake()->unique()->safeEmail(),
             'language' => SupportedLocales::default(),
+            'welcome' => false,
             'coprop2_name' => null,
             'coprop2_surname' => null,
             'coprop2_dni' => null,
