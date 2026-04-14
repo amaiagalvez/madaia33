@@ -59,7 +59,7 @@
             <nav class="mb-6 overflow-x-auto" aria-label="{{ __('profile.tabs_aria') }}">
                 <ul
                     class="flex min-w-max items-center gap-2 rounded-xl border border-gray-200 bg-white p-2">
-                    @php($tabs = $requiresTermsAcceptance ? ['owner'] : ['overview', 'votings', 'sessions', 'messages', 'owner'])
+                    @php($tabs = $requiresTermsAcceptance ? ['owner'] : ['overview', 'votings', 'sessions', 'received', 'messages', 'owner'])
                     @foreach ($tabs as $tab)
                         <li>
                             <a href="{{ route(\App\SupportedLocales::routeName('profile'), ['tab' => $tab]) }}"
@@ -305,6 +305,62 @@
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $session['ip_address'] ?? '—' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </section>
+            @endif
+
+            @if ($activeTab === 'received')
+                <section class="rounded-2xl border border-gray-200 bg-white p-6"
+                    data-profile-panel="received">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        {{ __('profile.received.title') }}
+                    </h2>
+
+                    @if ($receivedMessages->isEmpty())
+                        <div class="mt-4 rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center"
+                            data-profile-received-empty>
+                            <p class="text-sm text-gray-500">{{ __('profile.received.empty') }}
+                            </p>
+                        </div>
+                    @else
+                        <div class="mt-4 overflow-x-auto rounded-xl border border-gray-200"
+                            data-profile-received-table>
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                            {{ __('profile.received.subject') }}</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                            {{ __('profile.received.message') }}</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                            {{ __('profile.received.sent_at') }}</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                            {{ __('profile.received.status') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    @foreach ($receivedMessages as $receivedMessage)
+                                        <tr data-profile-received-row>
+                                            <td
+                                                class="px-4 py-3 text-sm font-medium text-gray-800">
+                                                {{ $receivedMessage['subject'] }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">
+                                                {{ $receivedMessage['message'] }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">
+                                                {{ $receivedMessage['sent_at']->format('Y-m-d H:i:s') }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-700">
+                                                {{ $receivedMessage['status_label'] }}
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>

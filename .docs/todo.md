@@ -52,7 +52,7 @@ En el listado de admin/campanas
 1. SUPER_ADMIN: tiene acceso a todo
 2. GENERAL_ADMIN: puede enviar emails a todos, pero a la hora de crear una campaña, no puede elegir el filtro. En el listado solo verá los que no tengan ningún filtro aplicado
 3. COMMUNITY_ADMIN (+locations): puede enviarr emails solo a los que tengan asignada una propiedad activa de un location que tenga asignado este user (puede tener asignado uno o varios locations)
-4. PROPERTY_OWNER (+ property_assignments): noo puede enviar emails
+4. PROPERTY_OWNER (+ property_assignments): no puede enviar emails
 5. DELEGATED_VOTE: no puede enviar emails
 
 - [ ] campaña: añadir un botón, enviar prueba (como tenenmos en el formulario de los settings email_configuration) mostrar un modal para pedir un email y enviar a dicho email una prueba de como queda la campaña. Se enviarán dos emails de prueba, uno en euskera y otro en castellano al email indicado.

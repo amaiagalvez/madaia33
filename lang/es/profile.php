@@ -11,6 +11,7 @@ return [
         'overview' => 'Resumen',
         'votings' => 'Mis votaciones',
         'sessions' => 'Sesiones',
+        'received' => 'Mensajes recibidos',
         'messages' => 'Mensajes enviados',
         'owner' => 'Ficha de propietaria',
     ],
@@ -45,6 +46,15 @@ return [
         'ip' => 'IP',
         'active' => 'Activa',
         'in_progress' => 'En curso',
+    ],
+    'received' => [
+        'title' => 'Mensajes recibidos',
+        'empty' => 'Todavia no tienes mensajes recibidos.',
+        'subject' => 'Asunto',
+        'message' => 'Mensaje',
+        'sent_at' => 'Fecha de envio',
+        'status' => 'Estado',
+        'opened' => 'Abierto',
     ],
     'messages' => [
         'title' => 'Mensajes enviados',
