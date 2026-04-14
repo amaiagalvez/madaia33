@@ -3,12 +3,14 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use App\Models\Role;
 use Livewire\Component;
 use App\Models\Campaign;
 use App\Models\CampaignRecipient;
-use App\Jobs\Messaging\SendCampaignMessageJob;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\Messaging\SendCampaignMessageJob;
+use App\Actions\Campaigns\DuplicateCampaignAction;
 
 class AdminCampaignDetail extends Component
 {
@@ -17,6 +19,8 @@ class AdminCampaignDetail extends Component
     public ?int $expandedRecipientId = null;
 
     public int $unopenedRecipientsCount = 0;
+
+    public bool $showResendModal = false;
 
     /**
      * @var array{total: int, opens: int, clicks: int, downloads: int, failures: int}
@@ -41,6 +45,49 @@ class AdminCampaignDetail extends Component
     public function toggleRecipientDetails(int $recipientId): void
     {
         $this->expandedRecipientId = $this->expandedRecipientId === $recipientId ? null : $recipientId;
+    }
+
+    public function duplicateCampaign(): void
+    {
+        $this->authorizeViewAny();
+        $this->authorize('duplicate', $this->campaign);
+
+        $user = $this->currentUser();
+
+        abort_if($user === null, 403);
+
+        $newCampaign = app(DuplicateCampaignAction::class)->execute($this->campaign, $user);
+
+        session()->flash('message', __('general.messages.saved'));
+
+        $this->redirectRoute('admin.campaigns', ['editCampaign' => $newCampaign->id], navigate: true);
+    }
+
+    public function confirmResendToUnopened(): void
+    {
+        $this->authorizeViewAny();
+        $this->authorize('view', $this->campaign);
+
+        abort_unless($this->campaign->status === 'completed', 403);
+
+        if ($this->unopenedRecipientsCount === 0) {
+            session()->flash('warning', __('campaigns.admin.messages.all_opened'));
+
+            return;
+        }
+
+        $this->showResendModal = true;
+    }
+
+    public function cancelResendToUnopened(): void
+    {
+        $this->showResendModal = false;
+    }
+
+    public function doResendToUnopened(): void
+    {
+        $this->cancelResendToUnopened();
+        $this->resendToUnopened();
     }
 
     public function resendToUnopened(): void
@@ -88,6 +135,9 @@ class AdminCampaignDetail extends Component
             'recipientRows' => $this->recipientRows(),
             'canResendToUnopened' => $this->campaign->status === 'completed' && $this->unopenedRecipientsCount > 0,
             'allOpenedNotice' => $this->campaign->status === 'completed' && $this->metrics['total'] > 0 && $this->unopenedRecipientsCount === 0,
+            'openRateSummary' => $this->openRateSummary(),
+            'clickBreakdown' => $this->clickBreakdown(),
+            'downloadBreakdown' => $this->downloadBreakdown(),
         ]);
     }
 
@@ -134,6 +184,7 @@ class AdminCampaignDetail extends Component
                     'type' => (string) $event->event_type,
                     'type_label' => __('campaigns.admin.event_types.' . $event->event_type),
                     'url' => $event->url,
+                    'document_label' => $event->document?->filename,
                     'ip_address' => $event->ip_address,
                     'created_at' => $event->created_at,
                 ];
@@ -141,6 +192,8 @@ class AdminCampaignDetail extends Component
 
             $rows[] = [
                 'id' => $recipient->id,
+                'owner_id' => $recipient->owner?->id,
+                'owner_edit_url' => $this->ownerEditUrl($recipient),
                 'name' => $this->recipientName($recipient),
                 'contact' => $recipient->contact,
                 'status' => $recipient->status,
@@ -154,6 +207,55 @@ class AdminCampaignDetail extends Component
         }
 
         return $rows;
+    }
+
+    private function openRateSummary(): string
+    {
+        if ($this->metrics['total'] === 0) {
+            return '0 · 0,0%';
+        }
+
+        $percentage = number_format(($this->metrics['opens'] / $this->metrics['total']) * 100, 1, ',', '.');
+
+        return $this->metrics['opens'] . '  ·  ' . $percentage . '%';
+    }
+
+    /**
+     * @return array<int, array{label: string, count: int}>
+     */
+    private function clickBreakdown(): array
+    {
+        return $this->campaign->recipients
+            ->flatMap(fn(CampaignRecipient $recipient) => $recipient->trackingEvents)
+            ->where('event_type', 'click')
+            ->filter(fn($event): bool => filled($event->url))
+            ->groupBy(fn($event): string => (string) $event->url)
+            ->map(fn($events, string $url): array => [
+                'label' => $url,
+                'count' => $events->count(),
+            ])
+            ->sortByDesc('count')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{label: string, count: int}>
+     */
+    private function downloadBreakdown(): array
+    {
+        return $this->campaign->recipients
+            ->flatMap(fn(CampaignRecipient $recipient) => $recipient->trackingEvents)
+            ->where('event_type', 'download')
+            ->filter(fn($event): bool => filled($event->document?->filename))
+            ->groupBy(fn($event): string => (string) $event->document?->filename)
+            ->map(fn($events, string $filename): array => [
+                'label' => $filename,
+                'count' => $events->count(),
+            ])
+            ->sortByDesc('count')
+            ->values()
+            ->all();
     }
 
     private function recipientName(CampaignRecipient $recipient): string
@@ -171,6 +273,18 @@ class AdminCampaignDetail extends Component
         }
 
         return $name ?: __('campaigns.admin.unknown_owner');
+    }
+
+    private function ownerEditUrl(CampaignRecipient $recipient): ?string
+    {
+        $owner = $recipient->owner;
+        $user = $this->currentUser();
+
+        if ($owner === null || $user === null || ! $user->hasRole(Role::SUPER_ADMIN)) {
+            return null;
+        }
+
+        return route('admin.owners.index', ['editOwner' => $owner->id]);
     }
 
     private function authorizeViewAny(): void

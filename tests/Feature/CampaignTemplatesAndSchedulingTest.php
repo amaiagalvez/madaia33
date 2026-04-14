@@ -3,8 +3,23 @@
 use Livewire\Livewire;
 use App\Models\Campaign;
 use App\Models\CampaignTemplate;
+use Database\Seeders\CampaignTemplateSeeder;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\Messaging\DispatchCampaignJob;
+
+it('seeds the owner welcome campaign template once', function () {
+    app(CampaignTemplateSeeder::class)->run();
+    app(CampaignTemplateSeeder::class)->run();
+
+    $template = CampaignTemplate::query()->where('name', 'Bienvenida propietaria')->first();
+
+    expect($template)
+        ->not->toBeNull()
+        ->and($template?->subject_eu)->toBe('Madaia 33 - Jabetza baieztapena')
+        ->and($template?->subject_es)->toBe('Madaia 33 - Confirmación de propiedad')
+        ->and($template?->channel)->toBe('email')
+        ->and(CampaignTemplate::query()->where('name', 'Bienvenida propietaria')->count())->toBe(1);
+});
 
 it('applies a template to the campaign manager form', function () {
     $user = adminUser();

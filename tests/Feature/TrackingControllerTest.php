@@ -85,7 +85,7 @@ it('serves public document without authentication and stores download event', fu
         ->exists())->toBeTrue();
 });
 
-it('redirects guest users to login for private documents', function () {
+it('allows recipients with a valid tracking token to access private documents without login', function () {
     Storage::fake('public');
 
     $owner = Owner::factory()->create();
@@ -110,7 +110,13 @@ it('redirects guest users to login for private documents', function () {
         'document' => $document->id,
     ]));
 
-    $response->assertRedirect('/login');
+    $response->assertSuccessful();
+
+    expect(CampaignTrackingEvent::query()
+        ->where('campaign_recipient_id', $recipient->id)
+        ->where('campaign_document_id', $document->id)
+        ->where('event_type', 'download')
+        ->exists())->toBeTrue();
 });
 
 it('returns 404 for invalid tracking tokens', function () {

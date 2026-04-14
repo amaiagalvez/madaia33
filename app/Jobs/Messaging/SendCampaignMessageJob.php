@@ -53,7 +53,7 @@ class SendCampaignMessageJob implements ShouldQueue
         $body = $resolver->resolve($localizedBody, $recipient->owner, $recipient->slot);
 
         if ($recipient->campaign->channel !== 'email') {
-            throw new RuntimeException('Unsupported channel provider');
+            throw new RuntimeException(__('campaigns.errors.unsupported_channel_provider'));
         }
 
         $emailProvider->send($recipient, $subject, $body);

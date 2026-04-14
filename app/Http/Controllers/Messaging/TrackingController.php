@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\CampaignDocument;
 use App\Models\CampaignRecipient;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\CampaignTrackingEvent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
@@ -65,10 +64,6 @@ class TrackingController extends Controller
 
         if ($recipient === null || $recipient->campaign_id !== $document->campaign_id) {
             abort(404);
-        }
-
-        if (! $document->is_public && ! Auth::check()) {
-            return redirect()->guest('/login');
         }
 
         CampaignTrackingEvent::query()->create([

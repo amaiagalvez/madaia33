@@ -12,6 +12,13 @@ class DispatchScheduledCampaigns extends Command
 
     protected $description = 'Dispatch due scheduled campaigns';
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->description = __('campaigns.console.dispatch_description');
+    }
+
     /**
      * Execute the console command.
      */
@@ -28,7 +35,7 @@ class DispatchScheduledCampaigns extends Command
             dispatch(new DispatchCampaignJob($campaign->id));
         }
 
-        $this->info('Scheduled campaigns dispatched: ' . $campaigns->count());
+        $this->info(__('campaigns.console.dispatch_result', ['count' => $campaigns->count()]));
 
         return self::SUCCESS;
     }

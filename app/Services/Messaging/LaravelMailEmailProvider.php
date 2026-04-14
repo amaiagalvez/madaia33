@@ -4,6 +4,7 @@ namespace App\Services\Messaging;
 
 use App\Mail\CampaignMail;
 use App\Models\Setting;
+use App\Models\CampaignDocument;
 use App\Support\ConfiguredMailSettings;
 use App\Models\CampaignRecipient;
 use Illuminate\Support\Facades\URL;
@@ -27,14 +28,25 @@ class LaravelMailEmailProvider implements EmailProvider
         $trackingPixelUrl = URL::to('/track/open/' . $recipient->tracking_token);
 
         $documents = $recipient->campaign
-            ? $recipient->campaign->documents
+            ? $recipient->campaign->loadMissing('documents')->documents
             : collect();
+
+        $documentLinks = $documents->map(
+            fn(CampaignDocument $document): array => [
+                'label' => $document->filename,
+                'url' => route('tracking.document', [
+                    'token' => $recipient->tracking_token,
+                    'document' => $document,
+                ]),
+            ],
+        );
 
         Mail::to($recipient->contact)->send(new CampaignMail(
             subjectText: $subject,
             htmlBody: $this->withTrackingLinks($body, $recipient->tracking_token),
             trackingPixelUrl: $trackingPixelUrl,
             documents: $documents,
+            documentLinks: $documentLinks,
         ));
     }
 

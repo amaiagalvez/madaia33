@@ -4,20 +4,20 @@ namespace App\Livewire;
 
 use App\Models\Role;
 use App\Models\User;
-use App\Actions\Campaigns\DuplicateCampaignAction;
 use Livewire\Component;
 use App\Models\Campaign;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use App\Models\CampaignDocument;
 use App\Models\CampaignTemplate;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Support\CampaignAdminOptions;
+use Illuminate\Support\Facades\Storage;
 use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Jobs\Messaging\DispatchCampaignJob;
 use App\Services\Messaging\RecipientResolver;
+use App\Actions\Campaigns\DuplicateCampaignAction;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class AdminCampaignManager extends Component
@@ -47,6 +47,9 @@ class AdminCampaignManager extends Component
     /** @var array<int, UploadedFile> */
     public array $attachments = [];
 
+    /** @var array<int, array{id: int, filename: string}> */
+    public array $storedAttachments = [];
+
     public bool $showForm = false;
 
     public string $sortColumn = 'created_at';
@@ -65,12 +68,26 @@ class AdminCampaignManager extends Component
 
     public bool $showDeleteModal = false;
 
+    public ?int $confirmingActionId = null;
+
+    public string $confirmingAction = '';
+
+    public bool $showActionModal = false;
+
     public function mount(): void
     {
         $this->authorizeViewAny();
 
         if ($this->currentUser()?->hasRole(Role::COMMUNITY_ADMIN)) {
             $this->recipientFilter = $this->options()->defaultRecipientFilter();
+        }
+
+        $editCampaignId = (int) request()->integer('editCampaign');
+
+        if ($editCampaignId > 0) {
+            $this->editCampaign($editCampaignId);
+
+            return;
         }
 
         $this->recalculateRecipients();
@@ -84,16 +101,12 @@ class AdminCampaignManager extends Component
         $this->authorizeCreate();
 
         return [
-            'subjectEu' => ['nullable', 'string', 'max:255', 'required_without:subjectEs'],
-            'subjectEs' => ['nullable', 'string', 'max:255', 'required_without:subjectEu'],
-            'bodyEu' => ['nullable', 'string', 'required_without:bodyEs'],
-            'bodyEs' => ['nullable', 'string', 'required_without:bodyEu'],
-            'channel' => ['required', 'string', Rule::in(['email', 'sms', 'whatsapp', 'telegram'])],
+            ...$this->contentRules(),
             'recipientFilter' => ['required', 'string', Rule::in($this->options()->allowedRecipientFilters())],
             'selectedTemplateId' => ['nullable', 'string', Rule::exists('campaign_templates', 'id')],
             'scheduledAt' => ['nullable', 'date'],
             'attachments' => ['array'],
-            'attachments.*' => ['file', 'mimes:pdf,docx,xlsx,jpg,png', 'max:20480'],
+            'attachments.*' => ['file', 'mimes:pdf,docx,xlsx,jpg,jpeg,png', 'max:20480'],
         ];
     }
 
@@ -127,6 +140,13 @@ class AdminCampaignManager extends Component
             : null;
 
         $this->attachments = [];
+        $this->storedAttachments = $campaign->documents
+            ->map(fn(CampaignDocument $document): array => [
+                'id' => $document->id,
+                'filename' => $document->filename,
+            ])
+            ->values()
+            ->all();
         $this->showForm = true;
 
         $this->recalculateRecipients();
@@ -146,6 +166,21 @@ class AdminCampaignManager extends Component
         session()->flash('message', __('general.messages.saved'));
     }
 
+    public function saveAsTemplate(): void
+    {
+        $this->authorizeCreate();
+        $this->validate($this->contentRules());
+
+        $template = CampaignTemplate::query()->create([
+            ...$this->templatePayload(),
+            'created_by_user_id' => $this->currentUser()?->id,
+        ]);
+
+        $this->selectedTemplateId = (string) $template->id;
+
+        session()->flash('message', __('general.messages.saved'));
+    }
+
     public function duplicateCampaign(int $id): void
     {
         $this->authorizeViewAny();
@@ -158,9 +193,11 @@ class AdminCampaignManager extends Component
 
         abort_if($user === null, 403);
 
-        app(DuplicateCampaignAction::class)->execute($sourceCampaign, $user);
+        $newCampaign = app(DuplicateCampaignAction::class)->execute($sourceCampaign, $user);
 
         session()->flash('message', __('general.messages.saved'));
+
+        $this->redirectRoute('admin.campaigns', ['editCampaign' => $newCampaign->id], navigate: true);
     }
 
     public function sendCampaign(int $id): void
@@ -228,6 +265,59 @@ class AdminCampaignManager extends Component
         $this->showDeleteModal = false;
     }
 
+    public function confirmAction(int $id, string $action): void
+    {
+        $this->authorizeViewAny();
+
+        abort_unless(in_array($action, ['duplicate', 'send', 'schedule', 'cancel_schedule'], true), 404);
+
+        $campaign = Campaign::query()->findOrFail($id);
+
+        match ($action) {
+            'duplicate' => $this->authorize('duplicate', $campaign),
+            'send', 'schedule', 'cancel_schedule' => $this->authorize('send', $campaign),
+        };
+
+        if (in_array($action, ['send', 'schedule'], true)) {
+            abort_unless($campaign->status === 'draft', 403);
+        }
+
+        if ($action === 'cancel_schedule') {
+            abort_unless($campaign->status === 'scheduled', 403);
+        }
+
+        $this->confirmingActionId = $campaign->id;
+        $this->confirmingAction = $action;
+        $this->showActionModal = true;
+    }
+
+    public function cancelAction(): void
+    {
+        $this->confirmingActionId = null;
+        $this->confirmingAction = '';
+        $this->showActionModal = false;
+    }
+
+    public function doAction(): void
+    {
+        if ($this->confirmingActionId === null || $this->confirmingAction === '') {
+            return;
+        }
+
+        $campaignId = $this->confirmingActionId;
+        $action = $this->confirmingAction;
+
+        $this->cancelAction();
+
+        match ($action) {
+            'duplicate' => $this->duplicateCampaign($campaignId),
+            'send' => $this->sendCampaign($campaignId),
+            'schedule' => $this->scheduleCampaign($campaignId),
+            'cancel_schedule' => $this->cancelSchedule($campaignId),
+            default => null,
+        };
+    }
+
     public function deleteCampaign(): void
     {
         $this->authorizeViewAny();
@@ -273,6 +363,48 @@ class AdminCampaignManager extends Component
     public function updatedRecipientFilter(): void
     {
         $this->recalculateRecipients();
+    }
+
+    public function removePendingAttachment(int $index): void
+    {
+        $this->authorizeViewAny();
+
+        if (! array_key_exists($index, $this->attachments)) {
+            return;
+        }
+
+        unset($this->attachments[$index]);
+
+        $this->attachments = array_values($this->attachments);
+    }
+
+    public function removeStoredAttachment(int $documentId): void
+    {
+        $this->authorizeViewAny();
+
+        if ($this->editingId === null) {
+            return;
+        }
+
+        $campaign = Campaign::query()->with('documents')->findOrFail($this->editingId);
+
+        abort_unless($this->canMutateCampaign($campaign), 403);
+
+        $document = $campaign->documents->firstWhere('id', $documentId);
+
+        if (! $document instanceof CampaignDocument) {
+            abort(404);
+        }
+
+        Storage::disk('public')->delete($document->path);
+        $document->delete();
+
+        $this->storedAttachments = array_values(array_filter(
+            $this->storedAttachments,
+            static fn(array $attachment): bool => (int) $attachment['id'] !== $documentId,
+        ));
+
+        session()->flash('message', __('general.messages.deleted'));
     }
 
     public function updatedSelectedTemplateId(string $value): void
@@ -327,6 +459,7 @@ class AdminCampaignManager extends Component
             'channelOptions' => $options->channelOptions(),
             'templateOptions' => $options->templateOptions(),
             'recipientFilterOptions' => $options->recipientFilterOptions(),
+            'options' => $options,
             'previewSubject' => $options->previewText($this->subjectEu, $this->subjectEs),
             'previewBody' => $options->previewText($this->bodyEu, $this->bodyEs),
         ]);
@@ -385,14 +518,61 @@ class AdminCampaignManager extends Component
     private function campaignPayload(): array
     {
         return [
+            ...$this->contentPayload(),
+            'recipient_filter' => $this->recipientFilter,
+            'scheduled_at' => $this->scheduledAt !== null && $this->scheduledAt !== '' ? $this->scheduledAt : null,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function templatePayload(): array
+    {
+        return [
+            ...$this->contentPayload(),
+            'name' => $this->templateName(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function contentPayload(): array
+    {
+        return [
             'subject_eu' => $this->normalizeNullableValue($this->subjectEu),
             'subject_es' => $this->normalizeNullableValue($this->subjectEs),
             'body_eu' => $this->normalizeNullableValue($this->bodyEu),
             'body_es' => $this->normalizeNullableValue($this->bodyEs),
             'channel' => $this->channel,
-            'recipient_filter' => $this->recipientFilter,
-            'scheduled_at' => $this->scheduledAt !== null && $this->scheduledAt !== '' ? $this->scheduledAt : null,
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function contentRules(): array
+    {
+        return [
+            'subjectEu' => ['nullable', 'string', 'max:255', 'required_without:subjectEs'],
+            'subjectEs' => ['nullable', 'string', 'max:255', 'required_without:subjectEu'],
+            'bodyEu' => ['nullable', 'string', 'required_without:bodyEs'],
+            'bodyEs' => ['nullable', 'string', 'required_without:bodyEu'],
+            'channel' => ['required', 'string', Rule::in(['email', 'sms', 'whatsapp', 'telegram'])],
+        ];
+    }
+
+    private function templateName(): string
+    {
+        $subject = $this->normalizeNullableValue($this->subjectEu)
+            ?? $this->normalizeNullableValue($this->subjectEs);
+
+        if ($subject !== null) {
+            return mb_substr($subject, 0, 255);
+        }
+
+        return __('campaigns.admin.template') . ' ' . now()->format('Y-m-d H:i');
     }
 
     private function normalizeNullableValue(string $value): ?string
@@ -429,6 +609,7 @@ class AdminCampaignManager extends Component
         $this->selectedTemplateId = '';
         $this->scheduledAt = null;
         $this->attachments = [];
+        $this->storedAttachments = [];
         $this->confirmingDeleteId = null;
         $this->showDeleteModal = false;
 

@@ -37,7 +37,7 @@ class CampaignAdminOptions
         return CampaignTemplate::query()
             ->orderBy('name')
             ->get()
-            ->map(static fn (CampaignTemplate $template): array => [
+            ->map(static fn(CampaignTemplate $template): array => [
                 'value' => (string) $template->id,
                 'label' => $template->name,
             ])
@@ -66,9 +66,11 @@ class CampaignAdminOptions
             ->get();
 
         foreach ($locations as $location) {
+            $value = $location->type . ':' . $location->code;
+
             $options[] = [
-                'value' => $location->type . ':' . $location->code,
-                'label' => $this->locationLabel($location->type) . ' ' . $location->code,
+                'value' => $value,
+                'label' => $this->labelForRecipientFilter($value),
             ];
         }
 
@@ -82,7 +84,7 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->filter(static fn (mixed $value): bool => is_string($value) && $value !== '')
+            ->filter(static fn(mixed $value): bool => is_string($value) && $value !== '')
             ->values()
             ->all();
     }
@@ -94,8 +96,8 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->filter(static fn (mixed $value): bool => is_string($value) && str_contains($value, ':'))
-            ->map(static fn (string $value): string => explode(':', $value, 2)[1])
+            ->filter(static fn(mixed $value): bool => is_string($value) && str_contains($value, ':'))
+            ->map(static fn(string $value): string => explode(':', $value, 2)[1])
             ->values()
             ->all();
     }
@@ -104,8 +106,25 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->first(fn (mixed $value): bool => is_string($value) && $value !== '')
+            ->first(fn(mixed $value): bool => is_string($value) && $value !== '')
             ?? 'all';
+    }
+
+    public function labelForRecipientFilter(?string $filter): string
+    {
+        $value = trim((string) $filter);
+
+        if ($value === '' || $value === 'all') {
+            return __('campaigns.admin.filters.all');
+        }
+
+        if (! str_contains($value, ':')) {
+            return $value;
+        }
+
+        [$type, $code] = explode(':', $value, 2);
+
+        return $this->locationLabel($type) . ' ' . $code;
     }
 
     public function previewText(?string $textEu, ?string $textEs): string
@@ -126,8 +145,10 @@ class CampaignAdminOptions
     private function locationLabel(string $locationType): string
     {
         return match ($locationType) {
-            'portal' => __('admin.locations.types.portal'),
-            'garage' => __('admin.locations.types.garage'),
+            'portal' => __('campaigns.admin.filters.portal'),
+            'local' => __('campaigns.admin.filters.local'),
+            'garage' => __('campaigns.admin.filters.garage'),
+            'storage' => __('campaigns.admin.filters.storage'),
             default => $locationType,
         };
     }

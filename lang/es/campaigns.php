@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'mail' => [
+        'documents' => 'Documentos: ',
+    ],
     'admin' => [
         'subject' => 'Asunto',
         'body' => 'Contenido',
@@ -18,6 +21,10 @@ return [
         'recipient_filter' => 'Filtro de destinatarias',
         'filters' => [
             'all' => 'Todas las propietarias',
+            'portal' => 'Portal',
+            'local' => 'Local',
+            'garage' => 'Garaje',
+            'storage' => 'Trastero',
         ],
         'status' => 'Estado',
         'statuses' => [
@@ -34,6 +41,8 @@ return [
         'created_at' => 'Fecha de creación',
         'attachments' => 'Adjuntos',
         'attachments_help' => 'Archivos permitidos: PDF, DOCX, XLSX, JPG, JPEG y PNG. Máximo 20 MB por archivo.',
+        'uploaded_documents' => 'Documentos ya subidos',
+        'pending_attachments' => 'Documentos seleccionados',
         'valid_recipients' => 'Destinatarias válidas',
         'coprop1' => 'Copropietaria 1',
         'coprop2' => 'Copropietaria 2',
@@ -47,6 +56,12 @@ return [
         'delete_title' => 'Eliminar campaña',
         'delete_template_title' => 'Eliminar plantilla',
         'confirm_delete' => '¿Seguro que quieres eliminar esta campaña?',
+        'confirm_delete_template' => '¿Seguro que quieres eliminar esta plantilla?',
+        'confirm_duplicate' => '¿Seguro que quieres duplicar esta campaña?',
+        'confirm_send' => '¿Seguro que quieres enviar esta campaña ahora?',
+        'confirm_schedule' => '¿Seguro que quieres programar esta campaña?',
+        'confirm_cancel_schedule' => '¿Seguro que quieres cancelar la programación de esta campaña?',
+        'confirm_resend_unopened' => '¿Seguro que quieres reenviar a quienes no han abierto esta campaña?',
         'actions' => [
             'duplicate' => 'Duplicar',
             'send' => 'Enviar ahora',
@@ -54,6 +69,8 @@ return [
             'cancel_schedule' => 'Cancelar programación',
             'mark_as_valid' => 'Marcar como válido',
             'resend_unopened' => 'Reenviar a no abiertos',
+            'remove_attachment' => 'Eliminar documento',
+            'save_template' => 'Guardar como plantilla',
         ],
         'messages' => [
             'resend_unopened_queued' => 'Se ha programado el reenvío a destinatarias no abiertas en esta misma campaña.',
@@ -74,10 +91,14 @@ return [
         'clicks_count' => 'Clics',
         'downloads_count' => 'Descargas',
         'last_activity' => 'Última actividad',
+        'ip_address' => 'Dirección IP',
         'consecutive_errors' => 'Errores consecutivos',
         'last_error' => 'Último error',
         'events' => 'Eventos',
         'event_details' => 'Detalle de eventos',
+        'document_name' => 'Documento',
+        'click_breakdown' => 'Enlaces',
+        'download_breakdown' => 'Documentos',
         'event_types' => [
             'open' => 'Apertura',
             'click' => 'Clic',
@@ -90,5 +111,12 @@ return [
         'unopened_count' => ':count destinatarias no han abierto el mensaje.',
         'yes' => 'Sí',
         'no' => 'No',
+    ],
+    'errors' => [
+        'unsupported_channel_provider' => 'No hay un proveedor de envío compatible para este canal.',
+    ],
+    'console' => [
+        'dispatch_description' => 'Enviar las campañas programadas que ya estén listas.',
+        'dispatch_result' => 'Campañas programadas enviadas: :count',
     ],
 ];

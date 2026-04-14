@@ -39,17 +39,22 @@ owners => Propietarias
 - [ ] Cookies sartu
 - [ ] config recaptcha, analitics
 
-- [ ] no veo el botón de reenviar a los quee no lo han abierto
-- [ ] añadir confirmación al botón (como el del listado de anuncios en la columna publicado)
-- [ ] crear un seeder para rellenar la tabla campaign_templates con una plantilla: usa  la plantilla que se usa para eenviar el email de welcome 
-- [ ] han fallado el envio de algunos emails y no los ha marcado como que tienen problemas
-- [ ] mover el menu debajo de Mezuak
-- [ ] no se guardan los documentoos añadidos
-- [ ] confirmación en los bootones 
-- [ ] traducciones
-- [ ] al copiar que se abra directamente el formulario de la neuva
-- [ ] kanpainan, breathcum-a sartu admin/ubicaciones/{id} bezala, itzuli ahal izateko kanpainak zerrendara, dagokion kanpainaren formularioa irekita
+- [ ] bozketak. Enviar email con los pdf delegado o presencial
+- [ ] profila. Bidalitako mezuak
 
+En el listado de admin/campanas
+- al pinchar en el botón programar, modal para pedir cuando programarlo
+- añadir nueva columna con el número de mensajes de abiertos
+
+    
+- [ ] baimenak bidaketak:
+1. SUPER_ADMIN: tiene acceso a todo
+2. GENERAL_ADMIN: puede enviar emails a todos, pero a la hora de crear una campaña, no puede elegir el filtro. En el listado solo verá los que no tengan ningún filtro aplicado
+3. COMMUNITY_ADMIN (+locations): puede enviarr emails solo a los que tengan asignada una propiedad activa de un location que tenga asignado este user (puede tener asignado uno o varios locations)
+4. PROPERTY_OWNER (+ property_assignments): noo puede enviar emails
+5. DELEGATED_VOTE: no puede enviar emails
+
+- [ ] campaña: añadir un botón, enviar prueba (como tenenmos en el formulario de los settings email_configuration) mostrar un modal para pedir un email y enviar a dicho email una prueba de como queda la campaña. Se enviarán dos emails de prueba, uno en euskera y otro en castellano al email indicado.
 
 # Panela
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje

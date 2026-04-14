@@ -5,6 +5,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use App\Models\CampaignDocument;
+use App\Support\EmailLegalText;
 use Illuminate\Support\Collection;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
@@ -15,15 +16,25 @@ class CampaignMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public readonly Collection $documentLinks;
+
+    public readonly ?string $legalText;
+
     /**
      * @param  Collection<int, CampaignDocument>  $documents
+     * @param  Collection<int, array{label: string, url: string}>|null  $documentLinks
      */
     public function __construct(
         public readonly string $subjectText,
         public readonly string $htmlBody,
         public readonly string $trackingPixelUrl,
         public readonly Collection $documents,
-    ) {}
+        ?Collection $documentLinks = null,
+        ?string $legalText = null,
+    ) {
+        $this->documentLinks = $documentLinks ?? collect();
+        $this->legalText = $legalText ?? EmailLegalText::resolve();
+    }
 
     public function envelope(): Envelope
     {
@@ -37,6 +48,8 @@ class CampaignMail extends Mailable
             with: [
                 'htmlBody' => $this->htmlBody,
                 'trackingPixelUrl' => $this->trackingPixelUrl,
+                'documentLinks' => $this->documentLinks,
+                'legalText' => $this->legalText,
             ],
         );
     }
@@ -47,7 +60,7 @@ class CampaignMail extends Mailable
     public function attachments(): array
     {
         return $this->documents
-            ->map(fn (CampaignDocument $document): Attachment => Attachment::fromStorageDisk('public', $document->path)
+            ->map(fn(CampaignDocument $document): Attachment => Attachment::fromStorageDisk('public', $document->path)
                 ->as($document->filename)
                 ->withMime($document->mime_type))
             ->all();

@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'mail' => [
+        'documents' => 'Dokumentuak:',
+    ],
     'admin' => [
         'subject' => 'Gaia',
         'body' => 'Edukia',
@@ -18,6 +21,10 @@ return [
         'recipient_filter' => 'Hartzaile-iragazkia',
         'filters' => [
             'all' => 'Jabe guztiak',
+            'portal' => 'Ataria',
+            'local' => 'Lokala',
+            'garage' => 'Garajea',
+            'storage' => 'Trastelekua',
         ],
         'status' => 'Egoera',
         'statuses' => [
@@ -34,6 +41,8 @@ return [
         'created_at' => 'Sorrera-data',
         'attachments' => 'Eranskinak',
         'attachments_help' => 'Onartutako fitxategiak: PDF, DOCX, XLSX, JPG, JPEG eta PNG. Gehienez 20 MB fitxategi bakoitzeko.',
+        'uploaded_documents' => 'Dagoeneko igo diren dokumentuak',
+        'pending_attachments' => 'Hautatutako dokumentuak',
         'valid_recipients' => 'Hartzaile baliodunak',
         'coprop1' => 'Ko-jabe 1',
         'coprop2' => 'Ko-jabe 2',
@@ -47,6 +56,12 @@ return [
         'delete_title' => 'Kanpaina ezabatu',
         'delete_template_title' => 'Txantiloia ezabatu',
         'confirm_delete' => 'Ziur zaude kanpaina hau ezabatu nahi duzula?',
+        'confirm_delete_template' => 'Ziur zaude txantiloi hau ezabatu nahi duzula?',
+        'confirm_duplicate' => 'Ziur al zaude kanpaina hau bikoiztu nahi duzula?',
+        'confirm_send' => 'Ziur al zaude kanpaina hau orain bidali nahi duzula?',
+        'confirm_schedule' => 'Ziur al zaude kanpaina hau programatu nahi duzula?',
+        'confirm_cancel_schedule' => 'Ziur al zaude kanpaina honen programazioa ezeztatu nahi duzula?',
+        'confirm_resend_unopened' => 'Ziur al zaude ireki ez duten hartzaileei berriz bidali nahi diezula?',
         'actions' => [
             'duplicate' => 'Bikoiztu',
             'send' => 'Bidali orain',
@@ -54,6 +69,8 @@ return [
             'cancel_schedule' => 'Programazioa ezeztatu',
             'mark_as_valid' => 'Baliozkotzat markatu',
             'resend_unopened' => 'Ireki ez dutenei berriz bidali',
+            'remove_attachment' => 'Dokumentua ezabatu',
+            'save_template' => 'Txantiloi gisa gorde',
         ],
         'messages' => [
             'resend_unopened_queued' => 'Ireki ez duten hartzaileei berriz bidaltzea kanpaina honetan programatu da.',
@@ -74,21 +91,32 @@ return [
         'clicks_count' => 'Klikak',
         'downloads_count' => 'Deskargak',
         'last_activity' => 'Azken jarduera',
+        'ip_address' => 'IP helbidea',
         'consecutive_errors' => 'Errore jarraituak',
         'last_error' => 'Azken errorea',
         'events' => 'Gertaerak',
         'event_details' => 'Gertaeren xehetasunak',
+        'document_name' => 'Dokumentua',
+        'click_breakdown' => 'Estekak',
+        'download_breakdown' => 'Dokumentuak',
         'event_types' => [
             'open' => 'Irekiera',
             'click' => 'Klika',
             'download' => 'Deskarga',
             'error' => 'Errorea',
-            'delivered' => 'Emanda',
+            'delivered' => 'Bidalita',
         ],
         'no_events' => 'Oraindik ez dago jarraipen-gertaerarik.',
         'unknown_owner' => 'Jabe ezezaguna',
         'unopened_count' => ':count hartzailek ez dute mezua ireki.',
         'yes' => 'Bai',
         'no' => 'Ez',
+    ],
+    'errors' => [
+        'unsupported_channel_provider' => 'Ez dago kanal honetarako bidalketa-hornitzaile bateragarririk.',
+    ],
+    'console' => [
+        'dispatch_description' => 'Prest dauden programatutako kanpainak bidali.',
+        'dispatch_result' => 'Bidalitako programatutako kanpainak: :count',
     ],
 ];
