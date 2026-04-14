@@ -6,6 +6,7 @@
 use App\Models\Image;
 use Database\Seeders\DevSeeder;
 use App\Models\Notice;
+use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
 use App\Mail\TestEmail;
 use App\Models\Setting;
@@ -158,7 +159,7 @@ it('stores contact subjects by language in contact_form', function () {
 });
 
 it('dev seeder configures local email settings for mailhog', function () {
-    artisan('db:seed', ['--class' => DevSeeder::class])->assertExitCode(0);
+    expect(Artisan::call('db:seed', ['--class' => DevSeeder::class]))->toBe(0);
 
     expect(settingValue('from_address'))->toBe('info@mailhog.local')
         ->and(settingValue('from_name'))->toBe('Komunitatea Local')
