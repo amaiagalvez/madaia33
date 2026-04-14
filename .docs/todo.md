@@ -39,7 +39,8 @@ owners => Propietarias
 - [ ] Cookies sartu
 - [ ] config recaptcha, analitics
 
-- [ ] bozketak. Enviar email con los pdf delegado o presencial
+- [ ] En el listado de bozketak añadir un botón para Enviar un email con los pdf delegado o presencial. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa botación. 
+
 - [ ] profila. Bidalitako mezuak
 
 En el listado de admin/campanas

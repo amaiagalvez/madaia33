@@ -44,6 +44,10 @@
         "/^set -e && cd /home/amaia/Dokumentuak/madaia33 && docker compose run --rm --user \\$\\{DC_UID:-1000\\}:\\$\\{DC_GID:-1000\\} madaia33 vendor/bin/pint --dirty && docker compose run --rm --user \\$\\{DC_UID:-1000\\}:\\$\\{DC_GID:-1000\\} madaia33 php artisan test --compact tests/Feature/AdminCampaignManagerTest\\.php tests/Feature/CampaignTemplatesAndSchedulingTest\\.php$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^set -e && docker compose run --rm --user \\$\\{DC_UID:-1000\\}:\\$\\{DC_GID:-1000\\} madaia33 vendor/bin/pint --dirty && docker compose run --rm --user \\$\\{DC_UID:-1000\\}:\\$\\{DC_GID:-1000\\} madaia33 php artisan test --compact tests/Unit/CampaignMailablesTest\\.php tests/Feature/AdminCampaignManagerTest\\.php tests/Feature/CampaignTemplatesAndSchedulingTest\\.php$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     },
     "chat.promptFilesRecommendations": {

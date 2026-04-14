@@ -58,6 +58,9 @@ it('renders tracked document links in the campaign email body', function () {
 });
 
 it('wraps campaign emails with the shared branded mail layout', function () {
+    config()->set('mail.from.address', 'sender@example.test');
+    config()->set('mail.from.name', 'Madaia 33');
+
     $mailable = new CampaignMail(
         subjectText: 'Aviso comunidad',
         htmlBody: '<p>Contenido del mensaje</p>',

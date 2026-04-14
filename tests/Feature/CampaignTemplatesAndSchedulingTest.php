@@ -62,8 +62,8 @@ it('dispatches only due scheduled campaigns and can cancel a schedule', function
     test()->artisan('campaigns:dispatch-scheduled')
         ->assertSuccessful();
 
-    Bus::assertDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $dueCampaign->id);
-    Bus::assertNotDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $futureCampaign->id);
+    Bus::assertDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $dueCampaign->id);
+    Bus::assertNotDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $futureCampaign->id);
 
     $dueCampaign->refresh();
     $futureCampaign->refresh();
