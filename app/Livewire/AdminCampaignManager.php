@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Actions\Campaigns\DuplicateCampaignAction;
 use Livewire\Component;
 use App\Models\Campaign;
 use Livewire\WithPagination;
@@ -153,35 +154,11 @@ class AdminCampaignManager extends Component
 
         $this->authorize('duplicate', $sourceCampaign);
 
-        $newCampaign = Campaign::query()->create([
-            'created_by_user_id' => $this->currentUser()?->id,
-            'subject_eu' => $sourceCampaign->subject_eu,
-            'subject_es' => $sourceCampaign->subject_es,
-            'body_eu' => $sourceCampaign->body_eu,
-            'body_es' => $sourceCampaign->body_es,
-            'channel' => $sourceCampaign->channel,
-            'recipient_filter' => $sourceCampaign->recipient_filter,
-            'status' => 'draft',
-            'scheduled_at' => null,
-            'sent_at' => null,
-        ]);
+        $user = $this->currentUser();
 
-        $documentsPayload = $sourceCampaign->documents
-            ->map(static fn (CampaignDocument $document): array => [
-                'campaign_id' => $newCampaign->id,
-                'filename' => $document->filename,
-                'path' => $document->path,
-                'mime_type' => $document->mime_type,
-                'size_bytes' => $document->size_bytes,
-                'is_public' => $document->is_public,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ])
-            ->all();
+        abort_if($user === null, 403);
 
-        if ($documentsPayload !== []) {
-            CampaignDocument::query()->insert($documentsPayload);
-        }
+        app(DuplicateCampaignAction::class)->execute($sourceCampaign, $user);
 
         session()->flash('message', __('general.messages.saved'));
     }
@@ -512,8 +489,6 @@ class AdminCampaignManager extends Component
     private function currentUser(): ?User
     {
         /** @var User|null $user */
-        $user = Auth::user();
-
-        return $user;
+        return Auth::user();
     }
 }

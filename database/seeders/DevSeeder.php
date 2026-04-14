@@ -63,13 +63,13 @@ class DevSeeder extends Seeder
     private function seedMailhogSettings(): void
     {
         $settings = [
-            'from_address' => $this->devMailValue('MAIL_FROM_ADDRESS', 'info@mailhog.local'),
-            'from_name' => $this->devMailValue('MAIL_FROM_NAME', 'Komunitatea Local'),
-            'smtp_host' => $this->devMailValue('MAIL_HOST', 'mailhog'),
-            'smtp_port' => $this->devMailValue('MAIL_PORT', '1025'),
-            'smtp_username' => $this->devMailValue('MAIL_USERNAME', ''),
-            'smtp_password' => $this->devMailValue('MAIL_PASSWORD', ''),
-            'smtp_encryption' => $this->devMailValue('MAIL_ENCRYPTION', ''),
+            'from_address' => 'info@mailhog.local',
+            'from_name' => 'Komunitatea Local',
+            'smtp_host' => 'mailhog',
+            'smtp_port' => '1025',
+            'smtp_username' => null,
+            'smtp_password' => null,
+            'smtp_encryption' => null,
         ];
 
         Setting::upsert(
@@ -84,6 +84,8 @@ class DevSeeder extends Seeder
             ['key'],
             ['value', 'section'],
         );
+
+        Setting::flushStringValuesCache();
     }
 
     private function devMailValue(string $key, string $default): string

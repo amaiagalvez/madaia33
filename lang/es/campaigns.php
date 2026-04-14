@@ -53,6 +53,11 @@ return [
             'schedule' => 'Programar',
             'cancel_schedule' => 'Cancelar programación',
             'mark_as_valid' => 'Marcar como válido',
+            'resend_unopened' => 'Reenviar a no abiertos',
+        ],
+        'messages' => [
+            'resend_unopened_queued' => 'Se ha programado el reenvío a destinatarias no abiertas en esta misma campaña.',
+            'all_opened' => 'Todas las destinatarias han abierto el mensaje. No hay nadie a quien reenviar.',
         ],
         'metrics' => [
             'total' => 'Total enviados',
@@ -82,6 +87,7 @@ return [
         ],
         'no_events' => 'Todavía no hay eventos de seguimiento.',
         'unknown_owner' => 'Propietaria desconocida',
+        'unopened_count' => ':count destinatarias no han abierto el mensaje.',
         'yes' => 'Sí',
         'no' => 'No',
     ],

@@ -349,3 +349,42 @@ Implementación incremental del sistema de mensajería masiva multicanal. Las ca
 - Los tests de propiedad (tarea 14) usan Pest nativo con `fake()`, datasets y `->repeat(2)` — sin dependencias adicionales
 - Cada tarea referencia los requisitos específicos para trazabilidad
 - Los checkpoints garantizan validación incremental antes de avanzar a la siguiente capa
+
+## Implementation Plan - Reenviar a no abiertos
+
+### Goal
+
+- [Mostrar en detalle de campaña el botón de reenvío a destinatarias sin apertura y ejecutar el reenvío en la misma campaña.]
+
+### Technical Decisions
+
+- [La lógica se implementará en `AdminCampaignDetail` para mantener la responsabilidad del flujo dentro de la pantalla de métricas y evitar duplicar reglas en `AdminCampaignManager`.]
+- [Se considerará “no abierto” cualquier `CampaignRecipient` sin `TrackingEvent` de tipo `open`; el filtro se resolverá en una sola consulta agregada para evitar N+1.]
+- [El botón se mostrará solo si la campaña está en `completed` y existe al menos una destinataria no abierta, alineado con el requisito 7.9 del spec.]
+- [El reenvío se ejecutará sobre la misma campaña: solo se reencolarán los `CampaignRecipient` sin evento `open`, sin crear campaña nueva.]
+
+### Execution Steps
+
+- [x]   1. Añadir en `AdminCampaignDetail` cómputo de destinatarias no abiertas y acción `resendToUnopened()` con autorización y validaciones de estado.
+- [x]   2. Añadir el botón en `resources/views/livewire/admin/campaign-detail.blade.php` con visibilidad condicional y feedback de éxito.
+- [x]   3. Reencolar en la misma campaña únicamente destinatarias no abiertas, sin crear campaña nueva.
+- [x]   4. Cubrir con tests Feature/Livewire: aparece el botón cuando procede, se oculta cuando todas abrieron, y reenvía solo no abiertas dentro de la misma campaña.
+- [x]   5. Ejecutar formato y suite mínima afectada en Docker (`pint --dirty` + tests de detalle/manager de campañas).
+
+### Work Items
+
+- [x] `app/Livewire/AdminCampaignDetail.php`
+- [x] `resources/views/livewire/admin/campaign-detail.blade.php`
+- [x] `app/Livewire/AdminCampaignManager.php` (si se extrae lógica de duplicación)
+- [x] `app/Actions/Campaigns/DuplicateCampaignAction.php`
+- [x] `app/Jobs/Messaging/DispatchCampaignJob.php`
+- [x] `tests/Feature/AdminCampaignDetailTest.php`
+- [x] `tests/Feature/CampaignJobsTest.php`
+- [x] `lang/eu/campaigns.php` y `lang/es/campaigns.php` (texto del botón/flash si falta)
+
+### Validation
+
+- [ ] TDD-based implementation when possible
+- [x] Required formatting/lint checks
+- [x] Relevant test suite
+- [ ] Dusk tests when frontend/flow changes exist

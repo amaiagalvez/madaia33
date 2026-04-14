@@ -44,13 +44,44 @@ it('dispatch campaign job enqueues one send job per resolved recipient', functio
     expect(CampaignRecipient::query()->where('campaign_id', $campaign->id)->count())->toBe(2);
 });
 
+it('dispatch campaign job reuses preloaded recipients without creating new rows', function () {
+    Queue::fake();
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'email',
+        'recipient_filter' => 'all',
+        'status' => 'draft',
+    ]);
+
+    $firstRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'status' => 'pending',
+    ]);
+
+    $secondRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'status' => 'pending',
+    ]);
+
+    $countBeforeDispatch = CampaignRecipient::query()
+        ->where('campaign_id', $campaign->id)
+        ->count();
+
+    (new DispatchCampaignJob($campaign->id))->handle(new RecipientResolver);
+
+    Queue::assertPushed(SendCampaignMessageJob::class, 2);
+    expect(CampaignRecipient::query()->where('campaign_id', $campaign->id)->count())->toBe($countBeforeDispatch);
+
+    Queue::assertPushed(SendCampaignMessageJob::class, fn(SendCampaignMessageJob $job): bool => in_array($job->recipientId, [$firstRecipient->id, $secondRecipient->id], true));
+});
+
 it('uses the owner language field for localized campaign content', function () {
     $sentPayload = (object) [
         'subject' => null,
         'body' => null,
     ];
 
-    app()->bind(EmailProvider::class, fn () => new class($sentPayload) implements EmailProvider {
+    app()->bind(EmailProvider::class, fn() => new class($sentPayload) implements EmailProvider {
         public function __construct(private object $sentPayload) {}
 
         public function send(CampaignRecipient $recipient, string $subject, string $body): void
@@ -88,7 +119,7 @@ it('uses the owner language field for localized campaign content', function () {
 });
 
 it('records tracking event and increments owner counter on failed send', function () {
-    app()->bind(EmailProvider::class, fn () => new class implements EmailProvider {
+    app()->bind(EmailProvider::class, fn() => new class implements EmailProvider {
         public function send(CampaignRecipient $recipient, string $subject, string $body): void
         {
             throw new RuntimeException('delivery failed');
@@ -131,7 +162,7 @@ it('records tracking event and increments owner counter on failed send', functio
 });
 
 it('resets owner counter on successful send and marks contact invalid on third failure', function () {
-    app()->bind(EmailProvider::class, fn () => new class implements EmailProvider {
+    app()->bind(EmailProvider::class, fn() => new class implements EmailProvider {
         public function send(CampaignRecipient $recipient, string $subject, string $body): void {}
     });
 
@@ -161,7 +192,7 @@ it('resets owner counter on successful send and marks contact invalid on third f
     expect($owner->coprop1_email_error_count)->toBe(0)
         ->and($owner->coprop1_email_invalid)->toBeFalse();
 
-    app()->bind(EmailProvider::class, fn () => new class implements EmailProvider {
+    app()->bind(EmailProvider::class, fn() => new class implements EmailProvider {
         public function send(CampaignRecipient $recipient, string $subject, string $body): void
         {
             throw new RuntimeException('delivery failed');
@@ -189,7 +220,7 @@ it('resets owner counter on successful send and marks contact invalid on third f
 });
 
 it('marks campaign as completed when all recipients are processed', function () {
-    app()->bind(EmailProvider::class, fn () => new class implements EmailProvider {
+    app()->bind(EmailProvider::class, fn() => new class implements EmailProvider {
         public function send(CampaignRecipient $recipient, string $subject, string $body): void {}
     });
 

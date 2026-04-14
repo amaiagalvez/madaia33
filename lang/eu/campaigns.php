@@ -53,6 +53,11 @@ return [
             'schedule' => 'Programatu',
             'cancel_schedule' => 'Programazioa ezeztatu',
             'mark_as_valid' => 'Baliozkotzat markatu',
+            'resend_unopened' => 'Ireki ez dutenei berriz bidali',
+        ],
+        'messages' => [
+            'resend_unopened_queued' => 'Ireki ez duten hartzaileei berriz bidaltzea kanpaina honetan programatu da.',
+            'all_opened' => 'Hartzaile guztiek mezua ireki dute. Ez dago inor berriz bidaltzeko.',
         ],
         'metrics' => [
             'total' => 'Guztira bidaliak',
@@ -82,6 +87,7 @@ return [
         ],
         'no_events' => 'Oraindik ez dago jarraipen-gertaerarik.',
         'unknown_owner' => 'Jabe ezezaguna',
+        'unopened_count' => ':count hartzailek ez dute mezua ireki.',
         'yes' => 'Bai',
         'no' => 'Ez',
     ],

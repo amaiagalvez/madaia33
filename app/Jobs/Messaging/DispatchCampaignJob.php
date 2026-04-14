@@ -28,6 +28,27 @@ class DispatchCampaignJob implements ShouldQueue
         $campaign->status = 'sending';
         $campaign->save();
 
+        $existingRecipients = CampaignRecipient::query()
+            ->where('campaign_id', $campaign->id)
+            ->get();
+
+        if ($existingRecipients->isNotEmpty()) {
+            foreach ($existingRecipients as $recipient) {
+                $recipient->status = 'pending';
+                $recipient->error_message = null;
+
+                if (! filled($recipient->tracking_token)) {
+                    $recipient->tracking_token = bin2hex(random_bytes(32));
+                }
+
+                $recipient->save();
+
+                dispatch(new SendCampaignMessageJob($recipient->id));
+            }
+
+            return;
+        }
+
         $resolvedRecipients = $resolver->resolve($campaign);
 
         foreach ($resolvedRecipients as $resolvedRecipient) {

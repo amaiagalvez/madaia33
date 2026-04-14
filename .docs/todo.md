@@ -40,6 +40,7 @@ owners => Propietarias
 - [ ] config recaptcha, analitics
 
 - [ ] no veo el botón de reenviar a los quee no lo han abierto
+- [ ] añadir confirmación al botón (como el del listado de anuncios en la columna publicado)
 - [ ] crear un seeder para rellenar la tabla campaign_templates con una plantilla: usa  la plantilla que se usa para eenviar el email de welcome 
 - [ ] han fallado el envio de algunos emails y no los ha marcado como que tienen problemas
 - [ ] mover el menu debajo de Mezuak
@@ -47,14 +48,8 @@ owners => Propietarias
 - [ ] confirmación en los bootones 
 - [ ] traducciones
 - [ ] al copiar que se abra directamente el formulario de la neuva
+- [ ] kanpainan, breathcum-a sartu admin/ubicaciones/{id} bezala, itzuli ahal izateko kanpainak zerrendara, dagokion kanpainaren formularioa irekita
 
-https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
-
-Para que todo esto sea legal de verdad, asegúrate de:
-✔ Checkbox de privacidad en formularios
-✔ No mostrar datos de vecinos públicamente
-✔ Control de acceso a actas
-✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
@@ -90,80 +85,3 @@ crear una miniweb en html con las instrucciones para usar la aplicación, añade
 añadir una ruta al menú del panel 
 tiene que estar en dos idiomas eu y es
 - [ ] añadir una regla al agente amalur para que lo mantenga actualizado
-
-## Implementation Plan
-
-### Goal
-
-- [Balidazio-mezuak hizkuntza-tabs kanpoan erakustea eremu eleaniztunetan, input sinpleetan zein mini-editorrean, beti ikusgarri izan daitezen.]
-
-### Technical Decisions
-
-- [Konponketa `resources/views/components/admin/bilingual-tabs.blade.php` osagai partekatuan egingo da, inpaktu bera izan dezan `x-admin.bilingual-field-tabs` eta `x-admin.bilingual-rich-text-tabs` erabilera guztietan.]
-- [Tab bakoitzaren pane barruko errore-mezuen ordez, errore laburpen/errendatze komun bat jarriko da tabs bloke nagusiaren azpian, dagozkion locale-field guztietako lehen erroreak ikusgai mantenduz.]
-- [Balidazio-estilo bisualak pane barruko input/editoreetan mantenduko dira (`border-red-*`), baina mezu testuala kanpora aterako da irisgarritasuna eta ikusgarritasuna ez galtzeko.]
-
-### Execution Steps
-
-- [x]   1. `bilingual-tabs` osagaiaren markupa berrantolatu errore-mezuak tabs edukitik kanpo renderizatzeko.
-- [x]   2. Eguneratu edo gehitu Unit test bat osagai partekatuarentzat, errorea tabs kanpoan agertzen dela egiaztatzeko input eta rich-text moduetarako.
-- [x]   3. Exekutatu ukitutako test minimoak eta beharrezko formateoa/egiaztapenak Docker barruan.
-
-### Work Items
-
-- [x] `resources/views/components/admin/bilingual-tabs.blade.php`
-- [x] `tests/Unit/BilingualRichTextTabsComponentTest.php`
-- [ ] Baliteke test osagarri bat behar izatea `bilingual-field-tabs` erabilerarako
-
-### Validation
-
-- [ ] TDD-based implementation when possible
-- [x] Required formatting/lint checks
-- [x] Relevant test suite
-- [ ] Dusk tests when frontend/flow changes exist
-
-## Txuletak
-/dusk-test pasar los dusk test
-pasar los test con coverage
-
-## Hobekuntzak
-- [ ] en settings en la seccion email_configuration, ocultar todos los campos menos el nombre (ponerlos como si fueran tipo password), añadir botón para modificarlos y que pida contraseña antes de modicarlos
-- [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
-- [ ] añadir espacio para comercios
-- [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
-
-## Implementation Plan - Dashboard queue botoia
-
-### Goal
-
-- [Dashboardean admin botoi berri bat gehitzea, klik eginda Laravel cola prozesatzea abiarazteko (`php artisan queue:work`) modu seguruan.]
-
-### Technical Decisions
-
-- [Botoia dagoen admin utilitate-botoien blokean txertatuko da, [resources/views/admin/dashboard/index.blade.php](resources/views/admin/dashboard/index.blade.php#L5) fitxategiko estiloa berrerabiliz.]
-- [Ekintza berria [routes/private.php](routes/private.php#L110) + [app/Http/Controllers/ArtisanController.php](app/Http/Controllers/ArtisanController.php#L9) bidez egingo da, dagoen `artisan.*` patroia jarraituta eta `role:superadmin` middleware berarekin.]
-- [HTTP eskaera ez blokeatzeko, exekuzioa modu mugatuan planteatuko da (adib. `queue:work --once` edo `--stop-when-empty`) eta ez worker infinitu gisa; bestela requesta zintzilik geratzeko arriskua dago.]
-- [UI testurako mezu berriak i18n bidez lotuko dira, `lang/eu` eta `lang/es` fitxategietan giltzak gehituta.]
-
-### Execution Steps
-
-- [x]   1. Definitu route + controller action berria colaren exekuziorako, segurtasun muga berdinekin.
-- [x]   2. Gehitu botoia dashboardean, confirm dialog + feedback mezuarekin.
-- [x]   3. Gehitu/egokitu Feature test bat admin utilitate-ekintzarako (route baimena eta redirect status mezua gutxienez).
-- [x]   4. Exekutatu test minimoak Docker barruan eta formateoa (`pint --dirty`).
-
-### Work Items
-
-- [x] [resources/views/admin/dashboard/index.blade.php](resources/views/admin/dashboard/index.blade.php)
-- [x] [routes/private.php](routes/private.php)
-- [x] [app/Http/Controllers/ArtisanController.php](app/Http/Controllers/ArtisanController.php)
-- [x] [lang/eu/admin.php](lang/eu/admin.php) (edo dashboardeko mezuak dauden tokia)
-- [x] [lang/es/admin.php](lang/es/admin.php) (edo dashboardeko mezuak dauden tokia)
-- [x] [tests/Feature/ArtisanDashboardActionsTest.php](tests/Feature/ArtisanDashboardActionsTest.php) (berria edo baliokidea)
-
-### Validation
-
-- [ ] TDD-based implementation when possible
-- [x] Required formatting/lint checks
-- [x] Relevant test suite
-- [ ] Dusk tests when frontend/flow changes exist
