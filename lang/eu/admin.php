@@ -112,6 +112,12 @@ return [
         'locations' => 'Kokalekuak',
         'votings' => 'Bozketak',
     ],
+    'queue' => [
+        'start_button' => 'Jarri ilara martxan',
+        'confirm_start' => 'Exekutatu queue:work ilara hustu arte?',
+        'status_finished' => 'Ilara hustu arte prozesatu da.',
+        'status_failed' => 'Ezin izan da ilara exekutatu.',
+    ],
     'legal' => [
         'privacy_policy' => 'Pribatutasun-politika',
         'legal_notice' => 'Lege-oharra',

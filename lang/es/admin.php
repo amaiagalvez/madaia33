@@ -112,6 +112,12 @@ return [
         'locations' => 'Ubicaciones',
         'votings' => 'Votaciones',
     ],
+    'queue' => [
+        'start_button' => 'Poner cola en marcha',
+        'confirm_start' => '¿Ejecutar queue:work hasta vaciar la cola?',
+        'status_finished' => 'Cola procesada hasta vaciarse.',
+        'status_failed' => 'No se pudo ejecutar la cola.',
+    ],
     'legal' => [
         'privacy_policy' => 'Política de privacidad',
         'legal_notice' => 'Aviso legal',

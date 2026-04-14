@@ -201,3 +201,4 @@
 - Before adding a new locale field to owners, inspect existing schema/model attributes first; reuse the current `language` field instead of introducing a redundant `preferred_locale`, and protect the behavior with a focused messaging regression test.
 - In multilingual admin forms that use rules like required_without, file, or mimes, keep both lang/es/validation.php and lang/eu/validation.php updated with those base Laravel messages plus human attribute labels; otherwise users see English or raw field names.
 - For queued or deferred campaign emails, reapply SMTP settings from the email_configuration settings at send time; relying only on app boot can leave campaign mail using stale runtime config that diverges from the welcome-mail flow.
+- In Feature POST tests for web/admin routes, include a valid CSRF token in session + payload to avoid false 419 failures that mask the real authorization/behavior assertions.

@@ -29,40 +29,40 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
         ]);
     })->name('dashboard');
 
-    Route::get('/avisos', fn () => view('admin.notices'))
+    Route::get('/avisos', fn() => view('admin.notices'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('notices');
-    Route::get('/campanas', fn () => view('admin.campaigns'))
+    Route::get('/campanas', fn() => view('admin.campaigns'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns');
-    Route::get('/campanas/plantillas', fn () => view('admin.campaign-templates'))
+    Route::get('/campanas/plantillas', fn() => view('admin.campaign-templates'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns.templates');
-    Route::get('/campanas/contactos-invalidos', fn () => view('admin.invalid-contacts'))
+    Route::get('/campanas/contactos-invalidos', fn() => view('admin.invalid-contacts'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns.invalid-contacts');
-    Route::get('/campanas/{campaign}', fn (Campaign $campaign) => view('admin.campaign-detail', ['campaign' => $campaign]))
+    Route::get('/campanas/{campaign}', fn(Campaign $campaign) => view('admin.campaign-detail', ['campaign' => $campaign]))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns.show');
-    Route::get('/imagenes', fn () => view('admin.images'))
+    Route::get('/imagenes', fn() => view('admin.images'))
         ->middleware('role:superadmin')
         ->name('images');
-    Route::get('/mensajes', fn () => view('admin.messages'))
+    Route::get('/mensajes', fn() => view('admin.messages'))
         ->middleware('role:superadmin,admin_general')
         ->name('messages');
-    Route::get('/configuracion', fn () => view('admin.settings'))
+    Route::get('/configuracion', fn() => view('admin.settings'))
         ->middleware('role:superadmin')
         ->name('settings');
-    Route::get('/portales', fn () => view('admin.locations.index', ['type' => 'portal']))
+    Route::get('/portales', fn() => view('admin.locations.index', ['type' => 'portal']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.portals');
-    Route::get('/locales', fn () => view('admin.locations.index', ['type' => 'local']))
+    Route::get('/locales', fn() => view('admin.locations.index', ['type' => 'local']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.locals');
-    Route::get('/garajes', fn () => view('admin.locations.index', ['type' => 'garage']))
+    Route::get('/garajes', fn() => view('admin.locations.index', ['type' => 'garage']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.garages');
-    Route::get('/trasteros', fn () => view('admin.locations.index', ['type' => 'storage']))
+    Route::get('/trasteros', fn() => view('admin.locations.index', ['type' => 'storage']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.storages');
     Route::get('/ubicaciones/{location}', function (Location $location) {
@@ -73,10 +73,10 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
 
         return view('admin.locations.show', ['location' => $location]);
     })->name('locations.show');
-    Route::get('/propietarias', fn () => view('admin.owners.index'))
+    Route::get('/propietarias', fn() => view('admin.owners.index'))
         ->middleware('role:superadmin')
         ->name('owners.index');
-    Route::get('/votaciones', fn () => view('admin.votings'))
+    Route::get('/votaciones', fn() => view('admin.votings'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings');
     Route::get('/votaciones/pdf/delegado', [VotingPdfController::class, 'adminDelegated'])
@@ -88,7 +88,7 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/votaciones/pdf/resultados', [VotingPdfController::class, 'adminResults'])
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings.pdf.results');
-    Route::get('/usuarios', fn () => view('admin.users.index'))
+    Route::get('/usuarios', fn() => view('admin.users.index'))
         ->middleware('role:superadmin')
         ->name('users.index');
 
@@ -98,6 +98,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::post('/artisan/migrate-and-seed', [ArtisanController::class, 'migration_and_seeds'])
         ->middleware('role:superadmin')
         ->name('artisan.migrate_and_seed');
+    Route::post('/artisan/queue-work-stop-when-empty', [ArtisanController::class, 'queueWorkStopWhenEmpty'])
+        ->middleware('role:superadmin')
+        ->name('artisan.queue_work_stop_when_empty');
 });
 
 Route::middleware('auth')->post('/impersonacion/volver-a-mi-usuario', function (Request $request) {

@@ -39,9 +39,8 @@ owners => Propietarias
 - [ ] Cookies sartu
 - [ ] config recaptcha, analitics
 
-- [ ] otro botón para poner la cola en marcha php artisan queue:work
 - [ ] no veo el botón de reenviar a los quee no lo han abierto
-- [ ] crear una plantilla con la plantilla que se usa para eenviar el email de welcome 
+- [ ] crear un seeder para rellenar la tabla campaign_templates con una plantilla: usa  la plantilla que se usa para eenviar el email de welcome 
 - [ ] han fallado el envio de algunos emails y no los ha marcado como que tienen problemas
 - [ ] mover el menu debajo de Mezuak
 - [ ] no se guardan los documentoos añadidos
@@ -132,3 +131,39 @@ pasar los test con coverage
 - [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
 - [ ] añadir espacio para comercios
 - [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)
+
+## Implementation Plan - Dashboard queue botoia
+
+### Goal
+
+- [Dashboardean admin botoi berri bat gehitzea, klik eginda Laravel cola prozesatzea abiarazteko (`php artisan queue:work`) modu seguruan.]
+
+### Technical Decisions
+
+- [Botoia dagoen admin utilitate-botoien blokean txertatuko da, [resources/views/admin/dashboard/index.blade.php](resources/views/admin/dashboard/index.blade.php#L5) fitxategiko estiloa berrerabiliz.]
+- [Ekintza berria [routes/private.php](routes/private.php#L110) + [app/Http/Controllers/ArtisanController.php](app/Http/Controllers/ArtisanController.php#L9) bidez egingo da, dagoen `artisan.*` patroia jarraituta eta `role:superadmin` middleware berarekin.]
+- [HTTP eskaera ez blokeatzeko, exekuzioa modu mugatuan planteatuko da (adib. `queue:work --once` edo `--stop-when-empty`) eta ez worker infinitu gisa; bestela requesta zintzilik geratzeko arriskua dago.]
+- [UI testurako mezu berriak i18n bidez lotuko dira, `lang/eu` eta `lang/es` fitxategietan giltzak gehituta.]
+
+### Execution Steps
+
+- [x]   1. Definitu route + controller action berria colaren exekuziorako, segurtasun muga berdinekin.
+- [x]   2. Gehitu botoia dashboardean, confirm dialog + feedback mezuarekin.
+- [x]   3. Gehitu/egokitu Feature test bat admin utilitate-ekintzarako (route baimena eta redirect status mezua gutxienez).
+- [x]   4. Exekutatu test minimoak Docker barruan eta formateoa (`pint --dirty`).
+
+### Work Items
+
+- [x] [resources/views/admin/dashboard/index.blade.php](resources/views/admin/dashboard/index.blade.php)
+- [x] [routes/private.php](routes/private.php)
+- [x] [app/Http/Controllers/ArtisanController.php](app/Http/Controllers/ArtisanController.php)
+- [x] [lang/eu/admin.php](lang/eu/admin.php) (edo dashboardeko mezuak dauden tokia)
+- [x] [lang/es/admin.php](lang/es/admin.php) (edo dashboardeko mezuak dauden tokia)
+- [x] [tests/Feature/ArtisanDashboardActionsTest.php](tests/Feature/ArtisanDashboardActionsTest.php) (berria edo baliokidea)
+
+### Validation
+
+- [ ] TDD-based implementation when possible
+- [x] Required formatting/lint checks
+- [x] Relevant test suite
+- [ ] Dusk tests when frontend/flow changes exist
