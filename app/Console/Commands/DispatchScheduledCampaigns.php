@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\Messaging\DispatchCampaignJob;
 use App\Models\Campaign;
 use Illuminate\Console\Command;
-use App\Jobs\Messaging\DispatchCampaignJob;
 
 class DispatchScheduledCampaigns extends Command
 {
