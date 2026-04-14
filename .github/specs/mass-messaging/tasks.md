@@ -10,8 +10,8 @@ Implementación incremental del sistema de mensajería masiva multicanal. Las ca
 
 - [ ] 1. Migraciones y modelos base
     - Mantener diseño del panel tomando como referencia el listado de avisos del panel (`notice-manager`).
-    - [ ] 1.1 Crear migración de modificación de `owners` (campos `coprop1_telegram_id`, `coprop2_telegram_id`, `preferred_locale`, contadores y flags de validez de contacto)
-    - Añadir `coprop1_telegram_id`, `coprop2_telegram_id`, `preferred_locale` nullable
+    - [ ] 1.1 Crear migración de modificación de `owners` (campos `coprop1_telegram_id`, `coprop2_telegram_id`, contadores y flags de validez de contacto)
+    - Añadir `coprop1_telegram_id` y `coprop2_telegram_id` nullable
     - Añadir `coprop1_email_error_count`, `coprop1_email_invalid`, `coprop1_phone_error_count`, `coprop1_phone_invalid` (y equivalentes coprop2) con defaults 0/false
     - Añadir `last_contact_error_at` nullable timestamp
     - Actualizar `$fillable` y `casts()` en `app/Models/Owner.php`
@@ -116,7 +116,7 @@ Implementación incremental del sistema de mensajería masiva multicanal. Las ca
 
     - [ ] 5.2 Implementar `SendCampaignMessageJob` en `app/Jobs/Messaging/SendCampaignMessageJob.php`
     - Cargar `CampaignRecipient` con `Campaign` y `Owner`
-    - Seleccionar idioma según `preferred_locale` (con fallback según requisito 2.3 y 2.4)
+    - Seleccionar idioma según `language` (con fallback según requisito 2.3 y 2.4)
     - Sustituir variables con `MessageVariableResolver`
     - Delegar en el `ChannelProvider` correspondiente al canal
     - WHEN éxito: registrar `CampaignTrackingEvent` de entrega y resetear contador de errores del contacto en Owner
@@ -299,9 +299,9 @@ Implementación incremental del sistema de mensajería masiva multicanal. Las ca
     - Etiquetar: `// Feature: mass-messaging, Property 1: Sustitución completa de variables`
     - _Requisitos: 3.8_
 
-    - [ ]\* 14.2 P2: Selección de idioma según preferred_locale — `tests/Unit/Messaging/LocaleSelectionTest.php`
+    - [ ]\* 14.2 P2: Selección de idioma según language — `tests/Unit/Messaging/LocaleSelectionTest.php`
     - Usar `it()->with(['eu', 'es'])` para cubrir ambos locales, verificar idioma seleccionado
-    - Etiquetar: `// Feature: mass-messaging, Property 2: Selección de idioma según preferred_locale`
+    - Etiquetar: `// Feature: mass-messaging, Property 2: Selección de idioma según language`
     - _Requisitos: 2.2_
 
     - [ ]\* 14.3 P3: Fallback de idioma cuando solo hay una versión — `tests/Unit/Messaging/LocaleSelectionTest.php`

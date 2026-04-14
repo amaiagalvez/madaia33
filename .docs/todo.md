@@ -55,13 +55,7 @@ Para que todo esto sea legal de verdad, asegúrate de:
 ✔ Logs de acceso (recomendado para votaciones)
 
 # Panela
-- [ ] para que ese el campo preferred_locale? Si es para el idioma usar language
-- [ ] leege oharrak, politika eta cookieak jarri {!!  !!} settings-eko testua erakustean
-- [ ] welcome eremua gehitu owner taulan datu basean, owner berri bat sortzean bidaltzen da emaila, ondoreen, welcome = true markatu bere erregistroan, Jabeak zerrendan, paneleean ghitu zutabe bat eremu honekin, eta ondoan botoi bat berriro bidali ahal izateko ongi etorri mezu hori.
-- [ ] ongi eotrri mezua bidaltzean orrdezkatu  ##izena## aldagaia koop1 izenagatik
-- [ ] contact formularioa:
-En el check del formulario debee aparecerr " Pribatutasun politika irakurri eta onartzen dut." o "He leído y acepto la política de privacidad" y al pulsar sobree ese texto debe de aparcer un modal con el texto legal que hay en settings contact_form
-- [ ] home front, priver bloque de anuncios a una columna
+- [x] para que ese el campo preferred_locale? Si es para el idioma usar language
 
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
