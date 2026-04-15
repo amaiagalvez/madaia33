@@ -22,8 +22,6 @@
 - [ ] traducciones repetidas
 - [ ] añadir el MCP para que consulte la documentación de laravel
 
-Igandea
-=======
 - votaciones resultados (suma de porcentajes)
 - spec kiro pendientes
 - unificar terminologia
@@ -39,15 +37,13 @@ owners => Propietarias
 - [ ] Cookies sartu
 - [ ] config recaptcha, analitics
 
-- [ ] En el listado de bozketak añadir un botón para Enviar un email con los pdf delegado o presencial. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa botación. 
+- [ ] En el listado de bozketak añadir un botón para Enviar un email con los pdf delegado o presencial. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa votación. 
 
 - [ ] profila. Bidalitako mezuak
 
 En el listado de admin/campanas
 - al pinchar en el botón programar, modal para pedir cuando programarlo
 - añadir nueva columna con el número de mensajes de abiertos
-
-    - [ ] en la vista de la galeria del front se ha perdido la funcionalidad de pinchar en la foto y verla en grande. Antes estaba.
 
 - [ ] campaña: añadir un botón, enviar prueba (como tenenmos en el formulario de los settings email_configuration) mostrar un modal para pedir un email y enviar a dicho email una prueba de como queda la campaña. Se enviarán dos emails de prueba, uno en euskera y otro en castellano al email indicado.
 

@@ -1,4 +1,5 @@
 - After each correction response, include `Aprendizajes:` with root cause + prevention, and save that learning in memory for the next correction.
+- When removing a constructor parameter for PHPMD compliance, search all test files for usages of that named argument and update them in the same pass; also check seeders for `null` values stored where the DB/test expects `''` (empty string).
 - Before finishing a correction, check VS Code Problems and fix warnings/errors in touched files.
 - If Problems include unrelated pre-existing items, report them explicitly instead of silently ignoring.
 - Mirror rule: every new or updated entry in `/memories/correction-workflow.md` must also be written to `.docs/repo-corrections.md`.

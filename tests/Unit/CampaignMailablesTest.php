@@ -66,13 +66,11 @@ it('wraps campaign emails with the shared branded mail layout', function () {
         htmlBody: '<p>Contenido del mensaje</p>',
         trackingPixelUrl: 'https://example.test/track/open/token123',
         documents: new Collection,
-        legalText: '<p>Aviso legal</p>',
     );
 
     $rendered = $mailable->render();
 
     expect($rendered)
         ->toContain('Contenido del mensaje')
-        ->toContain('Aviso legal')
         ->toContain('Madaia 33');
 });

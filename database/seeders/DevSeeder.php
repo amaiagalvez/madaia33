@@ -68,14 +68,14 @@ class DevSeeder extends Seeder
             'from_name' => 'Komunitatea Local',
             'smtp_host' => 'mailhog',
             'smtp_port' => '1025',
-            'smtp_username' => null,
-            'smtp_password' => null,
-            'smtp_encryption' => null,
+            'smtp_username' => '',
+            'smtp_password' => '',
+            'smtp_encryption' => '',
         ];
 
         Setting::upsert(
             collect($settings)
-                ->map(fn (string $value, string $key): array => [
+                ->map(fn (mixed $value, string $key): array => [
                     'key' => $key,
                     'value' => $value,
                     'section' => Setting::SECTION_EMAIL_CONFIGURATION,
