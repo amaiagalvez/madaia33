@@ -92,6 +92,18 @@
                     </a>
                 @endif
 
+                @if (auth()->user()?->canManageNotices())
+                    <a href="{{ route('admin.campaigns') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.campaigns*') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 8.25h18M3 12h18m-9 3.75h9M5.25 6h13.5A2.25 2.25 0 0 1 21 8.25v7.5A2.25 2.25 0 0 1 18.75 18H5.25A2.25 2.25 0 0 1 3 15.75v-7.5A2.25 2.25 0 0 1 5.25 6Z" />
+                        </svg>
+                        {{ __('admin.campaigns') }}
+                    </a>
+                @endif
+
                 <p class="px-3 pt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
                     {{ __('admin.sidebar.community') }}
                 </p>
@@ -217,6 +229,10 @@
                         @if (auth()->user()?->canManageNotices())
                             <a href="{{ route('admin.notices') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.notices') }}</a>
+                        @endif
+                        @if (auth()->user()?->canManageNotices())
+                            <a href="{{ route('admin.campaigns') }}"
+                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.campaigns') }}</a>
                         @endif
                         @if (auth()->user()?->isSuperadmin())
                             <a href="{{ route('admin.images') }}"

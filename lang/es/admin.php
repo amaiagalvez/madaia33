@@ -3,6 +3,7 @@
 return [
     'dashboard' => 'Panel de administración',
     'notices' => 'Avisos',
+    'campaigns' => 'Envíos',
     'gallery' => 'Galería',
     'messages' => 'Mensajes',
     'settings' => 'Configuración',
@@ -110,6 +111,12 @@ return [
         'owners' => 'Propietarias',
         'locations' => 'Ubicaciones',
         'votings' => 'Votaciones',
+    ],
+    'queue' => [
+        'start_button' => 'Poner cola en marcha',
+        'confirm_start' => '¿Ejecutar queue:work hasta vaciar la cola?',
+        'status_finished' => 'Cola procesada hasta vaciarse.',
+        'status_failed' => 'No se pudo ejecutar la cola.',
     ],
     'legal' => [
         'privacy_policy' => 'Política de privacidad',
@@ -251,9 +258,12 @@ return [
             'locals' => 'Locales',
             'garages' => 'Garajes',
             'storages' => 'Trasteros',
+            'welcome' => 'Bienvenida',
             'terms_accepted' => 'Condiciones de uso aceptadas',
         ],
         'view_properties' => 'Ver propiedades',
+        'resend_welcome_email' => 'Reenviar mensaje de bienvenida',
+        'confirm_resend_welcome' => '¿Seguro que quieres reenviar el mensaje de bienvenida?',
         'edit_owner' => 'Editar propietaria',
         'edit_submit' => 'Guardar cambios',
         'audit' => [

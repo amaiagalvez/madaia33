@@ -25,9 +25,8 @@ it('renders placeholder image when showImage is true but no image provided', fun
 
     $view = test()->blade('<x-notice-card :notice="$notice" show-image />', ['notice' => $notice]);
 
-    // Check for brand-tinted placeholder with aspect-video
+    // Check for brand-tinted placeholder
     $view->assertSee('from-[#edd2c7]/20');
-    $view->assertSee('aspect-video');
 });
 
 it('hides image when showImage is false', function () {

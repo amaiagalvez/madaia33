@@ -14,7 +14,7 @@ Sistema de envío de mensajes multicanal (email, SMS, WhatsApp, Telegram) dirigi
 - **Tracking_Event**: Registro de una interacción de un Recipient con un mensaje: apertura, clic en enlace o descarga de documento.
 - **Variable**: Marcador de posición en el cuerpo del mensaje con formato `**nombre_variable**` que el Messaging_System sustituye por el valor real de la propietaria antes del envío.
 - **Owner**: Modelo existente que representa a una propietaria. Contiene `coprop1_name`, `coprop1_email`, `coprop1_phone`, `coprop1_telegram_id`, `coprop2_name`, `coprop2_email`, `coprop2_phone`, `coprop2_telegram_id`. Los campos `telegram_id` son nuevos y deben añadirse al modelo. Se añadirán también campos de validez de contacto y contadores de errores consecutivos por canal.
-- **Preferred_Locale**: Idioma preferido de la propietaria para recibir comunicaciones. Valores posibles: `eu` (euskera), `es` (castellano), o `null` (sin preferencia). Almacenado en el Owner.
+- **Language**: Idioma preferido de la propietaria para recibir comunicaciones. Se reutiliza el campo existente del Owner con valores `eu` o `es`.
 - **Location**: Modelo existente que representa un portal o planta de garaje.
 - **PropertyAssignment**: Modelo existente que relaciona Owner con Property y, a través de ésta, con Location.
 - **Admin**: Usuario con acceso al panel de administración que puede crear y enviar Campaigns. Existen tres variantes con permisos distintos:
@@ -48,10 +48,10 @@ Sistema de envío de mensajes multicanal (email, SMS, WhatsApp, Telegram) dirigi
 #### Criterios de aceptación
 
 1. THE Messaging_System SHALL permitir al Admin introducir asunto y cuerpo del mensaje en euskera (`eu`) y en castellano (`es`), siendo obligatorio rellenar al menos uno de los dos idiomas.
-2. WHEN el Messaging_System envía un mensaje a un Recipient, THE Messaging_System SHALL seleccionar la versión del idioma que coincida con el `preferred_locale` del Owner asociado.
-3. IF el Owner no tiene `preferred_locale` definido, THEN THE Messaging_System SHALL enviar el mensaje en ambos idiomas en el mismo envío, con el contenido en euskera primero.
-4. IF el Admin solo ha redactado el mensaje en un idioma y el `preferred_locale` del Owner es el otro idioma, THEN THE Messaging_System SHALL enviar la versión disponible sin interrumpir el envío.
-5. THE Owner SHALL almacenar un campo `preferred_locale` con los valores posibles `eu`, `es` o `null`.
+2. WHEN el Messaging_System envía un mensaje a un Recipient, THE Messaging_System SHALL seleccionar la versión del idioma que coincida con el campo `language` del Owner asociado.
+3. IF el Owner no tiene `language` definido, THEN THE Messaging_System SHALL enviar el mensaje en ambos idiomas en el mismo envío, con el contenido en euskera primero.
+4. IF el Admin solo ha redactado el mensaje en un idioma y el `language` del Owner es el otro idioma, THEN THE Messaging_System SHALL enviar la versión disponible sin interrumpir el envío.
+5. THE Owner SHALL reutilizar el campo existente `language` para expresar el idioma preferido de comunicación.
 
 ---
 

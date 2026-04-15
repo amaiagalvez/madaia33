@@ -125,6 +125,10 @@ class Owners extends Component
 
     public string $rowErrorMessage = '';
 
+    public ?int $confirmingWelcomeOwnerId = null;
+
+    public bool $showWelcomeModal = false;
+
     public function boot(
         CreateOwnerAction $createOwnerAction,
         CreateOwnerFormService $createOwnerFormService,
@@ -246,6 +250,37 @@ class Owners extends Component
 
         $this->createOwnerAction->execute($this->createOwnerFormService->prepareOwnerData($data));
         $this->resetCreateOwnerFormState();
+    }
+
+    public function confirmResendWelcomeMail(int $ownerId): void
+    {
+        $this->confirmingWelcomeOwnerId = $ownerId;
+        $this->showWelcomeModal = true;
+    }
+
+    public function doResendWelcomeMail(): void
+    {
+        if ($this->confirmingWelcomeOwnerId === null) {
+            return;
+        }
+
+        $this->resendOwnerWelcomeMail($this->confirmingWelcomeOwnerId);
+        $this->cancelResendWelcomeMail();
+    }
+
+    public function cancelResendWelcomeMail(): void
+    {
+        $this->confirmingWelcomeOwnerId = null;
+        $this->showWelcomeModal = false;
+    }
+
+    public function resendOwnerWelcomeMail(int $ownerId): void
+    {
+        $owner = Owner::query()
+            ->with(['user', 'assignments.property.location'])
+            ->findOrFail($ownerId);
+
+        $this->createOwnerAction->sendWelcomeMailToOwner($owner);
     }
 
     public function openEditOwnerForm(int $ownerId): void

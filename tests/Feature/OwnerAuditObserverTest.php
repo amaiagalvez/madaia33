@@ -43,4 +43,67 @@ describe('OwnerAuditObserver', function () {
 
         expect($logsCount)->toBe(2);
     });
+
+    it('resets coprop1 email error counters when coprop1 email changes', function () {
+        $owner = Owner::factory()->create([
+            'coprop1_email' => 'old@example.test',
+            'coprop1_email_error_count' => 3,
+            'coprop1_email_invalid' => true,
+        ]);
+
+        $owner->update([
+            'coprop1_email' => 'new@example.test',
+        ]);
+
+        $owner->refresh();
+
+        expect($owner->coprop1_email_error_count)->toBe(0)
+            ->and($owner->coprop1_email_invalid)->toBeFalse();
+    });
+
+    it('resets coprop1 phone error counters when coprop1 phone changes', function () {
+        $owner = Owner::factory()->create([
+            'coprop1_phone' => '600111222',
+            'coprop1_phone_error_count' => 3,
+            'coprop1_phone_invalid' => true,
+        ]);
+
+        $owner->update([
+            'coprop1_phone' => '699999999',
+        ]);
+
+        $owner->refresh();
+
+        expect($owner->coprop1_phone_error_count)->toBe(0)
+            ->and($owner->coprop1_phone_invalid)->toBeFalse();
+    });
+
+    it('does not reset unrelated counters when only one contact field changes', function () {
+        $owner = Owner::factory()->create([
+            'coprop1_email' => 'old@example.test',
+            'coprop1_email_error_count' => 3,
+            'coprop1_email_invalid' => true,
+            'coprop1_phone_error_count' => 2,
+            'coprop1_phone_invalid' => true,
+            'coprop2_email_error_count' => 2,
+            'coprop2_email_invalid' => true,
+            'coprop2_phone_error_count' => 2,
+            'coprop2_phone_invalid' => true,
+        ]);
+
+        $owner->update([
+            'coprop1_email' => 'new@example.test',
+        ]);
+
+        $owner->refresh();
+
+        expect($owner->coprop1_email_error_count)->toBe(0)
+            ->and($owner->coprop1_email_invalid)->toBeFalse()
+            ->and($owner->coprop1_phone_error_count)->toBe(2)
+            ->and($owner->coprop1_phone_invalid)->toBeTrue()
+            ->and($owner->coprop2_email_error_count)->toBe(2)
+            ->and($owner->coprop2_email_invalid)->toBeTrue()
+            ->and($owner->coprop2_phone_error_count)->toBe(2)
+            ->and($owner->coprop2_phone_invalid)->toBeTrue();
+    });
 });

@@ -11,16 +11,22 @@ use Laravel\Dusk\Browser;
 test('contact form complete flow with recaptcha disabled', function () {
     Setting::updateOrCreate(['key' => 'recaptcha_secret_key'], ['value' => '']);
     Setting::updateOrCreate(['key' => 'recaptcha_site_key'], ['value' => '']);
+    Setting::updateOrCreate(['key' => 'legal_checkbox_text_eu'], ['value' => '<p>Kontakturako lege testua</p>']);
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/eu/harremana')
             ->assertSee('Kontaktua')
+            ->assertSee('Pribatutasun politika irakurri eta onartzen dut.')
+            ->click('[data-test="contact-legal-modal-trigger"]')
+            ->waitFor('[data-test="contact-legal-modal"]', 5)
+            ->assertSee('Kontakturako lege testua')
+            ->keys('', '{escape}')
+            ->check('#contact-legal')
             ->type('#contact-name', 'Ane Etxebarria')
             ->type('#contact-email', 'ane@example.com')
             ->type('#contact-subject', 'Proba gaia')
             ->type('#contact-message', 'Hau proba mezu bat da.')
-            ->check('#contact-legal')
             ->script("document.getElementById('recaptcha-token').value = 'test-token';
                         document.getElementById('recaptcha-token').dispatchEvent(new Event('input'));");
 

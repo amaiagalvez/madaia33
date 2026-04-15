@@ -11,6 +11,7 @@ return [
         'overview' => 'Laburpena',
         'votings' => 'Nire bozketak',
         'sessions' => 'Saioak',
+        'received' => 'Jasotako mezuak',
         'messages' => 'Bidalitako mezuak',
         'owner' => 'Jabearen fitxa',
     ],
@@ -45,6 +46,15 @@ return [
         'ip' => 'IP',
         'active' => 'Aktibo',
         'in_progress' => 'Martxan',
+    ],
+    'received' => [
+        'title' => 'Jasotako mezuak',
+        'empty' => 'Oraindik ez duzu jasotako mezurik.',
+        'subject' => 'Gaia',
+        'message' => 'Mezua',
+        'sent_at' => 'Bidalketa data',
+        'status' => 'Egoera',
+        'opened' => 'Irekita',
     ],
     'messages' => [
         'title' => 'Bidalitako mezuak',

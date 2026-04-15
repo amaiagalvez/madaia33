@@ -62,7 +62,7 @@ describe('CreateOwnerAction', function () {
         ]);
 
         $action = new CreateOwnerAction;
-        $action->execute([
+        $owner = $action->execute([
             'coprop1_name' => 'Miren Etxeberria',
             'coprop1_dni' => '12345678Z',
             'coprop1_email' => 'miren@example.com',
@@ -74,6 +74,8 @@ describe('CreateOwnerAction', function () {
                 ],
             ],
         ]);
+
+        expect($owner->fresh())->welcome->toBeTrue();
 
         Mail::assertSent(OwnerWelcomeMail::class, function (OwnerWelcomeMail $mail): bool {
             return $mail->hasTo('miren@example.com')

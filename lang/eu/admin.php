@@ -3,6 +3,7 @@
 return [
     'dashboard' => 'Aginte-panela',
     'notices' => 'Iragarkiak',
+    'campaigns' => 'Bidalketak',
     'gallery' => 'Argazki-bilduma',
     'messages' => 'Mezuak',
     'settings' => 'Ezarpenak',
@@ -110,6 +111,12 @@ return [
         'owners' => 'Jabeak',
         'locations' => 'Kokalekuak',
         'votings' => 'Bozketak',
+    ],
+    'queue' => [
+        'start_button' => 'Jarri ilara martxan',
+        'confirm_start' => 'Exekutatu queue:work ilara hustu arte?',
+        'status_finished' => 'Ilara hustu arte prozesatu da.',
+        'status_failed' => 'Ezin izan da ilara exekutatu.',
     ],
     'legal' => [
         'privacy_policy' => 'Pribatutasun-politika',
@@ -252,9 +259,12 @@ return [
             'locals' => 'Lokalak',
             'garages' => 'Garajeak',
             'storages' => 'Trastelekuak',
+            'welcome' => 'Ongi etorria',
             'terms_accepted' => 'Baldintzak onartu ditu',
         ],
         'view_properties' => 'Ikusi propietateak',
+        'resend_welcome_email' => 'Berriro bidali ongi etorriko mezua',
+        'confirm_resend_welcome' => 'Ziur zaude ongi etorriko mezua berriro bidali nahi duzula?',
         'edit_owner' => 'Editatu jabea',
         'edit_submit' => 'Gorde aldaketak',
         'audit' => [

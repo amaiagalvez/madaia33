@@ -63,6 +63,7 @@ test('lightbox adapts orientation and closes with escape and outside click', fun
             ->click($galleryOpenSelector)
             ->pause(300)
             ->assertScript("return document.body.style.overflow === 'hidden';", true)
+            ->assertScript("return getComputedStyle(document.querySelector('[data-lightbox]')).display !== 'none';", true)
             ->assertScript(
                 "return document.querySelector('[data-lightbox] img').classList.contains('max-h-[90vh]');",
                 true
@@ -87,6 +88,24 @@ test('lightbox adapts orientation and closes with escape and outside click', fun
         $browser
             ->pause(300)
             ->assertScript($overflowScript, '');
+    });
+});
+
+test('lightbox still opens for captions with quotes and line breaks', function () {
+    Image::factory()->create([
+        'alt_text_eu' => "Auzoaren \"argazkia\"\n2026ko oroitzapena",
+        'alt_text_es' => "La \"foto\" del barrio\nrecuerdo de 2026",
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) {
+        $browser->visit(GALLERY_PATH)
+            ->pause(350)
+            ->click('[data-gallery-open]')
+            ->pause(350)
+            ->assertScript("return document.body.style.overflow === 'hidden';", true)
+            ->assertScript("return getComputedStyle(document.querySelector('[data-lightbox]')).display !== 'none';", true)
+            ->assertScript("return !!document.querySelector('[data-lightbox] img');", true);
     });
 });
 

@@ -32,6 +32,21 @@
                     </button>
                 </form>
 
+                <form method="POST"
+                    action="{{ route('admin.artisan.queue_work_stop_when_empty') }}"
+                    onsubmit="return confirm('{{ __('admin.queue.confirm_start') }}')">
+                    @csrf
+                    <button type="submit"
+                        class="inline-flex items-center gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2">
+                        <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                        {{ __('admin.queue.start_button') }}
+                    </button>
+                </form>
+
                 @if (session('status'))
                     <p class="mt-3 text-sm font-medium text-green-700">
                         {{ session('status') }}

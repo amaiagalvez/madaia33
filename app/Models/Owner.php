@@ -22,21 +22,41 @@ class Owner extends Model
         'coprop1_surname',
         'coprop1_dni',
         'coprop1_phone',
+        'coprop1_telegram_id',
         'coprop1_email',
         'language',
+        'welcome',
         'accepted_terms_at',
         'coprop2_name',
         'coprop2_surname',
         'coprop2_dni',
         'coprop2_phone',
+        'coprop2_telegram_id',
         'coprop2_email',
+        'coprop1_email_error_count',
+        'coprop1_email_invalid',
+        'coprop1_phone_error_count',
+        'coprop1_phone_invalid',
+        'coprop2_email_error_count',
+        'coprop2_email_invalid',
+        'coprop2_phone_error_count',
+        'coprop2_phone_invalid',
+        'last_contact_error_at',
     ];
 
     /**
-     * @var array<string, string>
+     * @var array<string, int|string|bool>
      */
     protected $attributes = [
         'language' => SupportedLocales::DEFAULT,
+        'coprop1_email_error_count' => 0,
+        'coprop1_email_invalid' => false,
+        'coprop1_phone_error_count' => 0,
+        'coprop1_phone_invalid' => false,
+        'coprop2_email_error_count' => 0,
+        'coprop2_email_invalid' => false,
+        'coprop2_phone_error_count' => 0,
+        'coprop2_phone_invalid' => false,
     ];
 
     /**
@@ -46,7 +66,17 @@ class Owner extends Model
     {
         return [
             'language' => 'string',
+            'welcome' => 'boolean',
             'accepted_terms_at' => 'datetime',
+            'coprop1_email_error_count' => 'integer',
+            'coprop1_email_invalid' => 'boolean',
+            'coprop1_phone_error_count' => 'integer',
+            'coprop1_phone_invalid' => 'boolean',
+            'coprop2_email_error_count' => 'integer',
+            'coprop2_email_invalid' => 'boolean',
+            'coprop2_phone_error_count' => 'integer',
+            'coprop2_phone_invalid' => 'boolean',
+            'last_contact_error_at' => 'datetime',
         ];
     }
 
