@@ -39,7 +39,7 @@ owners => Propietarias
 
 - [ ] En el listado de bozketak añadir un botón para Enviar un email con los pdf delegado o presencial. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa votación. 
 
-- [ ] profila. Bidalitako mezuak
+- [ ] Al poner una bidalketa en marcha, activar el queue
 
 En el listado de admin/campanas
 - al pinchar en el botón programar, modal para pedir cuando programarlo
