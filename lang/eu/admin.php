@@ -259,9 +259,12 @@ return [
             'locals' => 'Lokalak',
             'garages' => 'Garajeak',
             'storages' => 'Trastelekuak',
+            'welcome' => 'Ongi etorria',
             'terms_accepted' => 'Baldintzak onartu ditu',
         ],
         'view_properties' => 'Ikusi propietateak',
+        'resend_welcome_email' => 'Berriro bidali ongi etorriko mezua',
+        'confirm_resend_welcome' => 'Ziur zaude ongi etorriko mezua berriro bidali nahi duzula?',
         'edit_owner' => 'Editatu jabea',
         'edit_submit' => 'Gorde aldaketak',
         'audit' => [

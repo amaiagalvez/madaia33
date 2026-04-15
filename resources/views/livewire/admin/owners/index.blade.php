@@ -323,6 +323,9 @@
                     {{ __('admin.owners.columns.storages') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
+                    {{ __('admin.owners.columns.welcome') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
                     {{ __('admin.owners.columns.terms_accepted') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell class="relative">
@@ -412,6 +415,19 @@
                         @endforeach
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500"
+                        data-owner-welcome="{{ $owner->id }}">
+                        <div class="flex items-center gap-2">
+                            <x-admin.status-indicator :active="$owner->welcome" />
+                            <button type="button"
+                                wire:click="confirmResendWelcomeMail({{ $owner->id }})"
+                                title="{{ __('admin.owners.resend_welcome_email') }}"
+                                data-action="resend-owner-welcome-{{ $owner->id }}"
+                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#793d3d]">
+                                <flux:icon.paper-airplane class="size-4" />
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500"
                         data-owner-terms-accepted="{{ $owner->id }}">
                         <x-admin.status-indicator :active="$owner->accepted_terms_at !== null" />
                     </td>
@@ -433,7 +449,7 @@
 
                 @if ($expandedOwnerId === $owner->id)
                     <tr wire:key="owner-inline-panel-{{ $owner->id }}" class="bg-gray-50">
-                        <td colspan="8" class="px-6 py-4">
+                        <td colspan="10" class="px-6 py-4">
                             <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4"
                                 data-owner-inline-panel="{{ $owner->id }}">
                                 @if ($rowErrorMessage !== '')
@@ -587,7 +603,7 @@
 @endif
 @empty
 <tr>
-    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
+    <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500">
         {{ __('admin.owners.no_records') }}
     </td>
 </tr>
@@ -598,4 +614,41 @@
 <div class="mt-4" data-section="owners-pagination">
     {{ $owners->links() }}
 </div>
+
+@if ($showWelcomeModal)
+    <dialog open
+        class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4"
+        aria-labelledby="welcome-modal-title">
+        <div class="mx-4 w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+            <div class="flex items-start gap-3">
+                <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                    <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.876L6 12Zm0 0h7.5" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 id="welcome-modal-title" class="text-base font-semibold text-gray-900">
+                        {{ __('admin.owners.resend_welcome_email') }}
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        {{ __('admin.owners.confirm_resend_welcome') }}
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" wire:click="cancelResendWelcomeMail"
+                    class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                    {{ __('general.buttons.cancel') }}
+                </button>
+                <button type="button" wire:click="doResendWelcomeMail"
+                    class="rounded-md bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    {{ __('general.buttons.confirm') }}
+                </button>
+            </div>
+        </div>
+    </dialog>
+@endif
 </div>

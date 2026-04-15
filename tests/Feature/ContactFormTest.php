@@ -328,11 +328,12 @@ it('if reCAPTCHA throws an exception, it rejects submission and does not store m
     expect(ContactMessage::count())->toBe(0);
 });
 
-it('render uses legal text and privacy policy fallback when settings are missing', function (string $locale) {
+it('render uses translated checkbox text when settings are missing', function (string $locale) {
     app()->setLocale($locale);
 
     Livewire::test('contact-form')
-        ->assertViewHas('legalText', __('contact.legal_text'))
+        ->assertViewHas('checkboxLabel', __('contact.legal_text'))
+        ->assertViewHas('legalModalText', __('contact.legal_text'))
         ->assertViewHas('siteKey', '');
 })->with('supported_locales');
 
@@ -371,9 +372,11 @@ it('accepts submission when recaptcha secret key is missing even if recaptcha_sk
     expect(ContactMessage::count())->toBe(1);
 });
 
-it('render uses the first available legal text from the fallback chain', function () {
-    createSetting('legal_checkbox_text_es', 'Texto legal ES desde settings');
+it('renders the translated checkbox label and the settings legal text in the modal', function () {
+    app()->setLocale('es');
+    createSetting('legal_checkbox_text_es', '<p>Texto legal ES desde settings</p>');
 
     Livewire::test('contact-form')
-        ->assertViewHas('legalText', 'Texto legal ES desde settings');
+        ->assertViewHas('checkboxLabel', __('contact.legal_text'))
+        ->assertViewHas('legalModalText', '<p>Texto legal ES desde settings</p>');
 });

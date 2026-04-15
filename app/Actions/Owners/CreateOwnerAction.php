@@ -28,7 +28,7 @@ class CreateOwnerAction
     {
         $password = Str::password(16);
 
-        $result = DB::transaction(fn (): array => $this->createOwnerWithAssignments($data, $password));
+        $result = DB::transaction(fn(): array => $this->createOwnerWithAssignments($data, $password));
 
         /** @var Owner $owner */
         $owner = $result['owner'];
@@ -37,7 +37,7 @@ class CreateOwnerAction
 
         $user->assignRole(Role::PROPERTY_OWNER);
 
-        $this->sendWelcomeMail($user, $data);
+        $this->sendWelcomeMailToOwner($owner, $data);
 
         return $owner;
     }
@@ -94,6 +94,7 @@ class CreateOwnerAction
             'coprop1_phone' => $data['coprop1_phone'] ?? null,
             'coprop1_email' => $data['coprop1_email'],
             'language' => $data['language'] ?? SupportedLocales::default(),
+            'welcome' => false,
             'coprop2_name' => $data['coprop2_name'] ?? null,
             'coprop2_surname' => $data['coprop2_surname'] ?? null,
             'coprop2_dni' => $data['coprop2_dni'] ?? null,
@@ -154,9 +155,27 @@ class CreateOwnerAction
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>|null  $data
      */
-    private function sendWelcomeMail(User $user, array $data): void
+    public function sendWelcomeMailToOwner(Owner $owner, ?array $data = null): void
+    {
+        $owner->loadMissing(['user', 'assignments.property.location']);
+
+        $user = $owner->user;
+
+        if (! $user instanceof User) {
+            return;
+        }
+
+        $this->sendWelcomeMail($owner, $user, $data);
+
+        $owner->forceFill(['welcome' => true])->saveQuietly();
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $data
+     */
+    private function sendWelcomeMail(Owner $owner, User $user, ?array $data = null): void
     {
         $settings = Setting::stringValues([
             'from_address',
@@ -181,7 +200,7 @@ class CreateOwnerAction
 
         $bodyHtml = str_replace(
             ['##izena##', '##info##'],
-            [(string) ($data['coprop1_name'] ?? $user->name), $this->buildAssignmentsInfoHtml($data)],
+            [(string) (($data['coprop1_name'] ?? null) ?: $owner->coprop1_name ?: $user->name), $this->buildAssignmentsInfoHtml($owner, $data)],
             $bodyTemplate,
         );
 
@@ -201,20 +220,33 @@ class CreateOwnerAction
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>|null  $data
      */
-    private function buildAssignmentsInfoHtml(array $data): string
+    private function buildAssignmentsInfoHtml(Owner $owner, ?array $data = null): string
     {
         /** @var array<int, array{property_id: int|string, start_date?: string, end_date?: string|null}> $assignments */
         $assignments = $data['assignments'] ?? [];
 
-        if ($assignments === []) {
+        $items = $assignments !== []
+            ? $this->buildAssignmentItemsFromPayload($assignments)
+            : $this->buildAssignmentItemsFromOwner($owner);
+
+        if ($items === []) {
             return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
         }
 
+        return '<ul>' . implode('', $items) . '</ul>';
+    }
+
+    /**
+     * @param  array<int, array{property_id: int|string, start_date?: string, end_date?: string|null}>  $assignments
+     * @return array<int, string>
+     */
+    private function buildAssignmentItemsFromPayload(array $assignments): array
+    {
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
@@ -225,25 +257,33 @@ class CreateOwnerAction
             ->get()
             ->keyBy('id');
 
-        $items = collect($assignments)
-            ->map(function (array $assignment) use ($properties): ?string {
-                $property = $properties->get((int) $assignment['property_id']);
-
-                if ($property === null || $property->location === null) {
-                    return null;
-                }
-
-                $label = $property->location->code . ' ' . $property->name;
-
-                return '<li>' . e($label) . '</li>';
-            })
+        return collect($assignments)
+            ->map(fn(array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
             ->filter()
-            ->values();
+            ->values()
+            ->all();
+    }
 
-        if ($items->isEmpty()) {
-            return '<p>' . e(__('admin.owners.email.no_properties')) . '</p>';
+    /**
+     * @return array<int, string>
+     */
+    private function buildAssignmentItemsFromOwner(Owner $owner): array
+    {
+        return $owner->assignments
+            ->map(fn(PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    private function assignmentItemFromProperty(?Property $property): ?string
+    {
+        if ($property === null || $property->location === null) {
+            return null;
         }
 
-        return '<ul>' . $items->implode('') . '</ul>';
+        $label = $property->location->code . ' ' . $property->name;
+
+        return '<li>' . e($label) . '</li>';
     }
 }

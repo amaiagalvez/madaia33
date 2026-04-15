@@ -13,6 +13,7 @@ use App\Livewire\Admin\Locations;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Mail;
 use App\Livewire\Admin\LocationDetail;
+use App\Actions\Owners\CreateOwnerAction;
 
 it('renders admin locations list for selected type', function () {
     $user = adminUser();
@@ -610,7 +611,44 @@ it('creates a new owner from the admin owners list', function () {
         return $mail->hasTo('irati@example.com');
     });
 
-    expect($owner->assignments()->count())->toBe(1);
+    expect($owner->welcome)->toBeTrue()
+        ->and($owner->assignments()->count())->toBe(1);
+});
+
+it('resends the owner welcome email from the owners list', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $portal = Location::factory()->portal()->create(['code' => '77-W', 'name' => 'Portal 77-W']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '2B']);
+
+    $owner = (new CreateOwnerAction)->execute([
+        'coprop1_name' => 'Ane Iriarte',
+        'coprop1_surname' => 'Goikoetxea',
+        'coprop1_dni' => '55443322K',
+        'coprop1_email' => 'ane@example.com',
+        'assignments' => [
+            [
+                'property_id' => $property->id,
+                'start_date' => '2026-01-01',
+                'end_date' => null,
+            ],
+        ],
+    ]);
+
+    Mail::assertSentCount(1);
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->call('confirmResendWelcomeMail', $owner->id)
+        ->assertSet('showWelcomeModal', true)
+        ->call('doResendWelcomeMail')
+        ->assertSet('showWelcomeModal', false)
+        ->assertHasNoErrors();
+
+    Mail::assertSentCount(2);
+
+    expect($owner->fresh()->welcome)->toBeTrue();
 });
 
 it('creates a new owner with a manual id from the admin owners list', function () {

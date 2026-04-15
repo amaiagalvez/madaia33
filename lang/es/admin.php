@@ -258,9 +258,12 @@ return [
             'locals' => 'Locales',
             'garages' => 'Garajes',
             'storages' => 'Trasteros',
+            'welcome' => 'Bienvenida',
             'terms_accepted' => 'Condiciones de uso aceptadas',
         ],
         'view_properties' => 'Ver propiedades',
+        'resend_welcome_email' => 'Reenviar mensaje de bienvenida',
+        'confirm_resend_welcome' => '¿Seguro que quieres reenviar el mensaje de bienvenida?',
         'edit_owner' => 'Editar propietaria',
         'edit_submit' => 'Guardar cambios',
         'audit' => [
