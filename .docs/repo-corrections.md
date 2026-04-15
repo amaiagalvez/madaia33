@@ -221,3 +221,4 @@
 - In Livewire PHPStan fixes, if a type is only used in PHPDoc, prefer a fully-qualified docblock type instead of importing the class; this prevents false "unused import" warnings while preserving static analysis typing.
 - To satisfy PHPMD `ExcessiveClassLength` in large Livewire components without behavior changes, extract cohesive action/auth blocks into a dedicated concern trait and keep the host component focused on form/query state.
 - When Pint reports targeted style regressions after manual refactors, run Pint on explicit file paths (not only --dirty) to guarantee quick deterministic fixes for function declaration/unary operator/array indentation rules.
+- In PHPStan fixes, `preg_match_all()` result offsets are always initialized as arrays; avoid redundant `?? []` on `$matches[n]` because it triggers `nullCoalesce.offset` warnings and hides real typing issues.

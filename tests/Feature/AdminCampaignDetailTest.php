@@ -304,5 +304,55 @@ it('resends only unopened recipients in the same campaign', function () {
         ->and($unopenedRecipient->status)->toBe('pending');
 
     Queue::assertPushed(SendCampaignMessageJob::class, 1);
-    Queue::assertPushed(SendCampaignMessageJob::class, fn (SendCampaignMessageJob $job): bool => $job->recipientId === $unopenedRecipient->id);
+    Queue::assertPushed(SendCampaignMessageJob::class, fn(SendCampaignMessageJob $job): bool => $job->recipientId === $unopenedRecipient->id);
+});
+
+it('shows whatsapp click-to-chat with tracked links and marks recipient as sent', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'completed',
+        'channel' => 'whatsapp',
+        'body_eu' => '<p>Kaixo komunitatea</p><p><a href="https://example.org/info">Informazioa</a></p>',
+        'body_es' => null,
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'contact' => '+34 600 11 22 33',
+        'tracking_token' => 'token-whatsapp-1',
+        'status' => 'pending',
+    ]);
+
+    $document = CampaignDocument::factory()->create([
+        'campaign_id' => $campaign->id,
+        'filename' => 'deialdia.pdf',
+    ]);
+
+    $trackedClickUrl = route('tracking.click', [
+        'token' => $recipient->tracking_token,
+        'url' => 'https://example.org/info',
+    ]);
+
+    $trackedDocumentUrl = route('tracking.document', [
+        'token' => $recipient->tracking_token,
+        'document' => $document->id,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $campaign])
+        ->assertSeeHtml('data-campaign-whatsapp-send-' . $recipient->id)
+        ->assertSee('wa.me/34600112233?text=', false)
+        ->assertSee(rawurlencode($trackedClickUrl), false)
+        ->assertSee(rawurlencode($trackedDocumentUrl), false)
+        ->call('markWhatsappSent', $recipient->id)
+        ->assertSee(__('campaigns.admin.messages.whatsapp_marked_sent'));
+
+    $recipient->refresh();
+
+    expect($recipient->status)->toBe('sent')
+        ->and(CampaignTrackingEvent::query()
+            ->where('campaign_recipient_id', $recipient->id)
+            ->where('event_type', 'whatsapp_sent')
+            ->exists())->toBeTrue();
 });

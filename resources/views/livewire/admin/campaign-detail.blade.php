@@ -182,7 +182,31 @@
                             <span>{{ $row['name'] }}</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-600">{{ $row['contact'] }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span>{{ $row['contact'] }}</span>
+
+                            @if ($row['whatsapp_url'])
+                                <a href="{{ $row['whatsapp_url'] }}" target="_blank"
+                                    rel="noopener noreferrer"
+                                    wire:click="markWhatsappSent({{ $row['id'] }})"
+                                    data-campaign-whatsapp-send-{{ $row['id'] }}
+                                    class="inline-flex items-center gap-1 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-2.5 py-1 text-xs font-semibold text-[#0f5132] transition hover:bg-[#25D366]/20">
+                                    <flux:icon.chat-bubble-left-right class="size-3.5" />
+                                    <span>{{ __('campaigns.admin.actions.send_whatsapp') }}</span>
+                                </a>
+
+                                @if ($row['whatsapp_sent'])
+                                    <span
+                                        class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                                        data-campaign-whatsapp-sent-{{ $row['id'] }}>
+                                        <flux:icon.check class="size-3.5" />
+                                        <span>{{ __('campaigns.admin.whatsapp.sent_badge') }}</span>
+                                    </span>
+                                @endif
+                            @endif
+                        </div>
+                    </td>
                     <td class="px-6 py-4 text-sm text-gray-600">
                         <span
                             class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $row['status'] === 'failed' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
