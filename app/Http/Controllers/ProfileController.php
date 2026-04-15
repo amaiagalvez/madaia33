@@ -3,16 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
-use App\Models\User;
 use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\Setting;
-use App\Models\Campaign;
 use App\SupportedLocales;
 use Illuminate\View\View;
 use App\Models\VotingBallot;
 use Illuminate\Http\Request;
-use App\Models\OwnerAuditLog;
 use App\Models\ContactMessage;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
@@ -43,26 +40,15 @@ class ProfileController extends Controller
 
         $activeAssignments = $this->activeAssignments($owner);
         $pendingAssignments = $activeAssignments->filter(
-            static fn($assignment): bool => ! (bool) $assignment->owner_validated,
+            static fn ($assignment): bool => ! (bool) $assignment->owner_validated,
         );
 
         $requiresTermsAcceptance = $owner !== null && $owner->accepted_terms_at === null;
 
-        $tabs = ['overview', 'votings', 'sessions', 'received', 'messages', 'owner'];
-        $requestedTab = (string) $request->query('tab', '');
-        $activeTab = in_array($requestedTab, $tabs, true)
-            ? $requestedTab
-            : ($requiresTermsAcceptance || $pendingAssignments->isNotEmpty() ? 'owner' : 'overview');
-
-        $termsHtml = Setting::localizedString(
-            'owners_terms_text',
-            __('profile.terms.default_text'),
-        ) ?? __('profile.terms.default_text');
-
         $ownerBallotVotingIds = $this->ownerBallotVotingIds($owner);
 
         return view('public.profile', [
-            'activeTab' => $activeTab,
+            'activeTab' => $this->resolveProfileTab($request, $requiresTermsAcceptance, $pendingAssignments),
             'activeAssignments' => $activeAssignments,
             'loginSessions' => $this->loginSessions($user?->id),
             'missedClosedVotings' => $this->missedClosedVotings($owner, $ownerBallotVotingIds),
@@ -72,10 +58,33 @@ class ProfileController extends Controller
             'pendingAssignments' => $pendingAssignments,
             'receivedMessages' => collect($this->receivedMessages($owner)),
             'requiresTermsAcceptance' => $requiresTermsAcceptance,
-            'termsHtml' => $termsHtml,
+            'termsHtml' => $this->profileTermsHtml(),
             'userBallots' => $this->userBallots($user?->id),
             'userMessages' => collect($this->userMessages($user?->id)),
         ]);
+    }
+
+    /**
+     * @param  Collection<int, mixed>  $pendingAssignments
+     */
+    private function resolveProfileTab(Request $request, bool $requiresTermsAcceptance, Collection $pendingAssignments): string
+    {
+        $tabs = ['overview', 'votings', 'sessions', 'received', 'messages', 'owner'];
+        $requestedTab = (string) $request->query('tab', '');
+
+        if (in_array($requestedTab, $tabs, true)) {
+            return $requestedTab;
+        }
+
+        return $requiresTermsAcceptance || $pendingAssignments->isNotEmpty() ? 'owner' : 'overview';
+    }
+
+    private function profileTermsHtml(): string
+    {
+        return Setting::localizedString(
+            'owners_terms_text',
+            __('profile.terms.default_text'),
+        ) ?? __('profile.terms.default_text');
     }
 
     public function acceptTerms(Request $request): RedirectResponse
@@ -134,11 +143,15 @@ class ProfileController extends Controller
             && $owner->accepted_terms_at === null;
     }
 
-    private function shouldAcceptDelegatedVoteTerms(User $user, string $termsScope): bool
+    private function shouldAcceptDelegatedVoteTerms(?object $user, string $termsScope): bool
     {
+        if ($user === null || ! method_exists($user, 'hasRole')) {
+            return false;
+        }
+
         return in_array($termsScope, ['vote_delegate', 'auto'], true)
             && $user->hasRole(Role::DELEGATED_VOTE)
-            && $user->delegated_vote_terms_accepted_at === null;
+            && data_get($user, 'delegated_vote_terms_accepted_at') === null;
     }
 
     public function updateOwner(Request $request): RedirectResponse
@@ -174,8 +187,8 @@ class ProfileController extends Controller
         abort_if($owner === null, 403);
 
         $assignmentIds = collect((array) $request->input('assignment_ids', []))
-            ->map(static fn(mixed $id): int => (int) $id)
-            ->filter(static fn(int $id): bool => $id > 0)
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
             ->values();
 
         if ($assignmentIds->isEmpty()) {
@@ -210,7 +223,7 @@ class ProfileController extends Controller
         }
 
         return $owner->assignments
-            ->filter(static fn($assignment): bool => $assignment->end_date === null)
+            ->filter(static fn ($assignment): bool => $assignment->end_date === null)
             ->values();
     }
 
@@ -260,7 +273,7 @@ class ProfileController extends Controller
             ->with('voting:id,name_eu,name_es,starts_at,ends_at')
             ->orderByDesc('voted_at')
             ->get(['id', 'voting_id', 'voted_at'])
-            ->map(static fn(VotingBallot $ballot): array => [
+            ->map(static fn (VotingBallot $ballot): array => [
                 'id' => $ballot->id,
                 'voting_name' => $ballot->voting->name,
                 'voted_at' => Carbon::parse($ballot->voted_at),
@@ -280,7 +293,7 @@ class ProfileController extends Controller
             ->where('user_id', $userId)
             ->orderByDesc('created_at')
             ->get(['id', 'subject', 'message', 'is_read', 'created_at', 'read_at'])
-            ->map(static fn(ContactMessage $message): array => [
+            ->map(static fn (ContactMessage $message): array => [
                 'id' => $message->id,
                 'subject' => $message->subject,
                 'message' => $message->message,
@@ -309,14 +322,18 @@ class ProfileController extends Controller
             ])
             ->orderByDesc('id')
             ->get(['id', 'campaign_id', 'owner_id', 'status', 'created_at'])
-            ->filter(static fn(CampaignRecipient $recipient): bool => $recipient->campaign instanceof Campaign)
+            ->filter(static fn (CampaignRecipient $recipient): bool => $recipient->campaign !== null)
             ->map(function (CampaignRecipient $recipient): array {
-                /** @var Campaign $campaign */
+                /** @var object $campaign */
                 $campaign = $recipient->campaign;
                 $locale = SupportedLocales::normalize(app()->getLocale());
                 $isOpened = $recipient->trackingEvents->contains('event_type', 'open');
-                $subject = $locale === SupportedLocales::SPANISH ? $campaign->subject_es : $campaign->subject_eu;
-                $body = $locale === SupportedLocales::SPANISH ? $campaign->body_es : $campaign->body_eu;
+                $subject = $locale === SupportedLocales::SPANISH
+                    ? (string) data_get($campaign, 'subject_es', '')
+                    : (string) data_get($campaign, 'subject_eu', '');
+                $body = $locale === SupportedLocales::SPANISH
+                    ? (string) data_get($campaign, 'body_es', '')
+                    : (string) data_get($campaign, 'body_eu', '');
 
                 return [
                     'id' => $recipient->id,
@@ -325,8 +342,8 @@ class ProfileController extends Controller
                     'status_label' => $isOpened
                         ? __('profile.received.opened')
                         : __('campaigns.admin.statuses.' . $recipient->status),
-                    'sent_at' => $campaign->sent_at !== null
-                        ? Carbon::parse($campaign->sent_at)
+                    'sent_at' => data_get($campaign, 'sent_at') !== null
+                        ? Carbon::parse((string) data_get($campaign, 'sent_at'))
                         : Carbon::parse($recipient->created_at),
                 ];
             })
@@ -346,7 +363,7 @@ class ProfileController extends Controller
         return VotingBallot::query()
             ->where('owner_id', $owner->id)
             ->pluck('voting_id')
-            ->map(static fn(mixed $votingId): int => (int) $votingId)
+            ->map(static fn (mixed $votingId): int => (int) $votingId)
             ->unique()
             ->values();
     }
@@ -363,9 +380,9 @@ class ProfileController extends Controller
 
         return $this->votingEligibilityService
             ->openEligibleVotingsForOwner($owner)
-            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
             ->values()
-            ->map(static fn(Voting $voting): array => [
+            ->map(static fn (Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),
@@ -389,10 +406,10 @@ class ProfileController extends Controller
             ->with('locations.location')
             ->orderByDesc('ends_at')
             ->get(['id', 'name_eu', 'name_es', 'starts_at', 'ends_at'])
-            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
-            ->filter(fn(Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
+            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->filter(fn (Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
             ->values()
-            ->map(static fn(Voting $voting): array => [
+            ->map(static fn (Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),
@@ -414,7 +431,7 @@ class ProfileController extends Controller
             ->latest()
             ->limit(10)
             ->get()
-            ->map(static function (OwnerAuditLog $log): array {
+            ->map(static function ($log): array {
                 return [
                     'field_label' => OwnerAuditFieldLabel::for($log->field),
                     'old_value' => $log->old_value !== '' ? $log->old_value : '—',

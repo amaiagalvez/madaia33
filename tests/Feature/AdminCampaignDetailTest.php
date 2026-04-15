@@ -304,5 +304,5 @@ it('resends only unopened recipients in the same campaign', function () {
         ->and($unopenedRecipient->status)->toBe('pending');
 
     Queue::assertPushed(SendCampaignMessageJob::class, 1);
-    Queue::assertPushed(SendCampaignMessageJob::class, fn(SendCampaignMessageJob $job): bool => $job->recipientId === $unopenedRecipient->id);
+    Queue::assertPushed(SendCampaignMessageJob::class, fn (SendCampaignMessageJob $job): bool => $job->recipientId === $unopenedRecipient->id);
 });

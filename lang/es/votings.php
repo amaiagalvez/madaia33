@@ -27,7 +27,7 @@ return [
         'owner' => 'Propietaria',
         'vote' => 'Voto',
         'properties' => 'Propiedades',
-        'percentage' => 'Porcentaje',
+        'percentage' => '% Total',
         'delegated_vote' => 'Voto Delegado',
         'delegated_by' => 'Quién votó en su nombre',
         'delegate_dni' => 'DNI',

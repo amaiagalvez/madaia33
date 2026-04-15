@@ -107,7 +107,8 @@ When the user confirms execution:
 8. **INDENTATION RULE**: enforce 4-space indentation in all created/modified files and run `vendor/bin/pint --dirty` after each change set
 9. Run relevant formatting, quality checks, and tests
 10. If failures exist, do not mark related tasks as complete; report failure, current state, and concrete next fixes
-11. Report results and residual risks in Basque
+11. **Quality gate (mandatory)**: before marking any task as finished, run `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality` inside Docker and confirm it exits with code 0. If it fails, fix the errors first; do not mark the task complete until the quality gate passes.
+12. Report results and residual risks in Basque
 
 ---
 
@@ -240,6 +241,7 @@ Before implementation, load the relevant skill for the scope touched by the spec
 - **Spec is source of truth**: reflect execution status in the spec itself, not only in private notes
 - **Voting integrity rule**: enforce one-choice-per-ballot DB unique constraint (`voting_ballot_id`) alongside app validation
 - **Admin aggregation rule**: avoid per-row count/query in lists; use a single aggregate query or one in-memory map to prevent N+1
+- **Quality gate before task close (mandatory)**: before marking any spec task as `[x]`, run `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality` and confirm it exits with code 0. Do not mark the task complete if the quality gate fails; fix first.
 
 ---
 

@@ -147,13 +147,13 @@ it('shows edit and delete actions only for draft or scheduled campaigns', functi
         ->assertSeeHtml('wire:click="editCampaign(' . $draftCampaign->id . ')"')
         ->assertSeeHtml('wire:click="confirmDelete(' . $draftCampaign->id . ')"')
         ->assertSeeHtml('wire:click="confirmAction(' . $draftCampaign->id . ',')
-        ->assertSeeHtml("title=\"" . __('campaigns.admin.actions.duplicate') . "\"")
-        ->assertSeeHtml("title=\"" . __('campaigns.admin.actions.send') . "\"")
-        ->assertSeeHtml("title=\"" . __('campaigns.admin.actions.schedule') . "\"")
+        ->assertSeeHtml('title="' . __('campaigns.admin.actions.duplicate') . '"')
+        ->assertSeeHtml('title="' . __('campaigns.admin.actions.send') . '"')
+        ->assertSeeHtml('title="' . __('campaigns.admin.actions.schedule') . '"')
         ->assertSeeHtml('wire:click="editCampaign(' . $scheduledCampaign->id . ')"')
         ->assertSeeHtml('wire:click="confirmDelete(' . $scheduledCampaign->id . ')"')
         ->assertSeeHtml('wire:click="confirmAction(' . $scheduledCampaign->id . ',')
-        ->assertSeeHtml("title=\"" . __('campaigns.admin.actions.cancel_schedule') . "\"")
+        ->assertSeeHtml('title="' . __('campaigns.admin.actions.cancel_schedule') . '"')
         ->assertDontSeeHtml('wire:click="editCampaign(' . $completedCampaign->id . ')"')
         ->assertDontSeeHtml('wire:click="confirmDelete(' . $completedCampaign->id . ')"');
 });

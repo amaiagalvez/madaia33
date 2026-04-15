@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\CampaignTemplate;
 use Illuminate\Database\Seeder;
+use App\Models\CampaignTemplate;
 
 class CampaignTemplateSeeder extends Seeder
 {

@@ -126,7 +126,7 @@ class SendCampaignMessageJob implements ShouldQueue
     private function mergeBothLocales(?string $eu, ?string $es): string
     {
         return collect([$eu, $es])
-            ->filter(fn(?string $value): bool => filled($value))
+            ->filter(fn (?string $value): bool => filled($value))
             ->implode("\n\n");
     }
 

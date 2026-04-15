@@ -3,9 +3,9 @@
 use Livewire\Livewire;
 use App\Models\Campaign;
 use App\Models\CampaignTemplate;
-use Database\Seeders\CampaignTemplateSeeder;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\Messaging\DispatchCampaignJob;
+use Database\Seeders\CampaignTemplateSeeder;
 
 it('seeds the owner welcome campaign template once', function () {
     app(CampaignTemplateSeeder::class)->run();
@@ -62,8 +62,8 @@ it('dispatches only due scheduled campaigns and can cancel a schedule', function
     test()->artisan('campaigns:dispatch-scheduled')
         ->assertSuccessful();
 
-    Bus::assertDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $dueCampaign->id);
-    Bus::assertNotDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $futureCampaign->id);
+    Bus::assertDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $dueCampaign->id);
+    Bus::assertNotDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $futureCampaign->id);
 
     $dueCampaign->refresh();
     $futureCampaign->refresh();

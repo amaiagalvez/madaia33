@@ -55,7 +55,7 @@ return [
         'login_cta' => 'Iniciar sesión',
         'seo_description' => 'Accede a la zona privada de la comunidad para iniciar sesion y gestionar tu area personal.',
         'form_title' => 'Acceso a la zona privada',
-        'username' => 'Usuaria',
+        'username' => 'Usuaria/o',
         'username_placeholder' => 'Por ejemplo: vecino01',
         'password' => 'Contraseña',
         'change_password_option' => 'Cambiar contraseña',

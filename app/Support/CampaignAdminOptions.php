@@ -36,7 +36,7 @@ class CampaignAdminOptions
         return CampaignTemplate::query()
             ->orderBy('name')
             ->get()
-            ->map(static fn(CampaignTemplate $template): array => [
+            ->map(static fn (CampaignTemplate $template): array => [
                 'value' => (string) $template->id,
                 'label' => $template->name,
             ])
@@ -103,7 +103,7 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->filter(static fn(mixed $value): bool => is_string($value) && $value !== '')
+            ->filter(static fn (mixed $value): bool => is_string($value) && $value !== '')
             ->values()
             ->all();
     }
@@ -115,8 +115,8 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->filter(static fn(mixed $value): bool => is_string($value) && str_contains($value, ':'))
-            ->map(static fn(string $value): string => explode(':', $value, 2)[1])
+            ->filter(static fn (mixed $value): bool => is_string($value) && str_contains($value, ':'))
+            ->map(static fn (string $value): string => explode(':', $value, 2)[1])
             ->values()
             ->all();
     }
@@ -125,7 +125,7 @@ class CampaignAdminOptions
     {
         $firstAllowedFilter = collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->first(fn(mixed $value): bool => is_string($value) && $value !== '');
+            ->first(fn (mixed $value): bool => is_string($value) && $value !== '');
 
         if (is_string($firstAllowedFilter) && $firstAllowedFilter !== '') {
             return $firstAllowedFilter;

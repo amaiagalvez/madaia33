@@ -153,7 +153,7 @@ class Owner extends Model
     protected function fullName1(): Attribute
     {
         return Attribute::make(
-            get: fn(): string => trim(
+            get: fn (): string => trim(
                 (string) $this->coprop1_name . ' ' . (string) $this->coprop1_surname,
             ),
         );
@@ -165,7 +165,7 @@ class Owner extends Model
     protected function fullName2(): Attribute
     {
         return Attribute::make(
-            get: fn(): string => trim(
+            get: fn (): string => trim(
                 (string) $this->coprop2_name . ' ' . (string) $this->coprop2_surname,
             ),
         );

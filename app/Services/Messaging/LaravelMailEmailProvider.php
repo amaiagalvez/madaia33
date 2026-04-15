@@ -2,13 +2,13 @@
 
 namespace App\Services\Messaging;
 
-use App\Mail\CampaignMail;
 use App\Models\Setting;
+use App\Mail\CampaignMail;
 use App\Models\CampaignDocument;
-use App\Support\ConfiguredMailSettings;
 use App\Models\CampaignRecipient;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
+use App\Support\ConfiguredMailSettings;
 use App\Contracts\Messaging\EmailProvider;
 
 class LaravelMailEmailProvider implements EmailProvider
@@ -32,7 +32,7 @@ class LaravelMailEmailProvider implements EmailProvider
             : collect();
 
         $documentLinks = $documents->map(
-            fn(CampaignDocument $document): array => [
+            fn (CampaignDocument $document): array => [
                 'label' => $document->filename,
                 'url' => route('tracking.document', [
                     'token' => $recipient->tracking_token,

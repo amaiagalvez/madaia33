@@ -118,6 +118,7 @@
 - In `admin-message-inbox`, default `unread` filter can hide a message immediately after `openMessage()` marks it as read; in tests switch filter to `all` before asserting expanded detail content.
 - If inbox default filter changes (e.g., `unread` -> `all`), update both behavior assertions and test naming to avoid false regressions from stale expectations.
 - For broad test-comment translation tasks, first run an `rg` inventory, then apply controlled phrase replacements by file and finish with `php artisan test --compact` on touched files to guarantee behavior remains unchanged.
+- In Blade Alpine click handlers, pass user-generated strings with @js inside a double-quoted attribute; mismatched quote types or addslashes-only escaping can silently break lightbox/modal opening on real content.
 - When adding agent-policy rules in `AGENTS.md`, encode the requirement with explicit agent scope + mandatory wording (e.g., `amalurra priority rule (mandatory)`) so the instruction is unambiguous and easy to enforce.
 - If the user asks to add rules in specific agent files, update `.github/agents/*.agent.md` directly (not only `AGENTS.md`) and keep the rule text symmetric across the requested agents.
 - If a migration alters ENUM constraints, make it database-driver aware (MySQL/SQLite). In SQLite tests, rebuild table with updated CHECK constraint or equivalent compatible path to avoid `near "MODIFY"` failures.
@@ -215,3 +216,6 @@
 - In shared admin form footer components, render slot content alongside the default save/cancel buttons so form-specific actions like saving as a template can be added without duplicating markup; protect it with a focused Livewire test.
 - In localized Feature tests, avoid building expected UI text with `__()` from the CLI/test context unless you set the locale first; prefer asserting rendered output patterns or explicitly set the app locale to prevent false failures from fallback keys.
 - In the public profile, keep sent and received message histories separate: sent items come from `ContactMessage` by `user_id`, while owner-linked inbox items must come from `CampaignRecipient` by `owner_id`; protect the distinction with a focused Feature test.
+- In Livewire PHPStan fixes, if a type is only used in PHPDoc, prefer a fully-qualified docblock type instead of importing the class; this prevents false "unused import" warnings while preserving static analysis typing.
+- To satisfy PHPMD `ExcessiveClassLength` in large Livewire components without behavior changes, extract cohesive action/auth blocks into a dedicated concern trait and keep the host component focused on form/query state.
+- When Pint reports targeted style regressions after manual refactors, run Pint on explicit file paths (not only --dirty) to guarantee quick deterministic fixes for function declaration/unary operator/array indentation rules.

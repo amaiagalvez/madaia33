@@ -15,6 +15,9 @@
                     <p class="mt-2 text-sm text-gray-600">{{ __('profile.summary') }}</p>
                 </div>
                 <div class="shrink-0 self-center">
+                    <p class="mb-2 max-w-xs text-xs text-gray-600" data-profile-contact-helper-text>
+                        {{ __('profile.contact_modal.description') }}
+                    </p>
                     @livewire('profile-contact-modal')
                 </div>
             </div>

@@ -27,7 +27,7 @@ return [
         'owner' => 'Jabea',
         'vote' => 'Botoa',
         'properties' => 'Propietateak',
-        'percentage' => 'Ehunekoa',
+        'percentage' => '% Totala',
         'delegated_vote' => 'Boto Delegatua',
         'delegated_by' => 'Norberaren ordez bozkatu duena',
         'delegate_dni' => 'DNI',

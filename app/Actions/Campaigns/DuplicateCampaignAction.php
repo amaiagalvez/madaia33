@@ -2,16 +2,16 @@
 
 namespace App\Actions\Campaigns;
 
+use App\Models\User;
 use App\Models\Campaign;
 use App\Models\CampaignDocument;
 use App\Models\CampaignRecipient;
-use App\Models\User;
 use Illuminate\Support\Collection;
 
 class DuplicateCampaignAction
 {
     /**
-     * @param Collection<int, CampaignRecipient>|null $manualRecipients
+     * @param  Collection<int, CampaignRecipient>|null  $manualRecipients
      */
     public function execute(Campaign $sourceCampaign, User $user, ?Collection $manualRecipients = null): Campaign
     {
@@ -37,7 +37,7 @@ class DuplicateCampaignAction
     private function duplicateDocuments(Campaign $sourceCampaign, Campaign $newCampaign): void
     {
         $documentsPayload = $sourceCampaign->documents
-            ->map(static fn(CampaignDocument $document): array => [
+            ->map(static fn (CampaignDocument $document): array => [
                 'campaign_id' => $newCampaign->id,
                 'filename' => $document->filename,
                 'path' => $document->path,
@@ -55,7 +55,7 @@ class DuplicateCampaignAction
     }
 
     /**
-     * @param Collection<int, CampaignRecipient>|null $manualRecipients
+     * @param  Collection<int, CampaignRecipient>|null  $manualRecipients
      */
     private function duplicateManualRecipients(?Collection $manualRecipients, Campaign $newCampaign): void
     {
@@ -64,7 +64,7 @@ class DuplicateCampaignAction
         }
 
         $recipientsPayload = $manualRecipients
-            ->map(static fn(CampaignRecipient $recipient): array => [
+            ->map(static fn (CampaignRecipient $recipient): array => [
                 'campaign_id' => $newCampaign->id,
                 'owner_id' => $recipient->owner_id,
                 'slot' => $recipient->slot,

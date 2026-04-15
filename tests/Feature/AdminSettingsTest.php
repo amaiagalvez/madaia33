@@ -4,19 +4,19 @@
 // Validates: Requirements 11.6, 12.4, 13.4
 
 use App\Models\Image;
-use Database\Seeders\DevSeeder;
 use App\Models\Notice;
-use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
 use App\Mail\TestEmail;
 use App\Models\Setting;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
+use Database\Seeders\DevSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use App\Support\ConfiguredMailSettings;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Validations\AdminSettingsValidation;
 
@@ -434,7 +434,7 @@ it('dashboard uses the front logo configured in settings', function () {
 it('factory-created settings have valid section', function () {
     $settings = Setting::factory()->count(4)->create();
 
-    $settings->each(fn(Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
+    $settings->each(fn (Setting $s) => expect(Setting::allowedSections())->toContain($s->section));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

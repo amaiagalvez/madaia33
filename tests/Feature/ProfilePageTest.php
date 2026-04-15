@@ -74,6 +74,7 @@ it('shows profile tabs with user voting and session information', function () {
     $response = test()->actingAs($user)
         ->get(route('profile.eu', ['tab' => 'votings']))
         ->assertOk()
+        ->assertSee(__('profile.contact_modal.description'))
         ->assertSee(__('profile.tabs.votings'))
         ->assertSee(__('profile.tabs.sessions'))
         ->assertSee(__('profile.tabs.messages'))
