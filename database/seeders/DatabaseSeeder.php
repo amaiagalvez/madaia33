@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
             SettingsSeeder::class,
+            CampaignTemplateSeeder::class,
             LocationSeeder::class,
             PropertySeeder::class,
         ]);

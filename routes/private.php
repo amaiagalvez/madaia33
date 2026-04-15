@@ -5,6 +5,7 @@ use App\Models\Image;
 use App\Models\Owner;
 use App\Models\Notice;
 use App\Models\Voting;
+use App\Models\Campaign;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use App\Models\ContactMessage;
@@ -31,6 +32,18 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/avisos', fn () => view('admin.notices'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('notices');
+    Route::get('/campanas', fn () => view('admin.campaigns'))
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('campaigns');
+    Route::get('/campanas/plantillas', fn () => view('admin.campaign-templates'))
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('campaigns.templates');
+    Route::get('/campanas/contactos-invalidos', fn () => view('admin.invalid-contacts'))
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('campaigns.invalid-contacts');
+    Route::get('/campanas/{campaign}', fn (Campaign $campaign) => view('admin.campaign-detail', ['campaign' => $campaign]))
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('campaigns.show');
     Route::get('/imagenes', fn () => view('admin.images'))
         ->middleware('role:superadmin')
         ->name('images');
@@ -85,6 +98,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::post('/artisan/migrate-and-seed', [ArtisanController::class, 'migration_and_seeds'])
         ->middleware('role:superadmin')
         ->name('artisan.migrate_and_seed');
+    Route::post('/artisan/queue-work-stop-when-empty', [ArtisanController::class, 'queueWorkStopWhenEmpty'])
+        ->middleware('role:superadmin')
+        ->name('artisan.queue_work_stop_when_empty');
 });
 
 Route::middleware('auth')->post('/impersonacion/volver-a-mi-usuario', function (Request $request) {

@@ -138,7 +138,7 @@ class SendCampaignMessageJob implements ShouldQueue
 
     public function handle(MessageVariableResolver $resolver): void;
     // 1. Carga CampaignRecipient con Campaign y Owner
-    // 2. Selecciona idioma según preferred_locale
+    // 2. Selecciona idioma según language
     // 3. Sustituye variables en asunto y cuerpo
     // 4. Delega en ChannelProvider correspondiente
     // 5. Registra éxito/fallo en CampaignTrackingEvent
@@ -413,8 +413,6 @@ class CampaignTrackingEvent extends Model
 // Añade a la tabla owners:
 $table->string('coprop1_telegram_id')->nullable()->after('coprop1_phone');
 $table->string('coprop2_telegram_id')->nullable()->after('coprop2_phone');
-$table->string('preferred_locale', 2)->nullable()->after('coprop2_telegram_id');
-// valores: 'eu' | 'es' | null
 
 // Campos de validez de contacto por canal:
 $table->unsignedTinyInteger('coprop1_email_error_count')->default(0);
@@ -453,15 +451,15 @@ _Para cualquier_ Owner con datos completos (nombre, propiedades activas con Loca
 
 **Valida: Requisito 3.8**
 
-### Propiedad 2: Selección de idioma según preferred_locale
+### Propiedad 2: Selección de idioma según language
 
-_Para cualquier_ Owner con `preferred_locale` definido (`eu` o `es`) y Campaign con ambas versiones de idioma disponibles, el mensaje enviado al Recipient debe estar en el idioma que coincide con `preferred_locale`.
+_Para cualquier_ Owner con `language` definido (`eu` o `es`) y Campaign con ambas versiones de idioma disponibles, el mensaje enviado al Recipient debe estar en el idioma que coincide con `language`.
 
 **Valida: Requisito 2.2**
 
 ### Propiedad 3: Fallback de idioma cuando solo hay una versión
 
-_Para cualquier_ Owner con `preferred_locale=X` y Campaign que solo tiene contenido en el idioma `Y` (distinto de `X`), el sistema debe enviar la versión disponible `Y` sin interrumpir el envío.
+_Para cualquier_ Owner con `language=X` y Campaign que solo tiene contenido en el idioma `Y` (distinto de `X`), el sistema debe enviar la versión disponible `Y` sin interrumpir el envío.
 
 **Valida: Requisito 2.4**
 

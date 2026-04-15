@@ -11,10 +11,12 @@ use App\Models\Setting;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Livewire\AdminSettings;
+use Database\Seeders\DevSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use App\Support\ConfiguredMailSettings;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Validations\AdminSettingsValidation;
 
@@ -154,6 +156,17 @@ it('stores contact subjects by language in contact_form', function () {
 
     expect(settingValue('contact_form_subject_eu'))->toBe('Gaia pertsonalizatua EU')
         ->and(settingValue('contact_form_subject_es'))->toBe('Asunto personalizado ES');
+});
+
+it('dev seeder configures local email settings for mailhog', function () {
+    expect(Artisan::call('db:seed', ['--class' => DevSeeder::class]))->toBe(0);
+
+    expect(settingValue('from_address'))->toBe('info@mailhog.local')
+        ->and(settingValue('from_name'))->toBe('Komunitatea Local')
+        ->and(settingValue('smtp_host'))->toBe('mailhog')
+        ->and(settingValue('smtp_port'))->toBe('1025')
+        ->and(settingValue('smtp_username'))->toBe('')
+        ->and(settingValue('smtp_encryption'))->toBe('');
 });
 
 it('stores mail configuration in settings table', function () {

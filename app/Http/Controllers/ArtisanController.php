@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Throwable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
@@ -37,5 +38,20 @@ class ArtisanController extends Controller
         Artisan::call('db:seed --force');
 
         return redirect()->route('admin.dashboard')->with('status', 'Database migrated!');
+    }
+
+    public function queueWorkStopWhenEmpty(): RedirectResponse
+    {
+        try {
+            Artisan::call('queue:work', [
+                '--stop-when-empty' => true,
+            ]);
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            return redirect()->route('admin.dashboard')->with('status', __('admin.queue.status_failed'));
+        }
+
+        return redirect()->route('admin.dashboard')->with('status', __('admin.queue.status_finished'));
     }
 }

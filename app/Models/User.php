@@ -213,6 +213,28 @@ class User extends Authenticatable
         ]);
     }
 
+    public function canManageCampaigns(): bool
+    {
+        return $this->campaignAccessScope() !== 'none';
+    }
+
+    public function campaignAccessScope(): string
+    {
+        if ($this->hasRole(Role::SUPER_ADMIN)) {
+            return 'all-filters';
+        }
+
+        if ($this->hasRole(Role::GENERAL_ADMIN)) {
+            return 'all-only';
+        }
+
+        if ($this->hasRole(Role::COMMUNITY_ADMIN)) {
+            return 'managed-locations';
+        }
+
+        return 'none';
+    }
+
     public function canUseDelegatedVoting(): bool
     {
         return $this->hasRole(Role::DELEGATED_VOTE);

@@ -7,12 +7,14 @@
     'showCancelButton' => true,
 ])
 
-<div data-admin-form-footer-actions {{ $attributes->class(['mt-6 flex gap-3']) }}>
+<div data-admin-form-footer-actions {{ $attributes->class(['mt-6 flex flex-wrap gap-3']) }}>
     @if ($showDefaultButtons)
         <button type="submit"
             class="inline-flex items-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
             {{ $saveLabel ?? ($isEditing ? __('general.buttons.save') : __('general.buttons.create_new')) }}
         </button>
+
+        {{ $slot }}
 
         @if ($showCancelButton)
             <button type="button"

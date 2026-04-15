@@ -22,8 +22,6 @@
 - [ ] traducciones repetidas
 - [ ] añadir el MCP para que consulte la documentación de laravel
 
-Igandea
-=======
 - votaciones resultados (suma de porcentajes)
 - spec kiro pendientes
 - unificar terminologia
@@ -36,28 +34,23 @@ property_assignments => Propiedades
 owners => Propietarias
 
 # Home
-- [ ] Osatu pribatutasun-politika eta lege-oharrak testuak
 - [ ] Cookies sartu
-- [ ] legeak.html begiratu
-
-- [ ] deploy
-    - [ ] se boorran las carpetas del storage
-    - [ ] no se sube la carpeta build
-    - [ ] se pierde el storage link
 - [ ] config recaptcha, analitics
 
-https://chatgpt.com/c/69d78d8d-dd40-832a-a8c7-3144bb109696
+- [ ] En el listado de bozketak añadir un botón para Enviar un email con los pdf delegado o presencial. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa votación. 
 
-Para que todo esto sea legal de verdad, asegúrate de:
-✔ Checkbox de privacidad en formularios
-✔ No mostrar datos de vecinos públicamente
-✔ Control de acceso a actas
-✔ Logs de acceso (recomendado para votaciones)
+- [ ] Al poner una bidalketa en marcha, activar el queue
+
+En el listado de admin/campanas
+- al pinchar en el botón programar, modal para pedir cuando programarlo
+- añadir nueva columna con el número de mensajes de abiertos
+
+- [ ] campaña: añadir un botón, enviar prueba (como tenenmos en el formulario de los settings email_configuration) mostrar un modal para pedir un email y enviar a dicho email una prueba de como queda la campaña. Se enviarán dos emails de prueba, uno en euskera y otro en castellano al email indicado.
 
 # Panela
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
-- Deialdiak sartzeko formularioa + pdf + emailez bidali
+- Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
@@ -88,44 +81,3 @@ crear una miniweb en html con las instrucciones para usar la aplicación, añade
 añadir una ruta al menú del panel 
 tiene que estar en dos idiomas eu y es
 - [ ] añadir una regla al agente amalur para que lo mantenga actualizado
-
-## Implementation Plan
-
-### Goal
-
-- [Balidazio-mezuak hizkuntza-tabs kanpoan erakustea eremu eleaniztunetan, input sinpleetan zein mini-editorrean, beti ikusgarri izan daitezen.]
-
-### Technical Decisions
-
-- [Konponketa `resources/views/components/admin/bilingual-tabs.blade.php` osagai partekatuan egingo da, inpaktu bera izan dezan `x-admin.bilingual-field-tabs` eta `x-admin.bilingual-rich-text-tabs` erabilera guztietan.]
-- [Tab bakoitzaren pane barruko errore-mezuen ordez, errore laburpen/errendatze komun bat jarriko da tabs bloke nagusiaren azpian, dagozkion locale-field guztietako lehen erroreak ikusgai mantenduz.]
-- [Balidazio-estilo bisualak pane barruko input/editoreetan mantenduko dira (`border-red-*`), baina mezu testuala kanpora aterako da irisgarritasuna eta ikusgarritasuna ez galtzeko.]
-
-### Execution Steps
-
-- [x]   1. `bilingual-tabs` osagaiaren markupa berrantolatu errore-mezuak tabs edukitik kanpo renderizatzeko.
-- [x]   2. Eguneratu edo gehitu Unit test bat osagai partekatuarentzat, errorea tabs kanpoan agertzen dela egiaztatzeko input eta rich-text moduetarako.
-- [x]   3. Exekutatu ukitutako test minimoak eta beharrezko formateoa/egiaztapenak Docker barruan.
-
-### Work Items
-
-- [x] `resources/views/components/admin/bilingual-tabs.blade.php`
-- [x] `tests/Unit/BilingualRichTextTabsComponentTest.php`
-- [ ] Baliteke test osagarri bat behar izatea `bilingual-field-tabs` erabilerarako
-
-### Validation
-
-- [ ] TDD-based implementation when possible
-- [x] Required formatting/lint checks
-- [x] Relevant test suite
-- [ ] Dusk tests when frontend/flow changes exist
-
-## Txuletak
-/dusk-test pasar los dusk test
-pasar los test con coverage
-
-## Hobekuntzak
-- [ ] en settings en la seccion email_configuration, ocultar todos los campos menos el nombre (ponerlos como si fueran tipo password), añadir botón para modificarlos y que pida contraseña antes de modicarlos
-- [ ] la opción de doble factor. Pasa lo que ya está echo del doble factor a esta nueva pantalla
-- [ ] añadir espacio para comercios
-- [ ] jarraitu garbitzen auth blade-ak (erabiltzen ez direnak kendu)

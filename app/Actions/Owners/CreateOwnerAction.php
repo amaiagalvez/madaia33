@@ -28,7 +28,7 @@ class CreateOwnerAction
     {
         $password = Str::password(16);
 
-        $result = DB::transaction(fn(): array => $this->createOwnerWithAssignments($data, $password));
+        $result = DB::transaction(fn (): array => $this->createOwnerWithAssignments($data, $password));
 
         /** @var Owner $owner */
         $owner = $result['owner'];
@@ -246,7 +246,7 @@ class CreateOwnerAction
     {
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
@@ -258,7 +258,7 @@ class CreateOwnerAction
             ->keyBy('id');
 
         return collect($assignments)
-            ->map(fn(array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
+            ->map(fn (array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
             ->filter()
             ->values()
             ->all();
@@ -270,7 +270,7 @@ class CreateOwnerAction
     private function buildAssignmentItemsFromOwner(Owner $owner): array
     {
         return $owner->assignments
-            ->map(fn(PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
+            ->map(fn (PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
             ->filter()
             ->values()
             ->all();

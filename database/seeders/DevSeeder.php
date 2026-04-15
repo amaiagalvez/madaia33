@@ -44,6 +44,7 @@ class DevSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             LocationSeeder::class,
+            CampaignTemplateSeeder::class,
         ]);
 
         $this->seedMailhogSettings();
@@ -62,16 +63,41 @@ class DevSeeder extends Seeder
 
     private function seedMailhogSettings(): void
     {
-        // Configure for mailhog in local development
-        Setting::upsert([
-            ['key' => 'from_address', 'value' => 'info@mailhog.local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'from_name', 'value' => 'Komunitatea Local', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_host', 'value' => 'mailhog', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_port', 'value' => '1025', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_username', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_password', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-            ['key' => 'smtp_encryption', 'value' => '', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
-        ], ['key'], ['value', 'section']);
+        $settings = [
+            'from_address' => 'info@mailhog.local',
+            'from_name' => 'Komunitatea Local',
+            'smtp_host' => 'mailhog',
+            'smtp_port' => '1025',
+            'smtp_username' => '',
+            'smtp_password' => '',
+            'smtp_encryption' => '',
+        ];
+
+        Setting::upsert(
+            collect($settings)
+                ->map(fn (mixed $value, string $key): array => [
+                    'key' => $key,
+                    'value' => $value,
+                    'section' => Setting::SECTION_EMAIL_CONFIGURATION,
+                ])
+                ->values()
+                ->all(),
+            ['key'],
+            ['value', 'section'],
+        );
+
+        Setting::flushStringValuesCache();
+    }
+
+    private function devMailValue(string $key, string $default): string
+    {
+        $value = trim((string) env($key, ''));
+
+        if ($value === '' || strtolower($value) === 'xxxxx') {
+            return $default;
+        }
+
+        return $value;
     }
 
     // -------------------------------------------------------------------------

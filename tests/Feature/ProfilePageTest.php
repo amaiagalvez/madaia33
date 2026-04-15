@@ -3,12 +3,15 @@
 use App\Models\User;
 use App\Models\Owner;
 use App\Models\Voting;
+use App\Models\Campaign;
 use App\Models\Property;
 use App\Models\VotingBallot;
 use App\Models\OwnerAuditLog;
 use App\Models\ContactMessage;
 use App\Models\UserLoginSession;
+use App\Models\CampaignRecipient;
 use App\Models\PropertyAssignment;
+use App\Models\CampaignTrackingEvent;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 it('shows profile tabs with user voting and session information', function () {
@@ -71,6 +74,7 @@ it('shows profile tabs with user voting and session information', function () {
     $response = test()->actingAs($user)
         ->get(route('profile.eu', ['tab' => 'votings']))
         ->assertOk()
+        ->assertSee(__('profile.contact_modal.description'))
         ->assertSee(__('profile.tabs.votings'))
         ->assertSee(__('profile.tabs.sessions'))
         ->assertSee(__('profile.tabs.messages'))
@@ -126,6 +130,71 @@ it('shows only messages sent by logged user in messages tab', function () {
         ->assertSee('Nire mezua profiletik bidalia.')
         ->assertDontSee('Beste erabiltzailearen mezua')
         ->assertDontSee('Hau ez da agertu behar.');
+});
+
+it('shows only received campaign messages for the linked owner in profile', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    $owner = Owner::factory()->for($user)->create([
+        'language' => 'eu',
+        'accepted_terms_at' => now(),
+    ]);
+
+    $otherOwner = Owner::factory()->for($otherUser)->create([
+        'language' => 'eu',
+        'accepted_terms_at' => now(),
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'subject_eu' => 'Jasotako gaia',
+        'subject_es' => 'Asunto recibido',
+        'body_eu' => 'Jabeari bidalitako mezua.',
+        'body_es' => 'Mensaje enviado a la propietaria.',
+        'channel' => 'email',
+        'status' => 'completed',
+        'sent_at' => now()->subHour(),
+    ]);
+
+    $otherCampaign = Campaign::factory()->create([
+        'subject_eu' => 'Ez da erakutsi behar',
+        'subject_es' => 'No debe mostrarse',
+        'body_eu' => 'Beste jabearentzako mezua.',
+        'body_es' => 'Mensaje para otra propietaria.',
+        'channel' => 'email',
+        'status' => 'completed',
+        'sent_at' => now()->subMinutes(30),
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => 'owner@example.com',
+        'status' => 'sent',
+    ]);
+
+    CampaignTrackingEvent::query()->create([
+        'campaign_recipient_id' => $recipient->id,
+        'event_type' => 'open',
+    ]);
+
+    CampaignRecipient::factory()->create([
+        'campaign_id' => $otherCampaign->id,
+        'owner_id' => $otherOwner->id,
+        'slot' => 'coprop1',
+        'contact' => 'other-owner@example.com',
+        'status' => 'sent',
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'received']))
+        ->assertOk()
+        ->assertSee(__('profile.received.title'))
+        ->assertSee('Jasotako gaia')
+        ->assertSee('Jabeari bidalitako mezua.')
+        ->assertDontSee('Ez da erakutsi behar')
+        ->assertDontSee('Beste jabearentzako mezua.');
 });
 
 it('accepts owner terms from profile page', function () {
