@@ -103,7 +103,7 @@ class AdminCampaignDetail extends Component
 
         $unopenedRecipientIds = $this->campaign
             ->recipients
-            ->filter(fn(CampaignRecipient $recipient): bool => ! $recipient->trackingEvents->contains('event_type', 'open'))
+            ->filter(fn (CampaignRecipient $recipient): bool => ! $recipient->trackingEvents->contains('event_type', 'open'))
             ->pluck('id')
             ->values();
 
@@ -157,18 +157,18 @@ class AdminCampaignDetail extends Component
     private function refreshMetrics(): void
     {
         $recipients = $this->campaign->recipients;
-        $openedRecipients = $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'open'))->count();
+        $openedRecipients = $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'open'))->count();
 
         $sentTotal = $this->campaign->channel === 'whatsapp'
-            ? $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'))->count()
+            ? $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'))->count()
             : $recipients->count();
 
         $this->metrics = [
             'total' => $sentTotal,
             'opens' => $openedRecipients,
-            'clicks' => $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'click'))->count(),
-            'downloads' => $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'download'))->count(),
-            'failures' => $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->status === 'failed' || $recipient->trackingEvents->contains('event_type', 'error'))->count(),
+            'clicks' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'click'))->count(),
+            'downloads' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'download'))->count(),
+            'failures' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->status === 'failed' || $recipient->trackingEvents->contains('event_type', 'error'))->count(),
         ];
 
         $this->unopenedRecipientsCount = max(0, $this->metrics['total'] - $openedRecipients);
@@ -237,11 +237,11 @@ class AdminCampaignDetail extends Component
     private function clickBreakdown(): array
     {
         return $this->campaign->recipients
-            ->flatMap(fn(CampaignRecipient $recipient) => $recipient->trackingEvents)
+            ->flatMap(fn (CampaignRecipient $recipient) => $recipient->trackingEvents)
             ->where('event_type', 'click')
-            ->filter(fn($event): bool => filled($event->url))
-            ->groupBy(fn($event): string => (string) $event->url)
-            ->map(fn($events, string $url): array => [
+            ->filter(fn ($event): bool => filled($event->url))
+            ->groupBy(fn ($event): string => (string) $event->url)
+            ->map(fn ($events, string $url): array => [
                 'label' => $url,
                 'count' => $events->count(),
             ])
@@ -256,11 +256,11 @@ class AdminCampaignDetail extends Component
     private function downloadBreakdown(): array
     {
         return $this->campaign->recipients
-            ->flatMap(fn(CampaignRecipient $recipient) => $recipient->trackingEvents)
+            ->flatMap(fn (CampaignRecipient $recipient) => $recipient->trackingEvents)
             ->where('event_type', 'download')
-            ->filter(fn($event): bool => filled($event->document?->filename))
-            ->groupBy(fn($event): string => (string) $event->document?->filename)
-            ->map(fn($events, string $filename): array => [
+            ->filter(fn ($event): bool => filled($event->document?->filename))
+            ->groupBy(fn ($event): string => (string) $event->document?->filename)
+            ->map(fn ($events, string $filename): array => [
                 'label' => $filename,
                 'count' => $events->count(),
             ])

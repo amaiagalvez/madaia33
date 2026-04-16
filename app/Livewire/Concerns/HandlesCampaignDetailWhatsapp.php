@@ -5,8 +5,8 @@ namespace App\Livewire\Concerns;
 use App\Models\CampaignRecipient;
 use App\Models\CampaignTrackingEvent;
 use App\Services\WhatsappMessageBuilder;
-use App\Support\Messaging\RecipientContactHealthManager;
 use App\Support\Messaging\WhatsappClickToChatUrl;
+use App\Support\Messaging\RecipientContactHealthManager;
 
 trait HandlesCampaignDetailWhatsapp
 {
