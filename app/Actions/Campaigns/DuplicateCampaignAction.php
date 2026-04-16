@@ -4,6 +4,7 @@ namespace App\Actions\Campaigns;
 
 use App\Models\User;
 use App\Models\Campaign;
+use App\Models\CampaignLocation;
 use App\Models\CampaignDocument;
 use App\Models\CampaignRecipient;
 use Illuminate\Support\Collection;
@@ -22,22 +23,42 @@ class DuplicateCampaignAction
             'body_eu' => $sourceCampaign->body_eu,
             'body_es' => $sourceCampaign->body_es,
             'channel' => $sourceCampaign->channel,
-            'recipient_filter' => $sourceCampaign->recipient_filter,
             'status' => 'draft',
             'scheduled_at' => null,
             'sent_at' => null,
         ]);
 
         $this->duplicateDocuments($sourceCampaign, $newCampaign);
+        $this->duplicateLocations($sourceCampaign, $newCampaign);
         $this->duplicateManualRecipients($manualRecipients, $newCampaign);
 
         return $newCampaign;
     }
 
+    private function duplicateLocations(Campaign $sourceCampaign, Campaign $newCampaign): void
+    {
+        $locationsPayload = CampaignLocation::query()
+            ->where('campaign_id', $sourceCampaign->id)
+            ->whereNull('deleted_at')
+            ->get()
+            ->map(static fn(CampaignLocation $location): array => [
+                'campaign_id' => $newCampaign->id,
+                'location_id' => $location->location_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'deleted_at' => null,
+            ])
+            ->all();
+
+        if ($locationsPayload !== []) {
+            CampaignLocation::query()->insert($locationsPayload);
+        }
+    }
+
     private function duplicateDocuments(Campaign $sourceCampaign, Campaign $newCampaign): void
     {
         $documentsPayload = $sourceCampaign->documents
-            ->map(static fn (CampaignDocument $document): array => [
+            ->map(static fn(CampaignDocument $document): array => [
                 'campaign_id' => $newCampaign->id,
                 'filename' => $document->filename,
                 'path' => $document->path,
@@ -64,7 +85,7 @@ class DuplicateCampaignAction
         }
 
         $recipientsPayload = $manualRecipients
-            ->map(static fn (CampaignRecipient $recipient): array => [
+            ->map(static fn(CampaignRecipient $recipient): array => [
                 'campaign_id' => $newCampaign->id,
                 'owner_id' => $recipient->owner_id,
                 'slot' => $recipient->slot,

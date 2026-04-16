@@ -50,18 +50,13 @@
                         model="channel" />
 
                     <div data-admin-field="select-filter">
-                        <label for="recipientFilter"
-                            class="block text-sm font-medium text-stone-700">
-                            {{ __('campaigns.admin.recipient_filter') }}
-                        </label>
-                        <select id="recipientFilter" wire:model.live="recipientFilter"
-                            class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
-                            @foreach ($recipientFilterOptions as $option)
-                                <option value="{{ $option['value'] }}">{{ $option['label'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('recipientFilter')
+                        <x-admin.form-multi-checkbox-pills :legend="__('campaigns.admin.recipient_filter')" :options="$recipientFilterOptions"
+                            model="recipientFilters" value-key="value" label-key="label" />
+
+                        @error('recipientFilters')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        @error('recipientFilters.*')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -190,7 +185,15 @@
                         {{ __('campaigns.admin.channels.' . $campaign->channel) }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600">
-                        {{ $options->labelForRecipientFilter((string) $campaign->recipient_filter) }}
+                        @if ($campaign->locations->isNotEmpty())
+                            {{ $campaign->locations->filter(fn($location) => $location->location !== null)->map(
+                                    fn($location) => __('campaigns.admin.filters.' . $location->location->type) .
+                                        ' ' .
+                                        $location->location->code,
+                                )->implode(', ') }}
+                        @else
+                            {{ __('campaigns.admin.filters.all') }}
+                        @endif
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600">
                         {{ __('campaigns.admin.statuses.' . $campaign->status) }}

@@ -6,11 +6,12 @@ use App\Models\User;
 use App\Models\Campaign;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\Messaging\DispatchCampaignJob;
+use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
 use App\Actions\Campaigns\DuplicateCampaignAction;
 
 trait HandlesCampaignManagerActions
 {
-    public function duplicateCampaign(int $id): void
+    public function duplicateCampaign(int $id, DuplicateCampaignAction $duplicateCampaignAction): void
     {
         $this->authorizeViewAny();
 
@@ -22,14 +23,14 @@ trait HandlesCampaignManagerActions
 
         abort_if($user === null, 403);
 
-        $newCampaign = app(DuplicateCampaignAction::class)->execute($sourceCampaign, $user);
+        $newCampaign = $duplicateCampaignAction->execute($sourceCampaign, $user);
 
         session()->flash('message', __('general.messages.saved'));
 
         $this->redirectRoute('admin.campaigns', ['editCampaign' => $newCampaign->id], navigate: true);
     }
 
-    public function sendCampaign(int $id): void
+    public function sendCampaign(int $id, RunQueueWorkStopWhenEmptyAction $runQueueWorkStopWhenEmptyAction): void
     {
         $this->authorizeViewAny();
 
@@ -40,6 +41,8 @@ trait HandlesCampaignManagerActions
         abort_unless($campaign->status === 'draft', 403);
 
         dispatch(new DispatchCampaignJob($campaign->id));
+
+        $runQueueWorkStopWhenEmptyAction->execute();
     }
 
     public function scheduleCampaign(int $id): void
@@ -127,8 +130,10 @@ trait HandlesCampaignManagerActions
         $this->showActionModal = false;
     }
 
-    public function doAction(): void
-    {
+    public function doAction(
+        RunQueueWorkStopWhenEmptyAction $runQueueWorkStopWhenEmptyAction,
+        DuplicateCampaignAction $duplicateCampaignAction,
+    ): void {
         if ($this->confirmingActionId === null || $this->confirmingAction === '') {
             return;
         }
@@ -139,8 +144,8 @@ trait HandlesCampaignManagerActions
         $this->cancelAction();
 
         match ($action) {
-            'duplicate' => $this->duplicateCampaign($campaignId),
-            'send' => $this->sendCampaign($campaignId),
+            'duplicate' => $this->duplicateCampaign($campaignId, $duplicateCampaignAction),
+            'send' => $this->sendCampaign($campaignId, $runQueueWorkStopWhenEmptyAction),
             'schedule' => $this->scheduleCampaign($campaignId),
             'cancel_schedule' => $this->cancelSchedule($campaignId),
             default => null,

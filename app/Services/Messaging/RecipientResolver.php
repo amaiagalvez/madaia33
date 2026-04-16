@@ -4,6 +4,7 @@ namespace App\Services\Messaging;
 
 use App\Models\Owner;
 use App\Models\Campaign;
+use App\Models\CampaignLocation;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -17,40 +18,59 @@ class RecipientResolver
         $owners = Owner::query()
             ->whereHas('activeAssignments')
             ->with('activeAssignments.property.location')
-            ->where($this->filterByCampaignRecipientFilter($campaign->recipient_filter))
+            ->where($this->filterByCampaignRecipientFilter($campaign))
             ->get();
 
         return $owners
-            ->flatMap(fn (Owner $owner) => $this->resolveOwnerContactsForChannel($owner, (string) $campaign->channel))
+            ->flatMap(fn(Owner $owner) => $this->resolveOwnerContactsForChannel($owner, (string) $campaign->channel))
             ->values();
     }
 
     /**
      * @return \Closure(Builder<Owner>): void
      */
-    private function filterByCampaignRecipientFilter(string $recipientFilter): \Closure
+    private function filterByCampaignRecipientFilter(Campaign $campaign): \Closure
     {
-        return function (Builder $query) use ($recipientFilter): void {
-            if ($recipientFilter === 'all') {
+        return function (Builder $query) use ($campaign): void {
+            $locationIds = $this->locationIdsForCampaign($campaign);
+
+            if ($locationIds === []) {
                 return;
             }
 
-            if (! str_contains($recipientFilter, ':')) {
-                return;
-            }
-
-            [$type, $code] = explode(':', $recipientFilter, 2);
-
-            if (! in_array($type, ['portal', 'garage'], true)) {
-                return;
-            }
-
-            $query->whereHas('activeAssignments.property.location', function (Builder $locationQuery) use ($type, $code): void {
-                $locationQuery
-                    ->where('type', $type)
-                    ->where('code', $code);
+            $query->whereHas('activeAssignments.property', function (Builder $propertyQuery) use ($locationIds): void {
+                $propertyQuery->whereIn('location_id', $locationIds);
             });
         };
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function locationIdsForCampaign(Campaign $campaign): array
+    {
+        if ($campaign->relationLoaded('locations')) {
+            return $campaign->locations
+                ->filter(static fn(CampaignLocation $location): bool => $location->deleted_at === null)
+                ->pluck('location_id')
+                ->map(static fn(int $locationId): int => $locationId)
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        if ($campaign->id === null) {
+            return [];
+        }
+
+        return CampaignLocation::query()
+            ->where('campaign_id', $campaign->id)
+            ->whereNull('deleted_at')
+            ->pluck('location_id')
+            ->map(static fn(int $locationId): int => $locationId)
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
@@ -78,8 +98,8 @@ class RecipientResolver
         };
 
         return collect($contactsBySlot)
-            ->filter(fn (?string $contact): bool => filled($contact))
-            ->map(fn (string $contact, string $slot): array => [
+            ->filter(fn(?string $contact): bool => filled($contact))
+            ->map(fn(string $contact, string $slot): array => [
                 'owner_id' => $owner->id,
                 'slot' => $slot,
                 'contact' => $contact,

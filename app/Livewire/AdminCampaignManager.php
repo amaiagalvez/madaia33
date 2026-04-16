@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Campaign;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use App\Models\CampaignLocation;
 use App\Models\CampaignDocument;
 use App\Models\CampaignTemplate;
 use Illuminate\Contracts\View\View;
@@ -16,7 +17,6 @@ use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Services\Messaging\RecipientResolver;
 use App\Livewire\Concerns\HandlesCampaignManagerActions;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class AdminCampaignManager extends Component
 {
@@ -37,7 +37,8 @@ class AdminCampaignManager extends Component
 
     public string $channel = 'email';
 
-    public string $recipientFilter = 'all';
+    /** @var array<int, string> */
+    public array $recipientFilters = [];
 
     public string $selectedTemplateId = '';
 
@@ -73,11 +74,18 @@ class AdminCampaignManager extends Component
 
     public bool $showActionModal = false;
 
+    private RecipientResolver $recipientResolver;
+
+    public function boot(RecipientResolver $recipientResolver): void
+    {
+        $this->recipientResolver = $recipientResolver;
+    }
+
     public function mount(): void
     {
         $this->authorizeViewAny();
 
-        $this->recipientFilter = $this->options()->defaultRecipientFilter();
+        $this->recipientFilters = $this->options()->defaultRecipientFilters();
 
         $editCampaignId = (int) request()->integer('editCampaign');
 
@@ -99,7 +107,8 @@ class AdminCampaignManager extends Component
 
         return [
             ...$this->contentRules(),
-            'recipientFilter' => ['required', 'string', Rule::in($this->options()->allowedRecipientFilters())],
+            'recipientFilters' => ['required', 'array', 'min:1'],
+            'recipientFilters.*' => ['required', 'string', Rule::in($this->options()->allowedRecipientFilters())],
             'selectedTemplateId' => ['nullable', 'string', Rule::exists('campaign_templates', 'id')],
             'scheduledAt' => ['nullable', 'date'],
             'attachments' => ['array'],
@@ -119,7 +128,7 @@ class AdminCampaignManager extends Component
     {
         $this->authorizeViewAny();
 
-        $campaign = Campaign::query()->with('documents')->findOrFail($id);
+        $campaign = Campaign::query()->with(['documents', 'locations'])->findOrFail($id);
 
         abort_unless($this->canMutateCampaign($campaign), 403);
 
@@ -129,7 +138,15 @@ class AdminCampaignManager extends Component
         $this->bodyEu = (string) ($campaign->body_eu ?? '');
         $this->bodyEs = (string) ($campaign->body_es ?? '');
         $this->channel = (string) $campaign->channel;
-        $this->recipientFilter = (string) $campaign->recipient_filter;
+        $this->recipientFilters = $campaign->locations
+            ->pluck('location_id')
+            ->map(static fn(int $locationId): string => (string) $locationId)
+            ->values()
+            ->all();
+
+        if ($this->recipientFilters === []) {
+            $this->recipientFilters = ['all'];
+        }
 
         $scheduledAt = (string) ($campaign->scheduled_at ?? '');
         $this->scheduledAt = $scheduledAt !== '' && strtotime($scheduledAt) !== false
@@ -138,7 +155,7 @@ class AdminCampaignManager extends Component
 
         $this->attachments = [];
         $this->storedAttachments = $campaign->documents
-            ->map(fn (CampaignDocument $document): array => [
+            ->map(fn(CampaignDocument $document): array => [
                 'id' => $document->id,
                 'filename' => $document->filename,
             ])
@@ -154,6 +171,8 @@ class AdminCampaignManager extends Component
         $this->validate();
 
         $campaign = $this->upsertCampaign();
+
+        $this->syncCampaignLocations($campaign);
 
         $this->storeAttachments($campaign);
 
@@ -201,7 +220,7 @@ class AdminCampaignManager extends Component
         $this->recalculateRecipients();
     }
 
-    public function updatedRecipientFilter(): void
+    public function updatedRecipientFilters(): void
     {
         $this->recalculateRecipients();
     }
@@ -242,7 +261,7 @@ class AdminCampaignManager extends Component
 
         $this->storedAttachments = array_values(array_filter(
             $this->storedAttachments,
-            static fn (array $attachment): bool => (int) $attachment['id'] !== $documentId,
+            static fn(array $attachment): bool => (int) $attachment['id'] !== $documentId,
         ));
 
         session()->flash('message', __('general.messages.deleted'));
@@ -279,6 +298,8 @@ class AdminCampaignManager extends Component
 
         $campaignsQuery = Campaign::query()->withCount('recipients');
 
+        $campaignsQuery->with(['locations.location']);
+
         $this->applyCampaignVisibilityScope($campaignsQuery);
 
         $campaigns = $campaignsQuery
@@ -303,22 +324,17 @@ class AdminCampaignManager extends Component
         $this->recipientCountTotal = 0;
         $this->recipientCountBySlot = ['coprop1' => 0, 'coprop2' => 0];
 
-        if ($this->channel === '' || $this->recipientFilter === '') {
-            return;
-        }
-
-        $filters = $this->options()->allowedRecipientFilters();
-
-        if (! in_array($this->recipientFilter, $filters, true)) {
+        if ($this->channel === '' || $this->recipientFilters === []) {
             return;
         }
 
         $campaign = new Campaign([
             'channel' => $this->channel,
-            'recipient_filter' => $this->recipientFilter,
         ]);
 
-        $rows = app(RecipientResolver::class)->resolve($campaign);
+        $campaign->setRelation('locations', $this->campaignLocationRelationRows());
+
+        $rows = $this->recipientResolver->resolve($campaign);
 
         $this->recipientCountTotal = $rows->count();
         $this->recipientCountBySlot['coprop1'] = $rows->where('slot', 'coprop1')->count();
@@ -352,7 +368,6 @@ class AdminCampaignManager extends Component
     {
         return [
             ...$this->contentPayload(),
-            'recipient_filter' => $this->recipientFilter,
             'scheduled_at' => $this->scheduledAt !== null && $this->scheduledAt !== '' ? $this->scheduledAt : null,
         ];
     }
@@ -439,13 +454,13 @@ class AdminCampaignManager extends Component
         $this->bodyEu = '';
         $this->bodyEs = '';
         $this->channel = 'email';
+        $this->recipientFilters = $this->options()->defaultRecipientFilters();
         $this->selectedTemplateId = '';
         $this->scheduledAt = null;
         $this->attachments = [];
         $this->storedAttachments = [];
         $this->confirmingDeleteId = null;
         $this->showDeleteModal = false;
-        $this->recipientFilter = $this->options()->defaultRecipientFilter();
 
         $this->resetValidation();
         $this->recalculateRecipients();
@@ -459,7 +474,7 @@ class AdminCampaignManager extends Component
         $accessScope = $this->currentUser()?->campaignAccessScope() ?? 'none';
 
         if ($accessScope === 'all-only') {
-            $query->where('recipient_filter', 'all');
+            $query->whereDoesntHave('locations');
 
             return;
         }
@@ -468,20 +483,113 @@ class AdminCampaignManager extends Component
             return;
         }
 
-        $allowedCodes = $this->options()->allowedManagedLocationCodes();
+        $allowedLocationIds = $this->options()->allowedManagedLocationIds();
 
-        if ($allowedCodes === []) {
+        if ($allowedLocationIds === []) {
             $query->whereRaw('1 = 0');
 
             return;
         }
 
-        $query->where(function (Builder $filterQuery) use ($allowedCodes): void {
-            foreach ($allowedCodes as $locationCode) {
-                $filterQuery->orWhere('recipient_filter', 'portal:' . $locationCode)
-                    ->orWhere('recipient_filter', 'garage:' . $locationCode);
-            }
-        });
+        $query
+            ->whereHas('locations', function (Builder $locationsQuery): void {
+                $locationsQuery->whereNull('campaign_locations.deleted_at');
+            })
+            ->whereDoesntHave('locations', function (Builder $locationsQuery) use ($allowedLocationIds): void {
+                $locationsQuery
+                    ->whereNull('campaign_locations.deleted_at')
+                    ->whereNotIn('location_id', $allowedLocationIds);
+            });
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function selectedLocationIds(): array
+    {
+        $allowedFilters = collect($this->options()->allowedRecipientFilters())
+            ->map(static fn(string $filter): int => (int) $filter)
+            ->filter(static fn(int $filter): bool => $filter > 0)
+            ->values()
+            ->all();
+
+        return collect($this->recipientFilters)
+            ->map(static fn(string $value): int => (int) $value)
+            ->filter(static fn(int $locationId): bool => in_array($locationId, $allowedFilters, true))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, CampaignLocation>
+     */
+    private function campaignLocationRelationRows()
+    {
+        return collect($this->selectedLocationIds())
+            ->map(static function (int $locationId): CampaignLocation {
+                return new CampaignLocation([
+                    'location_id' => $locationId,
+                    'deleted_at' => null,
+                ]);
+            })
+            ->values();
+    }
+
+    private function syncCampaignLocations(Campaign $campaign): void
+    {
+        if (in_array('all', $this->recipientFilters, true)) {
+            CampaignLocation::query()
+                ->where('campaign_id', $campaign->id)
+                ->whereNull('deleted_at')
+                ->update([
+                    'deleted_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+            return;
+        }
+
+        $locationIds = $this->selectedLocationIds();
+
+        if ($locationIds === []) {
+            CampaignLocation::query()
+                ->where('campaign_id', $campaign->id)
+                ->whereNull('deleted_at')
+                ->update([
+                    'deleted_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+            return;
+        }
+
+        CampaignLocation::query()
+            ->where('campaign_id', $campaign->id)
+            ->whereNull('deleted_at')
+            ->whereNotIn('location_id', $locationIds)
+            ->update([
+                'deleted_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        $upsertRows = collect($locationIds)
+            ->map(static function (int $locationId) use ($campaign): array {
+                return [
+                    'campaign_id' => $campaign->id,
+                    'location_id' => $locationId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'deleted_at' => null,
+                ];
+            })
+            ->all();
+
+        CampaignLocation::upsert(
+            $upsertRows,
+            ['campaign_id', 'location_id'],
+            ['updated_at', 'deleted_at'],
+        );
     }
 
     private function options(): CampaignAdminOptions

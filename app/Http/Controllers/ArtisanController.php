@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Throwable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
+use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
 
 class ArtisanController extends Controller
 {
@@ -40,15 +40,9 @@ class ArtisanController extends Controller
         return redirect()->route('admin.dashboard')->with('status', 'Database migrated!');
     }
 
-    public function queueWorkStopWhenEmpty(): RedirectResponse
+    public function queueWorkStopWhenEmpty(RunQueueWorkStopWhenEmptyAction $runQueueWorkStopWhenEmptyAction): RedirectResponse
     {
-        try {
-            Artisan::call('queue:work', [
-                '--stop-when-empty' => true,
-            ]);
-        } catch (Throwable $throwable) {
-            report($throwable);
-
+        if (! $runQueueWorkStopWhenEmptyAction->execute()) {
             return redirect()->route('admin.dashboard')->with('status', __('admin.queue.status_failed'));
         }
 

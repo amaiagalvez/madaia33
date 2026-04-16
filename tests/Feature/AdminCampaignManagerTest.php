@@ -5,9 +5,13 @@ use App\Models\User;
 use Livewire\Livewire;
 use App\Models\Campaign;
 use App\Models\Location;
+use App\Models\CampaignLocation;
+use Illuminate\Support\Facades\Bus;
+use App\Jobs\Messaging\DispatchCampaignJob;
 use App\Models\CampaignDocument;
 use App\Models\CampaignTemplate;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 
 it('renders campaigns in the admin list', function () {
@@ -17,14 +21,12 @@ it('renders campaigns in the admin list', function () {
         'subject_eu' => 'Kanpaina nagusia',
         'status' => 'draft',
         'channel' => 'email',
-        'recipient_filter' => 'all',
     ]);
 
     Campaign::factory()->create([
         'subject_eu' => 'Programatutako kanpaina',
         'status' => 'scheduled',
         'channel' => 'sms',
-        'recipient_filter' => 'all',
     ]);
 
     Livewire::actingAs($user)
@@ -37,11 +39,17 @@ it('renders campaigns in the admin list', function () {
 it('shows translated recipient filters and the invalid contacts breadcrumb', function () {
     $user = adminUser();
 
-    Campaign::factory()->create([
+    $location = Location::factory()->portal()->create(['code' => 'P-33']);
+
+    $campaign = Campaign::factory()->create([
         'subject_eu' => 'Atariko mezua',
         'status' => 'draft',
         'channel' => 'email',
-        'recipient_filter' => 'portal:P-33',
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $location->id,
     ]);
 
     test()->actingAs($user)
@@ -76,7 +84,7 @@ it('validates required campaign fields', function () {
         ->set('bodyEu', '')
         ->set('bodyEs', '')
         ->set('channel', '')
-        ->set('recipientFilter', '')
+        ->set('recipientFilters', [])
         ->call('saveCampaign')
         ->assertHasErrors([
             'subjectEu',
@@ -84,7 +92,7 @@ it('validates required campaign fields', function () {
             'bodyEu',
             'bodyEs',
             'channel',
-            'recipientFilter',
+            'recipientFilters',
         ]);
 });
 
@@ -95,7 +103,6 @@ it('duplicates a campaign into a new draft and opens the new form', function () 
         'subject_eu' => 'Jatorrizko kanpaina',
         'status' => 'completed',
         'channel' => 'email',
-        'recipient_filter' => 'all',
     ]);
 
     $component = Livewire::actingAs($user)
@@ -120,7 +127,6 @@ it('opens and closes the shared confirmation modal for campaign table actions', 
     $campaign = Campaign::factory()->create([
         'status' => 'draft',
         'channel' => 'email',
-        'recipient_filter' => 'all',
     ]);
 
     Livewire::actingAs($user)
@@ -133,6 +139,29 @@ it('opens and closes the shared confirmation modal for campaign table actions', 
         ->assertSet('confirmingActionId', null)
         ->assertSet('confirmingAction', '')
         ->assertSet('showActionModal', false);
+});
+
+it('starts queue worker when sending a campaign from the manager', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+    ]);
+
+    Bus::fake();
+
+    Artisan::shouldReceive('call')
+        ->once()
+        ->with('queue:work', [
+            '--stop-when-empty' => true,
+        ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('sendCampaign', $campaign->id);
+
+    Bus::assertDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
 });
 
 it('shows edit and delete actions only for draft or scheduled campaigns', function () {
@@ -168,14 +197,22 @@ it('limits general admins to unfiltered campaigns only', function () {
         'subject_eu' => 'Kanpaina orokorra',
         'status' => 'draft',
         'channel' => 'email',
-        'recipient_filter' => 'all',
+    ]);
+
+    $managedLocation = Location::factory()->portal()->create([
+        'code' => 'GA-01',
+        'name' => 'Portal GA-01',
     ]);
 
     $hiddenCampaign = Campaign::factory()->create([
         'subject_eu' => 'Kanpaina murriztua',
         'status' => 'draft',
         'channel' => 'email',
-        'recipient_filter' => 'portal:GA-01',
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $hiddenCampaign->id,
+        'location_id' => $managedLocation->id,
     ]);
 
     Livewire::actingAs($generalAdmin)
@@ -214,6 +251,15 @@ it('hides the all filter option from community admins', function () {
         ->assertDontSeeHtml('value="all"')
         ->assertSee('CA-33');
 });
+
+    it('does not preselect the all owners filter on new campaigns', function () {
+        $user = adminUser();
+
+        Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('createCampaign')
+        ->assertSet('recipientFilters', []);
+    });
 
 it('redirects property owners and delegated vote users away from campaigns', function (string $role) {
     Role::query()->firstOrCreate(['name' => $role]);
@@ -271,7 +317,7 @@ it('stores uploaded campaign documents when saving a campaign', function () {
         ->set('subjectEu', 'Dokumentudun mezua')
         ->set('bodyEu', 'Dokumentua bidali da.')
         ->set('channel', 'email')
-        ->set('recipientFilter', 'all')
+        ->set('recipientFilters', ['all'])
         ->set('attachments', [$attachment])
         ->call('saveCampaign')
         ->assertHasNoErrors();
@@ -290,7 +336,6 @@ it('shows stored campaign documents when reopening the edit form', function () {
     $campaign = Campaign::factory()->create([
         'status' => 'draft',
         'channel' => 'email',
-        'recipient_filter' => 'all',
     ]);
 
     CampaignDocument::factory()->create([
@@ -313,7 +358,6 @@ it('deletes a stored campaign document from the edit form', function () {
     $campaign = Campaign::factory()->create([
         'status' => 'draft',
         'channel' => 'email',
-        'recipient_filter' => 'all',
     ]);
 
     Storage::disk('public')->put('campaign-documents/' . $campaign->id . '/acta-junta.pdf', 'dummy-content');
@@ -332,4 +376,35 @@ it('deletes a stored campaign document from the edit form', function () {
 
     expect(CampaignDocument::withTrashed()->find($document->id)?->trashed())->toBeTrue()
         ->and(Storage::disk('public')->exists($document->path))->toBeFalse();
+});
+
+it('stores multiple location recipient filters in a single campaign', function () {
+    $user = adminUser();
+
+    $portal = Location::factory()->portal()->create(['code' => 'P-01']);
+    $garage = Location::factory()->garage()->create(['code' => 'G-02']);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('createCampaign')
+        ->set('subjectEu', 'Filtro anizkoitza')
+        ->set('bodyEu', 'Bi kokalekutarako mezua')
+        ->set('channel', 'email')
+        ->set('recipientFilters', [(string) $portal->id, (string) $garage->id])
+        ->call('saveCampaign')
+        ->assertHasNoErrors();
+
+    $campaign = Campaign::query()->latest('id')->first();
+
+    expect($campaign)->not->toBeNull();
+
+    $savedLocationIds = CampaignLocation::query()
+        ->where('campaign_id', $campaign->id)
+        ->whereNull('deleted_at')
+        ->pluck('location_id')
+        ->sort()
+        ->values()
+        ->all();
+
+    expect($savedLocationIds)->toBe([(int) $portal->id, (int) $garage->id]);
 });

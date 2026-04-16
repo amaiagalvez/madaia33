@@ -229,3 +229,4 @@
 - En envíos por lote con WhatsApp Web, abrir popup una sola vez y reutilizar `batchWindow.location.href` evita bloqueos por múltiples `window.open` consecutivos; mantener un nombre fijo de ventana mejora estabilidad.
 - Si una automatización frontend (lote WhatsApp por ventanas) falla repetidamente en producción, eliminar la funcionalidad completa (UI + Livewire + tests + i18n) es preferible a mantener un flujo inestable que marca estados erróneos.
 - For PHPMD CBO excess in large Laravel providers, move event/listener/observer wiring into a dedicated provider (e.g., DomainEventsServiceProvider) and register it in bootstrap/providers.php; this reduces coupling without behavior changes.
+- Al refactorizar bloques en Blade (formularios Livewire), verifica inmediatamente que no queden secciones duplicadas ni líneas sueltas de componentes; después ejecuta test Feature focalizado del formulario afectado.

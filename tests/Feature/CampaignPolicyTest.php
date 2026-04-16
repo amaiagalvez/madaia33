@@ -4,6 +4,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Campaign;
 use App\Models\Location;
+use App\Models\CampaignLocation;
 use App\Policies\CampaignPolicy;
 
 it('allows superadmin and admin_general to send campaigns with all filter', function (string $role) {
@@ -14,7 +15,6 @@ it('allows superadmin and admin_general to send campaigns with all filter', func
     $user->assignRole($role);
 
     $campaign = Campaign::factory()->create([
-        'recipient_filter' => 'all',
         'status' => 'draft',
     ]);
 
@@ -31,9 +31,15 @@ it('denies admin_general for location-specific campaigns', function () {
     Role::query()->firstOrCreate(['name' => Role::GENERAL_ADMIN]);
     $user->assignRole(Role::GENERAL_ADMIN);
 
+    $location = Location::factory()->portal()->create(['code' => 'P-33']);
+
     $campaign = Campaign::factory()->create([
-        'recipient_filter' => 'portal:P-33',
         'status' => 'draft',
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $location->id,
     ]);
 
     expect($policy->view($user, $campaign))->toBeFalse()
@@ -49,7 +55,6 @@ it('denies admin_comunidad when using all filter', function () {
     $user->assignRole(Role::COMMUNITY_ADMIN);
 
     $campaign = Campaign::factory()->create([
-        'recipient_filter' => 'all',
         'status' => 'draft',
     ]);
 
@@ -69,8 +74,41 @@ it('denies admin_comunidad for unmanaged location filters', function () {
     $user->managedLocations()->attach($managedLocation->id);
 
     $campaign = Campaign::factory()->create([
-        'recipient_filter' => 'portal:' . $unmanagedLocation->code,
         'status' => 'draft',
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $unmanagedLocation->id,
+    ]);
+
+    expect($policy->send($user, $campaign))->toBeFalse();
+});
+
+it('denies admin_comunidad when a multi-location filter contains unmanaged locations', function () {
+    $policy = new CampaignPolicy;
+
+    $user = User::factory()->create();
+    Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
+    $user->assignRole(Role::COMMUNITY_ADMIN);
+
+    $managedPortal = Location::factory()->portal()->create(['code' => 'P-70']);
+    $unmanagedGarage = Location::factory()->garage()->create(['code' => 'G-71']);
+
+    $user->managedLocations()->attach($managedPortal->id);
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $managedPortal->id,
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $unmanagedGarage->id,
     ]);
 
     expect($policy->send($user, $campaign))->toBeFalse();

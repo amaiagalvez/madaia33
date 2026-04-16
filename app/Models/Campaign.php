@@ -21,7 +21,6 @@ class Campaign extends Model
         'body_eu',
         'body_es',
         'channel',
-        'recipient_filter',
         'status',
         'scheduled_at',
         'sent_at',
@@ -52,6 +51,14 @@ class Campaign extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(CampaignDocument::class);
+    }
+
+    /**
+     * @return HasMany<CampaignLocation, $this>
+     */
+    public function locations(): HasMany
+    {
+        return $this->hasMany(CampaignLocation::class);
     }
 
     /**
