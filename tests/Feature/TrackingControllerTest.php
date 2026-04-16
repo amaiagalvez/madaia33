@@ -48,7 +48,11 @@ it('redirects to destination URL and stores click event', function () {
         ->where('campaign_recipient_id', $recipient->id)
         ->where('event_type', 'click')
         ->where('url', 'https://example.org/path')
-        ->exists())->toBeTrue();
+        ->exists())->toBeTrue()
+        ->and(CampaignTrackingEvent::query()
+            ->where('campaign_recipient_id', $recipient->id)
+            ->where('event_type', 'open')
+            ->exists())->toBeTrue();
 });
 
 it('serves public document without authentication and stores download event', function () {
@@ -82,7 +86,11 @@ it('serves public document without authentication and stores download event', fu
         ->where('campaign_recipient_id', $recipient->id)
         ->where('campaign_document_id', $document->id)
         ->where('event_type', 'download')
-        ->exists())->toBeTrue();
+        ->exists())->toBeTrue()
+        ->and(CampaignTrackingEvent::query()
+            ->where('campaign_recipient_id', $recipient->id)
+            ->where('event_type', 'open')
+            ->exists())->toBeTrue();
 });
 
 it('allows recipients with a valid tracking token to access private documents without login', function () {
@@ -116,7 +124,41 @@ it('allows recipients with a valid tracking token to access private documents wi
         ->where('campaign_recipient_id', $recipient->id)
         ->where('campaign_document_id', $document->id)
         ->where('event_type', 'download')
-        ->exists())->toBeTrue();
+        ->exists())->toBeTrue()
+        ->and(CampaignTrackingEvent::query()
+            ->where('campaign_recipient_id', $recipient->id)
+            ->where('event_type', 'open')
+            ->exists())->toBeTrue();
+});
+
+it('does not duplicate open events when click is tracked after an open', function () {
+    $owner = Owner::factory()->create();
+    $campaign = Campaign::factory()->create();
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'tracking_token' => 'token-click-opened',
+    ]);
+
+    CampaignTrackingEvent::query()->create([
+        'campaign_recipient_id' => $recipient->id,
+        'campaign_document_id' => null,
+        'event_type' => 'open',
+        'url' => null,
+        'ip_address' => '127.0.0.1',
+    ]);
+
+    $response = test()->get(route('tracking.click', [
+        'token' => $recipient->tracking_token,
+        'url' => 'https://example.org/already-opened',
+    ]));
+
+    $response->assertRedirect('https://example.org/already-opened');
+
+    expect(CampaignTrackingEvent::query()
+        ->where('campaign_recipient_id', $recipient->id)
+        ->where('event_type', 'open')
+        ->count())->toBe(1);
 });
 
 it('returns 404 for invalid tracking tokens', function () {

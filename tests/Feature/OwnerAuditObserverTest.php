@@ -78,6 +78,23 @@ describe('OwnerAuditObserver', function () {
             ->and($owner->coprop1_phone_invalid)->toBeFalse();
     });
 
+    it('resets coprop2 phone error counters when coprop2 phone changes', function () {
+        $owner = Owner::factory()->withSecondCoProp()->create([
+            'coprop2_phone' => '611111111',
+            'coprop2_phone_error_count' => 3,
+            'coprop2_phone_invalid' => true,
+        ]);
+
+        $owner->update([
+            'coprop2_phone' => '622222222',
+        ]);
+
+        $owner->refresh();
+
+        expect($owner->coprop2_phone_error_count)->toBe(0)
+            ->and($owner->coprop2_phone_invalid)->toBeFalse();
+    });
+
     it('does not reset unrelated counters when only one contact field changes', function () {
         $owner = Owner::factory()->create([
             'coprop1_email' => 'old@example.test',

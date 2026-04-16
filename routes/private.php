@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArtisanController;
 use App\Http\Controllers\VotingPdfController;
 use App\Http\Controllers\PublicVotingController;
+use App\Http\Controllers\CampaignWhatsappCsvController;
 
 Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
@@ -44,6 +45,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/campanas/{campaign}', fn (Campaign $campaign) => view('admin.campaign-detail', ['campaign' => $campaign]))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns.show');
+    Route::get('/campanas/{campaign}/whatsapp-csv', CampaignWhatsappCsvController::class)
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('campaigns.whatsapp-csv');
     Route::get('/imagenes', fn () => view('admin.images'))
         ->middleware('role:superadmin')
         ->name('images');

@@ -65,6 +65,8 @@ return [
         'actions' => [
             'duplicate' => 'Bikoiztu',
             'send' => 'Bidali orain',
+            'send_whatsapp' => 'WhatsApp bidez bidali',
+            'download_whatsapp_csv' => 'WhatsApp CSV deskargatu',
             'schedule' => 'Programatu',
             'cancel_schedule' => 'Programazioa ezeztatu',
             'mark_as_valid' => 'Baliozkotzat markatu',
@@ -75,6 +77,9 @@ return [
         'messages' => [
             'resend_unopened_queued' => 'Ireki ez duten hartzaileei berriz bidaltzea kanpaina honetan programatu da.',
             'all_opened' => 'Hartzaile guztiek mezua ireki dute. Ez dago inor berriz bidaltzeko.',
+            'whatsapp_marked_sent' => 'WhatsApp bidalketa eskuz markatu da.',
+            'whatsapp_invalid_contact' => 'Hartzailearen telefonoa ez da baliozkoa Click to Chat URL sortzeko.',
+            'whatsapp_contact_blocked' => 'Telefono honek hiru errore pilatu ditu eta ez zaio WhatsApp mezurik berriro bidaliko.',
         ],
         'metrics' => [
             'total' => 'Guztira bidaliak',
@@ -105,12 +110,23 @@ return [
             'download' => 'Deskarga',
             'error' => 'Errorea',
             'delivered' => 'Bidalita',
+            'whatsapp_sent' => 'WhatsApp bidalia',
         ],
         'no_events' => 'Oraindik ez dago jarraipen-gertaerarik.',
         'unknown_owner' => 'Jabe ezezaguna',
         'unopened_count' => ':count hartzailek ez dute mezua ireki.',
         'yes' => 'Bai',
         'no' => 'Ez',
+        'whatsapp' => [
+            'link_section' => 'Estekak',
+            'documents_section' => 'Dokumentuak',
+            'sent_badge' => 'WhatsApp bidalia',
+            'blocked_badge' => 'WhatsApp blokeatua',
+        ],
+        'csv' => [
+            'phone' => 'Telefonoa',
+            'message' => 'Mezua',
+        ],
     ],
     'errors' => [
         'unsupported_channel_provider' => 'Ez dago kanal honetarako bidalketa-hornitzaile bateragarririk.',

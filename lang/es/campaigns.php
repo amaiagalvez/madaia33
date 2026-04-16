@@ -65,6 +65,8 @@ return [
         'actions' => [
             'duplicate' => 'Duplicar',
             'send' => 'Enviar ahora',
+            'send_whatsapp' => 'Enviar por WhatsApp',
+            'download_whatsapp_csv' => 'Descargar CSV WhatsApp',
             'schedule' => 'Programar',
             'cancel_schedule' => 'Cancelar programación',
             'mark_as_valid' => 'Marcar como válido',
@@ -75,6 +77,9 @@ return [
         'messages' => [
             'resend_unopened_queued' => 'Se ha programado el reenvío a destinatarias no abiertas en esta misma campaña.',
             'all_opened' => 'Todas las destinatarias han abierto el mensaje. No hay nadie a quien reenviar.',
+            'whatsapp_marked_sent' => 'El envío por WhatsApp se ha marcado manualmente como enviado.',
+            'whatsapp_invalid_contact' => 'El teléfono de la destinataria no es válido para generar la URL de Click to Chat.',
+            'whatsapp_contact_blocked' => 'Este teléfono ha acumulado tres errores y ya no se le volverán a enviar mensajes por WhatsApp.',
         ],
         'metrics' => [
             'total' => 'Total enviados',
@@ -105,12 +110,23 @@ return [
             'download' => 'Descarga',
             'error' => 'Error',
             'delivered' => 'Entregado',
+            'whatsapp_sent' => 'WhatsApp enviado',
         ],
         'no_events' => 'Todavía no hay eventos de seguimiento.',
         'unknown_owner' => 'Propietaria desconocida',
         'unopened_count' => ':count destinatarias no han abierto el mensaje.',
         'yes' => 'Sí',
         'no' => 'No',
+        'whatsapp' => [
+            'link_section' => 'Enlaces',
+            'documents_section' => 'Documentos',
+            'sent_badge' => 'WhatsApp enviado',
+            'blocked_badge' => 'WhatsApp bloqueado',
+        ],
+        'csv' => [
+            'phone' => 'Teléfono',
+            'message' => 'Mensaje',
+        ],
     ],
     'errors' => [
         'unsupported_channel_provider' => 'No hay un proveedor de envío compatible para este canal.',

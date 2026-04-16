@@ -11,9 +11,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\Messaging\SendCampaignMessageJob;
 use App\Actions\Campaigns\DuplicateCampaignAction;
+use App\Livewire\Concerns\HandlesCampaignDetailWhatsapp;
 
 class AdminCampaignDetail extends Component
 {
+    use HandlesCampaignDetailWhatsapp;
+
     public Campaign $campaign;
 
     public ?int $expandedRecipientId = null;
@@ -156,8 +159,12 @@ class AdminCampaignDetail extends Component
         $recipients = $this->campaign->recipients;
         $openedRecipients = $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'open'))->count();
 
+        $sentTotal = $this->campaign->channel === 'whatsapp'
+            ? $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'))->count()
+            : $recipients->count();
+
         $this->metrics = [
-            'total' => $recipients->count(),
+            'total' => $sentTotal,
             'opens' => $openedRecipients,
             'clicks' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'click'))->count(),
             'downloads' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'download'))->count(),
@@ -197,6 +204,9 @@ class AdminCampaignDetail extends Component
                 'owner_edit_url' => $this->ownerEditUrl($recipient),
                 'name' => $this->recipientName($recipient),
                 'contact' => $recipient->contact,
+                'can_send_whatsapp' => $this->campaign->channel === 'whatsapp' && ! $this->isWhatsappContactBlocked($recipient),
+                'whatsapp_sent' => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'),
+                'whatsapp_blocked' => $this->campaign->channel === 'whatsapp' && $this->isWhatsappContactBlocked($recipient),
                 'status' => $recipient->status,
                 'status_label' => __('campaigns.admin.statuses.' . $recipient->status),
                 'opened' => $recipient->trackingEvents->contains('event_type', 'open'),

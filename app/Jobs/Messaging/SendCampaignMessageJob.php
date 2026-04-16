@@ -9,19 +9,34 @@ use App\Models\CampaignTrackingEvent;
 use App\Contracts\Messaging\EmailProvider;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\Middleware\RateLimited;
 use App\Services\Messaging\MessageVariableResolver;
+use App\Support\Messaging\RecipientContactHealthManager;
 
 class SendCampaignMessageJob implements ShouldQueue
 {
     use Queueable;
 
+    private const EMAIL_SEND_RATE_LIMITER = 'campaign-email-send';
+
     public function __construct(public readonly int $recipientId) {}
+
+    /**
+     * @return array<int, RateLimited>
+     */
+    public function middleware(): array
+    {
+        return [new RateLimited(self::EMAIL_SEND_RATE_LIMITER)];
+    }
 
     /**
      * Execute the job.
      */
-    public function handle(MessageVariableResolver $resolver, EmailProvider $emailProvider): void
-    {
+    public function handle(
+        MessageVariableResolver $resolver,
+        EmailProvider $emailProvider,
+        RecipientContactHealthManager $contactHealthManager,
+    ): void {
         $recipient = $this->loadRecipient();
 
         if ($recipient === null || $recipient->campaign === null || $recipient->owner === null) {
@@ -30,9 +45,9 @@ class SendCampaignMessageJob implements ShouldQueue
 
         try {
             $this->sendMessage($recipient, $resolver, $emailProvider);
-            $this->markDelivered($recipient);
+            $this->markDelivered($recipient, $contactHealthManager);
         } catch (Throwable $exception) {
-            $this->markFailed($recipient, $exception);
+            $this->markFailed($recipient, $exception, $contactHealthManager);
         }
 
         $this->completeCampaignWhenAllRecipientsProcessed($recipient);
@@ -59,24 +74,27 @@ class SendCampaignMessageJob implements ShouldQueue
         $emailProvider->send($recipient, $subject, $body);
     }
 
-    private function markDelivered(CampaignRecipient $recipient): void
+    private function markDelivered(CampaignRecipient $recipient, RecipientContactHealthManager $contactHealthManager): void
     {
         $recipient->status = 'sent';
         $recipient->error_message = null;
         $recipient->save();
 
         $this->recordTrackingEvent($recipient, 'delivered');
-        $this->resetContactErrorState($recipient);
+        $contactHealthManager->markSuccess($recipient);
     }
 
-    private function markFailed(CampaignRecipient $recipient, Throwable $exception): void
-    {
+    private function markFailed(
+        CampaignRecipient $recipient,
+        Throwable $exception,
+        RecipientContactHealthManager $contactHealthManager,
+    ): void {
         $recipient->status = 'failed';
         $recipient->error_message = $exception->getMessage();
         $recipient->save();
 
         $this->recordTrackingEvent($recipient, 'error');
-        $this->increaseContactErrorState($recipient);
+        $contactHealthManager->markFailure($recipient);
     }
 
     private function recordTrackingEvent(CampaignRecipient $recipient, string $eventType): void
@@ -128,65 +146,6 @@ class SendCampaignMessageJob implements ShouldQueue
         return collect([$eu, $es])
             ->filter(fn (?string $value): bool => filled($value))
             ->implode("\n\n");
-    }
-
-    private function resetContactErrorState(CampaignRecipient $recipient): void
-    {
-        $owner = $recipient->owner;
-
-        if ($owner === null) {
-            return;
-        }
-
-        $counterKey = $this->errorCounterField($recipient);
-        $invalidKey = $this->invalidField($recipient);
-
-        $owner->{$counterKey} = 0;
-        $owner->{$invalidKey} = false;
-        $owner->save();
-    }
-
-    private function increaseContactErrorState(CampaignRecipient $recipient): void
-    {
-        $owner = $recipient->owner;
-
-        if ($owner === null) {
-            return;
-        }
-
-        $counterKey = $this->errorCounterField($recipient);
-        $invalidKey = $this->invalidField($recipient);
-
-        $owner->{$counterKey} = (int) $owner->{$counterKey} + 1;
-        $owner->last_contact_error_at = now();
-
-        if ((int) $owner->{$counterKey} >= 3) {
-            $owner->{$invalidKey} = true;
-        }
-
-        $owner->save();
-    }
-
-    private function errorCounterField(CampaignRecipient $recipient): string
-    {
-        $slotPrefix = $recipient->slot === 'coprop2' ? 'coprop2' : 'coprop1';
-
-        if ($recipient->campaign->channel === 'email') {
-            return $slotPrefix . '_email_error_count';
-        }
-
-        return $slotPrefix . '_phone_error_count';
-    }
-
-    private function invalidField(CampaignRecipient $recipient): string
-    {
-        $slotPrefix = $recipient->slot === 'coprop2' ? 'coprop2' : 'coprop1';
-
-        if ($recipient->campaign->channel === 'email') {
-            return $slotPrefix . '_email_invalid';
-        }
-
-        return $slotPrefix . '_phone_invalid';
     }
 
     private function completeCampaignWhenAllRecipientsProcessed(CampaignRecipient $recipient): void
