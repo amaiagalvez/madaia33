@@ -47,6 +47,8 @@ En el listado de admin/campanas
 
 - [ ] campaña: añadir un botón, enviar prueba (como tenenmos en el formulario de los settings email_configuration) mostrar un modal para pedir un email y enviar a dicho email una prueba de como queda la campaña. Se enviarán dos emails de prueba, uno en euskera y otro en castellano al email indicado.
 
+- [ ] twilio https://www.twilio.com/docs/whatsapp
+
 # Panela
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
 - Aktak
