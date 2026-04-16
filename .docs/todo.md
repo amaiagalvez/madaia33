@@ -15,13 +15,13 @@
 - [ ] añadir tipo votaciones, una persona un voto / por porcentajes de participación
 
 - [ ] configurar el sentry
-- [ ] añadir debugbar y algo para ver los logs logviewer
 - [ ] accesibilidad
 
 - votaciones resultados (suma de porcentajes)
 - spec kiro pendientes
 
 # unificar terminología
+
 locations: Ubicaciones => Comunidades
 properties: Propiedades => Fincas
 property_assignments => Propiedades

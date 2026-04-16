@@ -9,6 +9,7 @@ return [
     'settings' => 'Configuración',
     'legal_pages' => 'Páginas legales',
     'logout' => 'Cerrar sesión',
+    'log_viewer' => 'Visor de logs',
     'login' => [
         'title' => 'Iniciar sesión',
         'email' => 'Correo electrónico',

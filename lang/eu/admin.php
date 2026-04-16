@@ -9,6 +9,7 @@ return [
     'settings' => 'Ezarpenak',
     'legal_pages' => 'Orrialde legalak',
     'logout' => 'Saioa itxi',
+    'log_viewer' => 'Log ikuslea',
     'login' => [
         'title' => 'Saioa hasi',
         'email' => 'Helbide elektronikoa',
