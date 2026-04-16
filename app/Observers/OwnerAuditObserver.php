@@ -29,23 +29,25 @@ class OwnerAuditObserver
     private function resetMessagingContactErrorsWhenContactChanges(Owner $owner): void
     {
         if ($owner->isDirty('coprop1_email')) {
-            $owner->coprop1_email_error_count = 0;
-            $owner->coprop1_email_invalid = false;
+            $this->resetContactErrorFlags($owner, 'coprop1', 'email');
         }
 
         if ($owner->isDirty('coprop2_email')) {
-            $owner->coprop2_email_error_count = 0;
-            $owner->coprop2_email_invalid = false;
+            $this->resetContactErrorFlags($owner, 'coprop2', 'email');
         }
 
         if ($owner->isDirty('coprop1_phone')) {
-            $owner->coprop1_phone_error_count = 0;
-            $owner->coprop1_phone_invalid = false;
+            $this->resetContactErrorFlags($owner, 'coprop1', 'phone');
         }
 
         if ($owner->isDirty('coprop2_phone')) {
-            $owner->coprop2_phone_error_count = 0;
-            $owner->coprop2_phone_invalid = false;
+            $this->resetContactErrorFlags($owner, 'coprop2', 'phone');
         }
+    }
+
+    private function resetContactErrorFlags(Owner $owner, string $slot, string $channel): void
+    {
+        $owner->{$slot . '_' . $channel . '_error_count'} = 0;
+        $owner->{$slot . '_' . $channel . '_invalid'} = false;
     }
 }

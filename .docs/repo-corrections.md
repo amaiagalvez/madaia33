@@ -222,3 +222,8 @@
 - To satisfy PHPMD `ExcessiveClassLength` in large Livewire components without behavior changes, extract cohesive action/auth blocks into a dedicated concern trait and keep the host component focused on form/query state.
 - When Pint reports targeted style regressions after manual refactors, run Pint on explicit file paths (not only --dirty) to guarantee quick deterministic fixes for function declaration/unary operator/array indentation rules.
 - In PHPStan fixes, `preg_match_all()` result offsets are always initialized as arrays; avoid redundant `?? []` on `$matches[n]` because it triggers `nullCoalesce.offset` warnings and hides real typing issues.
+- If PHPMD flags a Livewire component for ExcessiveClassLength after adding a cohesive feature block, extract that block into a `app/Livewire/Concerns/*` trait first; this preserves behavior and is usually the fastest compliant fix.
+- In owner contact error resets, centralize email/phone flag clearing in one helper and add explicit tests for coprop2 phone changes to avoid asymmetric regressions between slots/channels.
+- En lotes de WhatsApp Web, evita el autoavance por temporizador: usar navegación manual “siguiente” previene que cada `window.open` pise la conversación anterior y deje el flujo en falso “enviado”.
+- En envíos por lote con WhatsApp Web, abrir popup una sola vez y reutilizar `batchWindow.location.href` evita bloqueos por múltiples `window.open` consecutivos; mantener un nombre fijo de ventana mejora estabilidad.
+- Si una automatización frontend (lote WhatsApp por ventanas) falla repetidamente en producción, eliminar la funcionalidad completa (UI + Livewire + tests + i18n) es preferible a mantener un flujo inestable que marca estados erróneos.

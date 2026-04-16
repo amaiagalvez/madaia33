@@ -309,6 +309,11 @@ it('resends only unopened recipients in the same campaign', function () {
 
 it('shows whatsapp click-to-chat with tracked links and marks recipient as sent', function () {
     $user = adminUser();
+    $owner = Owner::factory()->create([
+        'coprop1_phone' => '+34 600 11 22 33',
+        'coprop1_phone_error_count' => 2,
+        'coprop1_phone_invalid' => false,
+    ]);
 
     $campaign = Campaign::factory()->create([
         'status' => 'completed',
@@ -319,6 +324,8 @@ it('shows whatsapp click-to-chat with tracked links and marks recipient as sent'
 
     $recipient = CampaignRecipient::factory()->create([
         'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
         'contact' => '+34 600 11 22 33',
         'tracking_token' => 'token-whatsapp-1',
         'status' => 'pending',
@@ -342,17 +349,105 @@ it('shows whatsapp click-to-chat with tracked links and marks recipient as sent'
     Livewire::actingAs($user)
         ->test('admin-campaign-detail', ['campaign' => $campaign])
         ->assertSeeHtml('data-campaign-whatsapp-send-' . $recipient->id)
-        ->assertSee('wa.me/34600112233?text=', false)
-        ->assertSee(rawurlencode($trackedClickUrl), false)
-        ->assertSee(rawurlencode($trackedDocumentUrl), false)
-        ->call('markWhatsappSent', $recipient->id)
+        ->call('sendWhatsappMessage', $recipient->id)
+        ->assertDispatched('open-whatsapp')
         ->assertSee(__('campaigns.admin.messages.whatsapp_marked_sent'));
 
     $recipient->refresh();
+    $owner->refresh();
+
+    $trackingEvent = CampaignTrackingEvent::query()
+        ->where('campaign_recipient_id', $recipient->id)
+        ->where('event_type', 'whatsapp_sent')
+        ->latest()
+        ->first();
 
     expect($recipient->status)->toBe('sent')
+        ->and($trackingEvent)->not->toBeNull()
+        ->and($trackingEvent?->url)->toStartWith('https://wa.me/34600112233?text=')
+        ->and($trackingEvent?->url)->toContain(rawurlencode($trackedClickUrl))
+        ->and($trackingEvent?->url)->toContain(rawurlencode($trackedDocumentUrl))
+        ->and($owner->coprop1_phone_error_count)->toBe(0)
+        ->and($owner->coprop1_phone_invalid)->toBeFalse();
+});
+
+it('marks whatsapp contact as invalid after the third failed attempt and blocks future sends', function () {
+    $user = adminUser();
+    $owner = Owner::factory()->create([
+        'coprop1_phone' => 'abc',
+        'coprop1_phone_error_count' => 2,
+        'coprop1_phone_invalid' => false,
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'completed',
+        'channel' => 'whatsapp',
+        'body_eu' => '<p>Kaixo komunitatea</p>',
+        'body_es' => null,
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => 'abc',
+        'tracking_token' => 'token-whatsapp-error',
+        'status' => 'pending',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $campaign])
+        ->call('sendWhatsappMessage', $recipient->id)
+        ->assertSee(__('campaigns.admin.messages.whatsapp_contact_blocked'));
+
+    $recipient->refresh();
+    $owner->refresh();
+
+    expect($recipient->status)->toBe('failed')
+        ->and($recipient->error_message)->toBe(__('campaigns.admin.messages.whatsapp_invalid_contact'))
+        ->and($owner->coprop1_phone_error_count)->toBe(3)
+        ->and($owner->coprop1_phone_invalid)->toBeTrue()
         ->and(CampaignTrackingEvent::query()
             ->where('campaign_recipient_id', $recipient->id)
-            ->where('event_type', 'whatsapp_sent')
+            ->where('event_type', 'error')
             ->exists())->toBeTrue();
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $campaign])
+        ->assertDontSeeHtml('data-campaign-whatsapp-send-' . $recipient->id)
+        ->assertSeeHtml('data-campaign-whatsapp-blocked-' . $recipient->id);
+});
+
+it('shows only whatsapp_sent count in total metric for whatsapp campaigns', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'whatsapp',
+        'status' => 'sending',
+    ]);
+
+    $sentRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'contact' => '+34600111222',
+        'status' => 'sent',
+    ]);
+
+    $pendingRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'contact' => '+34600333444',
+        'status' => 'pending',
+    ]);
+
+    CampaignTrackingEvent::factory()->create([
+        'campaign_recipient_id' => $sentRecipient->id,
+        'campaign_document_id' => null,
+        'event_type' => 'whatsapp_sent',
+        'url' => 'https://wa.me/34600111222?text=Kaixo',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $campaign])
+        ->assertSet('metrics.total', 1);
+
+    expect($pendingRecipient->status)->toBe('pending');
 });

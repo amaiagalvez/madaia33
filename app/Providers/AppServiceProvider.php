@@ -8,12 +8,14 @@ use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\View;
 use App\Observers\OwnerAuditObserver;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->registerMessagingRateLimiters();
         $this->applyConfiguredMailSettings();
         $this->registerLegacyBladeComponentAliases();
         $this->registerViewComposers();
@@ -51,15 +54,20 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Password::defaults(
-            fn (): ?Password => app()->isProduction()
+            fn(): ?Password => app()->isProduction()
                 ? Password::min(12)
-                    ->mixedCase()
-                    ->letters()
-                    ->numbers()
-                    ->symbols()
-                    ->uncompromised()
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised()
                 : null,
         );
+    }
+
+    protected function registerMessagingRateLimiters(): void
+    {
+        RateLimiter::for('campaign-email-send', fn(): Limit => Limit::perMinute(10)->by('campaign-email-send'));
     }
 
     /**

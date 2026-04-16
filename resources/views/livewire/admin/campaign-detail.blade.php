@@ -1,4 +1,15 @@
-<div class="space-y-6" data-campaign-detail-page>
+<div class="space-y-6" data-campaign-detail-page x-data="{
+    openWhatsApp(detail) {
+        const webUrl = detail.webUrl ?? detail.url ?? null;
+
+        if (!webUrl) {
+            return;
+        }
+
+        window.open(webUrl, '_blank', 'noopener');
+    }
+}"
+    x-on:open-whatsapp.window="openWhatsApp($event.detail)">
     @if (session()->has('message'))
         <div class="rounded-md bg-green-50 p-4 text-sm text-green-800">
             {{ session('message') }}
@@ -111,6 +122,16 @@
         <x-admin.stat-card :label="__('campaigns.admin.metrics.failures')" :value="$metrics['failures']" data-campaign-metric="failures" />
     </div>
 
+    @if ($campaign->channel === 'whatsapp')
+        <div class="flex justify-end" data-campaign-whatsapp-csv>
+            <a href="{{ route('admin.campaigns.whatsapp-csv', $campaign) }}"
+                class="inline-flex items-center gap-2 rounded-lg bg-[#793d3d] px-4 py-2 text-sm font-medium text-white hover:bg-[#5e2f2f]">
+                <flux:icon.arrow-down-tray class="size-4" />
+                {{ __('campaigns.admin.actions.download_whatsapp_csv') }}
+            </a>
+        </div>
+    @endif
+
     @if ($showResendModal)
         <dialog open
             class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4"
@@ -186,15 +207,14 @@
                         <div class="flex flex-wrap items-center gap-2">
                             <span>{{ $row['contact'] }}</span>
 
-                            @if ($row['whatsapp_url'])
-                                <a href="{{ $row['whatsapp_url'] }}" target="_blank"
-                                    rel="noopener noreferrer"
-                                    wire:click="markWhatsappSent({{ $row['id'] }})"
+                            @if ($row['can_send_whatsapp'])
+                                <button type="button"
+                                    wire:click="sendWhatsappMessage({{ $row['id'] }})"
                                     data-campaign-whatsapp-send-{{ $row['id'] }}
                                     class="inline-flex items-center gap-1 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-2.5 py-1 text-xs font-semibold text-[#0f5132] transition hover:bg-[#25D366]/20">
                                     <flux:icon.chat-bubble-left-right class="size-3.5" />
                                     <span>{{ __('campaigns.admin.actions.send_whatsapp') }}</span>
-                                </a>
+                                </button>
 
                                 @if ($row['whatsapp_sent'])
                                     <span
@@ -204,6 +224,13 @@
                                         <span>{{ __('campaigns.admin.whatsapp.sent_badge') }}</span>
                                     </span>
                                 @endif
+                            @elseif ($row['whatsapp_blocked'])
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
+                                    data-campaign-whatsapp-blocked-{{ $row['id'] }}>
+                                    <flux:icon.exclamation-triangle class="size-3.5" />
+                                    <span>{{ __('campaigns.admin.whatsapp.blocked_badge') }}</span>
+                                </span>
                             @endif
                         </div>
                     </td>

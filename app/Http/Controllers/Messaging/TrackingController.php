@@ -55,6 +55,8 @@ class TrackingController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
+        $this->markAsOpenedIfNeeded($recipient->id, $request->ip());
+
         return redirect()->away($destinationUrl);
     }
 
@@ -74,6 +76,28 @@ class TrackingController extends Controller
             'ip_address' => request()->ip(),
         ]);
 
+        $this->markAsOpenedIfNeeded($recipient->id, request()->ip());
+
         return response()->download(Storage::disk('public')->path($document->path), $document->filename);
+    }
+
+    private function markAsOpenedIfNeeded(int $recipientId, ?string $ipAddress): void
+    {
+        $alreadyOpened = CampaignTrackingEvent::query()
+            ->where('campaign_recipient_id', $recipientId)
+            ->where('event_type', 'open')
+            ->exists();
+
+        if ($alreadyOpened) {
+            return;
+        }
+
+        CampaignTrackingEvent::query()->create([
+            'campaign_recipient_id' => $recipientId,
+            'campaign_document_id' => null,
+            'event_type' => 'open',
+            'url' => null,
+            'ip_address' => $ipAddress,
+        ]);
     }
 }

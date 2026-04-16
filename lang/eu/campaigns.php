@@ -66,6 +66,7 @@ return [
             'duplicate' => 'Bikoiztu',
             'send' => 'Bidali orain',
             'send_whatsapp' => 'WhatsApp bidez bidali',
+            'download_whatsapp_csv' => 'WhatsApp CSV deskargatu',
             'schedule' => 'Programatu',
             'cancel_schedule' => 'Programazioa ezeztatu',
             'mark_as_valid' => 'Baliozkotzat markatu',
@@ -78,6 +79,7 @@ return [
             'all_opened' => 'Hartzaile guztiek mezua ireki dute. Ez dago inor berriz bidaltzeko.',
             'whatsapp_marked_sent' => 'WhatsApp bidalketa eskuz markatu da.',
             'whatsapp_invalid_contact' => 'Hartzailearen telefonoa ez da baliozkoa Click to Chat URL sortzeko.',
+            'whatsapp_contact_blocked' => 'Telefono honek hiru errore pilatu ditu eta ez zaio WhatsApp mezurik berriro bidaliko.',
         ],
         'metrics' => [
             'total' => 'Guztira bidaliak',
@@ -119,6 +121,11 @@ return [
             'link_section' => 'Estekak',
             'documents_section' => 'Dokumentuak',
             'sent_badge' => 'WhatsApp bidalia',
+            'blocked_badge' => 'WhatsApp blokeatua',
+        ],
+        'csv' => [
+            'phone' => 'Telefonoa',
+            'message' => 'Mezua',
         ],
     ],
     'errors' => [

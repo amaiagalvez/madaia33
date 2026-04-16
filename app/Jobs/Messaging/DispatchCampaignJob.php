@@ -4,6 +4,7 @@ namespace App\Jobs\Messaging;
 
 use App\Models\Campaign;
 use App\Models\CampaignRecipient;
+use Illuminate\Support\Collection;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Services\Messaging\RecipientResolver;
@@ -33,25 +34,36 @@ class DispatchCampaignJob implements ShouldQueue
             ->get();
 
         if ($existingRecipients->isNotEmpty()) {
-            foreach ($existingRecipients as $recipient) {
-                $recipient->status = 'pending';
-                $recipient->error_message = null;
-
-                if (! filled($recipient->tracking_token)) {
-                    $recipient->tracking_token = bin2hex(random_bytes(32));
-                }
-
-                $recipient->save();
-
-                dispatch(new SendCampaignMessageJob($recipient->id));
-            }
+            $this->resetExistingRecipients($campaign, $existingRecipients);
 
             return;
         }
 
-        $resolvedRecipients = $resolver->resolve($campaign);
+        $this->createAndDispatchRecipients($campaign, $resolver);
+    }
 
-        foreach ($resolvedRecipients as $resolvedRecipient) {
+    /** @param Collection<int, CampaignRecipient> $recipients */
+    private function resetExistingRecipients(Campaign $campaign, Collection $recipients): void
+    {
+        foreach ($recipients as $recipient) {
+            $recipient->status = 'pending';
+            $recipient->error_message = null;
+
+            if (! filled($recipient->tracking_token)) {
+                $recipient->tracking_token = bin2hex(random_bytes(32));
+            }
+
+            $recipient->save();
+
+            if ($this->shouldDispatchSendJob($campaign)) {
+                dispatch(new SendCampaignMessageJob($recipient->id));
+            }
+        }
+    }
+
+    private function createAndDispatchRecipients(Campaign $campaign, RecipientResolver $resolver): void
+    {
+        foreach ($resolver->resolve($campaign) as $resolvedRecipient) {
             $recipient = CampaignRecipient::query()->create([
                 'campaign_id' => $campaign->id,
                 'owner_id' => $resolvedRecipient['owner_id'],
@@ -62,7 +74,14 @@ class DispatchCampaignJob implements ShouldQueue
                 'error_message' => null,
             ]);
 
-            dispatch(new SendCampaignMessageJob($recipient->id));
+            if ($this->shouldDispatchSendJob($campaign)) {
+                dispatch(new SendCampaignMessageJob($recipient->id));
+            }
         }
+    }
+
+    private function shouldDispatchSendJob(Campaign $campaign): bool
+    {
+        return $campaign->channel !== 'whatsapp';
     }
 }
