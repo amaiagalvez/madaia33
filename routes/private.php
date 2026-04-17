@@ -92,6 +92,7 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
         ->name('votings');
     Route::get('/bozketak/{voting}/emaitzak', [VotingResultsController::class, 'show'])
         ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->whereNumber('voting')
         ->name('votings.results.show');
     Route::get('/bozketak/pdf/delegatua', [VotingPdfController::class, 'adminDelegated'])
         ->middleware('role:superadmin,admin_general,admin_comunidad')

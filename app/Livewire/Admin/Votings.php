@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Voting;
 use Livewire\Component;
 use App\Models\Location;
+use Carbon\CarbonInterface;
 use App\Models\VotingOption;
 use Livewire\WithPagination;
 use App\Models\VotingLocation;
@@ -163,7 +164,7 @@ class Votings extends Component
         $this->isPublished = (bool) $voting->is_published;
         $this->isAnonymous = (bool) $voting->is_anonymous;
         $this->selectedLocations = $voting->locations
-            ->map(static fn(VotingLocation $location): string => (string) $location->location_id)
+            ->map(static fn (VotingLocation $location): string => (string) $location->location_id)
             ->values()
             ->all();
 
@@ -213,7 +214,7 @@ class Votings extends Component
             return;
         }
 
-        DB::transaction(fn() => $this->persistVoting($normalizedOptions));
+        DB::transaction(fn () => $this->persistVoting($normalizedOptions));
 
         $this->resetForm();
         $this->showCreateForm = false;
@@ -309,7 +310,7 @@ class Votings extends Component
     public function deselectAllOnPage(array $pageIds): void
     {
         $this->selectedVotingIds = collect($this->selectedVotingIds)
-            ->reject(static fn(string $id): bool => in_array($id, $pageIds, true))
+            ->reject(static fn (string $id): bool => in_array($id, $pageIds, true))
             ->values()
             ->all();
     }
@@ -338,8 +339,8 @@ class Votings extends Component
     private function normalizedSelectedVotingIds(): array
     {
         return collect($this->selectedVotingIds)
-            ->map(static fn(string|int $id): int => (int) $id)
-            ->filter(static fn(int $id): bool => $id > 0)
+            ->map(static fn (string|int $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
             ->unique()
             ->values()
             ->all();
@@ -359,11 +360,11 @@ class Votings extends Component
 
         if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
             $allowedLocationIds = $this->managedLocationIds($user)
-                ->map(static fn(int $locationId): string => (string) $locationId)
+                ->map(static fn (int $locationId): string => (string) $locationId)
                 ->all();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn(string $locationId): bool => in_array($locationId, $allowedLocationIds, true))
+                ->filter(static fn (string $locationId): bool => in_array($locationId, $allowedLocationIds, true))
                 ->values()
                 ->all();
 
@@ -399,7 +400,7 @@ class Votings extends Component
                     'label_es' => trim((string) $option['labelEs']),
                 ];
             })
-            ->filter(fn(array $option): bool => $option['label_eu'] !== '')
+            ->filter(fn (array $option): bool => $option['label_eu'] !== '')
             ->values()
             ->all();
     }
@@ -447,7 +448,7 @@ class Votings extends Component
     private function syncVotingLocations(Voting $voting): void
     {
         $locationIds = collect(array_unique($this->selectedLocations))
-            ->map(static fn(string $locationId): int => (int) $locationId)
+            ->map(static fn (string $locationId): int => (int) $locationId)
             ->values()
             ->all();
 
@@ -541,7 +542,7 @@ class Votings extends Component
 
         $votingPageIds = $votings->getCollection()
             ->pluck('id')
-            ->map(static fn(int $id): string => (string) $id)
+            ->map(static fn (int $id): string => (string) $id)
             ->all();
 
         return view('livewire.admin.votings.index', [
@@ -553,7 +554,7 @@ class Votings extends Component
                 ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 ELSE 3 END")
                 ->orderBy('code')
                 ->get()
-                ->map(static fn(Location $l): array => [
+                ->map(static fn (Location $l): array => [
                     'id' => (string) $l->id,
                     'label' => __('admin.locations.types.' . $l->type) . ' ' . $l->code,
                 ])
@@ -656,7 +657,7 @@ class Votings extends Component
     {
         return $user->managedLocations()
             ->pluck('locations.id')
-            ->map(static fn(int $locationId): int => $locationId)
+            ->map(static fn (int $locationId): int => $locationId)
             ->values();
     }
 

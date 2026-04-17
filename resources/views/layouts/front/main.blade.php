@@ -13,12 +13,19 @@
 
     @if (request()->route()?->getName())
         @php($__baseName = \App\SupportedLocales::baseRouteName(request()->route()->getName()))
+        @php($__routeParameters = request()->route()?->parameters() ?? [])
         @foreach (\App\SupportedLocales::all() as $altLocale)
-            <link rel="alternate" hreflang="{{ $altLocale }}"
-                href="{{ route(\App\SupportedLocales::routeName($__baseName, $altLocale)) }}" />
+            @php($__alternateRouteName = \App\SupportedLocales::routeName($__baseName, $altLocale))
+            @if (\Illuminate\Support\Facades\Route::has($__alternateRouteName))
+                <link rel="alternate" hreflang="{{ $altLocale }}"
+                    href="{{ route($__alternateRouteName, $__routeParameters) }}" />
+            @endif
         @endforeach
-        <link rel="alternate" hreflang="x-default"
-            href="{{ route(\App\SupportedLocales::routeName($__baseName, \App\SupportedLocales::default())) }}" />
+        @php($__defaultRouteName = \App\SupportedLocales::routeName($__baseName, \App\SupportedLocales::default()))
+        @if (\Illuminate\Support\Facades\Route::has($__defaultRouteName))
+            <link rel="alternate" hreflang="x-default"
+                href="{{ route($__defaultRouteName, $__routeParameters) }}" />
+        @endif
     @endif
 
     <link rel="icon" href="/favicon.ico" sizes="any">
