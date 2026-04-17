@@ -140,7 +140,8 @@
                     cancel-action="cancelForm">
                     @if ($editingId !== null)
                         <button type="button" wire:click="openTestEmailModal"
-                            class="inline-flex items-center rounded-md border border-brand-600 bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+                            @disabled($hasUnsavedChanges)
+                            class="inline-flex items-center rounded-md border border-brand-600 bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white"
                             data-campaign-test-email-button>
                             {{ __('campaigns.admin.test_email.button') }}
                         </button>
@@ -152,6 +153,17 @@
                         {{ __('campaigns.admin.actions.save_template') }}
                     </button>
                 </x-admin.form-footer-actions>
+
+                @if ($editingId !== null && $hasUnsavedChanges)
+                    <p class="mt-2 text-xs text-stone-500" data-campaign-test-email-help>
+                        {{ __('admin.settings_form.save_before_test_email') }}
+                    </p>
+                @endif
+
+                @error('sendTestEmail')
+                    <p class="mt-2 text-sm text-red-600" data-campaign-test-email-error>
+                        {{ $message }}</p>
+                @enderror
             </form>
         </x-admin.side-panel-form>
     @endif

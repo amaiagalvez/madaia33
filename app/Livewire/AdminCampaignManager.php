@@ -2,26 +2,26 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\Campaign;
 use App\Models\Owner;
 use App\Models\Setting;
-use App\Models\CampaignRecipient;
+use Livewire\Component;
+use App\Models\Campaign;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use App\Models\CampaignDocument;
 use App\Models\CampaignLocation;
 use App\Models\CampaignTemplate;
+use App\Models\CampaignRecipient;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
 use App\Support\CampaignAdminOptions;
 use App\Support\ConfiguredMailSettings;
-use App\Contracts\Messaging\EmailProvider;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use App\Concerns\BuildsLocaleFieldConfigs;
-use App\Services\Messaging\MessageVariableResolver;
+use App\Contracts\Messaging\EmailProvider;
 use App\Services\Messaging\RecipientResolver;
+use App\Services\Messaging\MessageVariableResolver;
 use App\Livewire\Concerns\HandlesCampaignManagerActions;
 use App\Livewire\Concerns\HandlesCampaignManagerPayload;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
@@ -87,6 +87,11 @@ class AdminCampaignManager extends Component
 
     public string $testEmailAddress = '';
 
+    public bool $hasUnsavedChanges = false;
+
+    /** @var array<string, mixed> */
+    public array $savedFormSnapshot = [];
+
     private RecipientResolver $recipientResolver;
 
     public function boot(RecipientResolver $recipientResolver): void
@@ -109,6 +114,29 @@ class AdminCampaignManager extends Component
         }
 
         $this->recalculateRecipients();
+        $this->syncSavedFormSnapshot();
+    }
+
+    public function updated(string $property): void
+    {
+        if (in_array($property, [
+            'editingId',
+            'showForm',
+            'showDeleteModal',
+            'confirmingDeleteId',
+            'confirmingActionId',
+            'confirmingAction',
+            'showActionModal',
+            'showTestEmailModal',
+            'testEmailAddress',
+            'sortColumn',
+            'sortDir',
+            'recipientCountTotal',
+        ], true) || str_starts_with($property, 'recipientCountBySlot.')) {
+            return;
+        }
+
+        $this->refreshUnsavedChangesState();
     }
 
     /**
@@ -177,6 +205,7 @@ class AdminCampaignManager extends Component
         $this->showForm = true;
 
         $this->recalculateRecipients();
+        $this->syncSavedFormSnapshot();
     }
 
     public function saveCampaign(): void
@@ -214,6 +243,10 @@ class AdminCampaignManager extends Component
     {
         $this->authorizeTestEmailAction();
 
+        if (! $this->ensureNoUnsavedChangesBeforeTestEmail()) {
+            return;
+        }
+
         $this->testEmailAddress = '';
         $this->showTestEmailModal = true;
     }
@@ -227,6 +260,10 @@ class AdminCampaignManager extends Component
     public function sendTestEmail(): void
     {
         $this->authorizeTestEmailAction();
+
+        if (! $this->ensureNoUnsavedChangesBeforeTestEmail()) {
+            return;
+        }
 
         $this->validate([
             ...$this->contentRules(),
@@ -353,6 +390,7 @@ class AdminCampaignManager extends Component
         unset($this->attachments[$index]);
 
         $this->attachments = array_values($this->attachments);
+        $this->refreshUnsavedChangesState();
     }
 
     public function removeStoredAttachment(int $documentId): void
@@ -381,6 +419,8 @@ class AdminCampaignManager extends Component
             static fn(array $attachment): bool => (int) $attachment['id'] !== $documentId,
         ));
 
+        $this->syncSavedFormSnapshot();
+
         session()->flash('message', __('general.messages.deleted'));
     }
 
@@ -403,6 +443,7 @@ class AdminCampaignManager extends Component
         $this->channel = (string) $template->channel;
 
         $this->recalculateRecipients();
+        $this->refreshUnsavedChangesState();
     }
 
     public function render(): View
@@ -475,9 +516,12 @@ class AdminCampaignManager extends Component
         $this->showDeleteModal = false;
         $this->showTestEmailModal = false;
         $this->testEmailAddress = '';
+        $this->hasUnsavedChanges = false;
+        $this->savedFormSnapshot = [];
 
         $this->resetValidation();
         $this->recalculateRecipients();
+        $this->syncSavedFormSnapshot();
     }
 
     /**
@@ -519,7 +563,7 @@ class AdminCampaignManager extends Component
     {
         $campaign = $this->editingId !== null
             ? Campaign::query()->with(['documents', 'locations'])->findOrFail($this->editingId)
-            : new Campaign();
+            : new Campaign;
 
         $campaign->forceFill($this->contentPayload());
 
@@ -598,6 +642,71 @@ class AdminCampaignManager extends Component
         }
 
         $this->authorize('create', Campaign::class);
+    }
+
+    private function ensureNoUnsavedChangesBeforeTestEmail(): bool
+    {
+        if (! $this->hasUnsavedChanges) {
+            return true;
+        }
+
+        $this->addError('sendTestEmail', __('admin.settings_form.save_before_test_email'));
+
+        return false;
+    }
+
+    private function refreshUnsavedChangesState(): void
+    {
+        $this->hasUnsavedChanges = $this->currentFormSnapshot() !== $this->savedFormSnapshot;
+
+        if (! $this->hasUnsavedChanges) {
+            $this->resetErrorBag('sendTestEmail');
+        }
+    }
+
+    private function syncSavedFormSnapshot(): void
+    {
+        $this->savedFormSnapshot = $this->currentFormSnapshot();
+        $this->hasUnsavedChanges = false;
+        $this->resetErrorBag('sendTestEmail');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function currentFormSnapshot(): array
+    {
+        return [
+            'campaign' => $this->campaignPayload(),
+            'recipient_filters' => $this->normalizedRecipientFilters(),
+            'stored_attachment_ids' => collect($this->storedAttachments)
+                ->pluck('id')
+                ->map(static fn(mixed $id): int => (int) $id)
+                ->sort()
+                ->values()
+                ->all(),
+            'pending_attachment_names' => collect($this->attachments)
+                ->map(static fn($attachment): string => $attachment->getClientOriginalName())
+                ->sort()
+                ->values()
+                ->all(),
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function normalizedRecipientFilters(): array
+    {
+        if (in_array('all', $this->recipientFilters, true)) {
+            return ['all'];
+        }
+
+        return collect($this->selectedLocationIds())
+            ->map(static fn(int $locationId): string => (string) $locationId)
+            ->sort()
+            ->values()
+            ->all();
     }
 
     /**

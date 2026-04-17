@@ -41,7 +41,7 @@ return [
         'created_at' => 'Fecha de creación',
         'attachments' => 'Adjuntos',
         'attachments_help' => 'Archivos permitidos: PDF, DOCX, XLSX, JPG, JPEG y PNG. Máximo 20 MB por archivo.',
-        'uploaded_documents' => 'Documentos ya subidos',
+        'uploaded_documents' => 'Documentos',
         'pending_attachments' => 'Documentos seleccionados',
         'valid_recipients' => 'Destinatarias válidas',
         'coprop1' => 'Copropietaria 1',

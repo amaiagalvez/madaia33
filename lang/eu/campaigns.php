@@ -41,7 +41,7 @@ return [
         'created_at' => 'Sorrera-data',
         'attachments' => 'Eranskinak',
         'attachments_help' => 'Onartutako fitxategiak: PDF, DOCX, XLSX, JPG, JPEG eta PNG. Gehienez 20 MB fitxategi bakoitzeko.',
-        'uploaded_documents' => 'Dagoeneko igo diren dokumentuak',
+        'uploaded_documents' => 'Dokumentuak',
         'pending_attachments' => 'Hautatutako dokumentuak',
         'valid_recipients' => 'Hartzaile baliodunak',
         'coprop1' => 'Ko-jabe 1',

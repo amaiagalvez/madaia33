@@ -1,7 +1,7 @@
 # nohizbehinka egiteko 2026-04-11
-- [ ] Repasa los feature test y los que se pueedan convertir en unit pasalos
+- [ ] Repasa todos los feature test y los que se puedan convertir en unit test sin acceso a la base de datos pasalos
 - [ ] Repasa la suit de test y completa los que falten
-- [ ] con el agente sorgina repasar el código y proponer mejoras (código repetido, test que faltan, ...)
+- [ ] con el agente sorgina repasar el código y proponer mejoras (código repetido, test que faltan, consultas a la base de datos repetidas, ...)
 - [ ] con chatgpt pedirle que haga una auditoría de accesibilidad y pasarsela @lamia
 
 - [ ] sudo find /home/amaia/Dokumentuak/madaia33 -user root -exec chown amaia:amaia {} +
@@ -10,23 +10,20 @@
 - [ ] docker => pentest
 - [ ] dusk-test
 
-# Code
-- [ ] reepasar estatistikak home
-- [ ] configurar el sentry (despues de publicar master)
+# Despues de publicar master
+- [ ] configurar el sentry
 - [ ] añalizar cookiena chatgpt-rekin
+- [ ] probar envio whatcapp en el movil
+
+# Code
 - votaciones resultados (suma de porcentajes)
 - spec kiro pendientes (obra)
-
-# unificar terminología
-
-locations: Ubicaciones => Comunidades
-properties: Propiedades => Fincas
-property_assignments => Propiedades
-owners => Propietarias
-
-# Home
-- [ ] config recaptcha, analitics
-- [ ] probar envio whatcapp en el movil
+- [ ] reepasar estatistikak home
+- [ ] unificar terminología
+  - locations: Ubicaciones => Comunidades
+  - properties: Propiedades => Fincas
+  - property_assignments => Propiedades
+  - owners => Propietarias
 
 - [ ] En el listado de bozketak añadir un botón para Enviar un email. Crear una nueva campaña. Los recipients serán los owners que puedan votar en esa votación. Debe de abrir el formulario de la campaña creada para que pueda añadir el texto a enviar. Es decir, las locations que hay en la bozketa y las que se deben crear para la campaña deben de ser las mismas.
 En el texto de la campaña poner un aviso "añadir orden de día y documentos para delegar el voto y votar presenciamelte"
@@ -38,7 +35,7 @@ En el listado de admin/campanas
 - cuando se pulsa en el botón de enviar en un envío de whatcapp, actualizar la fecha de envió de esa campaña, ahora no se actualiza
 
 # Panela
-- [ ] Estatutos de la comunidad y de cada portal o planta de garaje
+- [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 
@@ -99,3 +96,4 @@ tiene que estar en dos idiomas eu y es
     - admin/configuracion
     - admin/usuarios
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
+- [ ] config recaptcha, analitics

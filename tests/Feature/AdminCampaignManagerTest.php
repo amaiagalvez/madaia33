@@ -3,16 +3,16 @@
 use App\Models\Role;
 use App\Models\User;
 use Livewire\Livewire;
+use App\Models\Setting;
 use App\Models\Campaign;
 use App\Models\Location;
-use App\Models\Setting;
 use App\Mail\CampaignMail;
 use App\Models\CampaignDocument;
 use App\Models\CampaignLocation;
 use App\Models\CampaignTemplate;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\Messaging\DispatchCampaignJob;
@@ -441,8 +441,10 @@ it('sends campaign test emails in basque and spanish to the provided address', f
     $campaign = Campaign::factory()->create([
         'status' => 'draft',
         'channel' => 'email',
-        'subject_eu' => 'Zirriborroa',
-        'body_eu' => 'Edukia',
+        'subject_eu' => 'Gaia EU',
+        'subject_es' => 'Asunto ES',
+        'body_eu' => '<p>Edukia EU</p>',
+        'body_es' => '<p>Contenido ES</p>',
     ]);
 
     Setting::query()->updateOrCreate(
@@ -453,11 +455,6 @@ it('sends campaign test emails in basque and spanish to the provided address', f
     Livewire::actingAs($user)
         ->test('admin-campaign-manager')
         ->call('editCampaign', $campaign->id)
-        ->set('subjectEu', 'Gaia EU')
-        ->set('subjectEs', 'Asunto ES')
-        ->set('bodyEu', '<p>Edukia EU</p>')
-        ->set('bodyEs', '<p>Contenido ES</p>')
-        ->set('channel', 'email')
         ->set('testEmailAddress', 'preview@example.com')
         ->call('sendTestEmail')
         ->assertHasNoErrors()
@@ -476,4 +473,33 @@ it('sends campaign test emails in basque and spanish to the provided address', f
             && $mail->subjectText === '[PRUEBA] Asunto ES'
             && $mail->htmlBody === '<p>Contenido ES</p>';
     });
+});
+
+it('blocks campaign test emails while the edit form has unsaved changes', function () {
+    Mail::fake();
+
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+        'subject_eu' => 'Gordetako gaia',
+        'body_eu' => 'Gordetako edukia',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('editCampaign', $campaign->id)
+        ->assertSet('hasUnsavedChanges', false)
+        ->set('subjectEu', 'Aldatutako gaia')
+        ->assertSet('hasUnsavedChanges', true)
+        ->call('openTestEmailModal')
+        ->assertSet('showTestEmailModal', false)
+        ->assertHasErrors(['sendTestEmail'])
+        ->set('testEmailAddress', 'preview@example.com')
+        ->call('sendTestEmail')
+        ->assertHasErrors(['sendTestEmail'])
+        ->assertSet('showTestEmailModal', false);
+
+    Mail::assertNothingSent();
 });
