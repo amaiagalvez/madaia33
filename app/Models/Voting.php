@@ -25,6 +25,7 @@ class Voting extends Model
         'ends_at',
         'is_published',
         'is_anonymous',
+        'show_results',
     ];
 
     protected static function newFactory(): VotingFactory
@@ -39,6 +40,7 @@ class Voting extends Model
             'ends_at' => 'date',
             'is_published' => 'boolean',
             'is_anonymous' => 'boolean',
+            'show_results' => 'boolean',
         ];
     }
 

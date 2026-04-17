@@ -37,11 +37,11 @@
 - Focused tests passed: `tests/Unit/NoticeCardComponentTest.php`, `tests/Unit/PrivatePageAccessibilityViewTest.php`, `tests/Feature/SecondaryPagesResponsiveTest.php` (15 passed).
 - Full tests passed: `php artisan test --compact` (677 passed, 2292 assertions).
 - `composer quality` failed due to pre-existing style issues outside this change set:
-	- `app/Http/Controllers/ProfileController.php`
-	- `app/Livewire/AdminCampaignManager.php`
-	- `tests/Browser/AdminCampaignTestEmailModalTest.php`
-	- `tests/Browser/CookieConsentBannerTest.php`
-	- `tests/Feature/AdminCampaignManagerTest.php`
+    - `app/Http/Controllers/ProfileController.php`
+    - `app/Livewire/AdminCampaignManager.php`
+    - `tests/Browser/AdminCampaignTestEmailModalTest.php`
+    - `tests/Browser/CookieConsentBannerTest.php`
+    - `tests/Feature/AdminCampaignManagerTest.php`
 - Dusk browser verification failed in this environment:
-	- Direct run (`php artisan test --compact tests/Browser`) fails with sqlite table bootstrapping issues and local Chromium path errors.
-	- Selenium workflow run progressed but did not produce a passing completion in this session.
+    - Direct run (`php artisan test --compact tests/Browser`) fails with sqlite table bootstrapping issues and local Chromium path errors.
+    - Selenium workflow run progressed but did not produce a passing completion in this session.

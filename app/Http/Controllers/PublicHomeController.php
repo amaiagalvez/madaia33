@@ -6,6 +6,7 @@ use App\Models\Image;
 use App\Models\Notice;
 use App\Models\Voting;
 use App\Models\Setting;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
 
@@ -53,6 +54,27 @@ class PublicHomeController extends Controller
             'locationNotices' => $locationNotices,
             'showViewAllButton' => $latestNotices->count() > 6,
             'hasOpenVotings' => Voting::query()->publishedOpen()->exists(),
+            'votingsWithResults' => $this->votingsWithResults(),
+            'latestVotingWithResults' => $this->latestVotingWithResults(),
         ]);
+    }
+
+    /**
+     * @return Collection<int, Voting>
+     */
+    private function votingsWithResults(): Collection
+    {
+        return Voting::query()
+            ->where('show_results', true)
+            ->orderByDesc('ends_at')
+            ->get(['id', 'name_eu', 'name_es']);
+    }
+
+    private function latestVotingWithResults(): ?Voting
+    {
+        return Voting::query()
+            ->where('show_results', true)
+            ->orderByDesc('ends_at')
+            ->first(['id', 'name_eu', 'name_es']);
     }
 }

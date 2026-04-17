@@ -23,7 +23,7 @@
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
-En el listado bozketak del panel, añadir una nueva columna "Emaitzak erakutsi" con el formato de la columna argitaratuta, y al pinchar encima que se active o se desactive y se guarde ne la base de datos en un nuevo campo en la tabla votings
+
 # Copilot
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario

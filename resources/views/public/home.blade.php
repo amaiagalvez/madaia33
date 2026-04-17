@@ -140,6 +140,36 @@
             <aside
                 class="section-shell overflow-hidden p-4 sm:p-5 lg:col-span-4 lg:flex lg:h-full lg:flex-col"
                 data-home-history>
+                @if ($latestVotingWithResults)
+                    <section
+                        class="mb-5 rounded-xl border border-[#edd2c7] bg-linear-to-br from-[#edd2c7]/30 via-white to-[#f1bd4d]/10 p-4"
+                        data-home-results-announcement>
+                        <div class="flex items-start gap-3">
+                            <div
+                                class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-600/25 bg-linear-to-br from-[#f1bd4d]/35 via-white to-[#edd2c7]/60 text-[#793d3d] shadow-sm">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                                    {{ __('votings.front.results_ended_announcement_title') }}
+                                </p>
+                                <p class="mt-1 text-xs leading-relaxed text-gray-600">
+                                    {{ __('votings.front.results_ended_announcement_body') }}
+                                </p>
+                                <a href="{{ route(\App\SupportedLocales::routeName('votings.results'), ['voting' => $latestVotingWithResults->id]) }}"
+                                    class="btn-brand mt-3 inline-flex min-h-10 items-center justify-center whitespace-nowrap px-4 py-2 text-xs"
+                                    data-results-voting-link="{{ $latestVotingWithResults->id }}">
+                                    {{ __('votings.front.results_view_link') }}
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+                @endif
                 <h2 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
                     {{ __('home.history_title') }}
                 </h2>

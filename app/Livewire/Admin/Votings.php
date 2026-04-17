@@ -84,6 +84,12 @@ class Votings extends Component
 
     public ?int $confirmingDeleteVotingId = null;
 
+    public bool $showResultsModal = false;
+
+    public ?int $confirmingResultsId = null;
+
+    public string $resultsAction = '';
+
     public string $ownersModalTitle = '';
 
     /**
@@ -275,6 +281,37 @@ class Votings extends Component
 
         session()->flash('message', __('general.messages.deleted'));
         $this->cancelDeleteVoting();
+    }
+
+    public function confirmShowResults(int $votingId, bool $show): void
+    {
+        abort_unless($this->canManageAdminVotings(), 403);
+
+        $this->confirmingResultsId = $votingId;
+        $this->resultsAction = $show ? 'show' : 'hide';
+        $this->showResultsModal = true;
+    }
+
+    public function doShowResults(): void
+    {
+        if ($this->confirmingResultsId === null) {
+            return;
+        }
+
+        $voting = Voting::query()->findOrFail($this->confirmingResultsId);
+
+        abort_unless($this->canAccessVoting($voting), 403);
+
+        $voting->update(['show_results' => $this->resultsAction === 'show']);
+
+        $this->cancelShowResults();
+    }
+
+    public function cancelShowResults(): void
+    {
+        $this->confirmingResultsId = null;
+        $this->resultsAction = '';
+        $this->showResultsModal = false;
     }
 
     public function downloadDelegatedPdf(): void

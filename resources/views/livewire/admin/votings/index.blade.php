@@ -167,6 +167,9 @@
                     {{ __('votings.admin.is_anonymous') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
+                    {{ __('votings.admin.show_results') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
                     {{ __('votings.admin.census') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
@@ -209,11 +212,22 @@
                             <flux:icon.x-circle class="size-4 text-red-500" />
                         @endif
                     </td>
+                    <td class="px-6 py-4 text-sm">
+                        <x-admin.action-link-confirm
+                            wire:click="confirmShowResults({{ $voting->id }}, {{ $voting->show_results ? 'false' : 'true' }})"
+                            title="{{ $voting->show_results ? __('votings.admin.confirm_hide_results') : __('votings.admin.confirm_show_results') }}"
+                            :state="$voting->show_results ? 'success' : 'danger'" data-show-results-toggle="{{ $voting->id }}">
+                            @if ($voting->show_results)
+                                <flux:icon.check-circle class="size-4" />
+                            @else
+                                <flux:icon.x-circle class="size-4" />
+                            @endif
+                        </x-admin.action-link-confirm>
+                    </td>
                     <td class="px-6 py-4 text-sm text-gray-700">
                         <div class="flex items-center gap-2">
                             <span>{{ $censusCounts[$voting->id] ?? 0 }}</span>
                             <button type="button" wire:click="openCensus({{ $voting->id }})"
-                                data-action="open-census-{{ $voting->id }}"
                                 class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
                                 title="{{ __('votings.admin.open_census') }}">
                                 <flux:icon.users class="size-4" />
@@ -253,7 +267,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="11" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('votings.admin.empty') }}</td>
                 </tr>
             @endforelse
@@ -264,6 +278,54 @@
         <div class="mt-6">
             {{ $votings->links() }}
         </div>
+    @endif
+
+    @if ($showResultsModal)
+        <dialog open
+            class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4"
+            aria-labelledby="voting-results-modal-title">
+            <div class="mx-4 w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+                <div class="flex items-start gap-3">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full {{ $resultsAction === 'show' ? 'bg-green-100' : 'bg-amber-100' }}">
+                        @if ($resultsAction === 'show')
+                            <svg class="h-5 w-5 text-green-600" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        @else
+                            <svg class="h-5 w-5 text-amber-600" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        @endif
+                    </div>
+                    <div>
+                        <h3 id="voting-results-modal-title"
+                            class="text-base font-semibold text-gray-900">
+                            {{ __('votings.admin.show_results') }}
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            {{ $resultsAction === 'show' ? __('votings.admin.confirm_show_results') : __('votings.admin.confirm_hide_results') }}
+                        </p>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" wire:click="cancelShowResults"
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                        {{ __('general.buttons.cancel') }}
+                    </button>
+                    <button type="button" wire:click="doShowResults"
+                        class="rounded-md px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 {{ $resultsAction === 'show' ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' : 'bg-amber-500 hover:bg-amber-600 focus:ring-amber-400' }}">
+                        {{ __('general.buttons.confirm') }}
+                    </button>
+                </div>
+            </div>
+        </dialog>
     @endif
 
     @if ($showDeleteModal)

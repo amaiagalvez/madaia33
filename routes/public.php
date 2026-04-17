@@ -9,6 +9,7 @@ use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\VotingPdfController;
 use App\Http\Controllers\PublicHomeController;
 use App\Http\Controllers\PublicVotingController;
+use App\Http\Controllers\PublicVotingResultsController;
 
 $privatePageHandler = static function () {
     if (Auth::check()) {
@@ -38,6 +39,7 @@ Route::prefix('eu')->group(function () use ($privatePageHandler) {
     Route::get('/ohar-legala', [LegalPageController::class, 'legalNotice'])->name('legal-notice.eu');
     Route::get('/cookie-politika', [LegalPageController::class, 'cookiePolicy'])->name('cookie-policy.eu');
     Route::get('/bozketak', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.eu');
+    Route::get('/bozketak/{voting}/emaitzak', [PublicVotingResultsController::class, 'show'])->middleware('auth')->name('votings.results.eu');
     Route::get('/bozketak/pdf/delegatua', [VotingPdfController::class, 'publicDelegated'])->middleware('auth')->name('votings.pdf.delegated.eu');
     Route::get('/bozketak/pdf/presentziala', [VotingPdfController::class, 'publicInPerson'])->middleware('auth')->name('votings.pdf.in_person.eu');
     Route::get('/profila', [ProfileController::class, 'show'])->middleware('auth')->name('profile.eu');
@@ -63,6 +65,7 @@ Route::prefix('es')->group(function () use ($privatePageHandler) {
     Route::get('/aviso-legal', [LegalPageController::class, 'legalNotice'])->name('legal-notice.es');
     Route::get('/politica-de-cookies', [LegalPageController::class, 'cookiePolicy'])->name('cookie-policy.es');
     Route::get('/votaciones', [PublicVotingController::class, 'index'])->middleware('auth')->name('votings.es');
+    Route::get('/votaciones/{voting}/resultados', [PublicVotingResultsController::class, 'show'])->middleware('auth')->name('votings.results.es');
     Route::get('/votaciones/pdf/delegado', [VotingPdfController::class, 'publicDelegated'])->middleware('auth')->name('votings.pdf.delegated.es');
     Route::get('/votaciones/pdf/presencial', [VotingPdfController::class, 'publicInPerson'])->middleware('auth')->name('votings.pdf.in_person.es');
     Route::get('/perfil', [ProfileController::class, 'show'])->middleware('auth')->name('profile.es');
