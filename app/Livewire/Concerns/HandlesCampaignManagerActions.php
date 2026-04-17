@@ -6,8 +6,8 @@ use App\Models\User;
 use App\Models\Campaign;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\Messaging\DispatchCampaignJob;
-use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
 use App\Actions\Campaigns\DuplicateCampaignAction;
+use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
 
 trait HandlesCampaignManagerActions
 {
@@ -169,6 +169,26 @@ trait HandlesCampaignManagerActions
         $this->cancelDelete();
 
         session()->flash('message', __('general.messages.deleted'));
+    }
+
+    private function upsertCampaign(): Campaign
+    {
+        if ($this->editingId !== null) {
+            $campaign = Campaign::query()->findOrFail($this->editingId);
+
+            abort_unless($this->canMutateCampaign($campaign), 403);
+
+            $campaign->update($this->campaignPayload());
+
+            return $campaign;
+        }
+
+        return Campaign::query()->create([
+            ...$this->campaignPayload(),
+            'created_by_user_id' => $this->currentUser()?->id,
+            'status' => 'draft',
+            'sent_at' => null,
+        ]);
     }
 
     private function canMutateCampaign(Campaign $campaign): bool

@@ -6,9 +6,10 @@ use Livewire\Component;
 use App\Models\Campaign;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
-use App\Models\CampaignLocation;
 use App\Models\CampaignDocument;
+use App\Models\CampaignLocation;
 use App\Models\CampaignTemplate;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
 use App\Support\CampaignAdminOptions;
 use Illuminate\Support\Facades\Storage;
@@ -16,12 +17,15 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Concerns\BuildsLocaleFieldConfigs;
 use App\Services\Messaging\RecipientResolver;
 use App\Livewire\Concerns\HandlesCampaignManagerActions;
+use App\Livewire\Concerns\HandlesCampaignManagerPayload;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class AdminCampaignManager extends Component
 {
     use BuildsLocaleFieldConfigs;
     use HandlesCampaignManagerActions;
+    use HandlesCampaignManagerPayload;
     use WithFileUploads;
     use WithPagination;
 
@@ -140,7 +144,7 @@ class AdminCampaignManager extends Component
         $this->channel = (string) $campaign->channel;
         $this->recipientFilters = $campaign->locations
             ->pluck('location_id')
-            ->map(static fn(int $locationId): string => (string) $locationId)
+            ->map(static fn (int $locationId): string => (string) $locationId)
             ->values()
             ->all();
 
@@ -155,7 +159,7 @@ class AdminCampaignManager extends Component
 
         $this->attachments = [];
         $this->storedAttachments = $campaign->documents
-            ->map(fn(CampaignDocument $document): array => [
+            ->map(fn (CampaignDocument $document): array => [
                 'id' => $document->id,
                 'filename' => $document->filename,
             ])
@@ -261,7 +265,7 @@ class AdminCampaignManager extends Component
 
         $this->storedAttachments = array_values(array_filter(
             $this->storedAttachments,
-            static fn(array $attachment): bool => (int) $attachment['id'] !== $documentId,
+            static fn (array $attachment): bool => (int) $attachment['id'] !== $documentId,
         ));
 
         session()->flash('message', __('general.messages.deleted'));
@@ -341,111 +345,6 @@ class AdminCampaignManager extends Component
         $this->recipientCountBySlot['coprop2'] = $rows->where('slot', 'coprop2')->count();
     }
 
-    private function upsertCampaign(): Campaign
-    {
-        if ($this->editingId !== null) {
-            $campaign = Campaign::query()->findOrFail($this->editingId);
-
-            abort_unless($this->canMutateCampaign($campaign), 403);
-
-            $campaign->update($this->campaignPayload());
-
-            return $campaign;
-        }
-
-        return Campaign::query()->create([
-            ...$this->campaignPayload(),
-            'created_by_user_id' => $this->currentUser()?->id,
-            'status' => 'draft',
-            'sent_at' => null,
-        ]);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function campaignPayload(): array
-    {
-        return [
-            ...$this->contentPayload(),
-            'scheduled_at' => $this->scheduledAt !== null && $this->scheduledAt !== '' ? $this->scheduledAt : null,
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function templatePayload(): array
-    {
-        return [
-            ...$this->contentPayload(),
-            'name' => $this->templateName(),
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function contentPayload(): array
-    {
-        return [
-            'subject_eu' => $this->normalizeNullableValue($this->subjectEu),
-            'subject_es' => $this->normalizeNullableValue($this->subjectEs),
-            'body_eu' => $this->normalizeNullableValue($this->bodyEu),
-            'body_es' => $this->normalizeNullableValue($this->bodyEs),
-            'channel' => $this->channel,
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function contentRules(): array
-    {
-        return [
-            'subjectEu' => ['nullable', 'string', 'max:255', 'required_without:subjectEs'],
-            'subjectEs' => ['nullable', 'string', 'max:255', 'required_without:subjectEu'],
-            'bodyEu' => ['nullable', 'string', 'required_without:bodyEs'],
-            'bodyEs' => ['nullable', 'string', 'required_without:bodyEu'],
-            'channel' => ['required', 'string', Rule::in(['email', 'sms', 'whatsapp', 'telegram'])],
-        ];
-    }
-
-    private function templateName(): string
-    {
-        $subject = $this->normalizeNullableValue($this->subjectEu)
-            ?? $this->normalizeNullableValue($this->subjectEs);
-
-        if ($subject !== null) {
-            return mb_substr($subject, 0, 255);
-        }
-
-        return __('campaigns.admin.template') . ' ' . now()->format('Y-m-d H:i');
-    }
-
-    private function normalizeNullableValue(string $value): ?string
-    {
-        $trimmed = trim($value);
-
-        return $trimmed === '' ? null : $trimmed;
-    }
-
-    private function storeAttachments(Campaign $campaign): void
-    {
-        foreach ($this->attachments as $attachment) {
-            $path = $attachment->store('campaign-documents/' . $campaign->id, 'public');
-
-            CampaignDocument::query()->create([
-                'campaign_id' => $campaign->id,
-                'filename' => $attachment->getClientOriginalName(),
-                'path' => $path,
-                'mime_type' => (string) $attachment->getClientMimeType(),
-                'size_bytes' => (int) $attachment->getSize(),
-                'is_public' => false,
-            ]);
-        }
-    }
-
     private function resetForm(): void
     {
         $this->editingId = null;
@@ -508,21 +407,21 @@ class AdminCampaignManager extends Component
     private function selectedLocationIds(): array
     {
         $allowedFilters = collect($this->options()->allowedRecipientFilters())
-            ->map(static fn(string $filter): int => (int) $filter)
-            ->filter(static fn(int $filter): bool => $filter > 0)
+            ->map(static fn (string $filter): int => (int) $filter)
+            ->filter(static fn (int $filter): bool => $filter > 0)
             ->values()
             ->all();
 
         return collect($this->recipientFilters)
-            ->map(static fn(string $value): int => (int) $value)
-            ->filter(static fn(int $locationId): bool => in_array($locationId, $allowedFilters, true))
+            ->map(static fn (string $value): int => (int) $value)
+            ->filter(static fn (int $locationId): bool => in_array($locationId, $allowedFilters, true))
             ->unique()
             ->values()
             ->all();
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, CampaignLocation>
+     * @return Collection<int, CampaignLocation>
      */
     private function campaignLocationRelationRows()
     {
@@ -536,16 +435,21 @@ class AdminCampaignManager extends Component
             ->values();
     }
 
+    private function softDeleteAllCampaignLocations(Campaign $campaign): void
+    {
+        CampaignLocation::query()
+            ->where('campaign_id', $campaign->id)
+            ->whereNull('deleted_at')
+            ->update([
+                'deleted_at' => now(),
+                'updated_at' => now(),
+            ]);
+    }
+
     private function syncCampaignLocations(Campaign $campaign): void
     {
         if (in_array('all', $this->recipientFilters, true)) {
-            CampaignLocation::query()
-                ->where('campaign_id', $campaign->id)
-                ->whereNull('deleted_at')
-                ->update([
-                    'deleted_at' => now(),
-                    'updated_at' => now(),
-                ]);
+            $this->softDeleteAllCampaignLocations($campaign);
 
             return;
         }
@@ -553,13 +457,7 @@ class AdminCampaignManager extends Component
         $locationIds = $this->selectedLocationIds();
 
         if ($locationIds === []) {
-            CampaignLocation::query()
-                ->where('campaign_id', $campaign->id)
-                ->whereNull('deleted_at')
-                ->update([
-                    'deleted_at' => now(),
-                    'updated_at' => now(),
-                ]);
+            $this->softDeleteAllCampaignLocations($campaign);
 
             return;
         }

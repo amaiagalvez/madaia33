@@ -22,7 +22,7 @@ class RecipientResolver
             ->get();
 
         return $owners
-            ->flatMap(fn(Owner $owner) => $this->resolveOwnerContactsForChannel($owner, (string) $campaign->channel))
+            ->flatMap(fn (Owner $owner) => $this->resolveOwnerContactsForChannel($owner, (string) $campaign->channel))
             ->values();
     }
 
@@ -51,15 +51,15 @@ class RecipientResolver
     {
         if ($campaign->relationLoaded('locations')) {
             return $campaign->locations
-                ->filter(static fn(CampaignLocation $location): bool => $location->deleted_at === null)
+                ->filter(static fn (CampaignLocation $location): bool => $location->deleted_at === null)
                 ->pluck('location_id')
-                ->map(static fn(int $locationId): int => $locationId)
+                ->map(static fn (int $locationId): int => $locationId)
                 ->unique()
                 ->values()
                 ->all();
         }
 
-        if ($campaign->id === null) {
+        if (! $campaign->exists) {
             return [];
         }
 
@@ -67,7 +67,7 @@ class RecipientResolver
             ->where('campaign_id', $campaign->id)
             ->whereNull('deleted_at')
             ->pluck('location_id')
-            ->map(static fn(int $locationId): int => $locationId)
+            ->map(static fn (int $locationId): int => $locationId)
             ->unique()
             ->values()
             ->all();
@@ -98,8 +98,8 @@ class RecipientResolver
         };
 
         return collect($contactsBySlot)
-            ->filter(fn(?string $contact): bool => filled($contact))
-            ->map(fn(string $contact, string $slot): array => [
+            ->filter(fn (?string $contact): bool => filled($contact))
+            ->map(fn (string $contact, string $slot): array => [
                 'owner_id' => $owner->id,
                 'slot' => $slot,
                 'contact' => $contact,

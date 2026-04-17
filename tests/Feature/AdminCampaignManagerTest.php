@@ -5,14 +5,14 @@ use App\Models\User;
 use Livewire\Livewire;
 use App\Models\Campaign;
 use App\Models\Location;
-use App\Models\CampaignLocation;
-use Illuminate\Support\Facades\Bus;
-use App\Jobs\Messaging\DispatchCampaignJob;
 use App\Models\CampaignDocument;
+use App\Models\CampaignLocation;
 use App\Models\CampaignTemplate;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
+use App\Jobs\Messaging\DispatchCampaignJob;
 
 it('renders campaigns in the admin list', function () {
     $user = adminUser();
@@ -161,7 +161,7 @@ it('starts queue worker when sending a campaign from the manager', function () {
         ->test('admin-campaign-manager')
         ->call('sendCampaign', $campaign->id);
 
-    Bus::assertDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
+    Bus::assertDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
 });
 
 it('shows edit and delete actions only for draft or scheduled campaigns', function () {
@@ -252,14 +252,14 @@ it('hides the all filter option from community admins', function () {
         ->assertSee('CA-33');
 });
 
-    it('does not preselect the all owners filter on new campaigns', function () {
-        $user = adminUser();
+it('does not preselect the all owners filter on new campaigns', function () {
+    $user = adminUser();
 
-        Livewire::actingAs($user)
+    Livewire::actingAs($user)
         ->test('admin-campaign-manager')
         ->call('createCampaign')
         ->assertSet('recipientFilters', []);
-    });
+});
 
 it('redirects property owners and delegated vote users away from campaigns', function (string $role) {
     Role::query()->firstOrCreate(['name' => $role]);

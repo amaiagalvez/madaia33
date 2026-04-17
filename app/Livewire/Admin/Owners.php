@@ -8,10 +8,10 @@ use Livewire\Component;
 use App\SupportedLocales;
 use Livewire\WithPagination;
 use App\Models\OwnerAuditLog;
-use App\Validations\OwnerFormValidation;
 use Illuminate\Contracts\View\View;
 use App\Support\OwnerAuditFieldLabel;
 use App\Services\CreateOwnerFormService;
+use App\Validations\OwnerFormValidation;
 use App\Actions\Owners\CreateOwnerAction;
 use App\Concerns\InteractsWithAdminOwners;
 use App\Actions\Properties\AssignPropertyAction;
@@ -316,20 +316,40 @@ class Owners extends Component
         );
 
         $owner->update([
+            ...$this->editOwnerPrimaryFields(),
+            ...$this->editOwnerSecondaryFields(),
+        ]);
+
+        $this->cancelEditOwner();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function editOwnerPrimaryFields(): array
+    {
+        return [
             'coprop1_name' => $this->editCoprop1Name,
             'coprop1_surname' => $this->editCoprop1Surname ?: null,
             'coprop1_dni' => $this->editCoprop1Dni ?: null,
             'coprop1_phone' => $this->editCoprop1Phone ?: null,
             'coprop1_email' => $this->editCoprop1Email,
             'language' => $this->editLanguage,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function editOwnerSecondaryFields(): array
+    {
+        return [
             'coprop2_name' => $this->editCoprop2Name ?: null,
             'coprop2_surname' => $this->editCoprop2Surname ?: null,
             'coprop2_dni' => $this->editCoprop2Dni ?: null,
             'coprop2_phone' => $this->editCoprop2Phone ?: null,
             'coprop2_email' => $this->editCoprop2Email ?: null,
-        ]);
-
-        $this->cancelEditOwner();
+        ];
     }
 
     public function cancelEditOwner(): void

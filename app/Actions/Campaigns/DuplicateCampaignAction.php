@@ -4,8 +4,8 @@ namespace App\Actions\Campaigns;
 
 use App\Models\User;
 use App\Models\Campaign;
-use App\Models\CampaignLocation;
 use App\Models\CampaignDocument;
+use App\Models\CampaignLocation;
 use App\Models\CampaignRecipient;
 use Illuminate\Support\Collection;
 
@@ -41,7 +41,7 @@ class DuplicateCampaignAction
             ->where('campaign_id', $sourceCampaign->id)
             ->whereNull('deleted_at')
             ->get()
-            ->map(static fn(CampaignLocation $location): array => [
+            ->map(static fn (CampaignLocation $location): array => [
                 'campaign_id' => $newCampaign->id,
                 'location_id' => $location->location_id,
                 'created_at' => now(),
@@ -58,7 +58,7 @@ class DuplicateCampaignAction
     private function duplicateDocuments(Campaign $sourceCampaign, Campaign $newCampaign): void
     {
         $documentsPayload = $sourceCampaign->documents
-            ->map(static fn(CampaignDocument $document): array => [
+            ->map(static fn (CampaignDocument $document): array => [
                 'campaign_id' => $newCampaign->id,
                 'filename' => $document->filename,
                 'path' => $document->path,
@@ -85,7 +85,7 @@ class DuplicateCampaignAction
         }
 
         $recipientsPayload = $manualRecipients
-            ->map(static fn(CampaignRecipient $recipient): array => [
+            ->map(static fn (CampaignRecipient $recipient): array => [
                 'campaign_id' => $newCampaign->id,
                 'owner_id' => $recipient->owner_id,
                 'slot' => $recipient->slot,

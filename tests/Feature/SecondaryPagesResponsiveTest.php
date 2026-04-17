@@ -48,7 +48,7 @@ it('private page login form exposes accessible error association and password to
     $response->assertSee('aria-controls="private-password"', false);
     $response->assertSee("x-bind:aria-pressed=\"showPassword ? 'true' : 'false'\"", false);
 
-    $errors = new ViewErrorBag();
+    $errors = new ViewErrorBag;
     $errors->put('default', new MessageBag([
         'email' => ['The email field is required.'],
     ]));

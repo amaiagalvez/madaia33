@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Location;
 use App\Models\Campaign;
+use App\Models\Location;
 use App\Models\CampaignLocation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
