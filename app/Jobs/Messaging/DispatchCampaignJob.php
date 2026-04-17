@@ -27,6 +27,11 @@ class DispatchCampaignJob implements ShouldQueue
         }
 
         $campaign->status = 'sending';
+
+        if (in_array($campaign->channel, ['whatsapp', 'manual'], true) && $campaign->sent_at === null) {
+            $campaign->sent_at = now();
+        }
+
         $campaign->save();
 
         $existingRecipients = CampaignRecipient::query()
@@ -82,6 +87,6 @@ class DispatchCampaignJob implements ShouldQueue
 
     private function shouldDispatchSendJob(Campaign $campaign): bool
     {
-        return $campaign->channel !== 'whatsapp';
+        return ! in_array($campaign->channel, ['whatsapp', 'manual'], true);
     }
 }

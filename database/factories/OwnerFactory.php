@@ -37,10 +37,12 @@ class OwnerFactory extends Factory
             'coprop1_email_invalid' => false,
             'coprop1_phone_error_count' => 0,
             'coprop1_phone_invalid' => false,
+            'coprop1_has_whatsapp' => false,
             'coprop2_email_error_count' => 0,
             'coprop2_email_invalid' => false,
             'coprop2_phone_error_count' => 0,
             'coprop2_phone_invalid' => false,
+            'coprop2_has_whatsapp' => false,
             'last_contact_error_at' => null,
         ];
     }

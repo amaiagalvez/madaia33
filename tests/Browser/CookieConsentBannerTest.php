@@ -1,7 +1,7 @@
 <?php
 
-use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
+use Laravel\Dusk\Browser;
 
 test('public cookie consent banner can be accepted', function () {
     /** @var DuskTestCase $this */
@@ -9,7 +9,7 @@ test('public cookie consent banner can be accepted', function () {
         $browser->visit(route('home.eu'))
             ->waitFor('[data-cookie-consent-banner]', 10)
             ->assertPresent('[data-cookie-consent-banner]')
-            ->click('[data-cookie-consent-accept]')
+            ->click('[data-cookie-consent-understood]')
             ->waitUntilMissing('[data-cookie-consent-banner]', 10)
             ->assertScript(<<<'JS'
                 (() => document.cookie.includes('madaia_cookie_consent=1'))();

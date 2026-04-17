@@ -17,12 +17,17 @@ class OwnerWelcomeMail extends Mailable
 
     public readonly ?string $legalText;
 
+    /**
+     * @SuppressWarnings("PHPMD.ExcessiveParameterList")
+     */
     public function __construct(
         public readonly ?string $fromAddress,
         public readonly ?string $fromName,
         public readonly string $subjectLine,
         public readonly string $bodyHtml,
         public readonly string $resetUrl,
+        public readonly ?string $trackingPixelUrl = null,
+        public readonly ?string $trackedResetUrl = null,
     ) {
         $this->legalText = EmailLegalText::resolve();
     }
@@ -42,7 +47,9 @@ class OwnerWelcomeMail extends Mailable
             with: [
                 'bodyHtml' => $this->bodyHtml,
                 'resetUrl' => $this->resetUrl,
+                'trackedResetUrl' => $this->trackedResetUrl,
                 'legalText' => $this->legalText,
+                'trackingPixelUrl' => $this->trackingPixelUrl,
             ],
         );
     }

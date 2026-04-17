@@ -39,6 +39,7 @@ return [
     ],
     'mail' => [
         'greeting' => 'Kaixo, :name.',
+        'confirmation_subject_prefix' => 'Konfirmazioa',
         'confirmation_intro' => 'Zure mezua jaso dugu. Hemen duzu kopia bat:',
         'confirmation_footer' => 'Eskerrik asko gurekin harremanetan jartzeagatik.',
         'notification_intro' => 'Kontaktu-mezu berri bat jaso duzu:',

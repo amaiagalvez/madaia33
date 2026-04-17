@@ -1,8 +1,12 @@
 - After each correction response, include `Aprendizajes:` with root cause + prevention, and save that learning in memory for the next correction.
+- For admin-only email subject prefixes, persist the canonical subject in DB and derive the prefixed admin subject only at send time; otherwise internal labels leak into user-facing history and audits.
+- When adding PHPMD suppressions, use quoted syntax `@SuppressWarnings("PHPMD.RuleName")`; unquoted `@SuppressWarnings(PHPMD.RuleName)` can break PHPStan with `phpDoc.parseError`.
+- In mailable render unit tests, set valid `mail.from.address`/`mail.from.name` in test config; otherwise global placeholder values can trigger `RfcComplianceException` and hide the real assertion target.
 - When removing a constructor parameter for PHPMD compliance, search all test files for usages of that named argument and update them in the same pass; also check seeders for `null` values stored where the DB/test expects `''` (empty string).
 - Before finishing a correction, check VS Code Problems and fix warnings/errors in touched files.
 - If Problems include unrelated pre-existing items, report them explicitly instead of silently ignoring.
 - Mirror rule: every new or updated entry in `/memories/correction-workflow.md` must also be written to `.docs/repo-corrections.md`.
+- In Feature tests for localized audit subjects, avoid hardcoding prefix expectations from unrelated translation keys; assert with the same helper used in production (for example, `ContactConfirmationSubject::forAudit(...)`) to prevent false failures when a locale key resolves to its literal key string.
 
 - Accessibility: never use `<label for>` with `div[contenteditable]`; use `aria-labelledby` (or a real form control id) to avoid browser autofill/a11y warnings.
 
@@ -44,6 +48,7 @@
 - In `routes/web.php`, avoid relying on outer variables inside `Route::prefix(...)->group(function () { ... })` unless explicitly imported with `use (...)`; prefer controller actions for non-trivial page data preparation.
 
 - If a Lightbox/overlay opens shifted (too low/high), teleport it to `body` (`x-teleport="body"`) so `fixed` positioning is viewport-based and not affected by ancestor layout/transform contexts.
+- In Alpine teleport templates for public overlays, keep a single root element inside `<template x-teleport="body">`; multiple root siblings can prevent mounting and cause Dusk selector timeouts.
 
 - In bilingual rich-text tabs, avoid `x-if` for language panes because it destroys/recreates editors and can drop unsynced content on tab switch; prefer `x-show` (or explicit buffer syncing) to preserve in-progress text.
 
@@ -253,6 +258,18 @@
 - For authenticated Lighthouse audits in this repo, cookie headers can be unreliable for Livewire/private flows; prefer a shared Chrome session (login with Puppeteer, then run Lighthouse on the same debugging port with storage reset disabled) to audit the real authenticated page.
 - In the Lighthouse skill for this repo, document two explicit paths: guest audits with plain Lighthouse and authenticated audits with a shared Chrome session; also state that `requestedUrl` and `finalUrl` must match or the authenticated audit is invalid.
 - In full-page Livewire public routes, Lighthouse `bf-cache` failures may come from any Livewire component in the layout (for example `language-switcher`), not only the main page component; if `no-store` persists, normalize the final response header in route-specific middleware and verify with a focused Feature header test.
+- In localized mailable tests, assert subjects against the active translation keys currently shipped in lang/* (not legacy copy); when locale copy changes, update dataset expectations in the same PR to avoid stale-string failures.
+- In long Docker quality runs, do not consider intermediate `PASS` lines as final success; wait for the command exit code because later quality stages (for example PHPMD) can still fail after Pint/PHPStan appear green.
+- When removing a method block in PHP with manual patches, immediately verify matching braces (`php -l` or Pint parse output) before running full quality; a single missing `}` can mask the real change and waste quality cycles.
+- In this repo, setting `owners.coprop1_email` to `''` in tests can trigger `Owner::saved` user-sync and break unique `users.email`; for no-email scenarios, avoid model events (`Owner::query()->whereKey(...)->update(...)`) or create owner fixtures without linked users.
+- In Blade component tags, never build dynamic attribute names like `data-foo-{{ $id }}`; use a stable attribute with dynamic value (`data-foo="{{ $id }}"`) and ensure wrapper components forward `$attributes`, or Blade parse errors and missing Dusk selectors will occur.
 - In localized Browser tests, avoid comparing against `__('key')` unless the test locale is explicitly set in PHP; assert the rendered locale text or set the locale first to avoid false failures from untranslated key strings.
 - In Blade FQCN references, an accidental space inside the namespace (for example `\App\ SupportedLocales`) causes route rendering 500s; inspect Laravel logs immediately when auth pages suddenly time out in Dusk or fail with 500 in Feature.
 - In `PublicVotingController` Feature tests, creating an open/published voting is not enough for rendering `public.votings`; the embedded `PublicVotings` Livewire component aborts 404 when the authenticated owner has no eligible assignment. Seed `Location` + `Property` + active `PropertyAssignment` (and at least one `VotingOption`) for that owner before asserting 200/view.
+- Feature test migration rule: when a test only verifies Blade render/static attributes and does not need HTTP/Livewire/DB integration, move it to `tests/Unit` and avoid persisted factories (`create()`), using `make()` or raw file assertions instead.
+- Dusk execution rule: do not validate Browser tests with plain `php artisan test tests/Browser`; use the Selenium workflow in `.github/skills/dusk-testing/SKILL.md` (migrate/seed sqlite, in-container app server, `APP_URL=http://dusk-app:8000`, `DUSK_DRIVER_URL=http://selenium:4444/wd/hub`).
+- In Dusk admin tests that immediately wait for in-page selectors, assert/admin-check the current path first (for example starts with `/admin`) before waiting for table/filter selectors; otherwise hidden redirects/403s surface as misleading selector timeouts.
+- In Livewire admin list/detail tables, when a column needs conditional extra content (for example `message_subject` only for campaign id 1), add the field in the row mapper and gate rendering in Blade with a strict campaign condition plus `filled(...)`; lock it with both Feature and Dusk assertions via stable `data-*` selectors.
+- In admin owners list visual alignments, mirror the Bidalketak table pattern by combining `x-admin.panel-table` with `table-class="min-w-full ... text-sm"`, wrapper `class="overflow-x-auto"`, and compact row actions (`gap-0` + `p-1`) with explicit `title` attributes; protect with stable `data-*` selectors in Browser tests.
+- In localized tests, avoid hardcoded translated literals; set the locale and assert against translation keys (`__()`) so tests stay aligned with active copy changes.
+- In Dusk regression fixes, if multiple failures share `ElementClickInterceptedException` from the cookie banner, add a shared Browser macro to dismiss consent and call it before lower-page interactions; this avoids brittle per-test JS workarounds and stabilizes suites after UI copy/selector changes.

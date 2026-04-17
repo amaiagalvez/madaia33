@@ -73,6 +73,8 @@
             <x-admin.stat-card :label="__('admin.stats.unread_messages')" :value="$unreadMessagesCount" />
             <x-admin.stat-card :label="__('admin.stats.users')" :value="$usersCount" />
             <x-admin.stat-card :label="__('admin.stats.owners')" :value="$ownersCount" />
+            <x-admin.stat-card :label="__('admin.stats.invalid_contacts_owners')" :value="$invalidContactsOwnersCount"
+                data-admin-stat-invalid-contacts />
             <x-admin.stat-card :label="__('admin.stats.locations')" :value="$locationsCount" />
             <x-admin.stat-card :label="__('admin.stats.votings')" :value="$votingsCount" />
         </div>

@@ -37,10 +37,12 @@ class Owner extends Model
         'coprop1_email_invalid',
         'coprop1_phone_error_count',
         'coprop1_phone_invalid',
+        'coprop1_has_whatsapp',
         'coprop2_email_error_count',
         'coprop2_email_invalid',
         'coprop2_phone_error_count',
         'coprop2_phone_invalid',
+        'coprop2_has_whatsapp',
         'last_contact_error_at',
     ];
 
@@ -53,10 +55,12 @@ class Owner extends Model
         'coprop1_email_invalid' => false,
         'coprop1_phone_error_count' => 0,
         'coprop1_phone_invalid' => false,
+        'coprop1_has_whatsapp' => false,
         'coprop2_email_error_count' => 0,
         'coprop2_email_invalid' => false,
         'coprop2_phone_error_count' => 0,
         'coprop2_phone_invalid' => false,
+        'coprop2_has_whatsapp' => false,
     ];
 
     /**
@@ -72,10 +76,12 @@ class Owner extends Model
             'coprop1_email_invalid' => 'boolean',
             'coprop1_phone_error_count' => 'integer',
             'coprop1_phone_invalid' => 'boolean',
+            'coprop1_has_whatsapp' => 'boolean',
             'coprop2_email_error_count' => 'integer',
             'coprop2_email_invalid' => 'boolean',
             'coprop2_phone_error_count' => 'integer',
             'coprop2_phone_invalid' => 'boolean',
+            'coprop2_has_whatsapp' => 'boolean',
             'last_contact_error_at' => 'datetime',
         ];
     }

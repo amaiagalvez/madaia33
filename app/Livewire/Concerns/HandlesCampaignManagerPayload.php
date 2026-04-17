@@ -54,14 +54,14 @@ trait HandlesCampaignManagerPayload
             'subjectEs' => ['nullable', 'string', 'max:255', 'required_without:subjectEu'],
             'bodyEu' => ['nullable', 'string', 'required_without:bodyEs'],
             'bodyEs' => ['nullable', 'string', 'required_without:bodyEu'],
-            'channel' => ['required', 'string', Rule::in(['email', 'sms', 'whatsapp', 'telegram'])],
+            'channel' => ['required', 'string', Rule::in(['email', 'sms', 'whatsapp', 'telegram', 'manual'])],
         ];
     }
 
     private function templateName(): string
     {
         $subject = $this->normalizeNullableValue($this->subjectEu)
-          ?? $this->normalizeNullableValue($this->subjectEs);
+            ?? $this->normalizeNullableValue($this->subjectEs);
 
         if ($subject !== null) {
             return mb_substr($subject, 0, 255);

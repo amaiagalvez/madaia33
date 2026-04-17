@@ -39,6 +39,7 @@ return [
     ],
     'mail' => [
         'greeting' => 'Hola, :name.',
+        'confirmation_subject_prefix' => 'Confirmación',
         'confirmation_intro' => 'Hemos recibido tu mensaje. A continuación encontrarás una copia:',
         'confirmation_footer' => 'Gracias por ponerte en contacto con nosotros.',
         'notification_intro' => 'Has recibido un nuevo mensaje de contacto:',

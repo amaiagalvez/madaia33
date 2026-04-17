@@ -49,6 +49,7 @@ test('home page smoke on mobile renders hero latest notices and working mobile m
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/eu')
+            ->dismissCookieConsentBanner()
             ->resize(375, 812)
             ->pause(500)
             ->assertScript("return document.querySelector('[data-hero-slider]') !== null;", true)
@@ -86,6 +87,7 @@ test('notices page smoke checks responsive grid filter and pagination', function
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/eu/iragarkiak')
+            ->dismissCookieConsentBanner()
             ->resize(375, 812)
             ->pause(500)
             ->assertScript(
@@ -114,6 +116,7 @@ test('gallery smoke opens lightbox closes with escape and works after rotating t
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/eu/argazki-bilduma')
+            ->dismissCookieConsentBanner()
             ->resize(375, 812)
             ->pause(400)
             ->click('[data-gallery-open]')
@@ -149,6 +152,7 @@ test('contact form smoke submits successfully and sends both emails', function (
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($visitorEmail, $subject) {
         $browser->visit('/eu/harremana')
+            ->dismissCookieConsentBanner()
             ->resize(375, 812)
             ->pause(400)
             ->type('#contact-name', 'Smoke Test User')

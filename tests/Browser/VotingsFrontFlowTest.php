@@ -40,6 +40,7 @@ test('open voting callout redirects guest to private login and then to votings p
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($owner) {
         $browser->visit('/eu')
+            ->dismissCookieConsentBanner()
             ->assertPresent('[data-home-votings-callout]')
             ->click('[data-home-votings-cta]')
             ->waitForLocation('/eu/pribatua')
@@ -148,6 +149,7 @@ test('owner without accepted terms sees blocking modal in front votings until ac
     $this->browse(function (Browser $browser) use ($owner) {
         $browser->loginAs($owner->user)
             ->visit('/eu/bozketak')
+            ->dismissCookieConsentBanner()
             ->waitFor('[data-votings-terms-modal]', 5)
             ->assertPresent('[data-votings-terms-modal]')
             ->assertPresent('[data-votings-terms-accept-button]')

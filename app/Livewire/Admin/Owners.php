@@ -10,6 +10,7 @@ use Livewire\WithPagination;
 use App\Models\OwnerAuditLog;
 use Illuminate\Contracts\View\View;
 use App\Support\OwnerAuditFieldLabel;
+use App\Support\OwnerIdentitySanitizer;
 use App\Services\CreateOwnerFormService;
 use App\Validations\OwnerFormValidation;
 use App\Actions\Owners\CreateOwnerAction;
@@ -44,6 +45,8 @@ class Owners extends Component
 
     public string $coprop1Phone = '';
 
+    public bool $coprop1HasWhatsapp = false;
+
     public string $coprop1Email = '';
 
     public string $language = SupportedLocales::BASQUE;
@@ -55,6 +58,8 @@ class Owners extends Component
     public string $coprop2Dni = '';
 
     public string $coprop2Phone = '';
+
+    public bool $coprop2HasWhatsapp = false;
 
     public string $coprop2Email = '';
 
@@ -85,6 +90,12 @@ class Owners extends Component
 
     public string $editCoprop1Phone = '';
 
+    public bool $editCoprop1HasWhatsapp = false;
+
+    public bool $editCoprop1PhoneInvalid = false;
+
+    public bool $editCoprop1EmailInvalid = false;
+
     public string $editCoprop1Email = '';
 
     public string $editLanguage = SupportedLocales::BASQUE;
@@ -96,6 +107,12 @@ class Owners extends Component
     public string $editCoprop2Dni = '';
 
     public string $editCoprop2Phone = '';
+
+    public bool $editCoprop2HasWhatsapp = false;
+
+    public bool $editCoprop2PhoneInvalid = false;
+
+    public bool $editCoprop2EmailInvalid = false;
 
     public string $editCoprop2Email = '';
 
@@ -129,6 +146,8 @@ class Owners extends Component
     public ?int $confirmingWelcomeOwnerId = null;
 
     public bool $showWelcomeModal = false;
+
+    public string $warningMessage = '';
 
     public function boot(
         CreateOwnerAction $createOwnerAction,
@@ -233,6 +252,9 @@ class Owners extends Component
 
     public function createOwner(): void
     {
+        $this->warningMessage = '';
+        $this->sanitizeCreateOwnerIdentityFields();
+
         $data = $this->validate(
             $this->ownerCreationRules(),
             $this->ownerCreationMessages(),
@@ -249,7 +271,12 @@ class Owners extends Component
             return;
         }
 
-        $this->createOwnerAction->execute($this->createOwnerFormService->prepareOwnerData($data));
+        $owner = $this->createOwnerAction->execute($this->createOwnerFormService->prepareOwnerData($data));
+
+        if (! $owner->welcome) {
+            $this->flashOwnerWelcomeNoEmailWarning();
+        }
+
         $this->resetCreateOwnerFormState();
     }
 
@@ -264,6 +291,8 @@ class Owners extends Component
         if ($this->confirmingWelcomeOwnerId === null) {
             return;
         }
+
+        $this->warningMessage = '';
 
         $this->resendOwnerWelcomeMail($this->confirmingWelcomeOwnerId);
         $this->cancelResendWelcomeMail();
@@ -281,7 +310,17 @@ class Owners extends Component
             ->with(['user', 'assignments.property.location'])
             ->findOrFail($ownerId);
 
-        $this->createOwnerAction->sendWelcomeMailToOwner($owner);
+        $sent = $this->createOwnerAction->sendWelcomeMailToOwner($owner);
+
+        if (! $sent) {
+            $this->flashOwnerWelcomeNoEmailWarning();
+        }
+    }
+
+    private function flashOwnerWelcomeNoEmailWarning(): void
+    {
+        $this->warningMessage = __('admin.owners.welcome_not_sent_missing_email');
+        session()->flash('warning', $this->warningMessage);
     }
 
     public function openEditOwnerForm(int $ownerId): void
@@ -293,12 +332,18 @@ class Owners extends Component
         $this->editCoprop1Surname = $owner->coprop1_surname ?? '';
         $this->editCoprop1Dni = $owner->coprop1_dni ?? '';
         $this->editCoprop1Phone = $owner->coprop1_phone ?? '';
+        $this->editCoprop1HasWhatsapp = (bool) $owner->coprop1_has_whatsapp;
+        $this->editCoprop1PhoneInvalid = (bool) $owner->coprop1_phone_invalid;
+        $this->editCoprop1EmailInvalid = (bool) $owner->coprop1_email_invalid;
         $this->editCoprop1Email = $owner->coprop1_email;
         $this->editLanguage = $owner->language ?? SupportedLocales::BASQUE;
         $this->editCoprop2Name = $owner->coprop2_name ?? '';
         $this->editCoprop2Surname = $owner->coprop2_surname ?? '';
         $this->editCoprop2Dni = $owner->coprop2_dni ?? '';
         $this->editCoprop2Phone = $owner->coprop2_phone ?? '';
+        $this->editCoprop2HasWhatsapp = (bool) $owner->coprop2_has_whatsapp;
+        $this->editCoprop2PhoneInvalid = (bool) $owner->coprop2_phone_invalid;
+        $this->editCoprop2EmailInvalid = (bool) $owner->coprop2_email_invalid;
         $this->editCoprop2Email = $owner->coprop2_email ?? '';
         $this->loadEditOwnerAuditLogs($owner);
         $this->resetValidation();
@@ -308,6 +353,7 @@ class Owners extends Component
     public function saveEditOwner(): void
     {
         $owner = Owner::findOrFail((int) $this->editingOwnerId);
+        $this->sanitizeEditOwnerIdentityFields();
 
         $this->validate(
             OwnerFormValidation::adminEditRules($owner->user_id),
@@ -333,6 +379,7 @@ class Owners extends Component
             'coprop1_surname' => $this->editCoprop1Surname ?: null,
             'coprop1_dni' => $this->editCoprop1Dni ?: null,
             'coprop1_phone' => $this->editCoprop1Phone ?: null,
+            'coprop1_has_whatsapp' => $this->editCoprop1HasWhatsapp,
             'coprop1_email' => $this->editCoprop1Email,
             'language' => $this->editLanguage,
         ];
@@ -348,8 +395,25 @@ class Owners extends Component
             'coprop2_surname' => $this->editCoprop2Surname ?: null,
             'coprop2_dni' => $this->editCoprop2Dni ?: null,
             'coprop2_phone' => $this->editCoprop2Phone ?: null,
+            'coprop2_has_whatsapp' => $this->editCoprop2HasWhatsapp,
             'coprop2_email' => $this->editCoprop2Email ?: null,
         ];
+    }
+
+    private function sanitizeCreateOwnerIdentityFields(): void
+    {
+        $this->coprop1Dni = OwnerIdentitySanitizer::sanitizeDni($this->coprop1Dni);
+        $this->coprop1Phone = OwnerIdentitySanitizer::sanitizePhone($this->coprop1Phone);
+        $this->coprop2Dni = OwnerIdentitySanitizer::sanitizeDni($this->coprop2Dni);
+        $this->coprop2Phone = OwnerIdentitySanitizer::sanitizePhone($this->coprop2Phone);
+    }
+
+    private function sanitizeEditOwnerIdentityFields(): void
+    {
+        $this->editCoprop1Dni = OwnerIdentitySanitizer::sanitizeDni($this->editCoprop1Dni);
+        $this->editCoprop1Phone = OwnerIdentitySanitizer::sanitizePhone($this->editCoprop1Phone);
+        $this->editCoprop2Dni = OwnerIdentitySanitizer::sanitizeDni($this->editCoprop2Dni);
+        $this->editCoprop2Phone = OwnerIdentitySanitizer::sanitizePhone($this->editCoprop2Phone);
     }
 
     public function cancelEditOwner(): void
@@ -361,12 +425,18 @@ class Owners extends Component
             'editCoprop1Surname',
             'editCoprop1Dni',
             'editCoprop1Phone',
+            'editCoprop1HasWhatsapp',
+            'editCoprop1PhoneInvalid',
+            'editCoprop1EmailInvalid',
             'editCoprop1Email',
             'editLanguage',
             'editCoprop2Name',
             'editCoprop2Surname',
             'editCoprop2Dni',
             'editCoprop2Phone',
+            'editCoprop2HasWhatsapp',
+            'editCoprop2PhoneInvalid',
+            'editCoprop2EmailInvalid',
             'editCoprop2Email',
             'editOwnerAuditLogCount',
             'editOwnerAuditLogs',
@@ -408,11 +478,13 @@ class Owners extends Component
             'coprop1Surname',
             'coprop1Dni',
             'coprop1Phone',
+            'coprop1HasWhatsapp',
             'coprop1Email',
             'coprop2Name',
             'coprop2Surname',
             'coprop2Dni',
             'coprop2Phone',
+            'coprop2HasWhatsapp',
             'coprop2Email',
         ]);
 

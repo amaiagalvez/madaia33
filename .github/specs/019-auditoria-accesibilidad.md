@@ -96,8 +96,8 @@ Robusto	🟠
 Implementar:
 
 :focus {
-  outline: 2px solid #000;
-  outline-offset: 2px;
+    outline: 2px solid #000;
+    outline-offset: 2px;
 }
 
 Y asegurar:
@@ -259,10 +259,10 @@ Ruta: privado
 Avance 2026-04-17:
 - Verificación funcional previa superada con Dusk: `tests/Browser/PrivatePageTest.php`, `tests/Browser/PasswordRecoveryPagesTest.php` y `tests/Browser/VotingsFrontFlowTest.php` en verde (`12 passed`, `37 assertions`).
 - Lighthouse ejecutado en Docker con `lh-app` sin Debugbar para:
-  - `/es/privado`
-  - `/es/olvido-contrasena`
-  - `/es/restablecer-contrasena/token-de-prueba?email=test@example.com`
-  - `/es/votaciones` autenticada (Chrome compartido: login con Puppeteer + Lighthouse sobre la misma sesión)
+    - `/es/privado`
+    - `/es/olvido-contrasena`
+    - `/es/restablecer-contrasena/token-de-prueba?email=test@example.com`
+    - `/es/votaciones` autenticada (Chrome compartido: login con Puppeteer + Lighthouse sobre la misma sesión)
 
 Resultados Fase 6 (2026-04-17):
 
@@ -282,11 +282,11 @@ Hallazgos Fase 6:
 Estado de Fase 6:
 - Se puede considerar completada la parte de medición automática y regresión funcional sobre las rutas objetivo.
 - Se mantiene abierta la fase a nivel de corrección porque siguen pendientes:
-  - bajar LCP en `privado`, `restablecer contraseña` y `votaciones`
-  - corregir `image-redundant-alt` en la shell auth
-  - revisar `meta-description` en flujos de recuperación de contraseña
-  - analizar `deprecations` y `bf-cache` en `votaciones`
-  - cerrar validación manual de teclado/foco/zoom 200% en estas rutas
+    - bajar LCP en `privado`, `restablecer contraseña` y `votaciones`
+    - corregir `image-redundant-alt` en la shell auth
+    - revisar `meta-description` en flujos de recuperación de contraseña
+    - analizar `deprecations` y `bf-cache` en `votaciones`
+    - cerrar validación manual de teclado/foco/zoom 200% en estas rutas
 
 ### Umbrales de aceptación
 - [ ] Navegación completa por teclado en páginas públicas clave

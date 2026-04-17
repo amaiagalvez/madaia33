@@ -13,14 +13,23 @@ use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Mail\VotingConfirmationMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Support\VotingEligibilityService;
+use App\Support\ContactConfirmationSubject;
 use Illuminate\Validation\ValidationException;
+use App\Support\Messaging\CampaignTrackingUrlBuilder;
+use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
+/**
+ * @SuppressWarnings("PHPMD.CouplingBetweenObjects")
+ */
 class CastVotingBallotAction
 {
     public function __construct(
         private readonly VotingEligibilityService $eligibilityService,
+        private readonly RecordDirectMessageRecipientAction $recordDirectMessageRecipientAction,
+        private readonly CampaignTrackingUrlBuilder $trackingUrlBuilder,
     ) {}
 
     /**
@@ -176,7 +185,25 @@ class CastVotingBallotAction
         }
 
         try {
-            Mail::to($owner->user->email)->send(new VotingConfirmationMail($owner, $voting));
+            $subject = __('votings.mail.subject');
+            $body = __('votings.mail.greeting', ['name' => $owner->coprop1_name]) . "\n"
+                . __('votings.mail.body', ['voting' => $voting->name]) . "\n"
+                . __('votings.mail.thanks');
+
+            $recipient = $this->recordDirectMessageRecipientAction->execute(
+                owner: $owner,
+                contact: $owner->user->email,
+                subject: ContactConfirmationSubject::forAudit($subject),
+                body: $body,
+                sentByUserId: Auth::id(),
+            );
+
+            Mail::to($owner->user->email)->send(new VotingConfirmationMail(
+                $owner,
+                $voting,
+                null,
+                $this->trackingUrlBuilder->openPixelUrl($recipient->tracking_token),
+            ));
         } catch (\Throwable $throwable) {
             Log::warning('Unable to send voting confirmation mail.', [
                 'owner_id' => $owner->id,

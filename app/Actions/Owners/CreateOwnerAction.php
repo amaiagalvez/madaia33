@@ -12,13 +12,21 @@ use Illuminate\Support\Str;
 use App\Mail\OwnerWelcomeMail;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use App\Support\Messaging\CampaignTrackingUrlBuilder;
+use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
 class CreateOwnerAction
 {
+    public function __construct(
+        private readonly ?RecordDirectMessageRecipientAction $recordDirectMessageRecipientAction = null,
+        private readonly ?CampaignTrackingUrlBuilder $trackingUrlBuilder = null,
+    ) {}
+
     /**
      * @param  array<string, mixed>  $data
      *
@@ -92,6 +100,7 @@ class CreateOwnerAction
             'coprop1_surname' => $data['coprop1_surname'] ?? null,
             'coprop1_dni' => $data['coprop1_dni'],
             'coprop1_phone' => $data['coprop1_phone'] ?? null,
+            'coprop1_has_whatsapp' => (bool) ($data['coprop1_has_whatsapp'] ?? false),
             'coprop1_email' => $data['coprop1_email'],
             'language' => $data['language'] ?? SupportedLocales::default(),
             'welcome' => false,
@@ -99,6 +108,7 @@ class CreateOwnerAction
             'coprop2_surname' => $data['coprop2_surname'] ?? null,
             'coprop2_dni' => $data['coprop2_dni'] ?? null,
             'coprop2_phone' => $data['coprop2_phone'] ?? null,
+            'coprop2_has_whatsapp' => (bool) ($data['coprop2_has_whatsapp'] ?? false),
             'coprop2_email' => $data['coprop2_email'] ?? null,
         ]);
 
@@ -157,23 +167,31 @@ class CreateOwnerAction
     /**
      * @param  array<string, mixed>|null  $data
      */
-    public function sendWelcomeMailToOwner(Owner $owner, ?array $data = null): void
+    public function sendWelcomeMailToOwner(Owner $owner, ?array $data = null): bool
     {
         $owner->loadMissing(['user', 'assignments.property.location']);
 
         $user = $owner->user;
 
         if (! $user instanceof User) {
-            return;
+            return false;
+        }
+
+        if (! is_string($user->email) || trim($user->email) === '') {
+            return false;
         }
 
         $this->sendWelcomeMail($owner, $user, $data);
 
         $owner->forceFill(['welcome' => true])->saveQuietly();
+
+        return true;
     }
 
     /**
      * @param  array<string, mixed>|null  $data
+     *
+     * @SuppressWarnings("PHPMD.ExcessiveMethodLength")
      */
     private function sendWelcomeMail(Owner $owner, User $user, ?array $data = null): void
     {
@@ -210,13 +228,37 @@ class CreateOwnerAction
             'email' => $user->email,
         ]);
 
+        $recipient = $this->recordDirectMessageRecipientAction()->execute(
+            owner: $owner,
+            contact: $user->email,
+            subject: $subject,
+            body: $bodyHtml,
+            sentByUserId: Auth::id(),
+        );
+
+        $trackedBodyHtml = $this->trackingUrlBuilder()->withTrackedLinks($bodyHtml, $recipient->tracking_token);
+        $trackedResetUrl = $this->trackingUrlBuilder()->trackedClickUrl($recipient->tracking_token, $resetUrl);
+        $trackingPixelUrl = $this->trackingUrlBuilder()->openPixelUrl($recipient->tracking_token);
+
         Mail::to($user->email)->send(new OwnerWelcomeMail(
             $settings['from_address'] ?? null,
             $settings['from_name'] ?? null,
             $subject,
-            $bodyHtml,
+            $trackedBodyHtml,
             $resetUrl,
+            $trackingPixelUrl,
+            $trackedResetUrl,
         ));
+    }
+
+    private function recordDirectMessageRecipientAction(): RecordDirectMessageRecipientAction
+    {
+        return $this->recordDirectMessageRecipientAction ?? app(RecordDirectMessageRecipientAction::class);
+    }
+
+    private function trackingUrlBuilder(): CampaignTrackingUrlBuilder
+    {
+        return $this->trackingUrlBuilder ?? app(CampaignTrackingUrlBuilder::class);
     }
 
     /**

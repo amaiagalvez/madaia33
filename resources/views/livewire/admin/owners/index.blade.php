@@ -1,4 +1,11 @@
 <div>
+    @if ($warningMessage !== '' || session()->has('warning'))
+        <div class="mb-4 rounded-md bg-amber-50 p-4 text-sm text-amber-800"
+            data-owner-warning-banner>
+            {{ $warningMessage !== '' ? $warningMessage : session('warning') }}
+        </div>
+    @endif
+
     <div class="mb-4 flex items-center justify-end gap-2">
         <x-admin.create-record-button wire:click="$set('showCreateForm', true)" />
     </div>
@@ -13,9 +20,13 @@
                 <x-admin.owner-shared-fields mode="wire" coprop1-name-model="editCoprop1Name"
                     coprop1-surname-model="editCoprop1Surname" coprop1-dni-model="editCoprop1Dni"
                     coprop1-phone-model="editCoprop1Phone" coprop1-email-model="editCoprop1Email"
-                    language-model="editLanguage" coprop2-name-model="editCoprop2Name"
-                    coprop2-dni-model="editCoprop2Dni" coprop2-surname-model="editCoprop2Surname"
-                    coprop2-phone-model="editCoprop2Phone" coprop2-email-model="editCoprop2Email" />
+                    coprop1-has-whatsapp-model="editCoprop1HasWhatsapp" :coprop1-phone-invalid="$editCoprop1PhoneInvalid"
+                    :coprop1-email-invalid="$editCoprop1EmailInvalid" language-model="editLanguage"
+                    coprop2-name-model="editCoprop2Name" coprop2-dni-model="editCoprop2Dni"
+                    coprop2-surname-model="editCoprop2Surname"
+                    coprop2-phone-model="editCoprop2Phone" coprop2-email-model="editCoprop2Email"
+                    coprop2-has-whatsapp-model="editCoprop2HasWhatsapp" :coprop2-phone-invalid="$editCoprop2PhoneInvalid"
+                    :coprop2-email-invalid="$editCoprop2EmailInvalid" />
 
                 <details class="mt-6 rounded-lg border border-zinc-200 bg-gray-50"
                     data-section="owner-audit-log">
@@ -131,6 +142,11 @@
                                 <flux:input wire:model="coprop1Phone" />
                                 <flux:error name="coprop1Phone" />
                             </flux:field>
+                            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" wire:model="coprop1HasWhatsapp"
+                                    class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-600">
+                                <span>{{ __('admin.owners.form.has_whatsapp') }}</span>
+                            </label>
                             <flux:field>
                                 <flux:label>{{ __('admin.owners.form.coprop1_email') }}
                                 </flux:label>
@@ -178,6 +194,11 @@
                                 <flux:input wire:model="coprop2Phone" />
                                 <flux:error name="coprop2Phone" />
                             </flux:field>
+                            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" wire:model="coprop2HasWhatsapp"
+                                    class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-600">
+                                <span>{{ __('admin.owners.form.has_whatsapp') }}</span>
+                            </label>
                             <flux:field>
                                 <flux:label>{{ __('admin.owners.form.coprop2_email') }}
                                 </flux:label>
@@ -299,7 +320,8 @@
         </div>
     </div>
 
-    <x-admin.panel-table>
+    <x-admin.panel-table table-class="min-w-full divide-y divide-gray-200 text-sm"
+        class="overflow-x-auto" data-owner-table>
         <thead class="bg-gray-50">
             <tr>
                 <x-admin.table-header-cell>
@@ -337,10 +359,10 @@
         <tbody class="divide-y divide-gray-200 bg-white">
             @forelse($owners as $owner)
                 <tr wire:key="owner-{{ $owner->id }}" data-owner-id="{{ $owner->id }}">
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap">
                         <span class="font-mono text-xs">{{ $owner->id }}</span>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-900">
+                    <td class="px-2 py-2 text-sm text-gray-900">
 
                         <div class="font-medium"> {{ $owner->full_name1 }}
                             <span class="text-xs leading-5 text-gray-500">
@@ -353,7 +375,7 @@
                         <div class="text-xs leading-5 text-gray-500">
                             {{ $owner->coprop1_phone }}</div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="px-2 py-2 text-sm text-gray-500">
                         <div class="font-medium text-gray-900">{{ $owner->full_name2 }}
                         </div>
 
@@ -363,7 +385,7 @@
                         <div class="text-xs leading-5 text-gray-500">
                             {{ $owner->coprop2_phone }}</div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="px-2 py-2 text-sm text-gray-500">
                         @php
                             $portalAssignments = $owner->assignments->filter(
                                 fn($a) => $a->property->location->type === 'portal',
@@ -376,7 +398,7 @@
                             </span><br>
                         @endforeach
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="px-2 py-2 text-sm text-gray-500">
                         @php
                             $localAssignments = $owner->assignments->filter(
                                 fn($a) => $a->property->location->type === 'local',
@@ -389,7 +411,7 @@
                             </span><br>
                         @endforeach
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="px-2 py-2 text-sm text-gray-500">
                         @php
                             $garageAssignments = $owner->assignments->filter(
                                 fn($a) => $a->property->location->type === 'garage',
@@ -402,7 +424,7 @@
                             </span><br>
                         @endforeach
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="px-2 py-2 text-sm text-gray-500">
                         @php
                             $storageAssignments = $owner->assignments->filter(
                                 fn($a) => $a->property->location->type === 'storage',
@@ -415,33 +437,36 @@
                             </span><br>
                         @endforeach
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500"
+                    <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap"
                         data-owner-welcome="{{ $owner->id }}">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1">
                             <x-admin.status-indicator :active="$owner->welcome" />
                             <button type="button"
                                 wire:click="confirmResendWelcomeMail({{ $owner->id }})"
                                 title="{{ __('admin.owners.resend_welcome_email') }}"
                                 data-action="resend-owner-welcome-{{ $owner->id }}"
-                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#793d3d]">
+                                class="rounded-full border border-transparent p-1 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#793d3d]">
                                 <flux:icon.paper-airplane class="size-4" />
                             </button>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500"
+                    <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap"
+                    <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap"
                         data-owner-terms-accepted="{{ $owner->id }}">
                         <x-admin.status-indicator :active="$owner->accepted_terms_at !== null" />
                     </td>
-                    <td class="px-6 py-4 text-right text-sm font-medium">
-                        <x-admin.table-row-actions>
+                    <td class="px-2 py-2 text-right text-sm font-medium whitespace-nowrap">
+                        <x-admin.table-row-actions class="gap-0"
+                            data-owner-row-actions="{{ $owner->id }}">
                             <x-admin.icon-button-edit
                                 wire:click="openEditOwnerForm({{ $owner->id }})"
-                                :title="__('admin.owners.edit_owner')" data-action="edit-owner-{{ $owner->id }}" />
+                                :title="__('admin.owners.edit_owner')" data-action="edit-owner-{{ $owner->id }}"
+                                class="!p-1" />
                             <button type="button"
                                 wire:click="toggleOwnerRow({{ $owner->id }})"
                                 title="{{ __('admin.owners.view_properties') }}"
                                 data-action="toggle-owner-inline-{{ $owner->id }}"
-                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
+                                class="rounded-full border border-transparent p-1 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]">
                                 <flux:icon.bars-3 class="size-4" />
                             </button>
                         </x-admin.table-row-actions>
@@ -645,6 +670,7 @@
                     {{ __('general.buttons.cancel') }}
                 </button>
                 <button type="button" wire:click="doResendWelcomeMail"
+                    data-action="confirm-resend-owner-welcome"
                     class="rounded-md bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400">
                     {{ __('general.buttons.confirm') }}
                 </button>

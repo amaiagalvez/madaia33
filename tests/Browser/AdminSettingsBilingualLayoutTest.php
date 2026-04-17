@@ -39,7 +39,7 @@ test('bilingual settings blocks keep the same height when switching between EUS 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $basqueLocale, $spanishLocale) {
         $browser->loginAs($admin)
-            ->visit('/admin/configuracion')
+            ->visit('/admin/konfigurazioa')
             ->waitFor('[data-settings-section="front"]', 5)
             ->click('[data-settings-section="front"]')
             ->waitFor('[data-bilingual-field="privacyContentEu"]', 5)

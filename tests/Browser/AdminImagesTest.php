@@ -23,7 +23,7 @@ test('admin can upload an image and it appears in the public gallery', function 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $tmpImage, $altText) {
         $browser->loginAs($admin)
-            ->visit('/admin/imagenes')
+            ->visit('/admin/argazkiak')
             ->assertSee('Argazki-bilduma');
 
         // Attach image file and continue with final upload assertion to avoid flaky preview timing

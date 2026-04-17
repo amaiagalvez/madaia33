@@ -615,6 +615,33 @@ it('creates a new owner from the admin owners list', function () {
         ->and($owner->assignments()->count())->toBe(1);
 });
 
+it('creates a new owner without email and does not send welcome email', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $portal = Location::factory()->portal()->create(['code' => '33-B', 'name' => 'Portal 33-B']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1B']);
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->set('coprop1Name', 'Owner Sin Email')
+        ->set('coprop1Dni', '11223344Z')
+        ->set('coprop1Email', '')
+        ->set('coprop1Phone', '600123999')
+        ->set('newAssignments.0.property_id', (string) $property->id)
+        ->set('newAssignments.0.start_date', '2026-01-01')
+        ->call('createOwner')
+        ->assertSet('warningMessage', __('admin.owners.welcome_not_sent_missing_email'));
+
+    $owner = Owner::query()->where('coprop1_dni', '11223344Z')->first();
+
+    expect($owner)->not->toBeNull();
+    expect($owner?->welcome)->toBeFalse();
+
+    Mail::assertNothingSent();
+});
+
 it('resends the owner welcome email from the owners list', function () {
     Mail::fake();
 
@@ -649,6 +676,33 @@ it('resends the owner welcome email from the owners list', function () {
     Mail::assertSentCount(2);
 
     expect($owner->fresh()->welcome)->toBeTrue();
+});
+
+it('does not resend owner welcome email when owner has no email', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $portal = Location::factory()->portal()->create(['code' => '77-X', 'name' => 'Portal 77-X']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '2C']);
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Owner No Mail',
+        'coprop1_email' => '',
+        'welcome' => false,
+    ]);
+
+    $owner->user?->forceFill(['email' => ''])->save();
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->call('confirmResendWelcomeMail', $owner->id)
+        ->assertSet('showWelcomeModal', true)
+        ->call('doResendWelcomeMail')
+        ->assertSet('showWelcomeModal', false)
+        ->assertSet('warningMessage', __('admin.owners.welcome_not_sent_missing_email'));
+
+    expect($owner->fresh()->welcome)->toBeFalse();
+    Mail::assertNothingSent();
 });
 
 it('creates a new owner with a manual id from the admin owners list', function () {
@@ -786,6 +840,90 @@ it('stores primary dni as null when admin owner edit sends empty dni', function 
         ->assertHasNoErrors();
 
     expect($owner->fresh()->coprop1_dni)->toBeNull();
+});
+
+it('sanitizes dni and phone fields when creating owner from admin list', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $portal = Location::factory()->portal()->create(['code' => '33-S', 'name' => 'Portal 33-S']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '3C']);
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->set('coprop1Name', 'Sanitized Owner')
+        ->set('coprop1Dni', '11.22-33 44a')
+        ->set('coprop1Email', 'sanitize-owner@example.com')
+        ->set('coprop1Phone', '600 12-31.23')
+        ->set('newAssignments.0.property_id', (string) $property->id)
+        ->set('newAssignments.0.start_date', '2026-01-01')
+        ->call('createOwner')
+        ->assertHasNoErrors();
+
+    $owner = Owner::query()->where('coprop1_email', 'sanitize-owner@example.com')->first();
+
+    expect($owner)->not->toBeNull()
+        ->and($owner?->coprop1_dni)->toBe('11223344A')
+        ->and($owner?->coprop1_phone)->toBe('600123123');
+});
+
+it('sanitizes dni and phone fields when editing owner from admin list', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Owner Dni Phone Admin',
+        'coprop1_email' => 'owner.dni.phone.admin@example.com',
+        'coprop1_dni' => '11223344A',
+        'coprop1_phone' => '600111222',
+        'coprop2_dni' => '22334455B',
+        'coprop2_phone' => '611222333',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('openEditOwnerForm', $owner->id)
+        ->set('editCoprop1Name', 'Owner Dni Phone Admin Updated')
+        ->set('editCoprop1Email', 'owner.dni.phone.admin.updated@example.com')
+        ->set('editCoprop1Dni', '11.22-33 44z')
+        ->set('editCoprop1Phone', '600 99-88.77')
+        ->set('editCoprop2Dni', ' 99.88-77 66x')
+        ->set('editCoprop2Phone', '611-00 11.22')
+        ->call('saveEditOwner')
+        ->assertHasNoErrors();
+
+    $owner->refresh();
+
+    expect($owner->coprop1_dni)->toBe('11223344Z')
+        ->and($owner->coprop1_phone)->toBe('600998877')
+        ->and($owner->coprop2_dni)->toBe('99887766X')
+        ->and($owner->coprop2_phone)->toBe('611001122');
+});
+
+it('updates has_whatsapp fields and shows invalid-contact warnings in admin owner edit', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_phone_invalid' => true,
+        'coprop1_email_invalid' => true,
+        'coprop2_phone_invalid' => true,
+        'coprop2_email_invalid' => true,
+        'coprop1_has_whatsapp' => false,
+        'coprop2_has_whatsapp' => false,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('openEditOwnerForm', $owner->id)
+        ->assertSee(__('admin.owners.form.phone_invalid_warning'))
+        ->assertSee(__('admin.owners.form.email_invalid_warning'))
+        ->set('editCoprop1HasWhatsapp', true)
+        ->set('editCoprop2HasWhatsapp', true)
+        ->call('saveEditOwner')
+        ->assertHasNoErrors();
+
+    expect($owner->fresh()->coprop1_has_whatsapp)->toBeTrue()
+        ->and($owner->fresh()->coprop2_has_whatsapp)->toBeTrue();
 });
 
 it('renders owners list with inline expansion action instead of detail bars link', function () {

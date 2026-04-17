@@ -4,11 +4,13 @@
 // Validates: Requirements 10.1–10.6, 11.1–11.5, 12.1–12.3, 13.1–13.3
 
 use App\Models\User;
+use App\Models\Owner;
 use Livewire\Livewire;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
+use App\Models\CampaignRecipient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -186,6 +188,40 @@ it('stores matching user_id when submitted email belongs to an existing user', f
     $storedMessage = ContactMessage::query()->firstOrFail();
 
     expect($storedMessage->user_id)->toBe($matchingUser->id);
+});
+
+it('logs matched owner confirmation mail in campaign recipients', function () {
+    Mail::fake();
+
+    $matchingUser = User::factory()->create([
+        'email' => CONTACT_FORM_VISITOR_EMAIL,
+    ]);
+    $owner = Owner::factory()->create([
+        'user_id' => $matchingUser->id,
+        'coprop1_email' => CONTACT_FORM_VISITOR_EMAIL,
+    ]);
+
+    session(['contact_form_recent_submissions' => []]);
+
+    Livewire::test('contact-form')
+        ->set('name', CONTACT_FORM_VISITOR_NAME)
+        ->set('email', CONTACT_FORM_VISITOR_EMAIL)
+        ->set('subject', 'Gaia audit test')
+        ->set('message', 'Mezu bakarra audit testetarako')
+        ->set('legalAccepted', true)
+        ->set('recaptchaToken', 'skip')
+        ->call('submit')
+        ->assertSet('statusType', 'success');
+
+    $recipient = CampaignRecipient::query()
+        ->where('campaign_id', 1)
+        ->where('owner_id', $owner->id)
+        ->latest('id')
+        ->first();
+
+    expect($recipient)->not->toBeNull()
+        ->and($recipient?->status)->toBe('sent')
+        ->and($recipient?->message_subject)->toBe('[Konfirmazioa] Gaia settings EU');
 });
 
 it('prevents duplicate submissions when the same payload is repeated quickly', function () {

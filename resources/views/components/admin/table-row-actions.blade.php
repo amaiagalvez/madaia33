@@ -4,7 +4,7 @@
     'barsSrText' => null,
 ])
 
-<div class="flex items-center justify-end gap-2" {{ $attributes }}>
+<div {{ $attributes->merge(['class' => 'flex items-center justify-end gap-2']) }}>
     {{ $slot }}
 
     @if ($barsHref !== null)

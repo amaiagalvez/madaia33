@@ -6,15 +6,10 @@ use App\Models\User;
 use App\Models\Campaign;
 use App\Models\CampaignDocument;
 use App\Models\CampaignLocation;
-use App\Models\CampaignRecipient;
-use Illuminate\Support\Collection;
 
 class DuplicateCampaignAction
 {
-    /**
-     * @param  Collection<int, CampaignRecipient>|null  $manualRecipients
-     */
-    public function execute(Campaign $sourceCampaign, User $user, ?Collection $manualRecipients = null): Campaign
+    public function execute(Campaign $sourceCampaign, User $user): Campaign
     {
         $newCampaign = Campaign::query()->create([
             'created_by_user_id' => $user->id,
@@ -30,7 +25,6 @@ class DuplicateCampaignAction
 
         $this->duplicateDocuments($sourceCampaign, $newCampaign);
         $this->duplicateLocations($sourceCampaign, $newCampaign);
-        $this->duplicateManualRecipients($manualRecipients, $newCampaign);
 
         return $newCampaign;
     }
@@ -73,31 +67,5 @@ class DuplicateCampaignAction
         if ($documentsPayload !== []) {
             CampaignDocument::query()->insert($documentsPayload);
         }
-    }
-
-    /**
-     * @param  Collection<int, CampaignRecipient>|null  $manualRecipients
-     */
-    private function duplicateManualRecipients(?Collection $manualRecipients, Campaign $newCampaign): void
-    {
-        if ($manualRecipients === null || $manualRecipients->isEmpty()) {
-            return;
-        }
-
-        $recipientsPayload = $manualRecipients
-            ->map(static fn (CampaignRecipient $recipient): array => [
-                'campaign_id' => $newCampaign->id,
-                'owner_id' => $recipient->owner_id,
-                'slot' => $recipient->slot,
-                'contact' => $recipient->contact,
-                'tracking_token' => bin2hex(random_bytes(32)),
-                'status' => 'pending',
-                'error_message' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ])
-            ->all();
-
-        CampaignRecipient::query()->insert($recipientsPayload);
     }
 }

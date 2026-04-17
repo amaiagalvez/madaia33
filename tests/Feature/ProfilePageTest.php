@@ -156,6 +156,53 @@ it('shows only messages sent by logged user in messages tab', function () {
         ->assertDontSee('Hau ez da agertu behar.');
 });
 
+it('renders expandable controls for long messages in sent and received tabs', function () {
+    $user = User::factory()->create();
+
+    $owner = Owner::factory()->for($user)->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $longSentMessage = str_repeat('Mezu luze bidalia. ', 20);
+    $longReceivedMessage = str_repeat('Mezu luze jasoa. ', 20);
+
+    $sentMessage = ContactMessage::factory()->create([
+        'user_id' => $user->id,
+        'subject' => 'Luzea bidalia',
+        'message' => $longSentMessage,
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'subject_eu' => 'Luzea jasoa',
+        'subject_es' => 'Recibido largo',
+        'body_eu' => $longReceivedMessage,
+        'body_es' => $longReceivedMessage,
+        'channel' => 'email',
+        'status' => 'sent',
+        'sent_at' => now()->subMinute(),
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => 'owner@example.com',
+        'status' => 'sent',
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'messages']))
+        ->assertOk()
+        ->assertSeeHtml('data-profile-message-expandable="' . $sentMessage->id . '"')
+        ->assertSee(__('profile.messages.show_more'));
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'received']))
+        ->assertOk()
+        ->assertSeeHtml('data-profile-received-expandable="' . $recipient->id . '"')
+        ->assertSee(__('profile.received.show_more'));
+});
+
 it('shows only received campaign messages for the linked owner in profile', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();
@@ -221,6 +268,46 @@ it('shows only received campaign messages for the linked owner in profile', func
         ->assertDontSee('Beste jabearentzako mezua.');
 });
 
+it('shows direct-message recipient subject and body in received tab for campaign id 1', function () {
+    $user = User::factory()->create();
+
+    $owner = Owner::factory()->for($user)->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $directMessagesCampaign = Campaign::factory()->create([
+        'id' => 1,
+        'subject_eu' => 'Web-etik Bidalitako Mezuak',
+        'subject_es' => 'Mensajes enviados desde la web',
+        'body_eu' => 'Kanpainaren testu orokorra, ez hau erakutsi.',
+        'body_es' => 'Texto general de campaña, no mostrar este.',
+        'channel' => 'email',
+        'status' => 'sent',
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $directMessagesCampaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => 'owner@example.com',
+        'status' => 'sent',
+        'message_subject' => 'Gaia zuzena jabe honentzat',
+        'message_body' => 'Hau da benetan bidalitako mezua.',
+    ]);
+
+    CampaignTrackingEvent::query()->create([
+        'campaign_recipient_id' => $recipient->id,
+        'event_type' => 'open',
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'received']))
+        ->assertOk()
+        ->assertSee('Gaia zuzena jabe honentzat')
+        ->assertSee('Hau da benetan bidalitako mezua.')
+        ->assertDontSee('Kanpainaren testu orokorra, ez hau erakutsi.');
+});
+
 it('accepts owner terms from profile page', function () {
     $user = User::factory()->create();
     $owner = Owner::factory()->for($user)->create([
@@ -259,11 +346,13 @@ it('allows logged owner to update own owner profile data', function () {
         'coprop1_dni' => '00000000A',
         'coprop1_email' => 'leire.zaharra@example.com',
         'coprop1_phone' => '600000000',
+        'coprop1_has_whatsapp' => false,
         'language' => 'eu',
         'coprop2_name' => 'Bigarren Zaharra',
         'coprop2_surname' => 'Bigarren Abizena Zaharra',
         'coprop2_dni' => '11111111B',
         'coprop2_phone' => '611111111',
+        'coprop2_has_whatsapp' => false,
         'coprop2_email' => 'bigarren.zaharra@example.com',
     ]);
 
@@ -272,14 +361,16 @@ it('allows logged owner to update own owner profile data', function () {
         ->post(route('profile.owner.update.eu'), [
             'coprop1_name' => 'Leire Berria',
             'coprop1_surname' => 'Abizena Berria',
-            'coprop1_dni' => '12345678A',
+            'coprop1_dni' => '12.34-56 78a',
             'coprop1_email' => 'leire.berria@example.com',
-            'coprop1_phone' => '600111222',
+            'coprop1_phone' => '600 11-12.22',
+            'coprop1_has_whatsapp' => '1',
             'language' => 'es',
             'coprop2_name' => 'Bigarren Izena',
             'coprop2_surname' => 'Bigarren Abizena',
-            'coprop2_dni' => '12345678Z',
-            'coprop2_phone' => '600222333',
+            'coprop2_dni' => '12.34-56 78z',
+            'coprop2_phone' => '600 22-23.33',
+            'coprop2_has_whatsapp' => '1',
             'coprop2_email' => 'bigarrena@example.com',
         ])
         ->assertRedirect(route('profile.eu', ['tab' => 'owner'], false));
@@ -291,11 +382,13 @@ it('allows logged owner to update own owner profile data', function () {
         ->and($owner->coprop1_dni)->toBe('12345678A')
         ->and($owner->coprop1_email)->toBe('leire.berria@example.com')
         ->and($owner->coprop1_phone)->toBe('600111222')
+        ->and($owner->coprop1_has_whatsapp)->toBeTrue()
         ->and($owner->language)->toBe('es')
         ->and($owner->coprop2_name)->toBe('Bigarren Izena')
         ->and($owner->coprop2_surname)->toBe('Bigarren Abizena')
         ->and($owner->coprop2_dni)->toBe('12345678Z')
         ->and($owner->coprop2_phone)->toBe('600222333')
+        ->and($owner->coprop2_has_whatsapp)->toBeTrue()
         ->and($owner->coprop2_email)->toBe('bigarrena@example.com')
         ->and($user->fresh()->name)->toBe('Leire Berria')
         ->and($user->fresh()->email)->toBe('leire.berria@example.com')

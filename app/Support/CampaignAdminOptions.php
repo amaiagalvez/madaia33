@@ -24,6 +24,7 @@ class CampaignAdminOptions
             ['value' => 'email', 'label' => __('campaigns.admin.channels.email')],
             // ['value' => 'sms', 'label' => __('campaigns.admin.channels.sms')],
             ['value' => 'whatsapp', 'label' => __('campaigns.admin.channels.whatsapp')],
+            ['value' => 'manual', 'label' => __('campaigns.admin.channels.manual')],
             // ['value' => 'telegram', 'label' => __('campaigns.admin.channels.telegram')],
         ];
     }

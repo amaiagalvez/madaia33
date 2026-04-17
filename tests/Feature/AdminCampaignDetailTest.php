@@ -140,6 +140,52 @@ it('shows unique campaign metrics and recipient detail rows', function () {
         ->assertSee('acta-marzo.pdf');
 });
 
+it('shows recipient message subject in contact column only for campaign id 1', function () {
+    $user = adminUser();
+
+    $campaignOne = Campaign::query()->find(1);
+
+    if ($campaignOne === null) {
+        $campaignOne = Campaign::factory()->create([
+            'id' => 1,
+            'channel' => 'email',
+            'status' => 'completed',
+        ]);
+    } else {
+        $campaignOne->forceFill([
+            'channel' => 'email',
+            'status' => 'completed',
+        ])->save();
+    }
+
+    $campaignOneRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaignOne->id,
+        'contact' => 'subject-one@example.com',
+        'message_subject' => 'Asunto visible en campaña 1',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $campaignOne])
+        ->assertSee('Asunto visible en campaña 1')
+        ->assertSeeHtml('data-campaign-contact-subject-' . $campaignOneRecipient->id);
+
+    $otherCampaign = Campaign::factory()->create([
+        'channel' => 'email',
+        'status' => 'completed',
+    ]);
+
+    $otherCampaignRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $otherCampaign->id,
+        'contact' => 'subject-other@example.com',
+        'message_subject' => 'Asunto no visible fuera de campaña 1',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $otherCampaign])
+        ->assertDontSee('Asunto no visible fuera de campaña 1')
+        ->assertDontSeeHtml('data-campaign-contact-subject-' . $otherCampaignRecipient->id);
+});
+
 it('renders the admin detail page with breadcrumb context for a campaign', function () {
     $user = adminUser();
     $campaign = Campaign::factory()->create([
@@ -355,6 +401,7 @@ it('shows whatsapp click-to-chat with tracked links and marks recipient as sent'
 
     $recipient->refresh();
     $owner->refresh();
+    $campaign->refresh();
 
     $trackingEvent = CampaignTrackingEvent::query()
         ->where('campaign_recipient_id', $recipient->id)
@@ -367,6 +414,7 @@ it('shows whatsapp click-to-chat with tracked links and marks recipient as sent'
         ->and($trackingEvent?->url)->toStartWith('https://wa.me/34600112233?text=')
         ->and($trackingEvent?->url)->toContain(rawurlencode($trackedClickUrl))
         ->and($trackingEvent?->url)->toContain(rawurlencode($trackedDocumentUrl))
+        ->and($campaign->sent_at)->not->toBeNull()
         ->and($owner->coprop1_phone_error_count)->toBe(0)
         ->and($owner->coprop1_phone_invalid)->toBeFalse();
 });
@@ -450,4 +498,50 @@ it('shows only whatsapp_sent count in total metric for whatsapp campaigns', func
         ->assertSet('metrics.total', 1);
 
     expect($pendingRecipient->status)->toBe('pending');
+});
+
+it('shows mark-sent button for manual channel pending recipients and marks them as sent', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'manual',
+        'status' => 'sending',
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'contact' => 'manual',
+        'status' => 'pending',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $campaign])
+        ->assertSeeHtml('data-campaign-manual-mark-' . $recipient->id)
+        ->assertDontSeeHtml('data-campaign-manual-sent-' . $recipient->id)
+        ->call('markManualRecipientSent', $recipient->id)
+        ->assertDontSeeHtml('data-campaign-manual-mark-' . $recipient->id)
+        ->assertSeeHtml('data-campaign-manual-sent-' . $recipient->id);
+
+    $recipient->refresh();
+    expect($recipient->status)->toBe('sent')
+        ->and($recipient->sent_at)->not->toBeNull();
+});
+
+it('does not show manual mark-sent button for non-manual channels', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'email',
+        'status' => 'completed',
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'contact' => 'owner@example.com',
+        'status' => 'pending',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $campaign])
+        ->assertDontSeeHtml('data-campaign-manual-mark-' . $recipient->id);
 });

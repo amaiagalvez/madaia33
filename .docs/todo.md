@@ -16,41 +16,26 @@
 - [ ] probar envio whatcapp en el movil
 
 # Code
-- votaciones resultados (suma de porcentajes)
+- votaciones resultados
+para cada votación, añadir un boton para abrir una blade con una lista con los resultados
+en la lista añadir el header y el breadcrumb (como en la lista de admin/bidalketak/{id})
+en esa nueva vista tiene que aparecer arriba el título y la pregunta de la votación y en una lista, a la izquierda, todos los vecinos que han votado en una columna, en otra columna, sus propiedades, cada una con su porcentaje community_pct y la suma de todos estos porcentajes
+y a continuación añadir tantas columnas como opciones tenga la votación.
+
+para votacionses no anónimas:
+por cada owner que haya votado, rellenar la columna de la opción que ha elegido con el porcentaje total de sus propiedades
+al final de cada columna de opción, poner la suma de los porcentajes
+
+para votacionses anónimas:
+al final de cada columna de opción, poner la suma de los porcentajes
+
 - spec kiro pendientes (obra)
-- [ ] reepasar estatistikak home
-- [ ] unificar terminología
-  - locations: Ubicaciones => Comunidades
-  - properties: Propiedades => Fincas
-  - property_assignments => Propiedades
-  - owners => Propietarias
-
-- [ ] En el listado de bozketak añadir un botón para Enviar un email. Crear una nueva campaña. Los recipients serán los owners que puedan votar en esa votación. Debe de abrir el formulario de la campaña creada para que pueda añadir el texto a enviar. Es decir, las locations que hay en la bozketa y las que se deben crear para la campaña deben de ser las mismas.
-En el texto de la campaña poner un aviso "añadir orden de día y documentos para delegar el voto y votar presenciamelte"
-
-En el listado de admin/campanas
-- al pinchar en el botón programar, modal para pedir cuando programarlo
-- añadir nueva columna con el número de mensajes de abiertos
-
-- cuando se pulsa en el botón de enviar en un envío de whatcapp, actualizar la fecha de envió de esa campaña, ahora no se actualiza
-
-# Panela
+- [ ] repasar estatistikak home
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
-
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
-
-- [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak 
-  
-
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
-
-## manual de usuaria
-crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación
-añadir una ruta al menú del panel 
-tiene que estar en dos idiomas eu y es
-- [ ] añadir una regla al agente amalur para que lo mantenga actualizado
 
 # Copilot
 - [ ] repasar agente lamia
@@ -72,27 +57,24 @@ tiene que estar en dos idiomas eu y es
 - [ ] añadir papelera para poder reestaurar los borrrados
 - [ ] añadir tipo votaciones, una persona un voto / por porcentajes de participación
 - [ ] en todos los sitios en lo que debe salir un modal, crear un dusk-test para que lo compruebe y así no tener riesgo de perder esa funcionalidad.
-- [ ] repasar queries duplicadas que indica la debugbar
-- examinar la pestaña Queries del debugbar y analizar las consultas duplicadas
-  - Front
-    - iragarkiak
-    - argazki-bilduma
-    - kontaktua
-    - pribatua
-  - Front logeado
-    - profila y las diferentes tabs que tiene
-    - bozketak
-  - Aginte-panela
-    - admin
-    - admin/avisos
-    - admin/imagenes
-    - admin/mensajes
-    - admin/campanas
-    - admin/campanas/{id}
-    - admin/portales
-    - admin/propietarias
-    - admin/votaciones
-    - admin/configuracion
-    - admin/usuarios
+- [ ] repasar queries duplicadas que indica la debugbar. examinar la pestaña Queries del debugbar y analizar las consultas duplicadas en todas las rutas
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
 - [ ] config recaptcha, analitics
+- [ ] manual de usuaria
+crar una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación añadir una ruta al menú del panel tiene que estar en dos idiomas eu y es
+añadir una regla al agente amalur para que lo mantenga actualizado
+- [ ] Cómo se envian los mensajes programados?
+- [ ] crear dusk-test para todas las pantallas
+
+6-C Julián Corcuera       629884577 osonikolas@gmail.com
+6-B Jose Meléndez         630856088 jose.melendez.amado@gmail.com
+5-C Javier                659451474 javierykarmele@gmail.com
+5-B Maitane Velasco       689115898 chaddazabaletaitor@yahoo.com
+4-B Javi Azkarate         695751202 javiazkarate@hotmail.com
+3-B Juanjo Ortega López   659054060 ortegalopez33@gmail.com 
+3-A Iñaki Beruete         626254424 iberuete60@gmail.com
+2-C Jose Antonio Fariñas  637310542 josean.fari@gmail.com
+1-B Jon Urbizu Etxabarri  685757583 jont5@hotmail.com
+1-A Amaia Galvez          672239752 info@amaia.eus
+33I Aitor                 629407916
+33  Idoia Asenjo          688894172

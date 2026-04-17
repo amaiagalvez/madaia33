@@ -8,10 +8,12 @@ use App\Models\Property;
 use App\Models\VotingBallot;
 use App\Models\VotingOption;
 use App\Livewire\PublicVotings;
+use App\Models\CampaignRecipient;
 use App\Models\PropertyAssignment;
 use App\Mail\VotingConfirmationMail;
 use Illuminate\Support\Facades\Mail;
 use App\Actions\Votings\CastVotingData;
+use App\Support\ContactConfirmationSubject;
 use Illuminate\Validation\ValidationException;
 use App\Actions\Votings\CastVotingBallotAction;
 use App\Http\Controllers\PublicVotingController;
@@ -47,6 +49,17 @@ it('sends a confirmation email after a successful vote', function () {
     Mail::assertSent(VotingConfirmationMail::class, function (VotingConfirmationMail $mail) use ($owner): bool {
         return $mail->hasTo($owner->user->email);
     });
+
+    $recipient = CampaignRecipient::query()
+        ->where('campaign_id', 1)
+        ->where('owner_id', $owner->id)
+        ->latest('id')
+        ->first();
+
+    expect($recipient)->not->toBeNull()
+        ->and($recipient?->status)->toBe('sent')
+        ->and($recipient?->message_subject)->toBe(ContactConfirmationSubject::forAudit((string) __('votings.mail.subject')))
+        ->and($recipient?->tracking_token)->not->toBe('');
 });
 
 it('rejects vote attempts when owner does not belong to the allowed locations', function () {

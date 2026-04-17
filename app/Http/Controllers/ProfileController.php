@@ -22,6 +22,8 @@ use App\Support\VotingEligibilityService;
 
 class ProfileController extends Controller
 {
+    private const DIRECT_MESSAGES_CAMPAIGN_ID = 1;
+
     public function __construct(private VotingEligibilityService $votingEligibilityService) {}
 
     public function show(Request $request): View
@@ -40,7 +42,7 @@ class ProfileController extends Controller
 
         $activeAssignments = $this->activeAssignments($owner);
         $pendingAssignments = $activeAssignments->filter(
-            static fn($assignment): bool => ! (bool) $assignment->owner_validated,
+            static fn ($assignment): bool => ! (bool) $assignment->owner_validated,
         );
 
         $requiresTermsAcceptance = $owner !== null && $owner->accepted_terms_at === null;
@@ -161,6 +163,8 @@ class ProfileController extends Controller
 
         abort_if($owner === null, 403);
 
+        $request->merge($this->sanitizeOwnerIdentityPayload($request->all()));
+
         $validated = $request->validate(OwnerFormValidation::profileUpdateRules($user->id));
 
         $owner->update([
@@ -185,6 +189,7 @@ class ProfileController extends Controller
             'coprop1_dni' => $validated['coprop1_dni'] ?: null,
             'coprop1_email' => $validated['coprop1_email'],
             'coprop1_phone' => $validated['coprop1_phone'] ?: null,
+            'coprop1_has_whatsapp' => (bool) ($validated['coprop1_has_whatsapp'] ?? false),
             'language' => $validated['language'],
         ];
     }
@@ -200,8 +205,30 @@ class ProfileController extends Controller
             'coprop2_surname' => $validated['coprop2_surname'] ?: null,
             'coprop2_dni' => $validated['coprop2_dni'] ?: null,
             'coprop2_phone' => $validated['coprop2_phone'] ?: null,
+            'coprop2_has_whatsapp' => (bool) ($validated['coprop2_has_whatsapp'] ?? false),
             'coprop2_email' => $validated['coprop2_email'] ?: null,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function sanitizeOwnerIdentityPayload(array $payload): array
+    {
+        foreach (['coprop1_dni', 'coprop2_dni'] as $field) {
+            if (array_key_exists($field, $payload)) {
+                $payload[$field] = strtoupper((string) preg_replace('/[^0-9A-Za-z]/', '', trim((string) $payload[$field])));
+            }
+        }
+
+        foreach (['coprop1_phone', 'coprop2_phone'] as $field) {
+            if (array_key_exists($field, $payload)) {
+                $payload[$field] = (string) preg_replace('/[^0-9]/', '', trim((string) $payload[$field]));
+            }
+        }
+
+        return $payload;
     }
 
     public function validateAssignments(Request $request): RedirectResponse
@@ -212,8 +239,8 @@ class ProfileController extends Controller
         abort_if($owner === null, 403);
 
         $assignmentIds = collect((array) $request->input('assignment_ids', []))
-            ->map(static fn(mixed $id): int => (int) $id)
-            ->filter(static fn(int $id): bool => $id > 0)
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
             ->values();
 
         if ($assignmentIds->isEmpty()) {
@@ -248,7 +275,7 @@ class ProfileController extends Controller
         }
 
         return $owner->assignments
-            ->filter(static fn($assignment): bool => $assignment->end_date === null)
+            ->filter(static fn ($assignment): bool => $assignment->end_date === null)
             ->values();
     }
 
@@ -304,9 +331,9 @@ class ProfileController extends Controller
             ])
             ->orderByDesc('voted_at')
             ->get(['id', 'voting_id', 'voted_at'])
-            ->map(static fn(VotingBallot $ballot): array => [
+            ->map(static fn (VotingBallot $ballot): array => [
                 'id' => $ballot->id,
-                'voting_name' => data_get($ballot->voting, 'name') ?: '—',
+                'voting_name' => (string) data_get($ballot->voting, 'name', '—'),
                 'voted_at' => Carbon::parse($ballot->voted_at),
             ]);
     }
@@ -324,7 +351,7 @@ class ProfileController extends Controller
             ->where('user_id', $userId)
             ->orderByDesc('created_at')
             ->get(['id', 'subject', 'message', 'is_read', 'created_at', 'read_at'])
-            ->map(static fn(ContactMessage $message): array => [
+            ->map(static fn (ContactMessage $message): array => [
                 'id' => $message->id,
                 'subject' => $message->subject,
                 'message' => $message->message,
@@ -338,6 +365,8 @@ class ProfileController extends Controller
 
     /**
      * @return array<int, array{id: int, subject: string, message: string, status_label: string, sent_at: Carbon}>
+     *
+     * @SuppressWarnings("PHPMD.CyclomaticComplexity")
      */
     private function receivedMessages(?Owner $owner): array
     {
@@ -352,19 +381,23 @@ class ProfileController extends Controller
                 'trackingEvents:campaign_recipient_id,event_type',
             ])
             ->orderByDesc('id')
-            ->get(['id', 'campaign_id', 'owner_id', 'status', 'created_at'])
-            ->filter(static fn(CampaignRecipient $recipient): bool => $recipient->campaign !== null)
+            ->get(['id', 'campaign_id', 'owner_id', 'status', 'message_subject', 'message_body', 'sent_at', 'created_at'])
+            ->filter(static fn (CampaignRecipient $recipient): bool => $recipient->campaign !== null)
             ->map(function (CampaignRecipient $recipient): array {
                 /** @var object $campaign */
                 $campaign = $recipient->campaign;
                 $locale = SupportedLocales::normalize(app()->getLocale());
                 $isOpened = $recipient->trackingEvents->contains('event_type', 'open');
-                $subject = $locale === SupportedLocales::SPANISH
+                $campaignSubject = $locale === SupportedLocales::SPANISH
                     ? (string) data_get($campaign, 'subject_es', '')
                     : (string) data_get($campaign, 'subject_eu', '');
-                $body = $locale === SupportedLocales::SPANISH
+                $campaignBody = $locale === SupportedLocales::SPANISH
                     ? (string) data_get($campaign, 'body_es', '')
                     : (string) data_get($campaign, 'body_eu', '');
+                $hasDirectMessageContent = filled($recipient->message_subject) || filled($recipient->message_body);
+                $isDirectMessage = $recipient->campaign_id === self::DIRECT_MESSAGES_CAMPAIGN_ID && $hasDirectMessageContent;
+                $subject = $isDirectMessage ? (string) ($recipient->message_subject ?? '') : $campaignSubject;
+                $body = $isDirectMessage ? (string) ($recipient->message_body ?? '') : $campaignBody;
 
                 return [
                     'id' => $recipient->id,
@@ -373,9 +406,11 @@ class ProfileController extends Controller
                     'status_label' => $isOpened
                         ? __('profile.received.opened')
                         : __('campaigns.admin.statuses.' . $recipient->status),
-                    'sent_at' => data_get($campaign, 'sent_at') !== null
-                        ? Carbon::parse((string) data_get($campaign, 'sent_at'))
-                        : Carbon::parse($recipient->created_at),
+                    'sent_at' => $recipient->sent_at !== null
+                        ? Carbon::parse((string) $recipient->sent_at)
+                        : (data_get($campaign, 'sent_at') !== null
+                            ? Carbon::parse((string) data_get($campaign, 'sent_at'))
+                            : Carbon::parse($recipient->created_at)),
                 ];
             })
             ->values()
@@ -394,7 +429,7 @@ class ProfileController extends Controller
         return VotingBallot::query()
             ->where('owner_id', $owner->id)
             ->pluck('voting_id')
-            ->map(static fn(mixed $votingId): int => (int) $votingId)
+            ->map(static fn (mixed $votingId): int => (int) $votingId)
             ->unique()
             ->values();
     }
@@ -411,9 +446,9 @@ class ProfileController extends Controller
 
         return $this->votingEligibilityService
             ->openEligibleVotingsForOwner($owner)
-            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
             ->values()
-            ->map(static fn(Voting $voting): array => [
+            ->map(static fn (Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),
@@ -437,10 +472,10 @@ class ProfileController extends Controller
             ->with('locations.location')
             ->orderByDesc('ends_at')
             ->get(['id', 'name_eu', 'name_es', 'starts_at', 'ends_at'])
-            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
-            ->filter(fn(Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
+            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->filter(fn (Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
             ->values()
-            ->map(static fn(Voting $voting): array => [
+            ->map(static fn (Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),

@@ -18,7 +18,7 @@ Mensaje codificado en URL
 Debes hacer URL encoding del texto:
 
 <a href="https://wa.me/34612345678?text=Hola%20quiero%20info" target="_blank">
-  Escríbenos por WhatsApp
+    Escríbenos por WhatsApp
 </a>
 
 Cuando el canal sea whatchapp, en su listado admin/campanas/{id} añadir una columna con el teléfono y al lado del teléfono un botón para enviar el mensaje.
@@ -41,9 +41,9 @@ Si hay enlaces en el teexto o documentos, cómo los puedo enviar?
 
 - Se usará `https://wa.me/<numero>?text=<mensaje>` con número normalizado en formato internacional sin `+` ni espacios.
 - El mensaje predefinido se construirá con:
-  - cuerpo de campaña (EU/ES según fallback existente)
-  - enlaces detectados en el texto
-  - enlaces de documentos de campaña como URL de descarga/seguimiento
+    - cuerpo de campaña (EU/ES según fallback existente)
+    - enlaces detectados en el texto
+    - enlaces de documentos de campaña como URL de descarga/seguimiento
 - Click to Chat no permite confirmar entrega/lectura real en WhatsApp. Solo se puede trazar que el admin abrió el enlace de envío.
 - La trazabilidad se guardará en `campaign_tracking_events` con un evento específico para WhatsApp (ej. `whatsapp_sent`).
 

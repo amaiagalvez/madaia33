@@ -45,12 +45,14 @@ class CreateOwnerFormService
             'coprop1_surname' => $this->nullableString($validated['coprop1Surname'] ?? null),
             'coprop1_dni' => $this->nullableString($validated['coprop1Dni'] ?? null),
             'coprop1_phone' => $this->nullableString($validated['coprop1Phone'] ?? null),
-            'coprop1_email' => $validated['coprop1Email'],
+            'coprop1_has_whatsapp' => (bool) ($validated['coprop1HasWhatsapp'] ?? false),
+            'coprop1_email' => $this->nullablePrimaryEmail($validated['coprop1Email'] ?? null),
             'language' => $validated['language'],
             'coprop2_name' => $this->nullableString($validated['coprop2Name'] ?? null),
             'coprop2_surname' => $this->nullableString($validated['coprop2Surname'] ?? null),
             'coprop2_dni' => $this->nullableString($validated['coprop2Dni'] ?? null),
             'coprop2_phone' => $this->nullableString($validated['coprop2Phone'] ?? null),
+            'coprop2_has_whatsapp' => (bool) ($validated['coprop2HasWhatsapp'] ?? false),
             'coprop2_email' => $this->nullableString($validated['coprop2Email'] ?? null),
             'assignments' => $this->normalizeAssignments($validated['newAssignments'] ?? []),
         ];
@@ -72,6 +74,15 @@ class CreateOwnerFormService
         }
 
         return (int) $value;
+    }
+
+    private function nullablePrimaryEmail(mixed $value): string
+    {
+        if ($value === null || trim((string) $value) === '') {
+            return '';
+        }
+
+        return (string) $value;
     }
 
     /**

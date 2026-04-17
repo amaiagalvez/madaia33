@@ -23,7 +23,7 @@ class CampaignWhatsappCsvController extends Controller
         $pending = $campaign->recipients
             ->filter(fn (CampaignRecipient $r): bool => ! $r->trackingEvents->contains('event_type', 'whatsapp_sent'));
 
-        $filename = 'whatsapp-campana-' . $campaign->id . '.csv';
+        $filename = 'whatsapp-bidalketa-' . $campaign->id . '.csv';
 
         return response()->streamDownload(function () use ($pending, $campaign, $builder): void {
             $stream = fopen('php://output', 'w');

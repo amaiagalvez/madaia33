@@ -40,6 +40,7 @@ test('lightbox adapts orientation and closes with escape and outside click', fun
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($galleryOpenSelector, $overflowScript) {
         $browser->visit(GALLERY_PATH)
+            ->dismissCookieConsentBanner()
             ->resize(390, 844)
             ->pause(350);
 
@@ -100,6 +101,7 @@ test('lightbox still opens for captions with quotes and line breaks', function (
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit(GALLERY_PATH)
+            ->dismissCookieConsentBanner()
             ->pause(350)
             ->click('[data-gallery-open]')
             ->pause(350)
@@ -115,6 +117,7 @@ test('lightbox closes with swipe down gesture', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit(GALLERY_PATH)
+            ->dismissCookieConsentBanner()
             ->resize(390, 844)
             ->pause(350);
 
