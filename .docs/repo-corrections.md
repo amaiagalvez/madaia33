@@ -7,6 +7,7 @@
 - If Problems include unrelated pre-existing items, report them explicitly instead of silently ignoring.
 - Mirror rule: every new or updated entry in `/memories/correction-workflow.md` must also be written to `.docs/repo-corrections.md`.
 - In GitHub Actions YAML, avoid splitting background-run commands so `&` starts a new line under `run:`; use a `run: |` block with the full command in one line to prevent parser/syntax issues.
+- In CI Dusk workflows, run `php artisan serve` with the same testing DB/session env used by migrations/tests; if server and test process use different DB configs, readiness checks can loop on 500 and fail before Dusk starts.
 - In Feature tests for localized audit subjects, avoid hardcoding prefix expectations from unrelated translation keys; assert with the same helper used in production (for example, `ContactConfirmationSubject::forAudit(...)`) to prevent false failures when a locale key resolves to its literal key string.
 
 - Accessibility: never use `<label for>` with `div[contenteditable]`; use `aria-labelledby` (or a real form control id) to avoid browser autofill/a11y warnings.
