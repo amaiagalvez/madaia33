@@ -117,6 +117,7 @@ When the user confirms execution:
 **Primary rule**: whenever possible, prioritize **Unit tests** (`tests/Unit/`) without database for pure logic:
 
 - **Amalurra priority rule (mandatory)**: when Amalurra proposes or executes testing work, it must prioritize Unit tests first and only keep or add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
+- **Amalurra i18n testing rule (mandatory)**: when translations exist for the asserted content, do not use hardcoded translated literals in tests; set the target locale and assert against translation keys/helpers (for example `__('group.key')`) so tests remain stable when copy changes.
 
 - **Pure logic** (validation rules, formatters, enums, transformers, calculations): `tests/Unit/`
 - **Integration flows** (HTTP, Livewire reactivity, database, side effects): `tests/Feature/`

@@ -37,7 +37,7 @@ test('admin can access owner sensitive inline controls from index', function () 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $owner) {
         $browser->loginAs($admin)
-            ->visit('/admin/propietarias')
+            ->visit('/admin/jabeak')
             ->waitFor('[data-owner-id="' . $owner->id . '"]', 5)
             ->assertPresent('[data-owner-id="' . $owner->id . '"]')
             ->click('[data-action="toggle-owner-inline-' . $owner->id . '"]')
@@ -78,7 +78,7 @@ test('admin sees warning when resending owner welcome without email', function (
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $owner) {
         $browser->loginAs($admin)
-            ->visit('/admin/propietarias')
+            ->visit('/admin/jabeak')
             ->waitFor('[data-section="filters"]', 10)
             ->waitFor('#owners-search', 10)
             ->type('#owners-search', '000 Owner Without Email')
@@ -145,7 +145,7 @@ test('admin owners list uses compact bidalketak-style actions with titles', func
         ]);
 
         $browser->loginAs($admin)
-            ->visit('/admin/propietarias')
+            ->visit('/admin/jabeak')
             ->waitFor('[data-owner-table]', 10)
             ->waitFor('[data-owner-id="' . $owner->id . '"]', 10)
             ->assertScript($script, true);
@@ -213,7 +213,7 @@ test('admin can access location detail sensitive view and sees editable property
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $location, $property) {
         $browser->loginAs($admin)
-            ->visit('/admin/ubicaciones/' . $location->id)
+            ->visit('/admin/finkak/' . $location->id)
             ->waitFor('[data-property-id="' . $property->id . '"]', 5)
             ->assertPresent('[data-property-id="' . $property->id . '"]')
             ->assertPresent('[data-assigned]')
@@ -228,11 +228,11 @@ test('guest cannot access sensitive owner and location admin views', function ()
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($location) {
         $browser->visit('/_dusk/logout')
-            ->visit('/admin/propietarias')
+            ->visit('/admin/jabeak')
             ->waitFor('[data-test="login-button"]', 10)
             ->assertPresent('[data-test="login-button"]')
             ->assertPathBeginsWith('/eu/pribatua')
-            ->visit('/admin/ubicaciones/' . $location->id)
+            ->visit('/admin/finkak/' . $location->id)
             ->waitFor('[data-test="login-button"]', 10)
             ->assertPresent('[data-test="login-button"]')
             ->assertPathBeginsWith('/eu/pribatua');

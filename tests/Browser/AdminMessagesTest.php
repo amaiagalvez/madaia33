@@ -27,7 +27,7 @@ test('admin can read a message and it gets marked as read', function () {
         $escapedBody = json_encode($messageBody, JSON_THROW_ON_ERROR);
 
         $browser->loginAs($admin)
-            ->visit('/admin/mensajes')
+            ->visit('/admin/mezuak')
             ->click('[data-messages-filter-btn="all"]')
             ->pause(300)
             ->assertSee('Dusk Sender')
@@ -73,7 +73,7 @@ test('admin can delete a message with confirmation', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $deleteSubject) {
         $browser->loginAs($admin)
-            ->visit('/admin/mensajes')
+            ->visit('/admin/mezuak')
             ->assertSee($deleteSubject);
 
         // Click delete button for this message (stop propagation prevents row click)

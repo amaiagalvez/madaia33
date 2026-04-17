@@ -74,7 +74,7 @@ it('builds VotingConfirmationMail with expected envelope and view', function () 
         ->and($mailable->content()->view)->toBe('mail.voting-confirmation');
 });
 
-it('localizes VotingConfirmationMail subject by active locale', function (string $locale, string $expectedSubject) {
+it('localizes VotingConfirmationMail subject by active locale', function (string $locale) {
     app()->setLocale($locale);
 
     $owner = new Owner(['coprop1_name' => 'Miren Etxeberria', 'coprop1_email' => 'miren@example.com']);
@@ -82,10 +82,10 @@ it('localizes VotingConfirmationMail subject by active locale', function (string
 
     $mailable = new VotingConfirmationMail($owner, $voting);
 
-    expect($mailable->envelope()->subject)->toBe($expectedSubject);
+    expect($mailable->envelope()->subject)->toBe(__('votings.mail.subject'));
 })->with([
-    ['es', 'Votaciones Comunidad'],
-    ['eu', 'Komunitateko bozketak'],
+    ['es'],
+    ['eu'],
 ]);
 
 it('resolves voting confirmation mail body translations by locale', function (string $locale, array $expected) {

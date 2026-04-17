@@ -35,6 +35,7 @@ test('lightbox moves focus on open, restores on close and keeps focus inside', f
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) {
         $browser->visit('/eu/argazki-bilduma')
+            ->dismissCookieConsentBanner()
             ->resize(390, 844)
             ->pause(300);
 

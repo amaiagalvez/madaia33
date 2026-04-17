@@ -91,7 +91,7 @@ return [
         'explanation_default_text' => 'Aqui puedes consultar las votaciones activas y emitir tu voto en cada una.',
     ],
     'mail' => [
-        'subject' => 'Voto recibido',
+        'subject' => 'Se ha recibido tu voto',
         'greeting' => 'Hola :name,',
         'body' => 'Hemos registrado tu voto en la votación :voting.',
         'thanks' => 'Gracias por participar.',
