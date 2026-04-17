@@ -451,11 +451,13 @@
                         </div>
                     </td>
                     <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap"
+                    <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap"
                         data-owner-terms-accepted="{{ $owner->id }}">
                         <x-admin.status-indicator :active="$owner->accepted_terms_at !== null" />
                     </td>
                     <td class="px-2 py-2 text-right text-sm font-medium whitespace-nowrap">
-                        <x-admin.table-row-actions class="gap-0" data-owner-row-actions="{{ $owner->id }}">
+                        <x-admin.table-row-actions class="gap-0"
+                            data-owner-row-actions="{{ $owner->id }}">
                             <x-admin.icon-button-edit
                                 wire:click="openEditOwnerForm({{ $owner->id }})"
                                 :title="__('admin.owners.edit_owner')" data-action="edit-owner-{{ $owner->id }}"

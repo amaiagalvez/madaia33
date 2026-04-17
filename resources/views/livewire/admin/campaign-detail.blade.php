@@ -265,7 +265,8 @@
                 </tr>
 
                 @if ($expandedRecipientId === $row['id'])
-                    <tr wire:key="campaign-detail-events-{{ $row['id'] }}" class="bg-stone-50">
+                    <tr wire:key="campaign-detail-events-{{ $row['id'] }}"
+                        class="bg-stone-50">
                         <td colspan="8" class="px-6 py-4">
                             <div class="space-y-3 rounded-lg border border-stone-200 bg-white p-4"
                                 data-campaign-event-list>
