@@ -97,6 +97,10 @@ class RecipientResolver
                 'coprop1' => $owner->coprop1_phone_invalid ? null : $owner->coprop1_telegram_id,
                 'coprop2' => $owner->coprop2_phone_invalid ? null : $owner->coprop2_telegram_id,
             ],
+            'manual' => [
+                'coprop1' => $this->manualChannelContact($owner),
+                'coprop2' => null,
+            ],
             default => [
                 'coprop1' => null,
                 'coprop2' => null,
@@ -111,5 +115,22 @@ class RecipientResolver
                 'contact' => $contact,
             ])
             ->values();
+    }
+
+    private function manualChannelContact(Owner $owner): ?string
+    {
+        if (filled($owner->coprop1_email)) {
+            return null;
+        }
+
+        if (! filled($owner->coprop1_phone)) {
+            return 'manual';
+        }
+
+        if (! $owner->coprop1_has_whatsapp) {
+            return 'manual';
+        }
+
+        return null;
     }
 }

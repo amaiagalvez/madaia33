@@ -50,7 +50,7 @@ class AdminCampaignTemplateManager extends Component
             'subjectEs' => ['nullable', 'string', 'max:255', 'required_without:subjectEu'],
             'bodyEu' => ['nullable', 'string', 'required_without:bodyEs'],
             'bodyEs' => ['nullable', 'string', 'required_without:bodyEu'],
-            'channel' => ['required', 'string', Rule::in(['email', 'sms', 'whatsapp', 'telegram'])],
+            'channel' => ['required', 'string', Rule::in(['email', 'sms', 'whatsapp', 'telegram', 'manual'])],
         ];
     }
 
@@ -143,6 +143,7 @@ class AdminCampaignTemplateManager extends Component
                 ['value' => 'email', 'label' => __('campaigns.admin.channels.email')],
                 // ['value' => 'sms', 'label' => __('campaigns.admin.channels.sms')],
                 ['value' => 'whatsapp', 'label' => __('campaigns.admin.channels.whatsapp')],
+                ['value' => 'manual', 'label' => __('campaigns.admin.channels.manual')],
                 // ['value' => 'telegram', 'label' => __('campaigns.admin.channels.telegram')],
             ],
         ]);

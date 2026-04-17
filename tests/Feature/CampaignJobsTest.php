@@ -174,6 +174,53 @@ it('dispatch campaign job reuses whatsapp recipients without enqueueing send job
     Queue::assertNotPushed(SendCampaignMessageJob::class);
 });
 
+it('dispatch campaign job creates manual recipients without enqueueing send jobs', function () {
+    Queue::fake();
+
+    $ownerWithoutPhoneAndEmail = Owner::factory()->create([
+        'coprop1_email' => 'manual-job-no-phone@example.test',
+        'coprop1_phone' => null,
+        'coprop1_has_whatsapp' => false,
+    ]);
+
+    $ownerWithPhoneWithoutWhatsappAndEmail = Owner::factory()->create([
+        'coprop1_email' => 'manual-job-no-whatsapp@example.test',
+        'coprop1_phone' => '600555666',
+        'coprop1_has_whatsapp' => false,
+    ]);
+
+    Owner::query()->whereKey($ownerWithoutPhoneAndEmail->id)->update(['coprop1_email' => '']);
+    Owner::query()->whereKey($ownerWithPhoneWithoutWhatsappAndEmail->id)->update(['coprop1_email' => '']);
+
+    $location = Location::factory()->portal()->create(['code' => 'P-22']);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerWithoutPhoneAndEmail->id,
+        'property_id' => Property::factory()->create(['location_id' => $location->id])->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerWithPhoneWithoutWhatsappAndEmail->id,
+        'property_id' => Property::factory()->create(['location_id' => $location->id])->id,
+        'end_date' => null,
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'manual',
+        'sent_at' => null,
+    ]);
+
+    (new DispatchCampaignJob($campaign->id))->handle(new RecipientResolver);
+
+    $campaign->refresh();
+
+    expect(CampaignRecipient::query()->where('campaign_id', $campaign->id)->count())->toBe(2)
+        ->and($campaign->sent_at)->not->toBeNull();
+
+    Queue::assertNotPushed(SendCampaignMessageJob::class);
+});
+
 it('uses the owner language field for localized campaign content', function () {
     $sentPayload = (object) [
         'subject' => null,

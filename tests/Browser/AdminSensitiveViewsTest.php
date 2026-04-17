@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
-use App\Models\Role;
 use Tests\DuskTestCase;
 use App\Models\Location;
 use App\Models\Property;

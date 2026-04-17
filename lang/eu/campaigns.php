@@ -16,6 +16,7 @@ return [
             'email' => 'Emaila',
             'sms' => 'SMS',
             'whatsapp' => 'WhatsApp',
+            'manual' => 'Eskuz',
             'telegram' => 'Telegram',
         ],
         'recipient_filter' => 'Hartzaile-iragazkia',
@@ -90,6 +91,7 @@ return [
             'cancel_schedule' => 'Programazioa ezeztatu',
             'mark_as_valid' => 'Baliozkotzat markatu',
             'resend_unopened' => 'Ireki ez dutenei berriz bidali',
+            'mark_manual_sent' => 'Bidalia markatu',
             'remove_attachment' => 'Dokumentua ezabatu',
             'save_template' => 'Txantiloi gisa gorde',
         ],
@@ -97,6 +99,7 @@ return [
             'resend_unopened_queued' => 'Ireki ez duten hartzaileei berriz bidaltzea kanpaina honetan programatu da.',
             'all_opened' => 'Hartzaile guztiek mezua ireki dute. Ez dago inor berriz bidaltzeko.',
             'whatsapp_marked_sent' => 'WhatsApp bidalketa eskuz markatu da.',
+            'manual_marked_sent' => 'Bidalketa eskuz markatuta egin da.',
             'whatsapp_invalid_contact' => 'Hartzailearen telefonoa ez da baliozkoa Click to Chat URL sortzeko.',
             'whatsapp_contact_blocked' => 'Telefono honek hiru errore pilatu ditu eta ez zaio WhatsApp mezurik berriro bidaliko.',
         ],
@@ -141,6 +144,9 @@ return [
             'documents_section' => 'Dokumentuak',
             'sent_badge' => 'WhatsApp bidalia',
             'blocked_badge' => 'WhatsApp blokeatua',
+        ],
+        'manual' => [
+            'sent_badge' => 'Eskuz bidalia',
         ],
         'csv' => [
             'phone' => 'Telefonoa',

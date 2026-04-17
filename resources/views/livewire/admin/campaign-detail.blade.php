@@ -238,6 +238,25 @@
                                         <span>{{ __('campaigns.admin.whatsapp.blocked_badge') }}</span>
                                     </span>
                                 @endif
+
+                                @if ($row['can_mark_manual_sent'])
+                                    <button type="button"
+                                        wire:click="markManualRecipientSent({{ $row['id'] }})"
+                                        data-campaign-manual-mark-{{ $row['id'] }}
+                                        class="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-stone-50 px-2.5 py-1 text-xs font-semibold text-stone-700 transition hover:bg-stone-100">
+                                        <flux:icon.check class="size-3.5" />
+                                        <span>{{ __('campaigns.admin.actions.mark_manual_sent') }}</span>
+                                    </button>
+                                @endif
+
+                                @if ($row['manual_sent'])
+                                    <span
+                                        class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                                        data-campaign-manual-sent-{{ $row['id'] }}>
+                                        <flux:icon.check class="size-3.5" />
+                                        <span>{{ __('campaigns.admin.manual.sent_badge') }}</span>
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </td>

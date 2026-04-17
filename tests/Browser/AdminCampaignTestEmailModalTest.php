@@ -3,8 +3,8 @@
 use App\Models\User;
 use Tests\DuskTestCase;
 use App\Models\Campaign;
-use App\Models\CampaignRecipient;
 use Laravel\Dusk\Browser;
+use App\Models\CampaignRecipient;
 
 test('campaign create form does not show test email button', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();

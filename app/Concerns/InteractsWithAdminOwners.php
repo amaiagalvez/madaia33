@@ -7,35 +7,17 @@ use App\Models\Location;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Collection;
+use App\Validations\OwnerFormValidation;
 use Illuminate\Database\Eloquent\Builder;
 
 trait InteractsWithAdminOwners
 {
     /**
-     * @return array<string, array<int, string>>
+     * @return array<string, mixed>
      */
     private function ownerCreationRules(): array
     {
-        return [
-            'ownerId' => ['nullable', 'integer', 'min:1', 'unique:owners,id'],
-            'coprop1Name' => ['required', 'string', 'max:255'],
-            'coprop1Surname' => ['nullable', 'string', 'max:255'],
-            'coprop1Dni' => ['nullable', 'string', 'max:20', 'unique:owners,coprop1_dni'],
-            'coprop1Phone' => ['nullable', 'string', 'max:20'],
-            'coprop1HasWhatsapp' => ['nullable', 'boolean'],
-            'coprop1Email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
-            'language' => ['required', 'string', 'in:eu,es'],
-            'coprop2Name' => ['nullable', 'string', 'max:255'],
-            'coprop2Surname' => ['nullable', 'string', 'max:255'],
-            'coprop2Dni' => ['nullable', 'string', 'max:20'],
-            'coprop2Phone' => ['nullable', 'string', 'max:20'],
-            'coprop2HasWhatsapp' => ['nullable', 'boolean'],
-            'coprop2Email' => ['nullable', 'email', 'max:255'],
-            'newAssignments' => ['required', 'array', 'min:1'],
-            'newAssignments.*.property_id' => ['required', 'exists:properties,id'],
-            'newAssignments.*.start_date' => ['required', 'date'],
-            'newAssignments.*.end_date' => ['nullable', 'date'],
-        ];
+        return OwnerFormValidation::createRules();
     }
 
     /**

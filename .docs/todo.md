@@ -16,22 +16,15 @@
 - [ ] probar envio whatcapp en el movil
 
 # Code
-- votaciones resultados (suma de porcentajes)
+- votaciones resultados
+para cada votación, añadir un boton para abrir una lista con los resultados
+en esa nueva vista tiene que aparecer todos los vecinos que han bo
 - spec kiro pendientes (obra)
 - [ ] repasar estatistikak home
-
-# Panela
-- [ ] 
-- Añadir otro canal para las bidalketak. "Eskuz" / "Manual". Al elegir este canal, como recipients se añadiran los coop1 que no tengan, ni telefono, ni email, o si tiene telefono que no tengan whatchapp ni email
-
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
-
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
-
-- [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak (fecha fin sin pasar o null)
-
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 
 # Copilot
@@ -60,9 +53,18 @@
 - [ ] manual de usuaria
 crar una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación añadir una ruta al menú del panel tiene que estar en dos idiomas eu y es
 añadir una regla al agente amalur para que lo mantenga actualizado
-- Cómo se envian los mensajes programados?
+- [ ] Cómo se envian los mensajes programados?
+- [ ] crear dusk-test para todas las pantallas
 
-
+6-C Julián Corcuera       629884577 osonikolas@gmail.com
 6-B Jose Meléndez         630856088 jose.melendez.amado@gmail.com
+5-C Javier                659451474 javierykarmele@gmail.com
+5-B Maitane Velasco       689115898 chaddazabaletaitor@yahoo.com
+4-B Javi Azkarate         695751202 javiazkarate@hotmail.com
 3-B Juanjo Ortega López   659054060 ortegalopez33@gmail.com 
-1-B Jon Urbizu Etxabarri  685757583 
+3-A Iñaki Beruete         626254424 iberuete60@gmail.com
+2-C Jose Antonio Fariñas  637310542 josean.fari@gmail.com
+1-B Jon Urbizu Etxabarri  685757583 jont5@hotmail.com
+1-A Amaia Galvez          672239752 info@amaia.eus
+33I Aitor                 629407916
+33  Idoia Asenjo          688894172

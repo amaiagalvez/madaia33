@@ -16,6 +16,7 @@ return [
             'email' => 'Email',
             'sms' => 'SMS',
             'whatsapp' => 'WhatsApp',
+            'manual' => 'Manual',
             'telegram' => 'Telegram',
         ],
         'recipient_filter' => 'Filtro de destinatarias',
@@ -90,6 +91,7 @@ return [
             'cancel_schedule' => 'Cancelar programación',
             'mark_as_valid' => 'Marcar como válido',
             'resend_unopened' => 'Reenviar a no abiertos',
+            'mark_manual_sent' => 'Marcar como enviado',
             'remove_attachment' => 'Eliminar documento',
             'save_template' => 'Guardar como plantilla',
         ],
@@ -97,6 +99,7 @@ return [
             'resend_unopened_queued' => 'Se ha programado el reenvío a destinatarias no abiertas en esta misma campaña.',
             'all_opened' => 'Todas las destinatarias han abierto el mensaje. No hay nadie a quien reenviar.',
             'whatsapp_marked_sent' => 'El envío por WhatsApp se ha marcado manualmente como enviado.',
+            'manual_marked_sent' => 'El envío se ha marcado manualmente como enviado.',
             'whatsapp_invalid_contact' => 'El teléfono de la destinataria no es válido para generar la URL de Click to Chat.',
             'whatsapp_contact_blocked' => 'Este teléfono ha acumulado tres errores y ya no se le volverán a enviar mensajes por WhatsApp.',
         ],
@@ -141,6 +144,9 @@ return [
             'documents_section' => 'Documentos',
             'sent_badge' => 'WhatsApp enviado',
             'blocked_badge' => 'WhatsApp bloqueado',
+        ],
+        'manual' => [
+            'sent_badge' => 'Enviado manualmente',
         ],
         'csv' => [
             'phone' => 'Teléfono',

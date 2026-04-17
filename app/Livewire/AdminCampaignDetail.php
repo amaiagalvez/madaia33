@@ -94,6 +94,25 @@ class AdminCampaignDetail extends Component
         $this->resendToUnopened();
     }
 
+    public function markManualRecipientSent(int $recipientId): void
+    {
+        $this->authorizeViewAny();
+        $this->authorize('view', $this->campaign);
+
+        abort_unless($this->campaign->channel === 'manual', 403);
+
+        $recipient = CampaignRecipient::query()
+            ->where('campaign_id', $this->campaign->id)
+            ->findOrFail($recipientId);
+
+        $recipient->status = 'sent';
+        $recipient->sent_at = now();
+        $recipient->error_message = null;
+        $recipient->save();
+
+        session()->flash('message', __('campaigns.admin.messages.manual_marked_sent'));
+    }
+
     public function resendToUnopened(): void
     {
         $this->authorizeViewAny();
@@ -103,7 +122,7 @@ class AdminCampaignDetail extends Component
 
         $unopenedRecipientIds = $this->campaign
             ->recipients
-            ->filter(fn(CampaignRecipient $recipient): bool => ! $recipient->trackingEvents->contains('event_type', 'open'))
+            ->filter(fn (CampaignRecipient $recipient): bool => ! $recipient->trackingEvents->contains('event_type', 'open'))
             ->pluck('id')
             ->values();
 
@@ -157,18 +176,18 @@ class AdminCampaignDetail extends Component
     private function refreshMetrics(): void
     {
         $recipients = $this->campaign->recipients;
-        $openedRecipients = $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'open'))->count();
+        $openedRecipients = $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'open'))->count();
 
         $sentTotal = $this->campaign->channel === 'whatsapp'
-            ? $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'))->count()
+            ? $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'))->count()
             : $recipients->count();
 
         $this->metrics = [
             'total' => $sentTotal,
             'opens' => $openedRecipients,
-            'clicks' => $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'click'))->count(),
-            'downloads' => $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'download'))->count(),
-            'failures' => $recipients->filter(fn(CampaignRecipient $recipient): bool => $recipient->status === 'failed' || $recipient->trackingEvents->contains('event_type', 'error'))->count(),
+            'clicks' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'click'))->count(),
+            'downloads' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'download'))->count(),
+            'failures' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->status === 'failed' || $recipient->trackingEvents->contains('event_type', 'error'))->count(),
         ];
 
         $this->unopenedRecipientsCount = max(0, $this->metrics['total'] - $openedRecipients);
@@ -208,6 +227,8 @@ class AdminCampaignDetail extends Component
                 'can_send_whatsapp' => $this->campaign->channel === 'whatsapp' && ! $this->isWhatsappContactBlocked($recipient),
                 'whatsapp_sent' => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'),
                 'whatsapp_blocked' => $this->campaign->channel === 'whatsapp' && $this->isWhatsappContactBlocked($recipient),
+                'can_mark_manual_sent' => $this->campaign->channel === 'manual' && $recipient->status !== 'sent',
+                'manual_sent' => $this->campaign->channel === 'manual' && $recipient->status === 'sent',
                 'status' => $recipient->status,
                 'status_label' => __('campaigns.admin.statuses.' . $recipient->status),
                 'opened' => $recipient->trackingEvents->contains('event_type', 'open'),
@@ -238,11 +259,11 @@ class AdminCampaignDetail extends Component
     private function clickBreakdown(): array
     {
         return $this->campaign->recipients
-            ->flatMap(fn(CampaignRecipient $recipient) => $recipient->trackingEvents)
+            ->flatMap(fn (CampaignRecipient $recipient) => $recipient->trackingEvents)
             ->where('event_type', 'click')
-            ->filter(fn($event): bool => filled($event->url))
-            ->groupBy(fn($event): string => (string) $event->url)
-            ->map(fn($events, string $url): array => [
+            ->filter(fn ($event): bool => filled($event->url))
+            ->groupBy(fn ($event): string => (string) $event->url)
+            ->map(fn ($events, string $url): array => [
                 'label' => $url,
                 'count' => $events->count(),
             ])
@@ -257,11 +278,11 @@ class AdminCampaignDetail extends Component
     private function downloadBreakdown(): array
     {
         return $this->campaign->recipients
-            ->flatMap(fn(CampaignRecipient $recipient) => $recipient->trackingEvents)
+            ->flatMap(fn (CampaignRecipient $recipient) => $recipient->trackingEvents)
             ->where('event_type', 'download')
-            ->filter(fn($event): bool => filled($event->document?->filename))
-            ->groupBy(fn($event): string => (string) $event->document?->filename)
-            ->map(fn($events, string $filename): array => [
+            ->filter(fn ($event): bool => filled($event->document?->filename))
+            ->groupBy(fn ($event): string => (string) $event->document?->filename)
+            ->map(fn ($events, string $filename): array => [
                 'label' => $filename,
                 'count' => $events->count(),
             ])
