@@ -111,8 +111,8 @@ return [
         'results_seo_description' => 'Bozketa honen emaitza ofizialak.',
         'results_back' => 'Bozketak',
         'results_charts_title' => 'Emaitzen grafikoak',
-        'results_ended_announcement_title' => 'Bozketak amaitu dira',
-        'results_ended_announcement_body' => 'Ondorengo bozketetan botoa ematea itxita dago. Emaitzak ikusteko, sakatu dagokion esteka.',
+        'results_ended_announcement_title' => 'Bozketen emaitzak ikusgai',
+        'results_ended_announcement_body' => 'Bozketen emaitzak ikusteko, sakatu dagokion esteka.',
         'results_view_link' => 'Emaitzak ikusi',
     ],
     'mail' => [

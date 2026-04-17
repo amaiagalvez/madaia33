@@ -8,6 +8,7 @@
 - Mirror rule: every new or updated entry in `/memories/correction-workflow.md` must also be written to `.docs/repo-corrections.md`.
 - In GitHub Actions YAML, avoid splitting background-run commands so `&` starts a new line under `run:`; use a `run: |` block with the full command in one line to prevent parser/syntax issues.
 - In CI, if you want Pint to fail the pipeline on formatting issues without using `--test`, run `vendor/bin/pint` and then `git diff --exit-code`; this converts auto-fixes into an explicit failing quality gate before tests.
+- In workflows with repeated `Setup PHP` blocks, verify each job's `coverage` setting explicitly after patching; broad replacements can enable Xdebug in the wrong job and slow CI without improving gates.
 - In CI Dusk workflows, run `php artisan serve` with the same testing DB/session env used by migrations/tests; if server and test process use different DB configs, readiness checks can loop on 500 and fail before Dusk starts.
 - In GitHub Actions with Selenium service containers, set Dusk `APP_URL` to `http://host.docker.internal:8000` (not `127.0.0.1`) and add `--add-host=host.docker.internal:host-gateway` to Selenium service options; otherwise browser sessions fail with `net::ERR_CONNECTION_REFUSED`.
 - In Feature tests for localized audit subjects, avoid hardcoding prefix expectations from unrelated translation keys; assert with the same helper used in production (for example, `ContactConfirmationSubject::forAudit(...)`) to prevent false failures when a locale key resolves to its literal key string.

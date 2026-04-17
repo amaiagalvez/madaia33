@@ -111,8 +111,8 @@ return [
         'results_seo_description' => 'Resultados oficiales de esta votación.',
         'results_back' => 'Votaciones',
         'results_charts_title' => 'Gráficos de resultados',
-        'results_ended_announcement_title' => 'Las votaciones han concluido',
-        'results_ended_announcement_body' => 'El periodo de votación ha finalizado. Puedes consultar los resultados pulsando el enlace correspondiente.',
+        'results_ended_announcement_title' => 'Resultados de las votaciones',
+        'results_ended_announcement_body' => 'Puedes consultar los resultados pulsando el enlace correspondiente.',
         'results_view_link' => 'Ver resultados',
     ],
     'mail' => [

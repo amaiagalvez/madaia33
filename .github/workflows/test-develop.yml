@@ -50,7 +50,7 @@ jobs:
         with:
           php-version: "8.4"
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -61,7 +61,7 @@ jobs:
           php artisan key:generate --no-interaction
           touch /tmp/laravel_pest.sqlite
 
-      - name: Run Pest unit and feature tests
+      - name: Run Pest unit and feature tests with coverage
         env:
           APP_ENV: testing
           DB_CONNECTION: sqlite
@@ -71,9 +71,26 @@ jobs:
           QUEUE_CONNECTION: sync
           MAIL_MAILER: array
           RECAPTCHA_SKIP: true
+          XDEBUG_MODE: coverage
         run: |
+          set -e
           php artisan migrate:fresh --seed --force
-          php artisan test --compact tests/Unit tests/Feature
+
+          php artisan test --testsuite=Unit,Feature --coverage --cache-directory=/tmp/phpunit-cache | tee /tmp/pest-coverage.out
+
+          coverage=$(grep -Eo 'Lines:\s*[0-9]+\.[0-9]+%' /tmp/pest-coverage.out | tail -n 1 | grep -Eo '[0-9]+\.[0-9]+' || true)
+
+          if [[ -z "$coverage" ]]; then
+            echo "Unable to parse coverage percentage from test output."
+            exit 1
+          fi
+
+          if ! awk "BEGIN {exit !($coverage >= 80)}"; then
+            echo "Coverage gate failed: ${coverage}% is below required 80%."
+            exit 1
+          fi
+
+          echo "Coverage gate passed: ${coverage}% >= 80%."
 
   dusk:
     runs-on: ubuntu-latest
