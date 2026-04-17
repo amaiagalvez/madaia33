@@ -60,6 +60,18 @@ test('reset password link can be requested', function () {
     Notification::assertSentTo($user, ResetPasswordNotification::class);
 });
 
+test('password reset request status is localized', function (string $locale) {
+    Notification::fake();
+
+    $user = User::factory()->create();
+
+    test()->get(route(SupportedLocales::routeName('password.request', $locale)));
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => $user->email])
+        ->assertSessionHas('status', __('passwords.sent', locale: $locale));
+})->with('supported_locales');
+
 test('reset password link can be requested with coproprietary email 1', function () {
     Notification::fake();
 

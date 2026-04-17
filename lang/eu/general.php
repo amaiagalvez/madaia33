@@ -56,7 +56,7 @@ return [
         'seo_description' => 'Komunitateko eremu pribatura sartzeko, saioa hasi eta zure kudeaketa pertsonalak kontsultatu.',
         'form_title' => 'Eremu pribatuan sartu',
         'username' => 'Erabiltzailea',
-        'username_placeholder' => 'Adibidez: bizilaguna01',
+        'username_placeholder' => '',
         'password' => 'Pasahitza',
         'change_password_option' => 'Pasahitza aldatu',
         'show_password' => 'Pasahitza erakutsi',

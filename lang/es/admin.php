@@ -29,6 +29,9 @@ return [
         'password' => 'Contraseña',
         'password_confirmation' => 'Confirmar contraseña',
         'reset_submit' => 'Restablecer contraseña',
+        'confirm_title' => 'Confirmar contraseña',
+        'confirm_description' => 'Esta es una zona segura de la aplicación. Por favor, confirma tu contraseña antes de continuar.',
+        'confirm_submit' => 'Confirmar contraseña',
     ],
     'settings_form' => [
         'admin_email' => 'Dónde recibir los mensajes',

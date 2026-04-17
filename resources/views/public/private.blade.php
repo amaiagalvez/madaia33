@@ -59,8 +59,7 @@
                             <input id="private-password" name="password"
                                 x-bind:type="showPassword ? 'text' : 'password'"
                                 autocomplete="current-password" required
-                                class="block w-full min-h-11 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-12 text-sm text-gray-900 shadow-sm transition-colors focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
-                                placeholder="••••••••" />
+                                class="block w-full min-h-11 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-12 text-sm text-gray-900 shadow-sm transition-colors focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
                             <button type="button" @click="showPassword = !showPassword"
                                 class="absolute inset-y-0 right-0 inline-flex min-h-11 items-center justify-center px-3 text-gray-500 transition-colors hover:text-[#793d3d] focus:outline-none focus:ring-2 focus:ring-brand-600/40"
                                 x-bind:aria-pressed="showPassword ? 'true' : 'false'"

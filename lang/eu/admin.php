@@ -29,6 +29,9 @@ return [
         'password' => 'Pasahitza',
         'password_confirmation' => 'Berretsi pasahitza',
         'reset_submit' => 'Berrezarri pasahitza',
+        'confirm_title' => 'Baieztatu pasahitza',
+        'confirm_description' => 'Aplikazioaren eremu seguru honetan sartu nahi duzu. Mesedez, baieztatu zure pasahitza jarraitu aurretik.',
+        'confirm_submit' => 'Baieztatu pasahitza',
     ],
     'settings_form' => [
         'admin_email' => 'Non jaso mezuak',

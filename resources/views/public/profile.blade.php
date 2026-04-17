@@ -105,7 +105,7 @@
                         </article>
                     </div>
 
-                    <a href="{{ route('security.edit') }}"
+                    <a href="{{ route(\App\SupportedLocales::routeName('password.request')) }}"
                         class="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-[#d9755b] hover:text-[#793d3d]">
                         {{ __('profile.overview.change_password') }}
                     </a>

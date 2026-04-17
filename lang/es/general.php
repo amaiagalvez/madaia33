@@ -56,7 +56,7 @@ return [
         'seo_description' => 'Accede a la zona privada de la comunidad para iniciar sesion y gestionar tu area personal.',
         'form_title' => 'Acceso a la zona privada',
         'username' => 'Usuaria/o',
-        'username_placeholder' => 'Por ejemplo: vecino01',
+        'username_placeholder' => '',
         'password' => 'Contraseña',
         'change_password_option' => 'Cambiar contraseña',
         'show_password' => 'Mostrar contraseña',

@@ -238,6 +238,29 @@
     @apply mb-0 leading-tight;
 }
 
+/* Keep auth form controls readable on password pages regardless of dark mode defaults. */
+[data-auth-shell] [data-flux-label] {
+    color: var(--color-zinc-700);
+}
+
+[data-auth-shell] [data-flux-control],
+[data-auth-shell] select[data-flux-select-native] {
+    color: var(--color-zinc-900);
+    background-color: var(--color-white);
+    border-color: var(--color-zinc-300);
+}
+
+[data-auth-shell] [data-flux-control]::placeholder {
+    color: var(--color-zinc-400);
+}
+
+[data-auth-shell] input[data-flux-control]:-webkit-autofill,
+[data-auth-shell] input[data-flux-control]:-webkit-autofill:hover,
+[data-auth-shell] input[data-flux-control]:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-zinc-900);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-white) inset;
+}
+
 /* Keep owner side-panel form controls readable regardless of inherited dark/light variables. */
 [data-section="owner-create-form"] [data-flux-label],
 [data-section="owner-edit-form"] [data-flux-label] {

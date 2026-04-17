@@ -55,7 +55,8 @@ owners => Propietarias
 - [ ] config recaptcha, analitics
 - [ ] probar envio whatcapp en el movil
 
-- [ ] En el listado de bozketak añadir un botón para Enviar un email con los pdf delegado y presencial. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa votación. Debe de abrir el formulario de la campaña creada para que pueda añadir el texto a enviar. Es decir, las locations que hay en la bozketa y las que se deben crear para la campaña deben de ser las mismas.
+- [ ] En el listado de bozketak añadir un botón para Enviar un email. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa votación. Debe de abrir el formulario de la campaña creada para que pueda añadir el texto a enviar. Es decir, las locations que hay en la bozketa y las que se deben crear para la campaña deben de ser las mismas.
+En el texto de la campaña poner un aviso "añadir orden de día y documentos para delegar el voto y votar preeenciamelte"
 
 En el listado de admin/campanas
 - al pinchar en el botón programar, modal para pedir cuando programarlo
@@ -63,11 +64,7 @@ En el listado de admin/campanas
 
 - cuando se pulsa en el botón de enviar en un envío de whatcapp, actualizar la fecha de envió de esa campaña, ahora no se actualiza
 
-- en le perfil, en el enlace "Pasahitza aldatu", la ruta tiene que ir en fución del idioma en el que se está navengando.
-
 - [ ] campaña: añadir un botón, enviar prueba (como tenenmos en el formulario de los settings email_configuration) mostrar un modal para pedir un email y enviar a dicho email una prueba de como queda la campaña. Se enviarán dos emails de prueba, uno en euskera y otro en castellano al email indicado.
-
-
 
 # Panela
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje

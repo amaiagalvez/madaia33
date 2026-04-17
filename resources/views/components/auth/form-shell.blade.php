@@ -1,6 +1,6 @@
 @props(['title', 'description' => null, 'showStatus' => true])
 
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-6" data-auth-shell>
     <x-auth.auth-header :title="$title" :description="$description" />
 
     @if ($showStatus)
