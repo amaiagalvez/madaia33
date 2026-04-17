@@ -41,12 +41,8 @@ En el listado de admin/campanas
 
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
-- [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak (aldatu dezakezu migrazioa, ez dago indarrean)
+- [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak 
   
-- [ ] Evios de mesajes. Repasa dónde se evian mensajes (a excepción de las campañas, esos ya están controlados) (formulario perfil, nuevo owner, alguno más?)
-- [ ] Crea una campaña especial con el id = 1 con el asunto "Web-etik Bidalitako Mezuak" o "Mensajes enviados desde la web" según el idioma. El seeder tiene que valer para producción.
-- [ ] Todos esos los mensajes que se envían directamente guardalos en una tabla "recipients" con el campaing_id = 1 y con el owner_id de a quien se le ha enviado, el asunto y el texto y la fecha de envío y si lo hubiere el usario que estaba logeado cuando se envio el mensaje. Marcarlo como enviado.
-- [ ] Trackea los mensajes para que se pueda saber quien lo ha habierto y quien ha pinchado en los enlaces del mensaje si los hubiera.
 
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 
