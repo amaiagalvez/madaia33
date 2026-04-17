@@ -15,12 +15,15 @@ use Illuminate\Support\Facades\Log;
 use App\Mail\VotingConfirmationMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use App\Support\ContactConfirmationSubject;
 use App\Support\VotingEligibilityService;
+use App\Support\ContactConfirmationSubject;
 use Illuminate\Validation\ValidationException;
 use App\Support\Messaging\CampaignTrackingUrlBuilder;
 use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
+/**
+ * @SuppressWarnings("PHPMD.CouplingBetweenObjects")
+ */
 class CastVotingBallotAction
 {
     public function __construct(
@@ -152,7 +155,7 @@ class CastVotingBallotAction
         $owner->loadMissing('activeAssignments.property');
 
         $ownerPct = $owner->activeAssignments
-            ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
 
         $total = VotingOptionTotal::query()
             ->where('voting_id', $voting->id)

@@ -75,6 +75,8 @@ class RecipientResolver
 
     /**
      * @return Collection<int, array{owner_id: int, slot: string, contact: string}>
+     *
+     * @SuppressWarnings("PHPMD.NPathComplexity")
      */
     private function resolveOwnerContactsForChannel(Owner $owner, string $channel): Collection
     {
@@ -83,9 +85,13 @@ class RecipientResolver
                 'coprop1' => $owner->coprop1_email_invalid ? null : $owner->coprop1_email,
                 'coprop2' => $owner->coprop2_email_invalid ? null : $owner->coprop2_email,
             ],
-            'sms', 'whatsapp' => [
+            'sms' => [
                 'coprop1' => $owner->coprop1_phone_invalid ? null : $owner->coprop1_phone,
                 'coprop2' => $owner->coprop2_phone_invalid ? null : $owner->coprop2_phone,
+            ],
+            'whatsapp' => [
+                'coprop1' => $owner->coprop1_phone_invalid || ! $owner->coprop1_has_whatsapp ? null : $owner->coprop1_phone,
+                'coprop2' => $owner->coprop2_phone_invalid || ! $owner->coprop2_has_whatsapp ? null : $owner->coprop2_phone,
             ],
             'telegram' => [
                 'coprop1' => $owner->coprop1_phone_invalid ? null : $owner->coprop1_telegram_id,

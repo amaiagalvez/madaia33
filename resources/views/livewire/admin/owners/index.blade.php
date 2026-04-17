@@ -13,9 +13,13 @@
                 <x-admin.owner-shared-fields mode="wire" coprop1-name-model="editCoprop1Name"
                     coprop1-surname-model="editCoprop1Surname" coprop1-dni-model="editCoprop1Dni"
                     coprop1-phone-model="editCoprop1Phone" coprop1-email-model="editCoprop1Email"
-                    language-model="editLanguage" coprop2-name-model="editCoprop2Name"
-                    coprop2-dni-model="editCoprop2Dni" coprop2-surname-model="editCoprop2Surname"
-                    coprop2-phone-model="editCoprop2Phone" coprop2-email-model="editCoprop2Email" />
+                    coprop1-has-whatsapp-model="editCoprop1HasWhatsapp" :coprop1-phone-invalid="$editCoprop1PhoneInvalid"
+                    :coprop1-email-invalid="$editCoprop1EmailInvalid" language-model="editLanguage"
+                    coprop2-name-model="editCoprop2Name" coprop2-dni-model="editCoprop2Dni"
+                    coprop2-surname-model="editCoprop2Surname"
+                    coprop2-phone-model="editCoprop2Phone" coprop2-email-model="editCoprop2Email"
+                    coprop2-has-whatsapp-model="editCoprop2HasWhatsapp" :coprop2-phone-invalid="$editCoprop2PhoneInvalid"
+                    :coprop2-email-invalid="$editCoprop2EmailInvalid" />
 
                 <details class="mt-6 rounded-lg border border-zinc-200 bg-gray-50"
                     data-section="owner-audit-log">
@@ -131,6 +135,11 @@
                                 <flux:input wire:model="coprop1Phone" />
                                 <flux:error name="coprop1Phone" />
                             </flux:field>
+                            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" wire:model="coprop1HasWhatsapp"
+                                    class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-600">
+                                <span>{{ __('admin.owners.form.has_whatsapp') }}</span>
+                            </label>
                             <flux:field>
                                 <flux:label>{{ __('admin.owners.form.coprop1_email') }}
                                 </flux:label>
@@ -178,6 +187,11 @@
                                 <flux:input wire:model="coprop2Phone" />
                                 <flux:error name="coprop2Phone" />
                             </flux:field>
+                            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" wire:model="coprop2HasWhatsapp"
+                                    class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-600">
+                                <span>{{ __('admin.owners.form.has_whatsapp') }}</span>
+                            </label>
                             <flux:field>
                                 <flux:label>{{ __('admin.owners.form.coprop2_email') }}
                                 </flux:label>

@@ -27,6 +27,11 @@ class DispatchCampaignJob implements ShouldQueue
         }
 
         $campaign->status = 'sending';
+
+        if ($campaign->channel === 'whatsapp' && $campaign->sent_at === null) {
+            $campaign->sent_at = now();
+        }
+
         $campaign->save();
 
         $existingRecipients = CampaignRecipient::query()

@@ -4,8 +4,10 @@ namespace App\Livewire\Concerns;
 
 use App\Models\User;
 use App\Models\Campaign;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\Messaging\DispatchCampaignJob;
+use App\Services\Messaging\RecipientResolver;
 use App\Actions\Campaigns\DuplicateCampaignAction;
 use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
 
@@ -30,7 +32,7 @@ trait HandlesCampaignManagerActions
         $this->redirectRoute('admin.campaigns', ['editCampaign' => $newCampaign->id], navigate: true);
     }
 
-    public function sendCampaign(int $id, RunQueueWorkStopWhenEmptyAction $runQueueWorkStopWhenEmptyAction): void
+    public function sendCampaign(int $id, RunQueueWorkStopWhenEmptyAction $runQueueWorkStopWhenEmptyAction, RecipientResolver $recipientResolver): void
     {
         $this->authorizeViewAny();
 
@@ -39,13 +41,19 @@ trait HandlesCampaignManagerActions
         $this->authorize('send', $campaign);
 
         abort_unless($campaign->status === 'draft', 403);
+
+        if ($recipientResolver->resolve($campaign)->isEmpty()) {
+            session()->flash('warning', __('campaigns.admin.no_recipients_warning'));
+
+            return;
+        }
 
         dispatch(new DispatchCampaignJob($campaign->id));
 
         $runQueueWorkStopWhenEmptyAction->execute();
     }
 
-    public function scheduleCampaign(int $id): void
+    public function scheduleCampaign(int $id, ?string $scheduledAt = null): void
     {
         $this->authorizeViewAny();
 
@@ -55,12 +63,66 @@ trait HandlesCampaignManagerActions
 
         abort_unless($campaign->status === 'draft', 403);
 
-        $when = now()->addMinutes(5);
+        $when = $scheduledAt === null
+            ? now()->addMinutes(5)
+            : Carbon::parse($scheduledAt);
 
         $campaign->update([
             'status' => 'scheduled',
             'scheduled_at' => $when,
         ]);
+    }
+
+    public function openScheduleModal(int $id): void
+    {
+        $this->authorizeViewAny();
+
+        $campaign = Campaign::query()->findOrFail($id);
+
+        $this->authorize('send', $campaign);
+
+        abort_unless($campaign->status === 'draft', 403);
+
+        $this->schedulingCampaignId = $campaign->id;
+        $this->scheduleAtInput = now()->addMinutes(5)->setSecond(0)->format('Y-m-d\TH:i');
+        $this->showScheduleModal = true;
+    }
+
+    public function cancelScheduleModal(): void
+    {
+        $this->schedulingCampaignId = null;
+        $this->scheduleAtInput = '';
+        $this->showScheduleModal = false;
+    }
+
+    public function saveSchedule(): void
+    {
+        $this->authorizeViewAny();
+
+        if ($this->schedulingCampaignId === null) {
+            return;
+        }
+
+        $minimumScheduleAt = now()->startOfMinute();
+
+        $validated = $this->validate(
+            [
+                'scheduleAtInput' => [
+                    'required',
+                    'date',
+                    'after_or_equal:' . $minimumScheduleAt->format('Y-m-d H:i:s'),
+                ],
+            ],
+            [
+                'scheduleAtInput.after_or_equal' => __('campaigns.admin.schedule_modal.after_or_equal'),
+            ],
+            [
+                'scheduleAtInput' => __('campaigns.admin.scheduled_at'),
+            ],
+        );
+
+        $this->scheduleCampaign($this->schedulingCampaignId, (string) $validated['scheduleAtInput']);
+        $this->cancelScheduleModal();
     }
 
     public function cancelSchedule(int $id): void
@@ -118,6 +180,12 @@ trait HandlesCampaignManagerActions
             abort_unless($campaign->status === 'scheduled', 403);
         }
 
+        if ($action === 'schedule') {
+            $this->openScheduleModal($campaign->id);
+
+            return;
+        }
+
         $this->confirmingActionId = $campaign->id;
         $this->confirmingAction = $action;
         $this->showActionModal = true;
@@ -133,6 +201,7 @@ trait HandlesCampaignManagerActions
     public function doAction(
         RunQueueWorkStopWhenEmptyAction $runQueueWorkStopWhenEmptyAction,
         DuplicateCampaignAction $duplicateCampaignAction,
+        RecipientResolver $recipientResolver,
     ): void {
         if ($this->confirmingActionId === null || $this->confirmingAction === '') {
             return;
@@ -145,7 +214,7 @@ trait HandlesCampaignManagerActions
 
         match ($action) {
             'duplicate' => $this->duplicateCampaign($campaignId, $duplicateCampaignAction),
-            'send' => $this->sendCampaign($campaignId, $runQueueWorkStopWhenEmptyAction),
+            'send' => $this->sendCampaign($campaignId, $runQueueWorkStopWhenEmptyAction, $recipientResolver),
             'schedule' => $this->scheduleCampaign($campaignId),
             'cancel_schedule' => $this->cancelSchedule($campaignId),
             default => null,

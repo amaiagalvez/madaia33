@@ -36,7 +36,7 @@ class CreateOwnerAction
     {
         $password = Str::password(16);
 
-        $result = DB::transaction(fn(): array => $this->createOwnerWithAssignments($data, $password));
+        $result = DB::transaction(fn (): array => $this->createOwnerWithAssignments($data, $password));
 
         /** @var Owner $owner */
         $owner = $result['owner'];
@@ -100,6 +100,7 @@ class CreateOwnerAction
             'coprop1_surname' => $data['coprop1_surname'] ?? null,
             'coprop1_dni' => $data['coprop1_dni'],
             'coprop1_phone' => $data['coprop1_phone'] ?? null,
+            'coprop1_has_whatsapp' => (bool) ($data['coprop1_has_whatsapp'] ?? false),
             'coprop1_email' => $data['coprop1_email'],
             'language' => $data['language'] ?? SupportedLocales::default(),
             'welcome' => false,
@@ -107,6 +108,7 @@ class CreateOwnerAction
             'coprop2_surname' => $data['coprop2_surname'] ?? null,
             'coprop2_dni' => $data['coprop2_dni'] ?? null,
             'coprop2_phone' => $data['coprop2_phone'] ?? null,
+            'coprop2_has_whatsapp' => (bool) ($data['coprop2_has_whatsapp'] ?? false),
             'coprop2_email' => $data['coprop2_email'] ?? null,
         ]);
 
@@ -280,7 +282,7 @@ class CreateOwnerAction
     {
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
@@ -292,7 +294,7 @@ class CreateOwnerAction
             ->keyBy('id');
 
         return collect($assignments)
-            ->map(fn(array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
+            ->map(fn (array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
             ->filter()
             ->values()
             ->all();
@@ -304,7 +306,7 @@ class CreateOwnerAction
     private function buildAssignmentItemsFromOwner(Owner $owner): array
     {
         return $owner->assignments
-            ->map(fn(PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
+            ->map(fn (PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
             ->filter()
             ->values()
             ->all();

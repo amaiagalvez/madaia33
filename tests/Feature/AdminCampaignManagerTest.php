@@ -7,15 +7,23 @@ use App\Models\Setting;
 use App\Models\Campaign;
 use App\Models\Location;
 use App\Mail\CampaignMail;
+use Illuminate\Support\Carbon;
+
+use function Pest\Laravel\mock;
+
 use App\Models\CampaignDocument;
 use App\Models\CampaignLocation;
 use App\Models\CampaignTemplate;
+use App\Models\CampaignRecipient;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
+use App\Models\CampaignTrackingEvent;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\Messaging\DispatchCampaignJob;
+use App\Services\Messaging\RecipientResolver;
 
 it('renders campaigns in the admin list', function () {
     $user = adminUser();
@@ -151,6 +159,11 @@ it('starts queue worker when sending a campaign from the manager', function () {
         'status' => 'draft',
         'channel' => 'email',
     ]);
+
+    mock(RecipientResolver::class)
+        ->shouldReceive('resolve')
+        ->once()
+        ->andReturn(Collection::make([['owner_id' => 1, 'slot' => 'A1', 'contact' => 'test@example.com']]));
 
     Bus::fake();
 
@@ -502,4 +515,99 @@ it('blocks campaign test emails while the edit form has unsaved changes', functi
         ->assertSet('showTestEmailModal', false);
 
     Mail::assertNothingSent();
+});
+
+it('schedules a draft campaign using the selected date and time', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+        'scheduled_at' => null,
+    ]);
+
+    $when = now()->addDay()->setSecond(0);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('openScheduleModal', $campaign->id)
+        ->assertSet('showScheduleModal', true)
+        ->set('scheduleAtInput', $when->format('Y-m-d\TH:i'))
+        ->call('saveSchedule')
+        ->assertHasNoErrors()
+        ->assertSet('showScheduleModal', false);
+
+    $campaign->refresh();
+
+    expect($campaign->status)->toBe('scheduled')
+        ->and($campaign->scheduled_at?->format('Y-m-d H:i'))->toBe(Carbon::parse($when)->format('Y-m-d H:i'));
+});
+
+it('rejects schedule dates earlier than now with translated message', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+        'scheduled_at' => null,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('openScheduleModal', $campaign->id)
+        ->set('scheduleAtInput', now()->subMinute()->format('Y-m-d\TH:i'))
+        ->call('saveSchedule')
+        ->assertHasErrors(['scheduleAtInput'])
+        ->assertSee(__('campaigns.admin.schedule_modal.after_or_equal'));
+});
+
+it('does not dispatch job and shows warning when campaign has no recipients', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create(['status' => 'draft', 'channel' => 'email']);
+
+    mock(RecipientResolver::class)
+        ->shouldReceive('resolve')
+        ->once()
+        ->andReturn(Collection::make([]));
+
+    Bus::fake();
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('sendCampaign', $campaign->id)
+        ->assertSee(__('campaigns.admin.no_recipients_warning'));
+
+    Bus::assertNotDispatched(DispatchCampaignJob::class);
+    $campaign->refresh();
+    expect($campaign->status)->toBe('draft');
+});
+
+it('shows opened recipients count in campaigns list', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'subject_eu' => 'Irekierak neurtu',
+        'status' => 'completed',
+    ]);
+
+    $openedRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'tracking_token' => 'open-token-1',
+    ]);
+
+    CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'tracking_token' => 'open-token-2',
+    ]);
+
+    CampaignTrackingEvent::factory()->create([
+        'campaign_recipient_id' => $openedRecipient->id,
+        'event_type' => 'open',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->assertSee(__('campaigns.admin.opened_messages_count'))
+        ->assertSee('1');
 });

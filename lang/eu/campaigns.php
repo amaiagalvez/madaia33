@@ -49,6 +49,7 @@ return [
         'no_recipients_warning' => 'Iragazki honek ez du une honetan hartzaile baliodunik sortzen.',
         'preview' => 'Aurrebista',
         'recipients_count' => 'Hartzaile kopurua',
+        'opened_messages_count' => 'Irekitako mezuak',
         'empty' => 'Ez dago kanpainarik oraindik.',
         'empty_recipients' => 'Ez dago kanpaina honetarako hartzailerik.',
         'empty_templates' => 'Ez dago txantiloirik oraindik.',
@@ -62,6 +63,12 @@ return [
         'confirm_schedule' => 'Ziur al zaude kanpaina hau programatu nahi duzula?',
         'confirm_cancel_schedule' => 'Ziur al zaude kanpaina honen programazioa ezeztatu nahi duzula?',
         'confirm_resend_unopened' => 'Ziur al zaude ireki ez duten hartzaileei berriz bidali nahi diezula?',
+        'schedule_modal' => [
+            'title' => 'Programatu bidalketa',
+            'description' => 'Aukeratu noiz bidali nahi duzun kanpaina hau.',
+            'save' => 'Programatu',
+            'after_or_equal' => 'Programatutako data orain edo beranduagokoa izan behar da.',
+        ],
         'test_email' => [
             'button' => 'Proba bidali',
             'title' => 'Kanpainaren proba bidali',
@@ -77,7 +84,7 @@ return [
         'actions' => [
             'duplicate' => 'Bikoiztu',
             'send' => 'Bidali orain',
-            'send_whatsapp' => 'WhatsApp bidez bidali',
+            'send_whatsapp' => 'Bidali',
             'download_whatsapp_csv' => 'WhatsApp CSV deskargatu',
             'schedule' => 'Programatu',
             'cancel_schedule' => 'Programazioa ezeztatu',

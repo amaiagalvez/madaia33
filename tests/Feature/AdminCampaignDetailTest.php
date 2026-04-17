@@ -355,6 +355,7 @@ it('shows whatsapp click-to-chat with tracked links and marks recipient as sent'
 
     $recipient->refresh();
     $owner->refresh();
+    $campaign->refresh();
 
     $trackingEvent = CampaignTrackingEvent::query()
         ->where('campaign_recipient_id', $recipient->id)
@@ -367,6 +368,7 @@ it('shows whatsapp click-to-chat with tracked links and marks recipient as sent'
         ->and($trackingEvent?->url)->toStartWith('https://wa.me/34600112233?text=')
         ->and($trackingEvent?->url)->toContain(rawurlencode($trackedClickUrl))
         ->and($trackingEvent?->url)->toContain(rawurlencode($trackedDocumentUrl))
+        ->and($campaign->sent_at)->not->toBeNull()
         ->and($owner->coprop1_phone_error_count)->toBe(0)
         ->and($owner->coprop1_phone_invalid)->toBeFalse();
 });

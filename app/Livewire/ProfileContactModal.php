@@ -10,12 +10,12 @@ use App\Models\ContactMessage;
 use App\Support\ContactMailData;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
-use App\Support\ContactConfirmationSubject;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
+use App\Support\ContactConfirmationSubject;
 use App\Support\Messaging\CampaignTrackingUrlBuilder;
 use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 

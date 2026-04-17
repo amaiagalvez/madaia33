@@ -346,11 +346,13 @@ it('allows logged owner to update own owner profile data', function () {
         'coprop1_dni' => '00000000A',
         'coprop1_email' => 'leire.zaharra@example.com',
         'coprop1_phone' => '600000000',
+        'coprop1_has_whatsapp' => false,
         'language' => 'eu',
         'coprop2_name' => 'Bigarren Zaharra',
         'coprop2_surname' => 'Bigarren Abizena Zaharra',
         'coprop2_dni' => '11111111B',
         'coprop2_phone' => '611111111',
+        'coprop2_has_whatsapp' => false,
         'coprop2_email' => 'bigarren.zaharra@example.com',
     ]);
 
@@ -362,11 +364,13 @@ it('allows logged owner to update own owner profile data', function () {
             'coprop1_dni' => '12345678A',
             'coprop1_email' => 'leire.berria@example.com',
             'coprop1_phone' => '600111222',
+            'coprop1_has_whatsapp' => '1',
             'language' => 'es',
             'coprop2_name' => 'Bigarren Izena',
             'coprop2_surname' => 'Bigarren Abizena',
             'coprop2_dni' => '12345678Z',
             'coprop2_phone' => '600222333',
+            'coprop2_has_whatsapp' => '1',
             'coprop2_email' => 'bigarrena@example.com',
         ])
         ->assertRedirect(route('profile.eu', ['tab' => 'owner'], false));
@@ -378,11 +382,13 @@ it('allows logged owner to update own owner profile data', function () {
         ->and($owner->coprop1_dni)->toBe('12345678A')
         ->and($owner->coprop1_email)->toBe('leire.berria@example.com')
         ->and($owner->coprop1_phone)->toBe('600111222')
+        ->and($owner->coprop1_has_whatsapp)->toBeTrue()
         ->and($owner->language)->toBe('es')
         ->and($owner->coprop2_name)->toBe('Bigarren Izena')
         ->and($owner->coprop2_surname)->toBe('Bigarren Abizena')
         ->and($owner->coprop2_dni)->toBe('12345678Z')
         ->and($owner->coprop2_phone)->toBe('600222333')
+        ->and($owner->coprop2_has_whatsapp)->toBeTrue()
         ->and($owner->coprop2_email)->toBe('bigarrena@example.com')
         ->and($user->fresh()->name)->toBe('Leire Berria')
         ->and($user->fresh()->email)->toBe('leire.berria@example.com')

@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('owners', function (Blueprint $table): void {
-            $table->boolean('welcome')->default(false);
+            $table->boolean('welcome')->default(false)->after('user_id');
         });
     }
 

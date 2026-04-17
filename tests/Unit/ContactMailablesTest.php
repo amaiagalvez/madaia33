@@ -2,8 +2,8 @@
 
 use App\Models\Owner;
 use App\Models\Voting;
-use App\Models\ContactMessage;
 use App\Mail\OwnerWelcomeMail;
+use App\Models\ContactMessage;
 use App\Support\ContactMailData;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;

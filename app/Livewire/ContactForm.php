@@ -9,7 +9,6 @@ use Livewire\Component;
 use App\SupportedLocales;
 use App\Models\ContactMessage;
 use App\Support\ContactMailData;
-use App\Support\ContactConfirmationSubject;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
 use Illuminate\Contracts\View\View;
@@ -18,6 +17,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 use App\Validations\ContactFormValidation;
+use App\Support\ContactConfirmationSubject;
 use App\Support\Messaging\CampaignTrackingUrlBuilder;
 use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
@@ -227,10 +227,10 @@ class ContactForm extends Component
         }
 
         return collect($storedSubmissions)
-            ->filter(fn(mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
+            ->filter(fn (mixed $timestamp, mixed $fingerprint): bool => is_string($fingerprint)
                 && is_numeric($timestamp)
                 && (int) $timestamp >= $threshold)
-            ->map(fn(mixed $timestamp): int => (int) $timestamp)
+            ->map(fn (mixed $timestamp): int => (int) $timestamp)
             ->all();
     }
 

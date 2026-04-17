@@ -112,6 +112,8 @@ it('dispatch campaign job creates whatsapp recipients without enqueueing send jo
         'coprop2_phone' => '600333444',
         'coprop1_phone_invalid' => false,
         'coprop2_phone_invalid' => false,
+        'coprop1_has_whatsapp' => true,
+        'coprop2_has_whatsapp' => true,
     ]);
 
     $location = Location::factory()->portal()->create(['code' => 'P-21']);
@@ -125,11 +127,15 @@ it('dispatch campaign job creates whatsapp recipients without enqueueing send jo
 
     $campaign = Campaign::factory()->create([
         'channel' => 'whatsapp',
+        'sent_at' => null,
     ]);
 
     (new DispatchCampaignJob($campaign->id))->handle(new RecipientResolver);
 
-    expect(CampaignRecipient::query()->where('campaign_id', $campaign->id)->count())->toBe(2);
+    $campaign->refresh();
+
+    expect(CampaignRecipient::query()->where('campaign_id', $campaign->id)->count())->toBe(2)
+        ->and($campaign->sent_at)->not->toBeNull();
 
     Queue::assertNotPushed(SendCampaignMessageJob::class);
 });

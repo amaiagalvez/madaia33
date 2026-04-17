@@ -49,6 +49,7 @@ return [
         'no_recipients_warning' => 'Este filtro no genera destinatarias válidas en este momento.',
         'preview' => 'Vista previa',
         'recipients_count' => 'Nº destinatarias',
+        'opened_messages_count' => 'Mensajes abiertos',
         'empty' => 'Todavía no hay campañas.',
         'empty_recipients' => 'No hay destinatarias para esta campaña.',
         'empty_templates' => 'Todavía no hay plantillas.',
@@ -62,6 +63,12 @@ return [
         'confirm_schedule' => '¿Seguro que quieres programar esta campaña?',
         'confirm_cancel_schedule' => '¿Seguro que quieres cancelar la programación de esta campaña?',
         'confirm_resend_unopened' => '¿Seguro que quieres reenviar a quienes no han abierto esta campaña?',
+        'schedule_modal' => [
+            'title' => 'Programar envío',
+            'description' => 'Selecciona cuándo quieres enviar esta campaña.',
+            'save' => 'Programar',
+            'after_or_equal' => 'La fecha programada debe ser de ahora en adelante.',
+        ],
         'test_email' => [
             'button' => 'Enviar prueba',
             'title' => 'Enviar prueba de campaña',
@@ -77,7 +84,7 @@ return [
         'actions' => [
             'duplicate' => 'Duplicar',
             'send' => 'Enviar ahora',
-            'send_whatsapp' => 'Enviar por WhatsApp',
+            'send_whatsapp' => 'Enviar',
             'download_whatsapp_csv' => 'Descargar CSV WhatsApp',
             'schedule' => 'Programar',
             'cancel_schedule' => 'Cancelar programación',

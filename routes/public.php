@@ -33,7 +33,7 @@ Route::prefix('eu')->group(function () use ($privatePageHandler) {
             'email' => (string) $request->query('email', ''),
         ]);
     })->name('password.reset.eu');
-    
+
     Route::get('/pribatutasun-politika', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy.eu');
     Route::get('/ohar-legala', [LegalPageController::class, 'legalNotice'])->name('legal-notice.eu');
     Route::get('/cookie-politika', [LegalPageController::class, 'cookiePolicy'])->name('cookie-policy.eu');

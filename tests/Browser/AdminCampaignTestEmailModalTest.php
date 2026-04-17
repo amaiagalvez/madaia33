@@ -87,3 +87,24 @@ test('campaign edit form disables test email button while there are unsaved chan
             ->assertPresent('[data-campaign-test-email-help]');
     });
 });
+
+test('campaign list opens schedule modal from clock action', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $campaign) {
+        $browser->loginAs($admin)
+            ->visit(route('admin.campaigns'))
+            ->waitFor('[data-campaign-schedule-action="' . $campaign->id . '"]', 10)
+            ->click('[data-campaign-schedule-action="' . $campaign->id . '"]')
+            ->waitFor('[data-campaign-schedule-modal]', 10)
+            ->assertPresent('[data-campaign-schedule-input]')
+            ->click('[data-campaign-schedule-cancel]')
+            ->waitUntilMissing('[data-campaign-schedule-modal]', 10);
+    });
+});

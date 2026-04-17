@@ -74,7 +74,7 @@ it('sends ContactConfirmation to the logged-in user', function () {
         ->set('message', 'Proba mezua.')
         ->call('submit');
 
-    Mail::assertSent(ContactConfirmation::class, fn($mail) => $mail->hasTo('ane@test.com'));
+    Mail::assertSent(ContactConfirmation::class, fn ($mail) => $mail->hasTo('ane@test.com'));
 
     $message = ContactMessage::query()->firstOrFail();
     $recipient = CampaignRecipient::query()
@@ -117,7 +117,7 @@ it('sends ContactNotification to admin email from settings', function () {
         ->set('message', 'Proba mezua.')
         ->call('submit');
 
-    Mail::assertSent(ContactNotification::class, fn($mail) => $mail->hasTo('admin@example.com'));
+    Mail::assertSent(ContactNotification::class, fn ($mail) => $mail->hasTo('admin@example.com'));
 });
 
 it('prepends PERFIL prefix only in admin notification subject', function () {
@@ -128,8 +128,8 @@ it('prepends PERFIL prefix only in admin notification subject', function () {
         ->set('message', 'Proba mezua.')
         ->call('submit');
 
-    Mail::assertSent(ContactNotification::class, fn($mail) => str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
-    Mail::assertSent(ContactConfirmation::class, fn($mail) => ! str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
+    Mail::assertSent(ContactNotification::class, fn ($mail) => str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
+    Mail::assertSent(ContactConfirmation::class, fn ($mail) => ! str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
 });
 
 it('resets fields and closes modal after successful submission', function () {

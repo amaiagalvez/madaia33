@@ -257,3 +257,43 @@ it('generates zero one or two recipients depending on available contacts', funct
         ->and($recipients->where('owner_id', $ownerOne->id))->toHaveCount(1)
         ->and($recipients->where('owner_id', $ownerTwo->id))->toHaveCount(2);
 });
+
+it('only resolves whatsapp recipients for owners with whatsapp enabled', function () {
+    $location = Location::factory()->portal()->create(['code' => 'P-09']);
+
+    $ownerWithWhatsapp = Owner::factory()->create([
+        'coprop1_phone' => '600100100',
+        'coprop1_phone_invalid' => false,
+        'coprop1_has_whatsapp' => true,
+    ]);
+
+    $ownerWithoutWhatsapp = Owner::factory()->create([
+        'coprop1_phone' => '600200200',
+        'coprop1_phone_invalid' => false,
+        'coprop1_has_whatsapp' => false,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerWithWhatsapp->id,
+        'property_id' => Property::factory()->create(['location_id' => $location->id])->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerWithoutWhatsapp->id,
+        'property_id' => Property::factory()->create(['location_id' => $location->id])->id,
+        'end_date' => null,
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'whatsapp',
+    ]);
+
+    $resolver = new RecipientResolver;
+
+    $recipients = $resolver->resolve($campaign);
+
+    expect($recipients)->toHaveCount(1)
+        ->and($recipients->first()['owner_id'])->toBe($ownerWithWhatsapp->id)
+        ->and($recipients->first()['contact'])->toBe('600100100');
+});

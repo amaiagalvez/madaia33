@@ -3,12 +3,12 @@
 use App\Models\Owner;
 use App\Models\Voting;
 use Tests\DuskTestCase;
-use App\Models\Property;
 use App\Models\Campaign;
-use App\Models\ContactMessage;
+use App\Models\Property;
 use Laravel\Dusk\Browser;
 use App\Models\VotingBallot;
 use App\Models\OwnerAuditLog;
+use App\Models\ContactMessage;
 use App\Models\CampaignRecipient;
 use App\Models\PropertyAssignment;
 

@@ -68,6 +68,11 @@ trait HandlesCampaignDetailWhatsapp
         $recipient->error_message = null;
         $recipient->save();
 
+        if ($this->campaign->sent_at === null) {
+            $this->campaign->sent_at = now();
+            $this->campaign->save();
+        }
+
         $contactHealthManager->markSuccess($recipient);
 
         return [

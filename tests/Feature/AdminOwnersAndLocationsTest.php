@@ -788,6 +788,32 @@ it('stores primary dni as null when admin owner edit sends empty dni', function 
     expect($owner->fresh()->coprop1_dni)->toBeNull();
 });
 
+it('updates has_whatsapp fields and shows invalid-contact warnings in admin owner edit', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_phone_invalid' => true,
+        'coprop1_email_invalid' => true,
+        'coprop2_phone_invalid' => true,
+        'coprop2_email_invalid' => true,
+        'coprop1_has_whatsapp' => false,
+        'coprop2_has_whatsapp' => false,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('openEditOwnerForm', $owner->id)
+        ->assertSee(__('admin.owners.form.phone_invalid_warning'))
+        ->assertSee(__('admin.owners.form.email_invalid_warning'))
+        ->set('editCoprop1HasWhatsapp', true)
+        ->set('editCoprop2HasWhatsapp', true)
+        ->call('saveEditOwner')
+        ->assertHasNoErrors();
+
+    expect($owner->fresh()->coprop1_has_whatsapp)->toBeTrue()
+        ->and($owner->fresh()->coprop2_has_whatsapp)->toBeTrue();
+});
+
 it('renders owners list with inline expansion action instead of detail bars link', function () {
     $user = adminUser();
     $owner = Owner::factory()->create(['coprop1_name' => 'Inline Jabea']);
