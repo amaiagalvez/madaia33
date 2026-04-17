@@ -2,9 +2,9 @@
 
 namespace Tests;
 
+use Laravel\Dusk\Browser;
 use Illuminate\Support\Collection;
 use Laravel\Dusk\TestCase as BaseTestCase;
-use Laravel\Dusk\Browser;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
