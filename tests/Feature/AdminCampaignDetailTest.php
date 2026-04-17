@@ -140,6 +140,52 @@ it('shows unique campaign metrics and recipient detail rows', function () {
         ->assertSee('acta-marzo.pdf');
 });
 
+it('shows recipient message subject in contact column only for campaign id 1', function () {
+    $user = adminUser();
+
+    $campaignOne = Campaign::query()->find(1);
+
+    if ($campaignOne === null) {
+        $campaignOne = Campaign::factory()->create([
+            'id' => 1,
+            'channel' => 'email',
+            'status' => 'completed',
+        ]);
+    } else {
+        $campaignOne->forceFill([
+            'channel' => 'email',
+            'status' => 'completed',
+        ])->save();
+    }
+
+    $campaignOneRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaignOne->id,
+        'contact' => 'subject-one@example.com',
+        'message_subject' => 'Asunto visible en campaña 1',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $campaignOne])
+        ->assertSee('Asunto visible en campaña 1')
+        ->assertSeeHtml('data-campaign-contact-subject-' . $campaignOneRecipient->id);
+
+    $otherCampaign = Campaign::factory()->create([
+        'channel' => 'email',
+        'status' => 'completed',
+    ]);
+
+    $otherCampaignRecipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $otherCampaign->id,
+        'contact' => 'subject-other@example.com',
+        'message_subject' => 'Asunto no visible fuera de campaña 1',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-detail', ['campaign' => $otherCampaign])
+        ->assertDontSee('Asunto no visible fuera de campaña 1')
+        ->assertDontSeeHtml('data-campaign-contact-subject-' . $otherCampaignRecipient->id);
+});
+
 it('renders the admin detail page with breadcrumb context for a campaign', function () {
     $user = adminUser();
     $campaign = Campaign::factory()->create([

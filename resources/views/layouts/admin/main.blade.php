@@ -54,7 +54,8 @@
                     {{ __('admin.sidebar.public_site') }}
                 </a>
 
-                <p class="px-3 pt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                <p class="px-3 pt-4 text-xs font-semibold uppercase tracking-wide text-stone-400"
+                    data-sidebar-group-web>
                     {{ __('admin.sidebar.web') }}
                 </p>
 
@@ -80,8 +81,15 @@
                         </svg>
                         {{ __('admin.gallery') }}
                     </a>
+                @endif
 
-                    <a href="{{ route('admin.messages') }}"
+                <p class="px-3 pt-4 text-xs font-semibold uppercase tracking-wide text-stone-400"
+                    data-sidebar-group-communications>
+                    {{ __('admin.sidebar.communications') }}
+                </p>
+
+                @if (auth()->user()?->isSuperadmin())
+                    <a href="{{ route('admin.messages') }}" data-sidebar-link-messages
                         class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.messages') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                         <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -93,7 +101,7 @@
                 @endif
 
                 @if (auth()->user()?->canManageNotices())
-                    <a href="{{ route('admin.campaigns') }}"
+                    <a href="{{ route('admin.campaigns') }}" data-sidebar-link-campaigns
                         class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.campaigns*') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
                         <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -101,6 +109,19 @@
                                 d="M3 8.25h18M3 12h18m-9 3.75h9M5.25 6h13.5A2.25 2.25 0 0 1 21 8.25v7.5A2.25 2.25 0 0 1 18.75 18H5.25A2.25 2.25 0 0 1 3 15.75v-7.5A2.25 2.25 0 0 1 5.25 6Z" />
                         </svg>
                         {{ __('admin.campaigns') }}
+                    </a>
+                @endif
+
+                @if (auth()->user()?->canManageAdminVotings())
+                    <a href="{{ route('admin.votings') }}" data-sidebar-link-votings
+                        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.votings') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0 1 20.25 6v12A2.25 2.25 0 0 1 18 20.25H6A2.25 2.25 0 0 1 3.75 18V6A2.25 2.25 0 0 1 6 3.75h1.5m9 0h-9" />
+                        </svg>
+
+                        {{ __('admin.votings.menu') }}
                     </a>
                 @endif
 
@@ -130,19 +151,6 @@
                                 d="M18 18.72a8.964 8.964 0 0 0 3-6.72A9 9 0 1 0 3 12a8.964 8.964 0 0 0 3 6.72m12 0a8.966 8.966 0 0 1-12 0m12 0A10.953 10.953 0 0 1 12 21c-2.331 0-4.496-.727-6-1.968m12 0a5.95 5.95 0 0 0-12 0m12 0a5.952 5.952 0 0 1-12 0m6-10.5a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                         </svg>
                         {{ __('admin.owners.menu') }}
-                    </a>
-                @endif
-
-                @if (auth()->user()?->canManageAdminVotings())
-                    <a href="{{ route('admin.votings') }}"
-                        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.votings') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
-                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
-                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0 1 20.25 6v12A2.25 2.25 0 0 1 18 20.25H6A2.25 2.25 0 0 1 3.75 18V6A2.25 2.25 0 0 1 6 3.75h1.5m9 0h-9" />
-                        </svg>
-
-                        {{ __('admin.votings.menu') }}
                     </a>
                 @endif
 
@@ -230,15 +238,25 @@
                             <a href="{{ route('admin.notices') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.notices') }}</a>
                         @endif
+                        @if (auth()->user()?->isSuperadmin())
+                            <a href="{{ route('admin.images') }}"
+                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.gallery') }}</a>
+                        @endif
+                        <p
+                            class="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                            {{ __('admin.sidebar.communications') }}
+                        </p>
+                        @if (auth()->user()?->isSuperadmin())
+                            <a href="{{ route('admin.messages') }}"
+                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.messages') }}</a>
+                        @endif
                         @if (auth()->user()?->canManageNotices())
                             <a href="{{ route('admin.campaigns') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.campaigns') }}</a>
                         @endif
-                        @if (auth()->user()?->isSuperadmin())
-                            <a href="{{ route('admin.images') }}"
-                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.gallery') }}</a>
-                            <a href="{{ route('admin.messages') }}"
-                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.messages') }}</a>
+                        @if (auth()->user()?->canManageAdminVotings())
+                            <a href="{{ route('admin.votings') }}"
+                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.votings.menu') }}</a>
                         @endif
                         <p
                             class="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-stone-400">
@@ -252,10 +270,6 @@
                         @if (auth()->user()?->isSuperadmin())
                             <a href="{{ route('admin.owners.index') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.owners.menu') }}</a>
-                        @endif
-                        @if (auth()->user()?->canManageAdminVotings())
-                            <a href="{{ route('admin.votings') }}"
-                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.votings.menu') }}</a>
                         @endif
                         <p
                             class="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-stone-400">

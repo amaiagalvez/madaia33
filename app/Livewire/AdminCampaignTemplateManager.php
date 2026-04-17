@@ -141,9 +141,9 @@ class AdminCampaignTemplateManager extends Component
             'templates' => CampaignTemplate::query()->latest()->paginate(12),
             'channelOptions' => [
                 ['value' => 'email', 'label' => __('campaigns.admin.channels.email')],
-                ['value' => 'sms', 'label' => __('campaigns.admin.channels.sms')],
+                // ['value' => 'sms', 'label' => __('campaigns.admin.channels.sms')],
                 ['value' => 'whatsapp', 'label' => __('campaigns.admin.channels.whatsapp')],
-                ['value' => 'telegram', 'label' => __('campaigns.admin.channels.telegram')],
+                // ['value' => 'telegram', 'label' => __('campaigns.admin.channels.telegram')],
             ],
         ]);
     }

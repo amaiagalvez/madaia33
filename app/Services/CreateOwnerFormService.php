@@ -46,7 +46,7 @@ class CreateOwnerFormService
             'coprop1_dni' => $this->nullableString($validated['coprop1Dni'] ?? null),
             'coprop1_phone' => $this->nullableString($validated['coprop1Phone'] ?? null),
             'coprop1_has_whatsapp' => (bool) ($validated['coprop1HasWhatsapp'] ?? false),
-            'coprop1_email' => $validated['coprop1Email'],
+            'coprop1_email' => $this->nullablePrimaryEmail($validated['coprop1Email'] ?? null),
             'language' => $validated['language'],
             'coprop2_name' => $this->nullableString($validated['coprop2Name'] ?? null),
             'coprop2_surname' => $this->nullableString($validated['coprop2Surname'] ?? null),
@@ -74,6 +74,15 @@ class CreateOwnerFormService
         }
 
         return (int) $value;
+    }
+
+    private function nullablePrimaryEmail(mixed $value): string
+    {
+        if ($value === null || trim((string) $value) === '') {
+            return '';
+        }
+
+        return (string) $value;
     }
 
     /**

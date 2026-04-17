@@ -203,6 +203,7 @@ class AdminCampaignDetail extends Component
                 'owner_id' => $recipient->owner?->id,
                 'owner_edit_url' => $this->ownerEditUrl($recipient),
                 'name' => $this->recipientName($recipient),
+                'message_subject' => $recipient->message_subject,
                 'contact' => $recipient->contact,
                 'can_send_whatsapp' => $this->campaign->channel === 'whatsapp' && ! $this->isWhatsappContactBlocked($recipient),
                 'whatsapp_sent' => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'),

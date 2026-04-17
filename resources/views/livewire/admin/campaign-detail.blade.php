@@ -204,34 +204,41 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span>{{ $row['contact'] }}</span>
+                        <div class="flex flex-col items-start gap-1.5">
+                            @if ($campaign->id === 1 && filled($row['message_subject']))
+                                <span class="text-xs font-semibold text-gray-900"
+                                    data-campaign-contact-subject-{{ $row['id'] }}>{{ $row['message_subject'] }}</span>
+                            @endif
 
-                            @if ($row['can_send_whatsapp'])
-                                <button type="button"
-                                    wire:click="sendWhatsappMessage({{ $row['id'] }})"
-                                    data-campaign-whatsapp-send-{{ $row['id'] }}
-                                    class="inline-flex items-center gap-1 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-2.5 py-1 text-xs font-semibold text-[#0f5132] transition hover:bg-[#25D366]/20">
-                                    <flux:icon.chat-bubble-left-right class="size-3.5" />
-                                    <span>{{ __('campaigns.admin.actions.send_whatsapp') }}</span>
-                                </button>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span>{{ $row['contact'] }}</span>
 
-                                @if ($row['whatsapp_sent'])
+                                @if ($row['can_send_whatsapp'])
+                                    <button type="button"
+                                        wire:click="sendWhatsappMessage({{ $row['id'] }})"
+                                        data-campaign-whatsapp-send-{{ $row['id'] }}
+                                        class="inline-flex items-center gap-1 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-2.5 py-1 text-xs font-semibold text-[#0f5132] transition hover:bg-[#25D366]/20">
+                                        <flux:icon.chat-bubble-left-right class="size-3.5" />
+                                        <span>{{ __('campaigns.admin.actions.send_whatsapp') }}</span>
+                                    </button>
+
+                                    @if ($row['whatsapp_sent'])
+                                        <span
+                                            class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                                            data-campaign-whatsapp-sent-{{ $row['id'] }}>
+                                            <flux:icon.check class="size-3.5" />
+                                            <span>{{ __('campaigns.admin.whatsapp.sent_badge') }}</span>
+                                        </span>
+                                    @endif
+                                @elseif ($row['whatsapp_blocked'])
                                     <span
-                                        class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
-                                        data-campaign-whatsapp-sent-{{ $row['id'] }}>
-                                        <flux:icon.check class="size-3.5" />
-                                        <span>{{ __('campaigns.admin.whatsapp.sent_badge') }}</span>
+                                        class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
+                                        data-campaign-whatsapp-blocked-{{ $row['id'] }}>
+                                        <flux:icon.exclamation-triangle class="size-3.5" />
+                                        <span>{{ __('campaigns.admin.whatsapp.blocked_badge') }}</span>
                                     </span>
                                 @endif
-                            @elseif ($row['whatsapp_blocked'])
-                                <span
-                                    class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
-                                    data-campaign-whatsapp-blocked-{{ $row['id'] }}>
-                                    <flux:icon.exclamation-triangle class="size-3.5" />
-                                    <span>{{ __('campaigns.admin.whatsapp.blocked_badge') }}</span>
-                                </span>
-                            @endif
+                            </div>
                         </div>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600">

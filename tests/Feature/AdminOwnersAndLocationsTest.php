@@ -615,6 +615,33 @@ it('creates a new owner from the admin owners list', function () {
         ->and($owner->assignments()->count())->toBe(1);
 });
 
+it('creates a new owner without email and does not send welcome email', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $portal = Location::factory()->portal()->create(['code' => '33-B', 'name' => 'Portal 33-B']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1B']);
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->set('coprop1Name', 'Owner Sin Email')
+        ->set('coprop1Dni', '11223344Z')
+        ->set('coprop1Email', '')
+        ->set('coprop1Phone', '600123999')
+        ->set('newAssignments.0.property_id', (string) $property->id)
+        ->set('newAssignments.0.start_date', '2026-01-01')
+        ->call('createOwner')
+        ->assertSet('warningMessage', __('admin.owners.welcome_not_sent_missing_email'));
+
+    $owner = Owner::query()->where('coprop1_dni', '11223344Z')->first();
+
+    expect($owner)->not->toBeNull();
+    expect($owner?->welcome)->toBeFalse();
+
+    Mail::assertNothingSent();
+});
+
 it('resends the owner welcome email from the owners list', function () {
     Mail::fake();
 
@@ -649,6 +676,33 @@ it('resends the owner welcome email from the owners list', function () {
     Mail::assertSentCount(2);
 
     expect($owner->fresh()->welcome)->toBeTrue();
+});
+
+it('does not resend owner welcome email when owner has no email', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $portal = Location::factory()->portal()->create(['code' => '77-X', 'name' => 'Portal 77-X']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '2C']);
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Owner No Mail',
+        'coprop1_email' => '',
+        'welcome' => false,
+    ]);
+
+    $owner->user?->forceFill(['email' => ''])->save();
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->call('confirmResendWelcomeMail', $owner->id)
+        ->assertSet('showWelcomeModal', true)
+        ->call('doResendWelcomeMail')
+        ->assertSet('showWelcomeModal', false)
+        ->assertSet('warningMessage', __('admin.owners.welcome_not_sent_missing_email'));
+
+    expect($owner->fresh()->welcome)->toBeFalse();
+    Mail::assertNothingSent();
 });
 
 it('creates a new owner with a manual id from the admin owners list', function () {

@@ -161,6 +161,7 @@ return [
     ],
     'sidebar' => [
         'web' => 'Web',
+        'communications' => 'Komunikazioak',
         'public_site' => 'Web publikora joan',
         'community' => 'Komunitatea',
         'configuration' => 'Konfigurazioa',
@@ -264,12 +265,13 @@ return [
             'locals' => 'Lokalak',
             'garages' => 'Garajeak',
             'storages' => 'Trastelekuak',
-            'welcome' => 'Ongi etorria',
-            'terms_accepted' => 'Baldintzak onartu ditu',
+            'welcome' => 'Ongi etorri Mezua',
+            'terms_accepted' => 'Baldintzak onartuta',
         ],
         'view_properties' => 'Ikusi propietateak',
         'resend_welcome_email' => 'Berriro bidali ongi etorriko mezua',
         'confirm_resend_welcome' => 'Ziur zaude ongi etorriko mezua berriro bidali nahi duzula?',
+        'welcome_not_sent_missing_email' => 'Ongi etorriko mezua ez da bidali, jabeak ez duelako emailik.',
         'edit_owner' => 'Editatu jabea',
         'edit_submit' => 'Gorde aldaketak',
         'audit' => [

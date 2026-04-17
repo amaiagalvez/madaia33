@@ -3,6 +3,7 @@
 use App\Models\User;
 use Tests\DuskTestCase;
 use App\Models\Campaign;
+use App\Models\CampaignRecipient;
 use Laravel\Dusk\Browser;
 
 test('campaign create form does not show test email button', function () {
@@ -106,5 +107,40 @@ test('campaign list opens schedule modal from clock action', function () {
             ->assertPresent('[data-campaign-schedule-input]')
             ->click('[data-campaign-schedule-cancel]')
             ->waitUntilMissing('[data-campaign-schedule-modal]', 10);
+    });
+});
+
+test('campaign detail shows message subject above contact for campaign id 1', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    $campaign = Campaign::query()->find(1);
+
+    if ($campaign === null) {
+        $campaign = Campaign::factory()->create([
+            'id' => 1,
+            'channel' => 'email',
+            'status' => 'completed',
+        ]);
+    } else {
+        $campaign->forceFill([
+            'channel' => 'email',
+            'status' => 'completed',
+        ])->save();
+    }
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'contact' => 'subject-dusk@example.com',
+        'message_subject' => 'Asunto visible Dusk campaña 1',
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $campaign, $recipient) {
+        $browser->loginAs($admin)
+            ->visit(route('admin.campaigns.show', $campaign))
+            ->waitFor('[data-campaign-recipient-detail-table]', 10)
+            ->waitFor('[data-campaign-contact-subject-' . $recipient->id . ']', 10)
+            ->assertSeeIn('[data-campaign-contact-subject-' . $recipient->id . ']', 'Asunto visible Dusk campaña 1')
+            ->assertSee('subject-dusk@example.com');
     });
 });

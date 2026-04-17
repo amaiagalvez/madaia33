@@ -161,6 +161,7 @@ return [
     ],
     'sidebar' => [
         'web' => 'Web',
+        'communications' => 'Comunicaciones',
         'public_site' => 'Ir a la web pública',
         'community' => 'Comunidad',
         'configuration' => 'Configuración',
@@ -263,12 +264,13 @@ return [
             'locals' => 'Locales',
             'garages' => 'Garajes',
             'storages' => 'Trasteros',
-            'welcome' => 'Bienvenida',
+            'welcome' => 'Mensaje Bienvenida',
             'terms_accepted' => 'Condiciones de uso aceptadas',
         ],
         'view_properties' => 'Ver propiedades',
         'resend_welcome_email' => 'Reenviar mensaje de bienvenida',
         'confirm_resend_welcome' => '¿Seguro que quieres reenviar el mensaje de bienvenida?',
+        'welcome_not_sent_missing_email' => 'No se ha enviado el mensaje de bienvenida porque la propietaria no tiene email.',
         'edit_owner' => 'Editar propietaria',
         'edit_submit' => 'Guardar cambios',
         'audit' => [

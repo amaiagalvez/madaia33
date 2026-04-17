@@ -146,6 +146,8 @@ class Owners extends Component
 
     public bool $showWelcomeModal = false;
 
+    public string $warningMessage = '';
+
     public function boot(
         CreateOwnerAction $createOwnerAction,
         CreateOwnerFormService $createOwnerFormService,
@@ -249,6 +251,8 @@ class Owners extends Component
 
     public function createOwner(): void
     {
+        $this->warningMessage = '';
+
         $data = $this->validate(
             $this->ownerCreationRules(),
             $this->ownerCreationMessages(),
@@ -265,7 +269,12 @@ class Owners extends Component
             return;
         }
 
-        $this->createOwnerAction->execute($this->createOwnerFormService->prepareOwnerData($data));
+        $owner = $this->createOwnerAction->execute($this->createOwnerFormService->prepareOwnerData($data));
+
+        if (! $owner->welcome) {
+            $this->flashOwnerWelcomeNoEmailWarning();
+        }
+
         $this->resetCreateOwnerFormState();
     }
 
@@ -280,6 +289,8 @@ class Owners extends Component
         if ($this->confirmingWelcomeOwnerId === null) {
             return;
         }
+
+        $this->warningMessage = '';
 
         $this->resendOwnerWelcomeMail($this->confirmingWelcomeOwnerId);
         $this->cancelResendWelcomeMail();
@@ -297,7 +308,17 @@ class Owners extends Component
             ->with(['user', 'assignments.property.location'])
             ->findOrFail($ownerId);
 
-        $this->createOwnerAction->sendWelcomeMailToOwner($owner);
+        $sent = $this->createOwnerAction->sendWelcomeMailToOwner($owner);
+
+        if (! $sent) {
+            $this->flashOwnerWelcomeNoEmailWarning();
+        }
+    }
+
+    private function flashOwnerWelcomeNoEmailWarning(): void
+    {
+        $this->warningMessage = __('admin.owners.welcome_not_sent_missing_email');
+        session()->flash('warning', $this->warningMessage);
     }
 
     public function openEditOwnerForm(int $ownerId): void

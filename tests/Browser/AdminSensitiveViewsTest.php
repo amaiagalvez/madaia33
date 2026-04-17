@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\Owner;
+use App\Models\Role;
 use Tests\DuskTestCase;
 use App\Models\Location;
 use App\Models\Property;
@@ -47,6 +48,110 @@ test('admin can access owner sensitive inline controls from index', function () 
     });
 });
 
+test('admin sees warning when resending owner welcome without email', function () {
+    $admin = User::factory()->create([
+        'email' => 'dusk-owner-warning-admin@example.com',
+        'name' => 'Dusk Owner Warning Admin',
+    ]);
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => '000 Owner Without Email',
+        'coprop1_email' => '',
+    ]);
+
+    $owner->user?->forceFill(['email' => ''])->save();
+
+    $location = Location::factory()->portal()->create();
+
+    $property = Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '3C',
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $owner) {
+        $browser->loginAs($admin)
+            ->visit('/admin/propietarias')
+            ->waitFor('[data-section="filters"]', 10)
+            ->waitFor('#owners-search', 10)
+            ->type('#owners-search', '000 Owner Without Email')
+            ->pause(700)
+            ->waitFor('[data-action="resend-owner-welcome-' . $owner->id . '"]', 10)
+            ->click('[data-action="resend-owner-welcome-' . $owner->id . '"]')
+            ->waitFor('[data-action="confirm-resend-owner-welcome"]', 5)
+            ->click('[data-action="confirm-resend-owner-welcome"]')
+            ->waitFor('[data-owner-warning-banner]', 5)
+            ->assertPresent('[data-owner-warning-banner]');
+    });
+});
+
+test('admin owners list uses compact bidalketak-style actions with titles', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Dusk Action Titles Owner',
+    ]);
+
+    $location = Location::factory()->portal()->create();
+
+    $property = Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '4A',
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $owner) {
+        $script = strtr(<<<'JS'
+            (() => {
+                const table = document.querySelector('[data-owner-table]');
+                const row = document.querySelector('[data-owner-id="OWNER_ID"]');
+
+                if (!table || !row) {
+                    return false;
+                }
+
+                const actions = row.querySelector('[data-owner-row-actions="OWNER_ID"]');
+                const editButton = row.querySelector('[data-action="edit-owner-OWNER_ID"]');
+                const detailsButton = row.querySelector('[data-action="toggle-owner-inline-OWNER_ID"]');
+                const resendButton = row.querySelector('[data-action="resend-owner-welcome-OWNER_ID"]');
+
+                if (!actions || !editButton || !detailsButton || !resendButton) {
+                    return false;
+                }
+
+                const hasCompactActions = actions.classList.contains('gap-0');
+                const hasTitles = [editButton, detailsButton, resendButton]
+                    .every((button) => (button.getAttribute('title') || '').trim().length > 0);
+
+                return table.classList.contains('overflow-x-auto')
+                    && hasCompactActions
+                    && hasTitles;
+            })();
+        JS, [
+            'OWNER_ID' => (string) $owner->id,
+        ]);
+
+        $browser->loginAs($admin)
+            ->visit('/admin/propietarias')
+            ->waitFor('[data-owner-table]', 10)
+            ->waitFor('[data-owner-id="' . $owner->id . '"]', 10)
+            ->assertScript($script, true);
+    });
+});
+
 test('admin top user menu dropdown opens from the desktop header', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
@@ -59,6 +164,39 @@ test('admin top user menu dropdown opens from the desktop header', function () {
             ->waitUntil("(() => { const el = document.querySelector('[data-test=\"logout-button\"]'); return !!el && el.offsetParent !== null; })()", 5)
             ->assertPresent('[data-test="logout-button"]')
             ->assertSee($admin->name);
+    });
+});
+
+test('admin sidebar shows communications block below web with moved items', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin) {
+        $browser->loginAs($admin)
+            ->visit('/admin')
+            ->waitFor('[data-sidebar-group-web]', 10)
+            ->waitFor('[data-sidebar-group-communications]', 10)
+            ->waitFor('[data-sidebar-link-messages]', 10)
+            ->waitFor('[data-sidebar-link-campaigns]', 10)
+            ->waitFor('[data-sidebar-link-votings]', 10)
+            ->assertScript(<<<'JS'
+                (() => {
+                    const webGroup = document.querySelector('[data-sidebar-group-web]');
+                    const communicationsGroup = document.querySelector('[data-sidebar-group-communications]');
+                    const messages = document.querySelector('[data-sidebar-link-messages]');
+                    const campaigns = document.querySelector('[data-sidebar-link-campaigns]');
+                    const votings = document.querySelector('[data-sidebar-link-votings]');
+
+                    if (!webGroup || !communicationsGroup || !messages || !campaigns || !votings) {
+                        return false;
+                    }
+
+                    return webGroup.getBoundingClientRect().top < communicationsGroup.getBoundingClientRect().top
+                        && communicationsGroup.getBoundingClientRect().top < messages.getBoundingClientRect().top
+                        && messages.getBoundingClientRect().top < campaigns.getBoundingClientRect().top
+                        && campaigns.getBoundingClientRect().top < votings.getBoundingClientRect().top;
+                })();
+            JS, true);
     });
 });
 
