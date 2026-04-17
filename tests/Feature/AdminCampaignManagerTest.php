@@ -116,6 +116,11 @@ it('duplicates a campaign into a new draft and opens the new form', function () 
         'channel' => 'email',
     ]);
 
+    CampaignRecipient::factory()->create([
+        'campaign_id' => $sourceCampaign->id,
+        'contact' => 'existing-recipient@example.test',
+    ]);
+
     $component = Livewire::actingAs($user)
         ->test('admin-campaign-manager')
         ->call('duplicateCampaign', $sourceCampaign->id);
@@ -127,7 +132,8 @@ it('duplicates a campaign into a new draft and opens the new form', function () 
         ->first();
 
     expect($duplicate)->not->toBeNull()
-        ->and($duplicate?->status)->toBe('draft');
+        ->and($duplicate?->status)->toBe('draft')
+        ->and(CampaignRecipient::query()->where('campaign_id', $duplicate->id)->count())->toBe(0);
 
     $component->assertRedirect(route('admin.campaigns', ['editCampaign' => $duplicate->id]));
 });

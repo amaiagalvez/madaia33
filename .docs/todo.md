@@ -18,7 +18,11 @@
 # Code
 - votaciones resultados
 para cada votación, añadir un boton para abrir una lista con los resultados
-en esa nueva vista tiene que aparecer todos los vecinos que han bo
+en esa nueva vista tiene que aparecer arriba el título y la pregunta de la votación y en una lista, a la izquierda, todos los vecinos que han votado en una columna, en otra columna, sus propiedades, cada una con su porcentaje community_pct y la suma de todos estos porcentajes
+para votacionses no anónimas:
+y a continuación añadir tantas columnas como opciones tenga la votación.
+por cada owner que haya votado, rellenar la columna de la opción que ha elegido con el porcentaje total de sus propiedades
+al final de cada columna de opción, poner la suma de los porcentajes
 - spec kiro pendientes (obra)
 - [ ] repasar estatistikak home
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
