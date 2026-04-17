@@ -18,7 +18,7 @@
 # Code
 - votaciones resultados (suma de porcentajes)
 - spec kiro pendientes (obra)
-- [ ] reepasar estatistikak home
+- [ ] repasar estatistikak home
 - [ ] unificar terminología
   - locations: Ubicaciones => Comunidades
   - properties: Propiedades => Fincas
@@ -28,12 +28,6 @@
 - [ ] En el listado de bozketak añadir un botón para Enviar un email. Crear una nueva campaña. Los recipients serán los owners que puedan votar en esa votación. Debe de abrir el formulario de la campaña creada para que pueda añadir el texto a enviar. Es decir, las locations que hay en la bozketa y las que se deben crear para la campaña deben de ser las mismas.
 En el texto de la campaña poner un aviso "añadir orden de día y documentos para delegar el voto y votar presenciamelte"
 
-En el listado de admin/campanas
-- al pinchar en el botón programar, modal para pedir cuando programarlo
-- añadir nueva columna con el número de mensajes de abiertos
-
-- cuando se pulsa en el botón de enviar en un envío de whatcapp, actualizar la fecha de envió de esa campaña, ahora no se actualiza
-
 # Panela
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
@@ -42,15 +36,8 @@ En el listado de admin/campanas
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 
 - [ ] Iragarkiak. Gehitu hasiera data eta bukaera data eremuak, gehitu zutabea zerrendan eta front-ean kontrolatu eta bakarrik erakutsi indarrean daudenak 
-  
 
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
-
-## manual de usuaria
-crear una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación
-añadir una ruta al menú del panel 
-tiene que estar en dos idiomas eu y es
-- [ ] añadir una regla al agente amalur para que lo mantenga actualizado
 
 # Copilot
 - [ ] repasar agente lamia
@@ -96,3 +83,7 @@ tiene que estar en dos idiomas eu y es
     - admin/usuarios
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
 - [ ] config recaptcha, analitics
+- [ ] manual de usuaria
+crar una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación añadir una ruta al menú del panel tiene que estar en dos idiomas eu y es
+añadir una regla al agente amalur para que lo mantenga actualizado
+- [ ] 

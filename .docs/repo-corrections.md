@@ -48,6 +48,7 @@
 - In `routes/web.php`, avoid relying on outer variables inside `Route::prefix(...)->group(function () { ... })` unless explicitly imported with `use (...)`; prefer controller actions for non-trivial page data preparation.
 
 - If a Lightbox/overlay opens shifted (too low/high), teleport it to `body` (`x-teleport="body"`) so `fixed` positioning is viewport-based and not affected by ancestor layout/transform contexts.
+- In Alpine teleport templates for public overlays, keep a single root element inside `<template x-teleport="body">`; multiple root siblings can prevent mounting and cause Dusk selector timeouts.
 
 - In bilingual rich-text tabs, avoid `x-if` for language panes because it destroys/recreates editors and can drop unsynced content on tab switch; prefer `x-show` (or explicit buffer syncing) to preserve in-progress text.
 

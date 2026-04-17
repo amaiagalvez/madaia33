@@ -89,6 +89,31 @@ test('profile owner tab renders a single shared owner form block', function () {
     });
 });
 
+test('profile terms modal is visible inside viewport when owner has pending acceptance', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => null,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner) {
+        $browser->resize(1440, 1024)
+            ->loginAs($owner->user)
+            ->visit('/eu/profila')
+            ->waitFor('[data-profile-terms-modal]', 5)
+            ->assertPresent('[data-profile-terms-modal-card]')
+            ->assertScript(
+                '(() => {'
+                    . 'const modal = document.querySelector("[data-profile-terms-modal-card]");'
+                    . 'if (!modal) return false;'
+                    . 'const rect = modal.getBoundingClientRect();'
+                    . 'const viewportHeight = window.innerHeight || document.documentElement.clientHeight;'
+                    . 'return rect.top < viewportHeight && rect.bottom > 0;'
+                    . '})()',
+                true,
+            );
+    });
+});
+
 test('profile votings tab renders pending active and missed closed lists', function () {
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
@@ -202,6 +227,75 @@ test('profile messages and received tabs allow expanding long message content', 
             ->click('[data-profile-received-toggle="' . $receivedRecipient->id . '"]')
             ->assertScript(
                 'return document.querySelector("[data-profile-received-expandable=\"' . $receivedRecipient->id . '\"]")?.open === true;',
+                true,
+            );
+    });
+});
+
+test('profile sent and received tables apply clear row separation styles', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    ContactMessage::factory()->create([
+        'user_id' => $owner->user_id,
+        'subject' => 'Lehen mezua',
+        'message' => 'Lehen edukia.',
+    ]);
+
+    ContactMessage::factory()->create([
+        'user_id' => $owner->user_id,
+        'subject' => 'Bigarren mezua',
+        'message' => 'Bigarren edukia.',
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'subject_eu' => 'Jasotako lehen mezua',
+        'subject_es' => 'Primer recibido',
+        'body_eu' => 'Jasotako lehen edukia.',
+        'body_es' => 'Primer contenido recibido.',
+        'channel' => 'email',
+        'status' => 'sent',
+        'sent_at' => now()->subMinute(),
+    ]);
+
+    CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => $owner->user->email,
+        'status' => 'sent',
+    ]);
+
+    CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => $owner->user->email,
+        'status' => 'sent',
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner) {
+        $browser->loginAs($owner->user)
+            ->visit('/eu/profila?tab=messages')
+            ->waitFor('[data-profile-panel="messages"]', 5)
+            ->assertScript(
+                '(() => {'
+                    . 'const rows = Array.from(document.querySelectorAll("[data-profile-message-row]"));'
+                    . 'if (rows.length < 2) return false;'
+                    . 'return rows.every((row) => row.classList.contains("border-b") && row.classList.contains("border-gray-200") && row.classList.contains("even:bg-gray-50/40"));'
+                    . '})()',
+                true,
+            )
+            ->visit('/eu/profila?tab=received')
+            ->waitFor('[data-profile-panel="received"]', 5)
+            ->assertScript(
+                '(() => {'
+                    . 'const rows = Array.from(document.querySelectorAll("[data-profile-received-row]"));'
+                    . 'if (rows.length < 2) return false;'
+                    . 'return rows.every((row) => row.classList.contains("border-b") && row.classList.contains("border-gray-200") && row.classList.contains("even:bg-gray-50/40"));'
+                    . '})()',
                 true,
             );
     });

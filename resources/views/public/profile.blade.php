@@ -31,30 +31,36 @@
         @endif
 
         @if ($requiresTermsAcceptance)
-            <div class="fixed inset-0 z-80 bg-black/50" aria-hidden="true"></div>
-            <section class="fixed inset-0 z-90 grid place-items-center p-4"
-                data-profile-terms-modal>
-                <div
-                    class="w-full max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-2xl">
-                    <h2 class="text-base font-semibold text-amber-900">
-                        {{ __('profile.terms.title') }}
-                    </h2>
-                    <div
-                        class="prose prose-sm mt-3 max-h-72 overflow-y-auto max-w-none text-amber-900">
-                        {!! $termsHtml !!}
-                    </div>
+            <div x-data>
+                <template x-teleport="body">
+                    <div class="fixed inset-0 z-110" data-profile-terms-modal>
+                        <div class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
+                        <section class="relative m-0 grid h-full w-full place-items-center overflow-y-auto p-4">
+                            <div
+                                class="my-auto w-full max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-2xl"
+                                data-profile-terms-modal-card>
+                                <h2 class="text-base font-semibold text-amber-900">
+                                    {{ __('profile.terms.title') }}
+                                </h2>
+                                <div
+                                    class="prose prose-sm mt-3 max-h-72 overflow-y-auto max-w-none text-amber-900">
+                                    {!! $termsHtml !!}
+                                </div>
 
-                    <form method="POST"
-                        action="{{ route(\App\SupportedLocales::routeName('profile.terms.accept')) }}"
-                        class="mt-5">
-                        @csrf
-                        <button type="submit"
-                            class="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#793d3d] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#5d2e2e]">
-                            {{ __('profile.terms.accept_button') }}
-                        </button>
-                    </form>
-                </div>
-            </section>
+                                <form method="POST"
+                                    action="{{ route(\App\SupportedLocales::routeName('profile.terms.accept')) }}"
+                                    class="mt-5">
+                                    @csrf
+                                    <button type="submit"
+                                        class="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#793d3d] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#5d2e2e]">
+                                        {{ __('profile.terms.accept_button') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </template>
+            </div>
         @endif
 
         <div
@@ -350,9 +356,9 @@
                                             {{ __('profile.received.status') }}</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-100 bg-white">
+                                <tbody class="bg-white">
                                     @foreach ($receivedMessages as $receivedMessage)
-                                        <tr data-profile-received-row>
+                                        <tr class="border-b border-gray-200 even:bg-gray-50/40 align-top last:border-b-0" data-profile-received-row>
                                             <td
                                                 class="px-4 py-3 text-sm font-medium text-gray-800">
                                                 {{ $receivedMessage['subject'] }}</td>
@@ -430,9 +436,9 @@
                                             {{ __('profile.messages.status') }}</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-100 bg-white">
+                                <tbody class="bg-white">
                                     @foreach ($userMessages as $userMessage)
-                                        <tr data-profile-message-row>
+                                        <tr class="border-b border-gray-200 even:bg-gray-50/40 align-top last:border-b-0" data-profile-message-row>
                                             <td
                                                 class="px-4 py-3 text-sm font-medium text-gray-800">
                                                 {{ $userMessage['subject'] }}</td>

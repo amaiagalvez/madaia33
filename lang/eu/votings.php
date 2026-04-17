@@ -91,7 +91,7 @@ return [
         'explanation_default_text' => 'Hemen bozketak kontsultatu eta bakoitzean zure botoa eman dezakezu.',
     ],
     'mail' => [
-        'subject' => 'Komunitateko bozketak',
+        'subject' => 'Zure bozka jaso da',
         'greeting' => 'Kaixo :name,',
         'body' => ':voting bozketan zure botoa jaso dugu.',
         'thanks' => 'Eskerrik asko parte hartzeagatik.',
