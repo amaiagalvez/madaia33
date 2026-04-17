@@ -1,20 +1,42 @@
 <?php
 
 use App\Models\User;
+use App\Models\Owner;
 use App\Models\Voting;
+use App\Models\Location;
+use App\Models\Property;
 use App\SupportedLocales;
+use App\Models\VotingOption;
 use Illuminate\Http\Request;
+use App\Models\PropertyAssignment;
 use App\Http\Controllers\PublicVotingController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 it('returns votings public view when open votings exist', function () {
-    Voting::factory()->current()->create([
+    $voting = Voting::factory()->current()->create([
         'is_published' => true,
     ]);
 
-    $view = app(PublicVotingController::class)->index();
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+    ]);
 
-    expect($view->name())->toBe('public.votings');
+    $owner = Owner::factory()->create();
+    $location = Location::factory()->portal()->create();
+    $property = Property::factory()->create(['location_id' => $location->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    test()->actingAs($owner->user);
+
+    $response = app(PublicVotingController::class)->index();
+
+    expect($response->getStatusCode())->toBe(200)
+        ->and($response->getOriginalContent()->name())->toBe('public.votings');
 });
 
 it('aborts with 404 when there are no open votings and no pending delegations', function () {
