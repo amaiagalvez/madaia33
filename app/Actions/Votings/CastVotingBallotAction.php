@@ -124,6 +124,8 @@ class CastVotingBallotAction
         VotingOption $option,
         CastVotingData $castData,
     ): VotingBallot {
+        $ownerPct = $this->ownerActiveCommunityPct($owner);
+
         $ballot = VotingBallot::create([
             'voting_id' => $voting->id,
             'owner_id' => $owner->id,
@@ -141,22 +143,18 @@ class CastVotingBallotAction
                 'voting_id' => $voting->id,
                 'voting_ballot_id' => $ballot->id,
                 'owner_id' => $owner->id,
+                'pct_total' => $ownerPct,
                 'voting_option_id' => $option->id,
             ]);
         }
 
-        $this->incrementVotingTotal($voting, $option, $owner);
+        $this->incrementVotingTotal($voting, $option, $ownerPct);
 
         return $ballot;
     }
 
-    private function incrementVotingTotal(Voting $voting, VotingOption $option, Owner $owner): void
+    private function incrementVotingTotal(Voting $voting, VotingOption $option, float $ownerPct): void
     {
-        $owner->loadMissing('activeAssignments.property');
-
-        $ownerPct = $owner->activeAssignments
-            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
-
         $total = VotingOptionTotal::query()
             ->where('voting_id', $voting->id)
             ->where('voting_option_id', $option->id)
@@ -174,6 +172,14 @@ class CastVotingBallotAction
             $total->increment('votes_count');
             $total->increment('pct_total', $ownerPct);
         }
+    }
+
+    private function ownerActiveCommunityPct(Owner $owner): float
+    {
+        $owner->loadMissing('activeAssignments.property');
+
+        return (float) $owner->activeAssignments
+            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
     }
 
     private function sendConfirmationMail(Owner $owner, Voting $voting): void

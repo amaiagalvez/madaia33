@@ -30,12 +30,13 @@ trait HandlesVotingOwnerModals
         $votedOwnerIds = $ballots->pluck('owner_id')->flip()->all();
 
         $votesByOwner = $ballots->mapWithKeys(function (VotingBallot $ballot): array {
-            $label = $this->formatBallotOptionName($ballot);
+            $label = $this->formatBallotOptionLabel($ballot);
 
             return [$ballot->owner_id => $label];
         })->all();
 
         $this->ownersModalIsAnonymous = (bool) $voting->is_anonymous;
+        $this->ownersModalContext = 'census';
 
         $this->ownersModalRows = $owners
             ->map(fn (Owner $owner): array => [
@@ -73,6 +74,7 @@ trait HandlesVotingOwnerModals
             ->get();
 
         $this->ownersModalIsAnonymous = (bool) $voting->is_anonymous;
+        $this->ownersModalContext = 'voters';
 
         $this->ownersModalRows = $ballots
             ->map(function (VotingBallot $ballot) use ($owners, $voting): ?array {
@@ -100,6 +102,7 @@ trait HandlesVotingOwnerModals
     {
         $this->showOwnersModal = false;
         $this->ownersModalIsAnonymous = false;
+        $this->ownersModalContext = 'voters';
         $this->ownersModalTitle = '';
         $this->ownersModalRows = [];
     }
@@ -121,6 +124,17 @@ trait HandlesVotingOwnerModals
             ->join(', ');
     }
 
+    private function formatBallotOptionLabel(VotingBallot $ballot): string
+    {
+        return $ballot->selections
+            ->sortBy(static fn (VotingSelection $selection): int => $selection->option->position ?? PHP_INT_MAX)
+            ->map(static function (VotingSelection $selection): string {
+                return trim((string) $selection->option->label);
+            })
+            ->filter()
+            ->join(', ');
+    }
+
     /**
      * @return array{name: string, percentage: float, vote: string, delegated_by: string, delegate_dni: string, has_voted: bool, properties: string}
      */
@@ -131,11 +145,9 @@ trait HandlesVotingOwnerModals
         return [
             'name' => $this->canSeeOwnerNamesInVotingModals() ? $owner->coprop1_name : '—',
             'percentage' => $this->eligibilityService->percentageForOwnerAtVotingDate($voting, $owner),
-            'vote' => $ballot instanceof VotingBallot ? $this->formatBallotOptionName($ballot) : '',
+            'vote' => $ballot instanceof VotingBallot ? $this->formatBallotOptionLabel($ballot) : '',
             'delegated_by' => $ballot instanceof VotingBallot
-                ? ($ballot->is_in_person
-                    ? __('votings.admin.in_person_vote')
-                    : ($castByUser instanceof User ? $castByUser->name : '—'))
+                ? ($castByUser instanceof User ? $castByUser->name : '—')
                 : '—',
             'delegate_dni' => $ballot instanceof VotingBallot ? ($ballot->cast_delegate_dni ?? '—') : '—',
             'has_voted' => $ballot instanceof VotingBallot,

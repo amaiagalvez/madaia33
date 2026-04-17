@@ -213,6 +213,7 @@
                         <div class="flex items-center gap-2">
                             <span>{{ $censusCounts[$voting->id] ?? 0 }}</span>
                             <button type="button" wire:click="openCensus({{ $voting->id }})"
+                                data-action="open-census-{{ $voting->id }}"
                                 class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
                                 title="{{ __('votings.admin.open_census') }}">
                                 <flux:icon.users class="size-4" />
@@ -232,14 +233,22 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-right text-sm font-medium">
-                        @if ($voting->ballots_count === 0)
-                            <x-admin.table-row-actions>
+                        <x-admin.table-row-actions>
+                            <a href="{{ route('admin.votings.results.show', ['voting' => $voting->id]) }}"
+                                class="rounded-full border border-transparent p-2 text-brand-600 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-brand-600"
+                                title="{{ __('votings.admin.open_results') }}"
+                                data-voting-results-link="{{ $voting->id }}">
+                                <flux:icon.chart-bar class="size-4" />
+                                <span
+                                    class="sr-only">{{ __('votings.admin.open_results') }}</span>
+                            </a>
+                            @if ($voting->ballots_count === 0)
                                 <x-admin.icon-button-edit
                                     wire:click="editVoting({{ $voting->id }})" />
                                 <x-admin.icon-button-delete
                                     wire:click="confirmDeleteVoting({{ $voting->id }})" />
-                            </x-admin.table-row-actions>
-                        @endif
+                            @endif
+                        </x-admin.table-row-actions>
                     </td>
                 </tr>
             @empty
@@ -305,7 +314,8 @@
                 </div>
 
                 <div class="max-h-[70vh] overflow-auto rounded-lg border border-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm"
+                        data-owners-modal-table>
                         <thead class="bg-gray-50">
                             <tr>
                                 <th
@@ -317,17 +327,19 @@
                                 <th
                                     class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                     {{ __('votings.admin.percentage') }}</th>
-                                @unless ($ownersModalIsAnonymous)
-                                    <th
+                                @if ($ownersModalContext !== 'census' && !$ownersModalIsAnonymous)
+                                    <th data-owners-modal-vote-column
                                         class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                                         {{ __('votings.admin.vote') }}</th>
-                                @endunless
-                                <th
-                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    {{ __('votings.admin.delegated_vote') }}</th>
-                                <th
-                                    class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    {{ __('votings.admin.delegated_by') }}</th>
+                                @endif
+                                @if ($ownersModalContext !== 'census')
+                                    <th data-owners-modal-delegate-dni-column
+                                        class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        {{ __('votings.admin.delegated_vote') }}</th>
+                                    <th data-owners-modal-delegated-by-column
+                                        class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        {{ __('votings.admin.delegated_by') }}</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
@@ -346,18 +358,23 @@
                                         {{ $row['properties'] ?? '—' }}</td>
                                     <td class="px-4 py-2 text-gray-600">
                                         {{ number_format($row['percentage'], 2, ',', '.') }}%</td>
-                                    @unless ($ownersModalIsAnonymous)
-                                        <td class="px-4 py-2 text-gray-600">{{ $row['vote'] ?: '—' }}
+                                    @if ($ownersModalContext !== 'census' && !$ownersModalIsAnonymous)
+                                        <td class="px-4 py-2 text-gray-600">
+                                            {{ $row['vote'] ?: '—' }}
                                         </td>
-                                    @endunless
-                                    <td class="px-4 py-2 text-gray-600">{{ $row['delegate_dni'] }}
-                                    </td>
-                                    <td class="px-4 py-2 text-gray-600">{{ $row['delegated_by'] }}
-                                    </td>
+                                    @endif
+                                    @if ($ownersModalContext !== 'census')
+                                        <td class="px-4 py-2 text-gray-600">
+                                            {{ $row['delegate_dni'] }}
+                                        </td>
+                                        <td class="px-4 py-2 text-gray-600">
+                                            {{ $row['delegated_by'] }}
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ $ownersModalIsAnonymous ? 5 : 6 }}"
+                                    <td colspan="{{ $ownersModalContext === 'census' ? 3 : ($ownersModalIsAnonymous ? 5 : 6) }}"
                                         class="px-4 py-6 text-center text-gray-500">
                                         {{ __('votings.admin.empty') }}</td>
                                 </tr>

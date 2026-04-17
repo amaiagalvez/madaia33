@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArtisanController;
 use App\Http\Controllers\VotingPdfController;
 use App\Http\Controllers\PublicVotingController;
+use App\Http\Controllers\Admin\VotingResultsController;
 use App\Http\Controllers\CampaignWhatsappCsvController;
 
 Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->group(function () {
@@ -89,6 +90,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/bozketak', fn () => view('admin.votings'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings');
+    Route::get('/bozketak/{voting}/emaitzak', [VotingResultsController::class, 'show'])
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('votings.results.show');
     Route::get('/bozketak/pdf/delegatua', [VotingPdfController::class, 'adminDelegated'])
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings.pdf.delegated');
