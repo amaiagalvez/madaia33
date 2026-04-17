@@ -197,6 +197,7 @@ erDiagram
         bigint voting_id
         bigint voting_ballot_id
         bigint owner_id
+        decimal pct_total
         bigint voting_option_id
         datetime deleted_at
     }

@@ -16,19 +16,6 @@
 - [ ] probar envio whatcapp en el movil
 
 # Code
-- votaciones resultados
-para cada votación, añadir un boton para abrir una blade con una lista con los resultados
-en la lista añadir el header y el breadcrumb (como en la lista de admin/bidalketak/{id})
-en esa nueva vista tiene que aparecer arriba el título y la pregunta de la votación y en una lista, a la izquierda, todos los vecinos que han votado en una columna, en otra columna, sus propiedades, cada una con su porcentaje community_pct y la suma de todos estos porcentajes
-y a continuación añadir tantas columnas como opciones tenga la votación.
-
-para votacionses no anónimas:
-por cada owner que haya votado, rellenar la columna de la opción que ha elegido con el porcentaje total de sus propiedades
-al final de cada columna de opción, poner la suma de los porcentajes
-
-para votacionses anónimas:
-al final de cada columna de opción, poner la suma de los porcentajes
-
 - spec kiro pendientes (obra)
 - [ ] repasar estatistikak home
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
@@ -36,7 +23,7 @@ al final de cada columna de opción, poner la suma de los porcentajes
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
-
+En el listado bozketak del panel, añadir una nueva columna "Emaitzak erakutsi" con el formato de la columna argitaratuta, y al pinchar encima que se active o se desactive y se guarde ne la base de datos en un nuevo campo en la tabla votings
 # Copilot
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario

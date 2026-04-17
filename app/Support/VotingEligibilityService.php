@@ -392,7 +392,7 @@ class VotingEligibilityService
 
         if (! $owner->relationLoaded('assignments')) {
             $owner->load([
-                'assignments' => function (Builder $assignmentQuery) use ($referenceDate, $residentialIds, $garageIds): void {
+                'assignments' => function (Relation $assignmentQuery) use ($referenceDate, $residentialIds, $garageIds): void {
                     $this->applyEligibleAssignmentQueryConstraints($assignmentQuery, $referenceDate, $residentialIds, $garageIds);
                 },
             ]);

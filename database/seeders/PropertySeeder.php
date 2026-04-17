@@ -65,8 +65,8 @@ class PropertySeeder extends Seeder
     private function communityPctForType(string $type): float
     {
         return match ($type) {
-            'garage' => 0.0185,
-            default => 0.3571,
+            'garage' => 0.02,
+            default => 0.36,
         };
     }
 
@@ -78,8 +78,8 @@ class PropertySeeder extends Seeder
     private function locationPctForType(string $type): float
     {
         return match ($type) {
-            'garage' => 0.5556,
-            default => 5.5556,
+            'garage' => 0.56,
+            default => 5.56,
         };
     }
 }

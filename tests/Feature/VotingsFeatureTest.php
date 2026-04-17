@@ -289,6 +289,11 @@ it('allows an eligible owner to vote once and stores auditable rows', function (
         ->where('voting_option_id', $option->id)
         ->count())->toBe(1);
 
+    expect(VotingSelection::query()
+        ->where('voting_id', $voting->id)
+        ->where('owner_id', $owner->id)
+        ->value('pct_total'))->toBe('1.5000');
+
     expect(VotingOptionTotal::query()
         ->where('voting_id', $voting->id)
         ->where('voting_option_id', $option->id)
