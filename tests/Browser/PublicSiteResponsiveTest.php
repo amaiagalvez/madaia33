@@ -6,6 +6,7 @@
 
 use App\Models\Image;
 use App\Models\Notice;
+use App\Models\Voting;
 use App\Models\Setting;
 use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
@@ -62,6 +63,35 @@ test('home page smoke on mobile renders hero latest notices and working mobile m
             ->click('[data-mobile-notices-link]')
             ->pause(350)
             ->assertPathIs('/eu/iragarkiak');
+    });
+});
+
+test('home results announcement is outside history block and uses notice-like typography', function () {
+    Notice::factory()->public()->count(2)->create();
+    Image::factory()->count(2)->create();
+    Voting::factory()->create([
+        'show_results' => true,
+        'ends_at' => now()->subDay(),
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) {
+        $browser->visit('/eu')
+            ->dismissCookieConsentBanner()
+            ->pause(500)
+            ->assertPresent('[data-home-results-announcement]')
+            ->assertScript(
+                "return (function () { var history = document.querySelector('[data-home-history]'); var announcement = document.querySelector('[data-home-results-announcement]'); return Boolean(history && announcement && !history.contains(announcement)); })();",
+                true
+            )
+            ->assertScript(
+                "return (function () { var title = document.querySelector('[data-home-results-announcement-title]'); return Boolean(title && title.classList.contains('text-base') && title.classList.contains('md:text-lg')); })();",
+                true
+            )
+            ->assertScript(
+                "return (function () { var body = document.querySelector('[data-home-results-announcement-body]'); return Boolean(body && body.classList.contains('text-sm') && body.classList.contains('md:text-base')); })();",
+                true
+            );
     });
 });
 

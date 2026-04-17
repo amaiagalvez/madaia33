@@ -229,7 +229,8 @@
                             <span>{{ $censusCounts[$voting->id] ?? 0 }}</span>
                             <button type="button" wire:click="openCensus({{ $voting->id }})"
                                 class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
-                                title="{{ __('votings.admin.open_census') }}">
+                                title="{{ __('votings.admin.open_census') }}"
+                                data-action="open-census-{{ $voting->id }}">
                                 <flux:icon.users class="size-4" />
                                 <span class="sr-only">{{ __('votings.admin.open_census') }}</span>
                             </button>

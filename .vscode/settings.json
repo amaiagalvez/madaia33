@@ -65,7 +65,8 @@
         "/^node - <<'NODE'\nconst fs = require\\('fs'\\);\nconst pages = \\['home','notices','contact'\\];\nconst cats = \\['performance','accessibility','best-practices','seo'\\];\nconst pct = \\(r,c\\) => Math\\.round\\(\\(r\\.categories\\[c\\]\\?\\.score \\?\\? 0\\) \\* 100\\);\nfor \\(const p of pages\\) \\{\n  const v1 = JSON\\.parse\\(fs\\.readFileSync\\(`\\.docs/lighthouse-madaia33-es-\\$\\{p\\}\\.json`, 'utf8'\\)\\);\n  const v2 = JSON\\.parse\\(fs\\.readFileSync\\(`\\.docs/lighthouse-madaia33-es-\\$\\{p\\}-v2\\.json`, 'utf8'\\)\\);\n  const m1 = v1\\.audits, m2 = v2\\.audits;\n  console\\.log\\(`PAGE \\$\\{p\\}`\\);\n  for \\(const c of cats\\) \\{\n    const b = pct\\(v1,c\\), a = pct\\(v2,c\\), d = a-b;\n    console\\.log\\(`  \\$\\{c\\}: \\$\\{b\\} -> \\$\\{a\\} \\(\\$\\{d>=0\\?'\\+':''\\}\\$\\{d\\}\\)`\\);\n  \\}\n  console\\.log\\(`  LCP: \\$\\{m1\\['largest-contentful-paint'\\]\\?\\.displayValue\\} -> \\$\\{m2\\['largest-contentful-paint'\\]\\?\\.displayValue\\}`\\);\n  console\\.log\\(`  TBT: \\$\\{m1\\['total-blocking-time'\\]\\?\\.displayValue\\} -> \\$\\{m2\\['total-blocking-time'\\]\\?\\.displayValue\\}`\\);\n  console\\.log\\(`  color-contrast: \\$\\{v1\\.audits\\['color-contrast'\\]\\?\\.score\\} -> \\$\\{v2\\.audits\\['color-contrast'\\]\\?\\.score\\}`\\);\n  console\\.log\\(`  label-content-name-mismatch: \\$\\{v1\\.audits\\['label-content-name-mismatch'\\]\\?\\.score\\} -> \\$\\{v2\\.audits\\['label-content-name-mismatch'\\]\\?\\.score\\}`\\);\n\\}\nNODE$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "docker exec": true
     },
     "chat.promptFilesRecommendations": {
         "speckit.constitution": true,

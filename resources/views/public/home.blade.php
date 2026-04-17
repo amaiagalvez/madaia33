@@ -137,14 +137,12 @@
                 </section>
             </div>
 
-            <aside
-                class="section-shell overflow-hidden p-4 sm:p-5 lg:col-span-4 lg:flex lg:h-full lg:flex-col"
-                data-home-history>
+            <div class="space-y-5 lg:col-span-4" data-home-results-and-history>
                 @if ($latestVotingWithResults)
                     <section
-                        class="mb-5 rounded-xl border border-[#edd2c7] bg-linear-to-br from-[#edd2c7]/30 via-white to-[#f1bd4d]/10 p-4"
-                        data-home-results-announcement>
-                        <div class="flex items-start gap-3">
+                        class="rounded-xl border border-[#edd2c7] bg-linear-to-br from-[#edd2c7]/30 via-white to-[#f1bd4d]/10 p-4"
+                        data-home-results-block>
+                        <div class="flex items-start gap-3" data-home-results-announcement>
                             <div
                                 class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-600/25 bg-linear-to-br from-[#f1bd4d]/35 via-white to-[#edd2c7]/60 text-[#793d3d] shadow-sm">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -154,15 +152,16 @@
                                 </svg>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                                <p class="font-semibold tracking-tight text-[#793d3d] text-base md:text-lg"
+                                    data-home-results-announcement-title>
                                     {{ __('votings.front.results_ended_announcement_title') }}
                                 </p>
-                                <p class="mt-1 text-xs leading-relaxed text-gray-600">
+                                <p class="mt-1 leading-relaxed text-gray-600 text-sm md:text-base"
+                                    data-home-results-announcement-body>
                                     {{ __('votings.front.results_ended_announcement_body') }}
                                 </p>
                                 <a href="{{ route(\App\SupportedLocales::routeName('votings.results'), ['voting' => $latestVotingWithResults->id]) }}"
-                                    class="btn-brand mt-3 inline-flex min-h-10 items-center justify-center whitespace-nowrap px-4 py-2 text-xs"
+                                    class="btn-brand mt-3 inline-flex min-h-10 items-center justify-center whitespace-nowrap px-4 py-2 text-sm"
                                     data-results-voting-link="{{ $latestVotingWithResults->id }}">
                                     {{ __('votings.front.results_view_link') }}
                                 </a>
@@ -170,48 +169,54 @@
                         </div>
                     </section>
                 @endif
-                <h2 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
-                    {{ __('home.history_title') }}
-                </h2>
-                <div class="mt-4 space-y-3" data-home-history-images>
-                    @foreach ($historyImageUrls as $historyImageUrl)
-                        <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
-                            <img src="{{ $historyImageUrl }}" alt="" aria-hidden="true"
-                                class="h-36 w-full object-cover sm:h-44" loading="lazy" />
-                        </div>
-                    @endforeach
-                </div>
-                <div class="mt-4 text-sm leading-relaxed text-gray-600 rich-content">
-                    {!! $historySummary !!}
-                </div>
 
-                <a href="mailto:{{ $frontPrimaryEmail }}"
-                    class="elevated-card mt-4 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 lg:mt-auto"
-                    data-home-history-photos-callout>
-                    <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                <aside
+                    class="section-shell overflow-hidden p-4 sm:p-5 lg:flex lg:h-full lg:flex-col"
+                    data-home-history>
+                    <h2 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
+                        {{ __('home.history_title') }}
+                    </h2>
+                    <div class="mt-4 space-y-3" data-home-history-images>
+                        @foreach ($historyImageUrls as $historyImageUrl)
+                            <div
+                                class="overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                                <img src="{{ $historyImageUrl }}" alt="" aria-hidden="true"
+                                    class="h-36 w-full object-cover sm:h-44" loading="lazy" />
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mt-4 text-sm leading-relaxed text-gray-600 rich-content">
+                        {!! $historySummary !!}
+                    </div>
+
+                    <a href="mailto:{{ $frontPrimaryEmail }}"
+                        class="elevated-card mt-4 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 lg:mt-auto"
+                        data-home-history-photos-callout>
+                        <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p
+                                class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
+                                {{ __('home.history_photos_title') }}
+                            </p>
+                            <p class="mt-0.5 text-xs text-gray-600 leading-relaxed">
+                                {{ $photoRequestText }}
+                            </p>
+                        </div>
+                        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-brand-600"
+                            fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>
-                    </div>
-                    <div>
-                        <p
-                            class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
-                            {{ __('home.history_photos_title') }}
-                        </p>
-                        <p class="mt-0.5 text-xs text-gray-600 leading-relaxed">
-                            {{ $photoRequestText }}
-                        </p>
-                    </div>
-                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-brand-600"
-                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                        aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                    </svg>
-                </a>
-            </aside>
+                    </a>
+                </aside>
+            </div>
         </div>
 
         @if ($showViewAllButton)
