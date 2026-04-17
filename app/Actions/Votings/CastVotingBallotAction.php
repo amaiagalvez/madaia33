@@ -13,14 +13,20 @@ use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Mail\VotingConfirmationMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Support\ContactConfirmationSubject;
 use App\Support\VotingEligibilityService;
 use Illuminate\Validation\ValidationException;
+use App\Support\Messaging\CampaignTrackingUrlBuilder;
+use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
 class CastVotingBallotAction
 {
     public function __construct(
         private readonly VotingEligibilityService $eligibilityService,
+        private readonly RecordDirectMessageRecipientAction $recordDirectMessageRecipientAction,
+        private readonly CampaignTrackingUrlBuilder $trackingUrlBuilder,
     ) {}
 
     /**
@@ -146,7 +152,7 @@ class CastVotingBallotAction
         $owner->loadMissing('activeAssignments.property');
 
         $ownerPct = $owner->activeAssignments
-            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+            ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
 
         $total = VotingOptionTotal::query()
             ->where('voting_id', $voting->id)
@@ -176,7 +182,25 @@ class CastVotingBallotAction
         }
 
         try {
-            Mail::to($owner->user->email)->send(new VotingConfirmationMail($owner, $voting));
+            $subject = __('votings.mail.subject');
+            $body = __('votings.mail.greeting', ['name' => $owner->coprop1_name]) . "\n"
+                . __('votings.mail.body', ['voting' => $voting->name]) . "\n"
+                . __('votings.mail.thanks');
+
+            $recipient = $this->recordDirectMessageRecipientAction->execute(
+                owner: $owner,
+                contact: $owner->user->email,
+                subject: ContactConfirmationSubject::forAudit($subject),
+                body: $body,
+                sentByUserId: Auth::id(),
+            );
+
+            Mail::to($owner->user->email)->send(new VotingConfirmationMail(
+                $owner,
+                $voting,
+                null,
+                $this->trackingUrlBuilder->openPixelUrl($recipient->tracking_token),
+            ));
         } catch (\Throwable $throwable) {
             Log::warning('Unable to send voting confirmation mail.', [
                 'owner_id' => $owner->id,

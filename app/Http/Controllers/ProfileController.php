@@ -22,6 +22,8 @@ use App\Support\VotingEligibilityService;
 
 class ProfileController extends Controller
 {
+    private const DIRECT_MESSAGES_CAMPAIGN_ID = 1;
+
     public function __construct(private VotingEligibilityService $votingEligibilityService) {}
 
     public function show(Request $request): View
@@ -306,7 +308,7 @@ class ProfileController extends Controller
             ->get(['id', 'voting_id', 'voted_at'])
             ->map(static fn(VotingBallot $ballot): array => [
                 'id' => $ballot->id,
-                'voting_name' => data_get($ballot->voting, 'name') ?: '—',
+                'voting_name' => (string) data_get($ballot->voting, 'name', '—'),
                 'voted_at' => Carbon::parse($ballot->voted_at),
             ]);
     }
@@ -352,19 +354,23 @@ class ProfileController extends Controller
                 'trackingEvents:campaign_recipient_id,event_type',
             ])
             ->orderByDesc('id')
-            ->get(['id', 'campaign_id', 'owner_id', 'status', 'created_at'])
+            ->get(['id', 'campaign_id', 'owner_id', 'status', 'message_subject', 'message_body', 'sent_at', 'created_at'])
             ->filter(static fn(CampaignRecipient $recipient): bool => $recipient->campaign !== null)
             ->map(function (CampaignRecipient $recipient): array {
                 /** @var object $campaign */
                 $campaign = $recipient->campaign;
                 $locale = SupportedLocales::normalize(app()->getLocale());
                 $isOpened = $recipient->trackingEvents->contains('event_type', 'open');
-                $subject = $locale === SupportedLocales::SPANISH
+                $campaignSubject = $locale === SupportedLocales::SPANISH
                     ? (string) data_get($campaign, 'subject_es', '')
                     : (string) data_get($campaign, 'subject_eu', '');
-                $body = $locale === SupportedLocales::SPANISH
+                $campaignBody = $locale === SupportedLocales::SPANISH
                     ? (string) data_get($campaign, 'body_es', '')
                     : (string) data_get($campaign, 'body_eu', '');
+                $hasDirectMessageContent = filled($recipient->message_subject) || filled($recipient->message_body);
+                $isDirectMessage = $recipient->campaign_id === self::DIRECT_MESSAGES_CAMPAIGN_ID && $hasDirectMessageContent;
+                $subject = $isDirectMessage ? (string) ($recipient->message_subject ?? '') : $campaignSubject;
+                $body = $isDirectMessage ? (string) ($recipient->message_body ?? '') : $campaignBody;
 
                 return [
                     'id' => $recipient->id,
@@ -373,9 +379,11 @@ class ProfileController extends Controller
                     'status_label' => $isOpened
                         ? __('profile.received.opened')
                         : __('campaigns.admin.statuses.' . $recipient->status),
-                    'sent_at' => data_get($campaign, 'sent_at') !== null
-                        ? Carbon::parse((string) data_get($campaign, 'sent_at'))
-                        : Carbon::parse($recipient->created_at),
+                    'sent_at' => $recipient->sent_at !== null
+                        ? Carbon::parse((string) $recipient->sent_at)
+                        : (data_get($campaign, 'sent_at') !== null
+                            ? Carbon::parse((string) data_get($campaign, 'sent_at'))
+                            : Carbon::parse($recipient->created_at)),
                 ];
             })
             ->values()

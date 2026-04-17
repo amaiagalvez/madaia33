@@ -156,6 +156,53 @@ it('shows only messages sent by logged user in messages tab', function () {
         ->assertDontSee('Hau ez da agertu behar.');
 });
 
+it('renders expandable controls for long messages in sent and received tabs', function () {
+    $user = User::factory()->create();
+
+    $owner = Owner::factory()->for($user)->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $longSentMessage = str_repeat('Mezu luze bidalia. ', 20);
+    $longReceivedMessage = str_repeat('Mezu luze jasoa. ', 20);
+
+    $sentMessage = ContactMessage::factory()->create([
+        'user_id' => $user->id,
+        'subject' => 'Luzea bidalia',
+        'message' => $longSentMessage,
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'subject_eu' => 'Luzea jasoa',
+        'subject_es' => 'Recibido largo',
+        'body_eu' => $longReceivedMessage,
+        'body_es' => $longReceivedMessage,
+        'channel' => 'email',
+        'status' => 'sent',
+        'sent_at' => now()->subMinute(),
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $campaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => 'owner@example.com',
+        'status' => 'sent',
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'messages']))
+        ->assertOk()
+        ->assertSeeHtml('data-profile-message-expandable="' . $sentMessage->id . '"')
+        ->assertSee(__('profile.messages.show_more'));
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'received']))
+        ->assertOk()
+        ->assertSeeHtml('data-profile-received-expandable="' . $recipient->id . '"')
+        ->assertSee(__('profile.received.show_more'));
+});
+
 it('shows only received campaign messages for the linked owner in profile', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();
@@ -219,6 +266,46 @@ it('shows only received campaign messages for the linked owner in profile', func
         ->assertSee('Jabeari bidalitako mezua.')
         ->assertDontSee('Ez da erakutsi behar')
         ->assertDontSee('Beste jabearentzako mezua.');
+});
+
+it('shows direct-message recipient subject and body in received tab for campaign id 1', function () {
+    $user = User::factory()->create();
+
+    $owner = Owner::factory()->for($user)->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $directMessagesCampaign = Campaign::factory()->create([
+        'id' => 1,
+        'subject_eu' => 'Web-etik Bidalitako Mezuak',
+        'subject_es' => 'Mensajes enviados desde la web',
+        'body_eu' => 'Kanpainaren testu orokorra, ez hau erakutsi.',
+        'body_es' => 'Texto general de campaña, no mostrar este.',
+        'channel' => 'email',
+        'status' => 'sent',
+    ]);
+
+    $recipient = CampaignRecipient::factory()->create([
+        'campaign_id' => $directMessagesCampaign->id,
+        'owner_id' => $owner->id,
+        'slot' => 'coprop1',
+        'contact' => 'owner@example.com',
+        'status' => 'sent',
+        'message_subject' => 'Gaia zuzena jabe honentzat',
+        'message_body' => 'Hau da benetan bidalitako mezua.',
+    ]);
+
+    CampaignTrackingEvent::query()->create([
+        'campaign_recipient_id' => $recipient->id,
+        'event_type' => 'open',
+    ]);
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'received']))
+        ->assertOk()
+        ->assertSee('Gaia zuzena jabe honentzat')
+        ->assertSee('Hau da benetan bidalitako mezua.')
+        ->assertDontSee('Kanpainaren testu orokorra, ez hau erakutsi.');
 });
 
 it('accepts owner terms from profile page', function () {

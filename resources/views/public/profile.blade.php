@@ -357,7 +357,31 @@
                                                 class="px-4 py-3 text-sm font-medium text-gray-800">
                                                 {{ $receivedMessage['subject'] }}</td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
-                                                {{ $receivedMessage['message'] }}</td>
+                                                @php($receivedMessageText = (string) ($receivedMessage['message'] ?? ''))
+                                                @php($hasLongReceivedMessage = \Illuminate\Support\Str::length($receivedMessageText) > 160)
+
+                                                @if (!$hasLongReceivedMessage)
+                                                    <p class="whitespace-pre-line">
+                                                        {{ $receivedMessageText }}</p>
+                                                @else
+                                                    <details class="group max-w-[32rem]"
+                                                        data-profile-received-expandable="{{ $receivedMessage['id'] }}">
+                                                        <summary
+                                                            class="cursor-pointer list-none whitespace-pre-line text-gray-700 marker:content-none"
+                                                            data-profile-received-toggle="{{ $receivedMessage['id'] }}">
+                                                            <span
+                                                                data-profile-received-preview="{{ $receivedMessage['id'] }}">{{ \Illuminate\Support\Str::limit($receivedMessageText, 160) }}</span>
+                                                            <span
+                                                                class="ml-2 text-xs font-semibold text-[#793d3d] group-open:hidden">{{ __('profile.received.show_more') }}</span>
+                                                            <span
+                                                                class="ml-2 hidden text-xs font-semibold text-[#793d3d] group-open:inline">{{ __('profile.received.show_less') }}</span>
+                                                        </summary>
+                                                        <p class="mt-2 whitespace-pre-line"
+                                                            data-profile-received-full="{{ $receivedMessage['id'] }}">
+                                                            {{ $receivedMessageText }}</p>
+                                                    </details>
+                                                @endif
+                                            </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $receivedMessage['sent_at']->format('Y-m-d H:i:s') }}
                                             </td>
@@ -413,7 +437,31 @@
                                                 class="px-4 py-3 text-sm font-medium text-gray-800">
                                                 {{ $userMessage['subject'] }}</td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
-                                                {{ $userMessage['message'] }}</td>
+                                                @php($userMessageText = (string) ($userMessage['message'] ?? ''))
+                                                @php($hasLongUserMessage = \Illuminate\Support\Str::length($userMessageText) > 160)
+
+                                                @if (!$hasLongUserMessage)
+                                                    <p class="whitespace-pre-line">
+                                                        {{ $userMessageText }}</p>
+                                                @else
+                                                    <details class="group max-w-[32rem]"
+                                                        data-profile-message-expandable="{{ $userMessage['id'] }}">
+                                                        <summary
+                                                            class="cursor-pointer list-none whitespace-pre-line text-gray-700 marker:content-none"
+                                                            data-profile-message-toggle="{{ $userMessage['id'] }}">
+                                                            <span
+                                                                data-profile-message-preview="{{ $userMessage['id'] }}">{{ \Illuminate\Support\Str::limit($userMessageText, 160) }}</span>
+                                                            <span
+                                                                class="ml-2 text-xs font-semibold text-[#793d3d] group-open:hidden">{{ __('profile.messages.show_more') }}</span>
+                                                            <span
+                                                                class="ml-2 hidden text-xs font-semibold text-[#793d3d] group-open:inline">{{ __('profile.messages.show_less') }}</span>
+                                                        </summary>
+                                                        <p class="mt-2 whitespace-pre-line"
+                                                            data-profile-message-full="{{ $userMessage['id'] }}">
+                                                            {{ $userMessageText }}</p>
+                                                    </details>
+                                                @endif
+                                            </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $userMessage['created_at']->format('Y-m-d H:i:s') }}
                                             </td>

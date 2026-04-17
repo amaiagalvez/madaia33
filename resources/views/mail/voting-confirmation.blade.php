@@ -1,4 +1,4 @@
-<x-mail.layout :legal-text="$legalText">
+<x-mail.layout :legal-text="$legalText" :tracking-pixel-url="$trackingPixelUrl">
     <p style="margin: 0 0 16px 0;">
         {{ __('votings.mail.greeting', ['name' => $owner->coprop1_name]) }}</p>
 

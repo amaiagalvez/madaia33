@@ -8,8 +8,10 @@ use App\Models\Property;
 use App\Models\VotingBallot;
 use App\Models\VotingOption;
 use App\Livewire\PublicVotings;
+use App\Models\CampaignRecipient;
 use App\Models\PropertyAssignment;
 use App\Mail\VotingConfirmationMail;
+use App\Support\ContactConfirmationSubject;
 use Illuminate\Support\Facades\Mail;
 use App\Actions\Votings\CastVotingData;
 use Illuminate\Validation\ValidationException;
@@ -47,6 +49,17 @@ it('sends a confirmation email after a successful vote', function () {
     Mail::assertSent(VotingConfirmationMail::class, function (VotingConfirmationMail $mail) use ($owner): bool {
         return $mail->hasTo($owner->user->email);
     });
+
+    $recipient = CampaignRecipient::query()
+        ->where('campaign_id', 1)
+        ->where('owner_id', $owner->id)
+        ->latest('id')
+        ->first();
+
+    expect($recipient)->not->toBeNull()
+        ->and($recipient?->status)->toBe('sent')
+        ->and($recipient?->message_subject)->toBe(ContactConfirmationSubject::forAudit((string) __('votings.mail.subject')))
+        ->and($recipient?->tracking_token)->not->toBe('');
 });
 
 it('rejects vote attempts when owner does not belong to the allowed locations', function () {
@@ -77,7 +90,7 @@ it('rejects vote attempts when owner does not belong to the allowed locations', 
 
     $action = app(CastVotingBallotAction::class);
 
-    expect(fn () => $action->execute($voting, $owner, $option->id, $owner->user, CastVotingData::fromInputs()))
+    expect(fn() => $action->execute($voting, $owner, $option->id, $owner->user, CastVotingData::fromInputs()))
         ->toThrow(ValidationException::class);
 
     expect(VotingBallot::query()

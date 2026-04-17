@@ -228,3 +228,4 @@ Before proposing or implementing any change, load the relevant skill:
 - **Admin table action consistency**: keep notice-table icon-button pattern (`rounded-full` + same hover semantics)
 - **Voting integrity rule**: enforce one-choice-per-ballot with DB unique constraint (`voting_ballot_id`) in addition to app validation
 - **Admin aggregation rule**: avoid per-row count/query patterns in Livewire lists; prefer one aggregate query or one in-memory map
+- **Browser tests workflow rule (mandatory)**: avoid plain `php artisan test tests/Browser`; run Dusk with the selenium workflow from `.github/skills/dusk-testing/SKILL.md` (seeded sqlite, in-container server, `APP_URL=http://dusk-app:8000`).

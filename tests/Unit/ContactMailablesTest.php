@@ -3,6 +3,7 @@
 use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\ContactMessage;
+use App\Mail\OwnerWelcomeMail;
 use App\Support\ContactMailData;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
@@ -111,3 +112,46 @@ it('resolves voting confirmation mail body translations by locale', function (st
         ],
     ],
 ]);
+
+it('renders tracking pixel URL in direct-message mail views', function () {
+    config()->set('mail.from.address', CONTACT_MAIL_FROM_ADDRESS);
+    config()->set('mail.from.name', CONTACT_MAIL_FROM_NAME);
+
+    $trackingPixelUrl = 'https://example.test/track/open/token-direct-message';
+
+    $contactConfirmation = new ContactConfirmation(
+        new ContactMailData(
+            visitorName: CONTACT_MAIL_VISITOR_NAME,
+            messageSubject: CONTACT_MAIL_SUBJECT,
+            messageBody: CONTACT_MAIL_BODY,
+            legalText: '<p>Testu legala</p>',
+        ),
+        CONTACT_MAIL_FROM_ADDRESS,
+        CONTACT_MAIL_FROM_NAME,
+        $trackingPixelUrl,
+    );
+
+    $owner = new Owner(['coprop1_name' => 'Miren Etxeberria', 'coprop1_email' => 'miren@example.com']);
+    $voting = new Voting(['name_eu' => 'Boto-ematea', 'name_es' => 'Votacion']);
+
+    $votingConfirmation = new VotingConfirmationMail(
+        owner: $owner,
+        voting: $voting,
+        legalText: '<p>Legezko testua</p>',
+        trackingPixelUrl: $trackingPixelUrl,
+    );
+
+    $ownerWelcome = new OwnerWelcomeMail(
+        fromAddress: CONTACT_MAIL_FROM_ADDRESS,
+        fromName: CONTACT_MAIL_FROM_NAME,
+        subjectLine: 'Ongietorri',
+        bodyHtml: '<p>Edukia</p>',
+        resetUrl: 'https://example.test/reset',
+        trackingPixelUrl: $trackingPixelUrl,
+        trackedResetUrl: 'https://example.test/track/click/token?url=https%3A%2F%2Fexample.test%2Freset',
+    );
+
+    expect($contactConfirmation->render())->toContain($trackingPixelUrl)
+        ->and($votingConfirmation->render())->toContain($trackingPixelUrl)
+        ->and($ownerWelcome->render())->toContain($trackingPixelUrl);
+});

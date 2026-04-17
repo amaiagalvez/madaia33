@@ -19,8 +19,12 @@ class CampaignRecipient extends Model
         'owner_id',
         'slot',
         'contact',
+        'message_subject',
+        'message_body',
         'tracking_token',
         'status',
+        'sent_at',
+        'sent_by_user_id',
         'error_message',
     ];
 
@@ -32,6 +36,8 @@ class CampaignRecipient extends Model
         return [
             'campaign_id' => 'integer',
             'owner_id' => 'integer',
+            'sent_at' => 'datetime',
+            'sent_by_user_id' => 'integer',
         ];
     }
 
@@ -49,6 +55,14 @@ class CampaignRecipient extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(Owner::class);
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function sentBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'sent_by_user_id');
     }
 
     /**

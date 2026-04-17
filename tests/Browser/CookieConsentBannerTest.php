@@ -1,7 +1,7 @@
 <?php
 
-use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
+use Laravel\Dusk\Browser;
 
 test('public cookie consent banner can be accepted', function () {
     /** @var DuskTestCase $this */

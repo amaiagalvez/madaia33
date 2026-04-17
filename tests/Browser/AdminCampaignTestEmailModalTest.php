@@ -6,35 +6,35 @@ use App\Models\Campaign;
 use Laravel\Dusk\Browser;
 
 test('campaign create form does not show test email button', function () {
-  $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
-  /** @var DuskTestCase $this */
-  $this->browse(function (Browser $browser) use ($admin) {
-    $browser->loginAs($admin)
-      ->visit(route('admin.campaigns'))
-      ->waitFor('[data-campaign-create-button]', 10)
-      ->click('[data-campaign-create-button]')
-      ->waitFor('[data-admin-form-footer-actions]', 10)
-      ->assertMissing('[data-campaign-test-email-button]');
-  });
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin) {
+        $browser->loginAs($admin)
+            ->visit(route('admin.campaigns'))
+            ->waitFor('[data-campaign-create-button]', 10)
+            ->click('[data-campaign-create-button]')
+            ->waitFor('[data-admin-form-footer-actions]', 10)
+            ->assertMissing('[data-campaign-test-email-button]');
+    });
 });
 
 test('campaign edit test email modal appears above side panel', function () {
-  $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
-  $campaign = Campaign::factory()->create([
-    'status' => 'draft',
-    'channel' => 'email',
-  ]);
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+    ]);
 
-  /** @var DuskTestCase $this */
-  $this->browse(function (Browser $browser) use ($admin, $campaign) {
-    $browser->loginAs($admin)
-      ->visit(route('admin.campaigns', ['editCampaign' => $campaign->id]))
-      ->waitFor('[data-campaign-test-email-button]', 10)
-      ->click('[data-campaign-test-email-button]')
-      ->waitFor('[data-campaign-test-email-modal]', 10)
-      ->assertScript(<<<'JS'
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $campaign) {
+        $browser->loginAs($admin)
+            ->visit(route('admin.campaigns', ['editCampaign' => $campaign->id]))
+            ->waitFor('[data-campaign-test-email-button]', 10)
+            ->click('[data-campaign-test-email-button]')
+            ->waitFor('[data-campaign-test-email-modal]', 10)
+            ->assertScript(<<<'JS'
                 (() => {
                     const modal = document.querySelector('[data-campaign-test-email-modal]');
                     const panel = document.querySelector('[data-admin-side-panel-form]');
@@ -49,25 +49,25 @@ test('campaign edit test email modal appears above side panel', function () {
                     return modalZ > panelZ;
                 })();
             JS, true);
-  });
+    });
 });
 
 test('campaign edit form disables test email button while there are unsaved changes', function () {
-  $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
-  $campaign = Campaign::factory()->create([
-    'status' => 'draft',
-    'channel' => 'email',
-  ]);
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+    ]);
 
-  /** @var DuskTestCase $this */
-  $this->browse(function (Browser $browser) use ($admin, $campaign) {
-    $browser->loginAs($admin)
-      ->visit(route('admin.campaigns', ['editCampaign' => $campaign->id]))
-      ->waitFor('#selectedTemplateId', 10)
-      ->waitFor('[data-campaign-test-email-button]', 10)
-      ->assertScript("document.querySelector('[data-campaign-test-email-button]')?.disabled === false", true)
-      ->script(<<<'JS'
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $campaign) {
+        $browser->loginAs($admin)
+            ->visit(route('admin.campaigns', ['editCampaign' => $campaign->id]))
+            ->waitFor('#selectedTemplateId', 10)
+            ->waitFor('[data-campaign-test-email-button]', 10)
+            ->assertScript("document.querySelector('[data-campaign-test-email-button]')?.disabled === false", true)
+            ->script(<<<'JS'
                 const select = document.getElementById('selectedTemplateId');
 
                 if (select) {
@@ -81,9 +81,9 @@ test('campaign edit form disables test email button while there are unsaved chan
                 }
             JS);
 
-    $browser->pause(1000)
-      ->waitFor('[data-campaign-test-email-help]', 10)
-      ->assertScript("document.querySelector('[data-campaign-test-email-button]')?.disabled === true", true)
-      ->assertPresent('[data-campaign-test-email-help]');
-  });
+        $browser->pause(1000)
+            ->waitFor('[data-campaign-test-email-help]', 10)
+            ->assertScript("document.querySelector('[data-campaign-test-email-button]')?.disabled === true", true)
+            ->assertPresent('[data-campaign-test-email-help]');
+    });
 });

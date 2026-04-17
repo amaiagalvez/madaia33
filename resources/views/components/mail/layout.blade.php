@@ -1,5 +1,6 @@
 @props([
     'legalText' => null,
+    'trackingPixelUrl' => null,
 ])
 @php($siteName = \App\Support\EmailSiteName::resolve())
 <!DOCTYPE html>
@@ -62,6 +63,16 @@
                             <td
                                 style="padding: 16px 32px 24px 32px; font-size: 11px; line-height: 17px; color: #b9a7a5; font-family: Arial, Helvetica, sans-serif;">
                                 {!! $legalText !!}
+                            </td>
+                        </tr>
+                    @endif
+
+                    @if (!empty($trackingPixelUrl))
+                        <tr>
+                            <td style="font-size: 0; line-height: 0;">
+                                <img src="{{ $trackingPixelUrl }}" alt="" width="1"
+                                    height="1"
+                                    style="display:block; border:0; margin:0; padding:0;" />
                             </td>
                         </tr>
                     @endif

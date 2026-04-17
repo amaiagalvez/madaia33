@@ -12,13 +12,21 @@ use Illuminate\Support\Str;
 use App\Mail\OwnerWelcomeMail;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use App\Support\Messaging\CampaignTrackingUrlBuilder;
+use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
 class CreateOwnerAction
 {
+    public function __construct(
+        private readonly ?RecordDirectMessageRecipientAction $recordDirectMessageRecipientAction = null,
+        private readonly ?CampaignTrackingUrlBuilder $trackingUrlBuilder = null,
+    ) {}
+
     /**
      * @param  array<string, mixed>  $data
      *
@@ -28,7 +36,7 @@ class CreateOwnerAction
     {
         $password = Str::password(16);
 
-        $result = DB::transaction(fn (): array => $this->createOwnerWithAssignments($data, $password));
+        $result = DB::transaction(fn(): array => $this->createOwnerWithAssignments($data, $password));
 
         /** @var Owner $owner */
         $owner = $result['owner'];
@@ -174,6 +182,8 @@ class CreateOwnerAction
 
     /**
      * @param  array<string, mixed>|null  $data
+     *
+     * @SuppressWarnings("PHPMD.ExcessiveMethodLength")
      */
     private function sendWelcomeMail(Owner $owner, User $user, ?array $data = null): void
     {
@@ -210,13 +220,37 @@ class CreateOwnerAction
             'email' => $user->email,
         ]);
 
+        $recipient = $this->recordDirectMessageRecipientAction()->execute(
+            owner: $owner,
+            contact: $user->email,
+            subject: $subject,
+            body: $bodyHtml,
+            sentByUserId: Auth::id(),
+        );
+
+        $trackedBodyHtml = $this->trackingUrlBuilder()->withTrackedLinks($bodyHtml, $recipient->tracking_token);
+        $trackedResetUrl = $this->trackingUrlBuilder()->trackedClickUrl($recipient->tracking_token, $resetUrl);
+        $trackingPixelUrl = $this->trackingUrlBuilder()->openPixelUrl($recipient->tracking_token);
+
         Mail::to($user->email)->send(new OwnerWelcomeMail(
             $settings['from_address'] ?? null,
             $settings['from_name'] ?? null,
             $subject,
-            $bodyHtml,
+            $trackedBodyHtml,
             $resetUrl,
+            $trackingPixelUrl,
+            $trackedResetUrl,
         ));
+    }
+
+    private function recordDirectMessageRecipientAction(): RecordDirectMessageRecipientAction
+    {
+        return $this->recordDirectMessageRecipientAction ?? app(RecordDirectMessageRecipientAction::class);
+    }
+
+    private function trackingUrlBuilder(): CampaignTrackingUrlBuilder
+    {
+        return $this->trackingUrlBuilder ?? app(CampaignTrackingUrlBuilder::class);
     }
 
     /**
@@ -246,7 +280,7 @@ class CreateOwnerAction
     {
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
@@ -258,7 +292,7 @@ class CreateOwnerAction
             ->keyBy('id');
 
         return collect($assignments)
-            ->map(fn (array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
+            ->map(fn(array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
             ->filter()
             ->values()
             ->all();
@@ -270,7 +304,7 @@ class CreateOwnerAction
     private function buildAssignmentItemsFromOwner(Owner $owner): array
     {
         return $owner->assignments
-            ->map(fn (PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
+            ->map(fn(PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
             ->filter()
             ->values()
             ->all();

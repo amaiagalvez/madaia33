@@ -25,7 +25,11 @@ use App\Services\Messaging\MessageVariableResolver;
 use App\Livewire\Concerns\HandlesCampaignManagerActions;
 use App\Livewire\Concerns\HandlesCampaignManagerPayload;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
+/**
+ * @SuppressWarnings("PHPMD.ExcessiveClassLength")
+ */
 class AdminCampaignManager extends Component
 {
     use BuildsLocaleFieldConfigs;
@@ -257,6 +261,9 @@ class AdminCampaignManager extends Component
         $this->testEmailAddress = '';
     }
 
+    /**
+     * @SuppressWarnings("PHPMD.ExcessiveMethodLength")
+     */
     public function sendTestEmail(): void
     {
         $this->authorizeTestEmailAction();
@@ -587,8 +594,8 @@ class AdminCampaignManager extends Component
             return null;
         }
 
-        $ownerId = (int) ($recipientRow['owner_id'] ?? 0);
-        $slot = (string) ($recipientRow['slot'] ?? 'coprop1');
+        $ownerId = (int) $recipientRow['owner_id'];
+        $slot = (string) $recipientRow['slot'];
 
         if ($ownerId <= 0 || ! in_array($slot, ['coprop1', 'coprop2'], true)) {
             return null;

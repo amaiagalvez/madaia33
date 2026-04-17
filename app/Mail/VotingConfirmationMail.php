@@ -17,12 +17,16 @@ class VotingConfirmationMail extends Mailable
 
     public readonly ?string $legalText;
 
+    public readonly ?string $trackingPixelUrl;
+
     public function __construct(
         public readonly Owner $owner,
         public readonly Voting $voting,
         ?string $legalText = null,
+        ?string $trackingPixelUrl = null,
     ) {
         $this->legalText = $legalText ?? EmailLegalText::resolve();
+        $this->trackingPixelUrl = $trackingPixelUrl;
     }
 
     public function envelope(): Envelope
@@ -36,6 +40,9 @@ class VotingConfirmationMail extends Mailable
     {
         return new Content(
             view: 'mail.voting-confirmation',
+            with: [
+                'trackingPixelUrl' => $this->trackingPixelUrl,
+            ],
         );
     }
 }
