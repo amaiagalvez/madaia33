@@ -12,36 +12,9 @@
 
 # Code
 - [ ] reepasar estatistikak home
-- [ ] añadir papelera para poder reestaurar los borrrados
-- [ ] añadir tipo votaciones, una persona un voto / por porcentajes de participación
-- [ ] repasar queries duplicadas que indica la debugbar
 - [ ] configurar el sentry (despues de publicar master)
-
 - votaciones resultados (suma de porcentajes)
 - spec kiro pendientes (obra)
-- en todos los sitios en lo que debe salir un modal, crear un dusk-test para que lo compruebe y así no tener riesgo de perder esa funcionalidad.
-- examinar la pestaña Queries del debugbar y analizar las consultas duplicadas
-  - Front
-    - iragarkiak
-    - argazki-bilduma
-    - kontaktua
-    - pribatua
-    - 
-  - Front logeado
-    - profila y las diferentes tabs que tiene
-    - bozketak
-  - Aginte-panela
-    - admin
-    - admin/avisos
-    - admin/imagenes
-    - admin/mensajes
-    - admin/campanas
-    - admin/campanas/{id}
-    - admin/portales
-    - admin/propietarias
-    - admin/votaciones
-    - admin/configuracion
-    - admin/usuarios
 
 # unificar terminología
 
@@ -63,8 +36,6 @@ En el listado de admin/campanas
 - añadir nueva columna con el número de mensajes de abiertos
 
 - cuando se pulsa en el botón de enviar en un envío de whatcapp, actualizar la fecha de envió de esa campaña, ahora no se actualiza
-
-- [ ] campaña: añadir un botón, enviar prueba (como tenenmos en el formulario de los settings email_configuration) mostrar un modal para pedir un email y enviar a dicho email una prueba de como queda la campaña. Se enviarán dos emails de prueba, uno en euskera y otro en castellano al email indicado.
 
 # Panela
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje
@@ -107,3 +78,28 @@ tiene que estar en dos idiomas eu y es
 - [ ] seo
 - [ ] twilio https://www.twilio.com/docs/whatsapp
 - [ ] en el skill db-schema separar las tablas de las votoaciones en otro bloque
+- [ ] añadir papelera para poder reestaurar los borrrados
+- [ ] añadir tipo votaciones, una persona un voto / por porcentajes de participación
+- [ ] en todos los sitios en lo que debe salir un modal, crear un dusk-test para que lo compruebe y así no tener riesgo de perder esa funcionalidad.
+- [ ] repasar queries duplicadas que indica la debugbar
+- examinar la pestaña Queries del debugbar y analizar las consultas duplicadas
+  - Front
+    - iragarkiak
+    - argazki-bilduma
+    - kontaktua
+    - pribatua
+  - Front logeado
+    - profila y las diferentes tabs que tiene
+    - bozketak
+  - Aginte-panela
+    - admin
+    - admin/avisos
+    - admin/imagenes
+    - admin/mensajes
+    - admin/campanas
+    - admin/campanas/{id}
+    - admin/portales
+    - admin/propietarias
+    - admin/votaciones
+    - admin/configuracion
+    - admin/usuarios

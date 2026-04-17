@@ -62,6 +62,18 @@ return [
         'confirm_schedule' => 'Ziur al zaude kanpaina hau programatu nahi duzula?',
         'confirm_cancel_schedule' => 'Ziur al zaude kanpaina honen programazioa ezeztatu nahi duzula?',
         'confirm_resend_unopened' => 'Ziur al zaude ireki ez duten hartzaileei berriz bidali nahi diezula?',
+        'test_email' => [
+            'button' => 'Proba bidali',
+            'title' => 'Kanpainaren proba bidali',
+            'description' => 'Bi proba-mezu bidaliko dira (euskaraz eta gaztelaniaz) adierazitako helbidera.',
+            'email_label' => 'Hartzailearen emaila',
+            'send' => 'Proba bidali',
+            'sent' => 'Bi proba-mezu bidali dira (EU eta ES).',
+            'failed' => 'Ezin izan da proba bidali: :error',
+            'smtp_not_configured' => 'Konfiguratu SMTP ezarpenetan probak bidali aurretik.',
+            'from_not_configured' => 'Konfiguratu bidaltzailea (from) ezarpenetan probak bidali aurretik.',
+            'only_email_channel' => 'Proba email bidezko kanpainetan bakarrik dago eskuragarri.',
+        ],
         'actions' => [
             'duplicate' => 'Bikoiztu',
             'send' => 'Bidali orain',

@@ -5,10 +5,13 @@ use App\Models\User;
 use Livewire\Livewire;
 use App\Models\Campaign;
 use App\Models\Location;
+use App\Models\Setting;
+use App\Mail\CampaignMail;
 use App\Models\CampaignDocument;
 use App\Models\CampaignLocation;
 use App\Models\CampaignTemplate;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
@@ -161,7 +164,7 @@ it('starts queue worker when sending a campaign from the manager', function () {
         ->test('admin-campaign-manager')
         ->call('sendCampaign', $campaign->id);
 
-    Bus::assertDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
+    Bus::assertDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
 });
 
 it('shows edit and delete actions only for draft or scheduled campaigns', function () {
@@ -407,4 +410,70 @@ it('stores multiple location recipient filters in a single campaign', function (
         ->all();
 
     expect($savedLocationIds)->toBe([(int) $portal->id, (int) $garage->id]);
+});
+
+it('shows campaign test-email button only while editing and opens modal', function () {
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('createCampaign')
+        ->assertDontSeeHtml('data-campaign-test-email-button')
+        ->call('editCampaign', $campaign->id)
+        ->assertSeeHtml('data-campaign-test-email-button')
+        ->call('openTestEmailModal')
+        ->assertSet('showTestEmailModal', true)
+        ->assertSeeHtml('data-campaign-test-email-modal')
+        ->call('closeTestEmailModal')
+        ->assertSet('showTestEmailModal', false);
+});
+
+it('sends campaign test emails in basque and spanish to the provided address', function () {
+    Mail::fake();
+
+    $user = adminUser();
+
+    $campaign = Campaign::factory()->create([
+        'status' => 'draft',
+        'channel' => 'email',
+        'subject_eu' => 'Zirriborroa',
+        'body_eu' => 'Edukia',
+    ]);
+
+    Setting::query()->updateOrCreate(
+        ['key' => 'smtp_host'],
+        ['value' => 'smtp.example.test', 'section' => Setting::SECTION_EMAIL_CONFIGURATION],
+    );
+
+    Livewire::actingAs($user)
+        ->test('admin-campaign-manager')
+        ->call('editCampaign', $campaign->id)
+        ->set('subjectEu', 'Gaia EU')
+        ->set('subjectEs', 'Asunto ES')
+        ->set('bodyEu', '<p>Edukia EU</p>')
+        ->set('bodyEs', '<p>Contenido ES</p>')
+        ->set('channel', 'email')
+        ->set('testEmailAddress', 'preview@example.com')
+        ->call('sendTestEmail')
+        ->assertHasNoErrors()
+        ->assertSet('showTestEmailModal', false);
+
+    Mail::assertSent(CampaignMail::class, 2);
+
+    Mail::assertSent(CampaignMail::class, function (CampaignMail $mail): bool {
+        return $mail->hasTo('preview@example.com')
+            && $mail->subjectText === '[FROGA] Gaia EU'
+            && $mail->htmlBody === '<p>Edukia EU</p>';
+    });
+
+    Mail::assertSent(CampaignMail::class, function (CampaignMail $mail): bool {
+        return $mail->hasTo('preview@example.com')
+            && $mail->subjectText === '[PRUEBA] Asunto ES'
+            && $mail->htmlBody === '<p>Contenido ES</p>';
+    });
 });

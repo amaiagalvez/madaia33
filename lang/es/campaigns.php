@@ -62,6 +62,18 @@ return [
         'confirm_schedule' => '¿Seguro que quieres programar esta campaña?',
         'confirm_cancel_schedule' => '¿Seguro que quieres cancelar la programación de esta campaña?',
         'confirm_resend_unopened' => '¿Seguro que quieres reenviar a quienes no han abierto esta campaña?',
+        'test_email' => [
+            'button' => 'Enviar prueba',
+            'title' => 'Enviar prueba de campaña',
+            'description' => 'Se enviarán dos correos de prueba (euskera y castellano) al email indicado.',
+            'email_label' => 'Email destinatario',
+            'send' => 'Enviar prueba',
+            'sent' => 'Se han enviado dos correos de prueba (EU y ES).',
+            'failed' => 'No se ha podido enviar la prueba: :error',
+            'smtp_not_configured' => 'Configura el SMTP en Ajustes antes de enviar pruebas.',
+            'from_not_configured' => 'Configura el remitente (from) en Ajustes antes de enviar pruebas.',
+            'only_email_channel' => 'La prueba solo está disponible para campañas por email.',
+        ],
         'actions' => [
             'duplicate' => 'Duplicar',
             'send' => 'Enviar ahora',

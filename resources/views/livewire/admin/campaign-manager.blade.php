@@ -7,16 +7,16 @@
 
     <div class="mb-6 flex flex-wrap items-center justify-end gap-3">
         <a href="{{ route('admin.campaigns.templates') }}"
-            class="inline-flex items-center rounded-md border border-[#d9755b] bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40">
+            class="inline-flex items-center rounded-md border border-brand-600 bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40">
             {{ __('campaigns.admin.templates') }}
         </a>
         <a href="{{ route('admin.campaigns.invalid-contacts') }}"
-            class="inline-flex items-center rounded-md border border-[#d9755b] bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40">
+            class="inline-flex items-center rounded-md border border-brand-600 bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40">
             {{ __('campaigns.admin.invalid_contacts') }}
         </a>
 
         @unless ($showForm)
-            <x-admin.create-record-button wire:click="createCampaign" />
+            <x-admin.create-record-button wire:click="createCampaign" data-campaign-create-button />
         @endunless
     </div>
 
@@ -31,7 +31,7 @@
                             {{ __('campaigns.admin.template') }}
                         </label>
                         <select id="selectedTemplateId" wire:model.live="selectedTemplateId"
-                            class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                            class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600">
                             <option value="">{{ __('campaigns.admin.no_template') }}</option>
                             @foreach ($templateOptions as $option)
                                 <option value="{{ $option['value'] }}">{{ $option['label'] }}
@@ -101,7 +101,7 @@
                                     <ul class="mt-2 space-y-2">
                                         @foreach ($attachments as $index => $attachment)
                                             <li
-                                                class="flex items-center justify-between rounded-lg border border-dashed border-[#d9755b]/40 bg-white px-3 py-2">
+                                                class="flex items-center justify-between rounded-lg border border-dashed border-brand-600/40 bg-white px-3 py-2">
                                                 <span
                                                     class="text-sm text-stone-700">{{ $attachment->getClientOriginalName() }}</span>
                                                 <x-admin.icon-button-delete
@@ -138,14 +138,74 @@
 
                 <x-admin.form-footer-actions show-default-buttons :is-editing="(bool) $editingId"
                     cancel-action="cancelForm">
+                    @if ($editingId !== null)
+                        <button type="button" wire:click="openTestEmailModal"
+                            class="inline-flex items-center rounded-md border border-brand-600 bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+                            data-campaign-test-email-button>
+                            {{ __('campaigns.admin.test_email.button') }}
+                        </button>
+                    @endif
+
                     <button type="button" wire:click="saveAsTemplate"
-                        class="inline-flex items-center rounded-md border border-[#d9755b] bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                        class="inline-flex items-center rounded-md border border-brand-600 bg-white px-4 py-2 text-sm font-medium text-[#793d3d] shadow-sm transition hover:bg-[#edd2c7]/40 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
                         data-campaign-save-template>
                         {{ __('campaigns.admin.actions.save_template') }}
                     </button>
                 </x-admin.form-footer-actions>
             </form>
         </x-admin.side-panel-form>
+    @endif
+
+    @if ($showTestEmailModal)
+        <dialog open
+            class="fixed inset-0 z-100 m-0 grid h-full w-full place-items-center bg-transparent p-4"
+            style="z-index: 1000;" aria-labelledby="campaign-test-email-modal-title"
+            data-campaign-test-email-modal>
+            <div class="mx-4 w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+                <div class="flex items-start gap-3">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                        <flux:icon.paper-airplane class="size-5 text-amber-600" />
+                    </div>
+                    <div>
+                        <h3 id="campaign-test-email-modal-title"
+                            class="text-base font-semibold text-gray-900">
+                            {{ __('campaigns.admin.test_email.title') }}
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            {{ __('campaigns.admin.test_email.description') }}
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="campaign-test-email-address"
+                        class="block text-sm font-medium text-stone-700">
+                        {{ __('campaigns.admin.test_email.email_label') }}
+                    </label>
+                    <input id="campaign-test-email-address" type="email"
+                        wire:model.defer="testEmailAddress"
+                        class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
+                        data-campaign-test-email-input />
+
+                    @error('testEmailAddress')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" wire:click="closeTestEmailModal"
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                        {{ __('general.buttons.cancel') }}
+                    </button>
+                    <button type="button" wire:click="sendTestEmail"
+                        class="rounded-md bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        data-campaign-test-email-submit>
+                        {{ __('campaigns.admin.test_email.send') }}
+                    </button>
+                </div>
+            </div>
+        </dialog>
     @endif
 
     <x-admin.panel-table table-class="min-w-full divide-y divide-gray-200" data-campaign-table>
@@ -320,7 +380,7 @@
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" wire:click="cancelAction"
-                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
                         {{ __('general.buttons.cancel') }}
                     </button>
                     <button type="button" wire:click="doAction"
@@ -353,7 +413,7 @@
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" wire:click="cancelDelete"
-                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
                         {{ __('general.buttons.cancel') }}
                     </button>
                     <button type="button" wire:click="deleteCampaign"
