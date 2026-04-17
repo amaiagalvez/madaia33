@@ -7,8 +7,8 @@
                 <button type="button" wire:click="setTagFilter('')" data-gallery-filter="all"
                     @class([
                         'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
-                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === '',
-                        'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                        'border-[#793d3d] bg-[#793d3d] text-white' => $activeTag === '',
+                        'border-gray-300 bg-white text-gray-700 hover:border-[#793d3d] hover:text-[#793d3d]' =>
                             $activeTag !== '',
                     ])>
                     {{ __('gallery.filter.all') }}
@@ -16,8 +16,8 @@
                 <button type="button" wire:click="setTagFilter('history')"
                     data-gallery-filter="history" @class([
                         'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
-                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === 'history',
-                        'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                        'border-[#793d3d] bg-[#793d3d] text-white' => $activeTag === 'history',
+                        'border-gray-300 bg-white text-gray-700 hover:border-[#793d3d] hover:text-[#793d3d]' =>
                             $activeTag !== 'history',
                     ])>
                     {{ __('gallery.filter.history') }}
@@ -25,8 +25,8 @@
                 <button type="button" wire:click="setTagFilter('comunity')"
                     data-gallery-filter="comunity" @class([
                         'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
-                        'border-[#d9755b] bg-[#d9755b] text-white' => $activeTag === 'comunity',
-                        'border-gray-300 bg-white text-gray-700 hover:border-[#d9755b] hover:text-[#793d3d]' =>
+                        'border-[#793d3d] bg-[#793d3d] text-white' => $activeTag === 'comunity',
+                        'border-gray-300 bg-white text-gray-700 hover:border-[#793d3d] hover:text-[#793d3d]' =>
                             $activeTag !== 'comunity',
                     ])>
                     {{ __('gallery.filter.comunity') }}
@@ -47,7 +47,7 @@
                         d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
                 </svg>
             </div>
-            <p class="text-gray-500 text-sm">{{ __('gallery.empty') }}</p>
+            <p class="text-gray-600 text-sm">{{ __('gallery.empty') }}</p>
         </div>
     @else
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" data-gallery-grid>
@@ -64,7 +64,7 @@
                 @endphp
                 <button type="button" data-gallery-open
                     wire:key="gallery-image-{{ $image->id }}"
-                    class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'col-span-2 min-h-56 sm:row-span-2 sm:min-h-72' : 'aspect-square' }}"
+                    class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md {{ $loop->first ? 'col-span-2 min-h-56 sm:row-span-2 sm:min-h-72' : 'aspect-square' }}"
                     @click="show(@js($image->public_url), @js($accessibleAltText), $event)"
                     aria-label="{{ $accessibleAltText }}">
                     <img src="{{ $image->public_url }}" alt="{{ $accessibleAltText }}"
@@ -84,7 +84,7 @@
     @endif
 
     <a href="mailto:{{ $frontPrimaryEmail }}"
-        class="elevated-card mt-6 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+        class="elevated-card mt-6 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
         data-gallery-photos-callout>
         <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -98,11 +98,11 @@
                 class="text-sm font-semibold text-gray-900 transition-colors group-hover:text-[#793d3d]">
                 {{ __('home.history_photos_title') }}
             </p>
-            <p class="mt-0.5 text-xs leading-relaxed text-gray-500">
+            <p class="mt-0.5 text-xs leading-relaxed text-gray-600">
                 {{ $photoRequestText }}
             </p>
         </div>
-        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
+        <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-brand-600"
             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
             aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round"

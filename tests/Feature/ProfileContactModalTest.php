@@ -2,7 +2,7 @@
 
 // Feature: profile contact modal
 // Validates: Profile page contact form modal — sends ContactConfirmation to user
-// and ContactNotification to admin, stored as ContactMessage with PERFIL subject prefix.
+// and ContactNotification to admin, with PERFIL prefix only in admin subject.
 
 use App\Models\User;
 use Livewire\Livewire;
@@ -71,7 +71,7 @@ it('sends ContactConfirmation to the logged-in user', function () {
         ->set('message', 'Proba mezua.')
         ->call('submit');
 
-    Mail::assertSent(ContactConfirmation::class, fn ($mail) => $mail->hasTo('ane@test.com'));
+    Mail::assertSent(ContactConfirmation::class, fn($mail) => $mail->hasTo('ane@test.com'));
 });
 
 it('sends ContactNotification to admin email from settings', function () {
@@ -82,10 +82,10 @@ it('sends ContactNotification to admin email from settings', function () {
         ->set('message', 'Proba mezua.')
         ->call('submit');
 
-    Mail::assertSent(ContactNotification::class, fn ($mail) => $mail->hasTo('admin@example.com'));
+    Mail::assertSent(ContactNotification::class, fn($mail) => $mail->hasTo('admin@example.com'));
 });
 
-it('prepends PERFIL to the subject', function () {
+it('prepends PERFIL prefix only in admin notification subject', function () {
     Mail::fake();
     $user = User::factory()->create(['email' => 'ane@test.com']);
 
@@ -93,7 +93,8 @@ it('prepends PERFIL to the subject', function () {
         ->set('message', 'Proba mezua.')
         ->call('submit');
 
-    Mail::assertSent(ContactConfirmation::class, fn ($mail) => str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
+    Mail::assertSent(ContactNotification::class, fn($mail) => str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
+    Mail::assertSent(ContactConfirmation::class, fn($mail) => !str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
 });
 
 it('resets fields and closes modal after successful submission', function () {
@@ -105,4 +106,13 @@ it('resets fields and closes modal after successful submission', function () {
         ->call('submit')
         ->assertSet('message', '')
         ->assertSet('showModal', false);
+});
+
+it('renders dialog labelling and message focus hook when opened', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)->test('profile-contact-modal')
+        ->call('open')
+        ->assertSeeHtml('aria-labelledby="profile-contact-modal-title"')
+        ->assertSeeHtml('aria-describedby="profile-contact-modal-description"');
 });

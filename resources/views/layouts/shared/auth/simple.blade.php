@@ -1,8 +1,13 @@
+@props(['title' => null, 'description' => null])
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 
 <head>
     @include('partials.shared.head')
+    @if (filled($description))
+        <meta name="description" content="{{ $description }}">
+    @endif
 </head>
 
 <body
@@ -13,8 +18,7 @@
             data-auth-shell>
             <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
                 class="mb-8 flex flex-col items-center gap-2 font-medium" wire:navigate>
-                <img src="{{ $publicLogoUrl }}"
-                    alt="{{ $publicSiteName ?? config('app.name', '-') }}"
+                <img src="{{ $publicLogoUrl }}" alt="" aria-hidden="true"
                     class="h-14 w-14 rounded-2xl border border-gray-200 bg-white object-contain p-1 shadow-sm" />
                 <span class="sr-only">{{ $publicSiteName ?? config('app.name', '-') }}</span>
             </a>

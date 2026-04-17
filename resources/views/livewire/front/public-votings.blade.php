@@ -1,4 +1,4 @@
-<div x-data x-init="if (navigator.geolocation) { navigator.geolocation.getCurrentPosition((position) => { $wire.setVoteCoordinates(position.coords.latitude, position.coords.longitude); }); }">
+<div x-data x-init="if (window.isSecureContext && navigator.geolocation) { navigator.geolocation.getCurrentPosition((position) => { $wire.setVoteCoordinates(position.coords.latitude, position.coords.longitude); }); }">
     @if ($requiresTermsAcceptance)
         <div class="fixed inset-0 z-80 bg-black/50" aria-hidden="true"></div>
         <section class="fixed inset-0 z-90 grid place-items-center p-4" data-votings-terms-modal>

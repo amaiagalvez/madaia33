@@ -21,11 +21,12 @@
                     data-section="owner-audit-log">
                     <summary
                         class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-zinc-800">
-                        <span>{{ __('admin.owners.audit.title') }}
-                            ({{ $editOwnerAuditLogCount }})</span>
-                        <span class="text-xs font-medium text-zinc-500">
-                            {{ __('admin.owners.audit.latest_limit', ['count' => count($editOwnerAuditLogs)]) }}
-                        </span>
+                        <span>{{ __('admin.owners.audit.title') }}</span>
+                        <svg class="h-4 w-4 text-zinc-500" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
                     </summary>
 
                     <div class="border-t border-zinc-200 px-4 py-4">

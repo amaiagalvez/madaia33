@@ -465,11 +465,13 @@
                             data-profile-owner-audit-log>
                             <summary
                                 class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-zinc-800">
-                                <span>{{ __('admin.owners.audit.title') }}
-                                    ({{ count($ownerAuditLogs) }})</span>
-                                <span class="text-xs font-medium text-zinc-500">
-                                    {{ __('admin.owners.audit.latest_limit', ['count' => count($ownerAuditLogs)]) }}
-                                </span>
+                                <span>{{ __('admin.owners.audit.title') }}</span>
+                                <svg class="h-4 w-4 text-zinc-500" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                    aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
                             </summary>
 
                             <div class="border-t border-zinc-200 px-4 py-4">
@@ -556,22 +558,23 @@
                                     {{ __('profile.owner.validation_help') }}
                                 </div>
 
-                                <div class="space-y-3">
+                                <div class="grid grid-cols-1 gap-3 md:grid-cols-3"
+                                    data-profile-owner-properties-grid>
                                     @foreach ($activeAssignments as $assignment)
                                         <label
                                             class="flex items-start gap-3 rounded-xl border border-gray-200 p-4">
                                             @if (!$assignment->owner_validated)
                                                 <input type="checkbox" name="assignment_ids[]"
                                                     value="{{ $assignment->id }}"
-                                                    class="mt-1 h-4 w-4 rounded border-gray-300 text-[#793d3d] focus:ring-[#d9755b]"
-                                                    checked>
+                                                    class="mt-0.5 h-6 w-6 rounded border-gray-300 text-[#793d3d] focus:ring-brand-600"
+                                                    data-profile-owner-assignment-checkbox>
                                             @endif
                                             <span class="block">
                                                 <span
-                                                    class="block text-sm font-semibold text-gray-900">{{ $assignment->property ? ($assignment->property->location?->code ? $assignment->property->location->code . ' — ' : '') . $assignment->property->name : __('profile.owner.unknown_property') }}</span>
+                                                    class="block text-sm font-semibold text-gray-900">{{ $assignment->property ? ($assignment->property->location?->code ? $assignment->property->location->code . '  ' : '') . $assignment->property->name : __('profile.owner.unknown_property') }}</span>
                                                 <span
-                                                    class="mt-1 block text-xs text-gray-600">{{ __('profile.owner.assignment_dates', ['start' => $assignment->start_date?->format('Y-m-d') ?? '—']) }}</span>
-                                                <span class="mt-1 block text-xs text-gray-600"
+                                                    class="mt-1 block text-sm text-gray-900">{{ __('profile.owner.assignment_dates', ['start' => $assignment->start_date?->format('Y-m-d') ?? '—']) }}</span>
+                                                <span class="mt-1 block text-sm text-gray-900"
                                                     data-profile-owner-property-percentages>
                                                     {{ __('profile.owner.community_pct') }}:
                                                     {{ $assignment->property?->community_pct !== null ? number_format((float) $assignment->property->community_pct, 2, ',', '.') . '%' : '-' }}
@@ -580,7 +583,7 @@
                                                     {{ $assignment->property?->location_pct !== null ? number_format((float) $assignment->property->location_pct, 2, ',', '.') . '%' : '-' }}
                                                 </span>
                                                 <span
-                                                    class="mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $assignment->owner_validated ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800' }}">
+                                                    class="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium {{ $assignment->owner_validated ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800' }}">
                                                     {{ $assignment->owner_validated ? __('profile.owner.validated') : __('profile.owner.pending_validation') }}
                                                 </span>
                                             </span>

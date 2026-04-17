@@ -2,8 +2,18 @@
     subjectCount: 0,
     messageCount: 0,
     showLegalModal: false,
+    lastFocusedElement: null,
     focusFirstField() {
         this.$refs.firstField?.focus();
+    },
+    openLegalModal(event) {
+        this.lastFocusedElement = event?.currentTarget ?? document.activeElement;
+        this.showLegalModal = true;
+        this.$nextTick(() => setTimeout(() => this.$refs.legalModalCloseButton?.focus(), 180));
+    },
+    closeLegalModal() {
+        this.showLegalModal = false;
+        this.$nextTick(() => this.lastFocusedElement?.focus());
     },
     autoResizeTextarea(el) {
         if (!el) {
@@ -94,7 +104,7 @@
                             autocomplete="name" maxlength="255" x-ref="firstField"
                             class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
                     {{ $errors->has('name') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
-                            aria-describedby="{{ $errors->has('name') ? 'contact-name-error' : '' }}"
+                            @if ($errors->has('name')) aria-describedby="contact-name-error" @endif
                             aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}">
                         @error('name')
                             <p id="contact-name-error" class="text-red-600 text-sm mt-1">
@@ -114,7 +124,7 @@
                             autocomplete="email" maxlength="255"
                             class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
                     {{ $errors->has('email') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
-                            aria-describedby="{{ $errors->has('email') ? 'contact-email-error' : '' }}"
+                            @if ($errors->has('email')) aria-describedby="contact-email-error" @endif
                             aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}">
                         @error('email')
                             <p id="contact-email-error" class="text-red-600 text-sm mt-1">
@@ -134,7 +144,7 @@
                             @input="subjectCount = $event.target.value.length"
                             class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
                     {{ $errors->has('subject') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
-                            aria-describedby="{{ $errors->has('subject') ? 'contact-subject-error' : '' }}"
+                            aria-describedby="{{ $errors->has('subject') ? 'contact-subject-counter contact-subject-error' : 'contact-subject-counter' }}"
                             aria-invalid="{{ $errors->has('subject') ? 'true' : 'false' }}">
                         <p id="contact-subject-counter" class="mt-1 text-xs text-gray-500"
                             aria-live="polite">
@@ -159,7 +169,7 @@
                             @input="messageCount = $event.target.value.length; autoResizeTextarea($event.target)"
                             class="block w-full min-h-11 rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-1
                     {{ $errors->has('message') ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#d9755b] focus:ring-[#d9755b]' }}"
-                            aria-describedby="{{ $errors->has('message') ? 'contact-message-error' : '' }}"
+                            aria-describedby="{{ $errors->has('message') ? 'contact-message-counter contact-message-error' : 'contact-message-counter' }}"
                             aria-invalid="{{ $errors->has('message') ? 'true' : 'false' }}"></textarea>
                         <p id="contact-message-counter" class="mt-1 text-xs text-gray-500"
                             aria-live="polite">
@@ -175,14 +185,14 @@
                     {{-- Legal checkbox --}}
                     <div class="mb-6">
                         <div class="flex items-start gap-2">
-                            <label for="contact-legal"
-                                class="sr-only">{{ $checkboxLabel }}</label>
                             <input id="contact-legal" type="checkbox" wire:model="legalAccepted"
                                 class="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#d9755b] focus:ring-[#d9755b]"
-                                aria-describedby="{{ $errors->has('legalAccepted') ? 'contact-legal-error' : '' }}"
+                                aria-labelledby="contact-legal-label"
+                                @if ($errors->has('legalAccepted')) aria-describedby="contact-legal-error" @endif
                                 aria-invalid="{{ $errors->has('legalAccepted') ? 'true' : 'false' }}">
                             <div class="text-sm text-gray-700">
-                                <button type="button" @click.prevent.stop="showLegalModal = true"
+                                <button type="button" id="contact-legal-label"
+                                    @click.prevent.stop="openLegalModal($event)"
                                     class="cursor-pointer text-left underline decoration-[#d9755b]/40 underline-offset-4 hover:text-[#793d3d]"
                                     data-test="contact-legal-modal-trigger">
                                     {{ $checkboxLabel }}
@@ -201,7 +211,7 @@
 
                     {{-- Submit --}}
                     <button type="submit" x-ref="submitButton"
-                        class="inline-flex w-full sm:w-auto min-h-11 items-center justify-center rounded-md bg-[#d9755b] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 disabled:opacity-50"
+                        class="inline-flex w-full sm:w-auto min-h-11 items-center justify-center rounded-md bg-[#793d3d] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#5f2f2f] focus:outline-none focus:ring-2 focus:ring-[#793d3d] focus:ring-offset-2 disabled:opacity-50"
                         data-contact-submit wire:loading.attr="disabled" wire:target="submit">
                         <span wire:loading.remove>{{ __('contact.send') }}</span>
                         <span wire:loading wire:target="submit" class="flex items-center gap-2"
@@ -219,11 +229,12 @@
 
                 <template x-teleport="body">
                     <div x-cloak x-show="showLegalModal" x-transition.opacity
-                        x-on:keydown.escape.window="showLegalModal = false"
+                        x-on:keydown.escape.window="if (showLegalModal) { closeLegalModal() }"
                         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
                         aria-modal="true" role="dialog"
-                        aria-label="{{ __('general.footer.privacy_policy') }}">
-                        <div class="absolute inset-0 bg-black/50" @click="showLegalModal = false"
+                        aria-labelledby="contact-legal-modal-title"
+                        aria-describedby="contact-legal-modal-content">
+                        <div class="absolute inset-0 bg-black/50" @click="closeLegalModal()"
                             aria-hidden="true">
                         </div>
 
@@ -231,10 +242,12 @@
                             @click.stop data-test="contact-legal-modal">
                             <div
                                 class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-                                <h2 class="text-lg font-semibold text-gray-900">
+                                <h2 id="contact-legal-modal-title"
+                                    class="text-lg font-semibold text-gray-900">
                                     {{ __('general.footer.privacy_policy') }}
                                 </h2>
-                                <button type="button" @click="showLegalModal = false"
+                                <button type="button" x-ref="legalModalCloseButton"
+                                    @click="closeLegalModal()"
                                     class="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                                     aria-label="{{ __('general.buttons.close') }}">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"

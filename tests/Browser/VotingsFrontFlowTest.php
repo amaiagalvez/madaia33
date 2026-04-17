@@ -158,6 +158,44 @@ test('owner without accepted terms sees blocking modal in front votings until ac
     });
 });
 
+test('authenticated owner sees votings explanation and pdf actions on local http origin', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $portal = Location::factory()->portal()->create(['code' => '77-U']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+        'label_eu' => 'Bai',
+        'label_es' => 'Si',
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner) {
+        $browser->loginAs($owner->user)
+            ->visit('/es/votaciones')
+            ->waitFor('[data-page="votings"]')
+            ->assertPresent('[data-votings-content]')
+            ->assertPresent('[data-votings-explanation-card]')
+            ->assertPresent('[data-votings-pdf-actions]')
+            ->assertScript('return window.isSecureContext;', false);
+    });
+});
+
 test('superadmin can open votings front in read only mode', function () {
     $superadmin = User::query()->find(1) ?? User::factory()->create([
         'id' => 1,

@@ -103,7 +103,7 @@
 
         <!-- Navigation Buttons (Hidden on mobile, visible on md+) -->
         <button @click="resetAutoplay()" wire:click="previousImage"
-            class="absolute left-4 top-1/2 -translate-y-1/2 z-10 hidden md:flex items-center justify-center h-12 w-12 rounded-full bg-white/20 hover:bg-white/40 transition-colors backdrop-blur-sm"
+            class="absolute left-4 top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-colors hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 md:flex"
             aria-label="{{ __('hero_slider.previous') }}">
             <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2"
                 stroke="currentColor">
@@ -113,7 +113,7 @@
         </button>
 
         <button @click="resetAutoplay()" wire:click="nextImage"
-            class="absolute right-4 top-1/2 -translate-y-1/2 z-10 hidden md:flex items-center justify-center h-12 w-12 rounded-full bg-white/20 hover:bg-white/40 transition-colors backdrop-blur-sm"
+            class="absolute right-4 top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-colors hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 md:flex"
             aria-label="{{ __('hero_slider.next') }}">
             <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2"
                 stroke="currentColor">
@@ -125,7 +125,7 @@
         <!-- Mobile Touch Controls -->
         <div class="absolute inset-x-0 bottom-18 z-10 flex justify-between px-4 md:hidden">
             <button @click="resetAutoplay()" wire:click="previousImage"
-                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                 aria-label="{{ __('hero_slider.previous') }}">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" aria-hidden="true">
@@ -134,7 +134,7 @@
                 </svg>
             </button>
             <button @click="resetAutoplay()" wire:click="nextImage"
-                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                 aria-label="{{ __('hero_slider.next') }}">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" aria-hidden="true">
@@ -148,7 +148,7 @@
         <div class="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
             @foreach ($images as $index => $image)
                 <button @click="resetAutoplay()" wire:click="goToImage({{ $index }})"
-                    class="h-2 sm:h-3 rounded-full transition-all duration-300"
+                    class="h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 sm:h-3"
                     :class="{
                         'bg-white w-6 sm:w-8': currentIndex === {{ $index }},
                         'bg-white/50 w-2 sm:w-3 hover:bg-white/75': currentIndex !==
@@ -161,7 +161,7 @@
 
         <!-- Autoplay Toggle (Mobile-friendly) -->
         <button wire:click="toggleAutoplay"
-            class="absolute top-4 sm:top-6 right-4 sm:right-6 z-10 flex items-center justify-center h-10 w-10 rounded-full bg-white/20 hover:bg-white/40 transition-colors backdrop-blur-sm"
+            class="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-colors hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 sm:right-6 sm:top-6"
             :aria-label="`${autoplayEnabled ? '{{ __('hero_slider.pause') }}' : '{{ __('hero_slider.play') }}'}`">
             <svg x-show="autoplayEnabled" class="h-5 w-5 text-white" fill="currentColor"
                 viewBox="0 0 24 24">

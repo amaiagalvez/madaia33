@@ -27,6 +27,7 @@ Run Lighthouse reliably in this repository using Docker-only commands, then prov
 1. Confirm affected Dusk tests pass first.
 2. Keep Docker-first workflow (no host `npm` / `node` execution).
 3. Use non-root user context for project commands where possible.
+4. For authenticated/private audits, do not rely on manual cookie injection as the default approach.
 
 ## Default Workflow (First Try)
 
@@ -36,17 +37,166 @@ Run Lighthouse reliably in this repository using Docker-only commands, then prov
 docker compose up -d db madaia33
 ```
 
-### 2) Run Lighthouse from a Docker image with Chrome included
+### 2) Start a temporary app container with Debugbar disabled
 
-Use this stable command pattern:
+Use this command so Lighthouse audits the UI without `phpdebugbar` overlays/noise:
 
 ```bash
-docker run --rm --network madaia33_frontend -u $(id -u):$(id -g) -v "$PWD:/work" -w /work ghcr.io/puppeteer/puppeteer:22.15.0 sh -lc "npx -y lighthouse@11 'http://madaia33/es/avisos' --only-categories=performance,accessibility,best-practices,seo --chrome-flags='--headless --no-sandbox --disable-gpu' --output=json --output-path='/work/.docs/lighthouse-madaia33-es-avisos.json'"
+docker compose run --rm -d --name lh-app \
+    --user "${DC_UID:-1000}:${DC_GID:-1000}" \
+    -e APP_ENV=testing \
+    -e APP_DEBUG=false \
+    -e DEBUGBAR_ENABLED=false \
+    -e APP_URL=http://lh-app:8000 \
+    -e DB_CONNECTION=sqlite \
+    -e DB_DATABASE=/tmp/lighthouse.sqlite \
+    -e CACHE_STORE=array \
+    -e SESSION_DRIVER=file \
+    -e QUEUE_CONNECTION=sync \
+    madaia33 sh -lc '
+set -e
+rm -f /tmp/lighthouse.sqlite
+php artisan migrate:fresh --seed --force >/tmp/lighthouse-migrate.log 2>&1
+php artisan serve --host=0.0.0.0 --port=8000 >/tmp/lighthouse-serve.log 2>&1
+'
+```
+
+If the page to audit requires seeded demo users/owners/votings from `DevSeeder`, recreate `lh-app` with `APP_ENV=local` instead of `APP_ENV=testing`:
+
+```bash
+docker rm -f lh-app >/dev/null 2>&1 || true
+docker compose run --rm -d --name lh-app \
+    --user "${DC_UID:-1000}:${DC_GID:-1000}" \
+    -e APP_ENV=local \
+    -e APP_DEBUG=false \
+    -e DEBUGBAR_ENABLED=false \
+    -e APP_URL=http://lh-app:8000 \
+    -e DB_CONNECTION=sqlite \
+    -e DB_DATABASE=/tmp/lighthouse.sqlite \
+    -e CACHE_STORE=array \
+    -e SESSION_DRIVER=file \
+    -e QUEUE_CONNECTION=sync \
+    madaia33 sh -lc '
+set -e
+rm -f /tmp/lighthouse.sqlite
+php artisan migrate:fresh --seed --force >/tmp/lighthouse-migrate.log 2>&1
+php artisan serve --host=0.0.0.0 --port=8000 >/tmp/lighthouse-serve.log 2>&1
+'
+```
+
+Then verify the container is reachable before running Lighthouse:
+
+```bash
+for i in $(seq 1 60); do
+    docker run --rm --network madaia33_frontend curlimages/curl:8.7.1 -fsS http://lh-app:8000/es >/dev/null 2>&1 && break
+    if [ "$i" -eq 60 ]; then
+        echo "lh-app unreachable" >&2
+        exit 1
+    fi
+done
+```
+
+Stop and remove it when finished:
+
+```bash
+docker rm -f lh-app >/dev/null 2>&1 || true
+```
+
+### 3) Run Lighthouse from a Docker image with Chrome included
+
+Use this robust command pattern (recommended):
+
+```bash
+WORKSPACE_DIR="$(pwd -P)"
+docker run --rm --network madaia33_frontend \
+    -u "$(id -u):$(id -g)" \
+    -v "${WORKSPACE_DIR}:/work" \
+    -w /work \
+    ghcr.io/puppeteer/puppeteer:22.15.0 \
+    sh -lc "npx -y lighthouse@11 'http://lh-app:8000/es/avisos' \
+        --only-categories=performance,accessibility,best-practices,seo \
+        --chrome-flags='--headless --no-sandbox --disable-gpu' \
+        --output=json \
+        --output-path='/work/.docs/lighthouse-madaia33-es-avisos.json' \
+        --quiet"
+
+ls -l "${WORKSPACE_DIR}/.docs/lighthouse-madaia33-es-avisos.json"
 ```
 
 Repeat for each affected URL and keep reports in `.docs/`.
 
-### 3) Summarize category scores from report JSON
+### 3b) Authenticated pages: use a shared Chrome session
+
+For private/authenticated/Livewire-heavy pages, use a real browser session and run Lighthouse against that same Chrome instance. This is the default for routes like `/es/votaciones`.
+
+Reason:
+
+- Manual cookie/header injection can silently audit a redirect/login page instead of the target route.
+- Shared-session Chrome avoids CSRF/session drift and better reflects real authenticated behavior.
+
+Use this pattern:
+
+```bash
+WORKSPACE_DIR="$(pwd -P)"
+docker run --rm --network madaia33_frontend \
+        -u "$(id -u):$(id -g)" \
+        -v "${WORKSPACE_DIR}:/work" \
+        -w /work \
+        ghcr.io/puppeteer/puppeteer:22.15.0 sh -lc '
+set -e
+cat >/tmp/lh-login.cjs <<"NODE"
+const puppeteer = require("/home/pptruser/node_modules/puppeteer");
+
+(async () => {
+    const browser = await puppeteer.launch({
+        executablePath: "/usr/bin/google-chrome",
+        headless: true,
+        args: ["--remote-debugging-port=9222", "--no-sandbox", "--disable-gpu", "--user-data-dir=/tmp/lh-profile"],
+    });
+
+    const page = await browser.newPage();
+    await page.goto("http://lh-app:8000/es/privado", { waitUntil: "networkidle2" });
+    await page.type("input[name=email]", "propietaria@email.eus");
+    await page.type("input[name=password]", "password");
+    await Promise.all([
+        page.click("[data-test=login-button]"),
+        page.waitForNavigation({ waitUntil: "networkidle2" }),
+    ]);
+    await page.goto("http://lh-app:8000/es/votaciones", { waitUntil: "networkidle2" });
+    await page.waitForSelector("[data-page=votings]", { timeout: 10000 });
+    console.log("LH_READY");
+    setInterval(() => {}, 1000);
+})();
+NODE
+
+node /tmp/lh-login.cjs >/tmp/lh-login.log 2>&1 &
+NODE_PID=$!
+i=0
+while [ "$i" -lt 60 ]; do
+        if grep -q "LH_READY" /tmp/lh-login.log; then break; fi
+        if ! kill -0 "$NODE_PID" 2>/dev/null; then cat /tmp/lh-login.log; exit 1; fi
+        i=$((i+1))
+        if [ "$i" -eq 60 ]; then cat /tmp/lh-login.log; exit 1; fi
+        sleep 1
+done
+
+npx -y lighthouse@11 "http://lh-app:8000/es/votaciones" \
+        --port=9222 \
+        --disable-storage-reset \
+        --only-categories=performance,accessibility,best-practices,seo \
+        --chrome-flags="--headless --no-sandbox --disable-gpu" \
+        --output=json \
+        --output-path="/work/.docs/lighthouse-madaia33-es-votaciones-auth.json" \
+        --quiet
+
+kill "$NODE_PID" || true
+ls -l /work/.docs/lighthouse-madaia33-es-votaciones-auth.json
+'
+```
+
+After each authenticated audit, confirm that `requestedUrl` and `finalUrl` both match the intended route. If `finalUrl` falls back to `/login`, `/es/privado`, or another auth gate, the audit is invalid and must be rerun.
+
+### 4) Summarize category scores from report JSON
 
 ```bash
 node - <<'NODE'
@@ -61,7 +211,7 @@ for (const file of files) {
 NODE
 ```
 
-### 4) Compare before/after scores (when rerunning after a fix)
+### 5) Compare before/after scores (when rerunning after a fix)
 
 Save improved reports with a `-v2` suffix (e.g. `lighthouse-madaia33-es-galeria-v2.json`), then run:
 
@@ -97,11 +247,23 @@ NODE
 
 - Error: Lighthouse cannot reach URL / `ERR_CONNECTION_REFUSED`.
     - Cause: wrong hostname/port from inside Docker network.
-    - Fix: target `http://madaia33/...` (service name), not `localhost` from a separate container.
+    - Fix: when using the temporary audit container, target `http://lh-app:8000/...` and keep `--network madaia33_frontend` in the Lighthouse container.
+
+- Authenticated page report finishes on `/login`, `/es/privado`, or another unexpected URL.
+    - Cause: invalid session reproduction; cookie/header injection did not preserve the real authenticated state.
+    - Fix: rerun with Step `3b` (shared Chrome session), then verify `requestedUrl === finalUrl`.
+
+- A long all-in-one shell command appears to stall or returns partial output.
+    - Cause: the workflow is too large for one opaque terminal step, making diagnosis difficult.
+    - Fix: split execution into small verified steps: start `lh-app`, verify reachability, run each Lighthouse audit separately, then summarize results.
+
+- Contrast failure points to `.phpdebugbar-*` selectors.
+    - Cause: Debugbar rendered in audited DOM.
+    - Fix: rerun using Step 2 (`APP_DEBUG=false`, `DEBUGBAR_ENABLED=false`) and only treat it as app issue if selector still points to product DOM.
 
 - No report files appear in workspace.
-    - Cause: output path not inside mounted volume.
-    - Fix: write to `/work/.docs/...` and ensure `-v "$PWD:/work"` is present.
+    - Cause: output path not inside mounted volume or ambiguous working directory.
+    - Fix: use `WORKSPACE_DIR="$(pwd -P)"`, mount `-v "${WORKSPACE_DIR}:/work"`, write to `/work/.docs/...`, and verify with `ls -l` after each run.
 
 - HTTPS audit failure in local environment.
     - Cause: local test URL is HTTP.
@@ -163,3 +325,5 @@ Final section:
 - Store generated JSON reports in `.docs/` so they are auditable.
 - Keep Docker-first and non-root execution discipline.
 - If running from host shell for quick JSON parsing, avoid mutating project files unless requested.
+- For authenticated front routes in this repo, prefer `APP_ENV=local` when you need the full DevSeeder dataset (owner users, active votings, delegated flows).
+- For public/guest pages, `APP_ENV=testing` is usually enough and keeps the dataset smaller.

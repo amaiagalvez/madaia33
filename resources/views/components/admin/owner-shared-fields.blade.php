@@ -29,7 +29,8 @@
         <div class="grid gap-3">
             @if ($isWireMode)
                 <flux:field>
-                    <flux:label>{{ __('admin.owners.form.coprop1_name') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop1_name') }} <span class="text-red-600"
+                            aria-hidden="true">*</span></flux:label>
                     <flux:input wire:model="{{ $coprop1NameModel }}" />
                     <flux:error name="{{ $coprop1NameModel }}" />
                 </flux:field>
@@ -49,12 +50,14 @@
                     <flux:error name="{{ $coprop1PhoneModel }}" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('admin.owners.form.coprop1_email') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.coprop1_email') }} <span
+                            class="text-red-600" aria-hidden="true">*</span></flux:label>
                     <flux:input wire:model="{{ $coprop1EmailModel }}" type="email" />
                     <flux:error name="{{ $coprop1EmailModel }}" />
                 </flux:field>
                 <flux:field>
-                    <flux:label>{{ __('admin.owners.form.language') }}</flux:label>
+                    <flux:label>{{ __('admin.owners.form.language') }} <span class="text-red-600"
+                            aria-hidden="true">*</span></flux:label>
                     <flux:select wire:model="{{ $languageModel }}">
                         <flux:select.option value="eu">{{ __('general.language.eu') }}
                         </flux:select.option>
@@ -65,7 +68,8 @@
                 </flux:field>
             @else
                 <label class="text-sm font-medium text-gray-700">
-                    {{ __('admin.owners.form.coprop1_name') }}
+                    {{ __('admin.owners.form.coprop1_name') }} <span class="text-red-600"
+                        aria-hidden="true">*</span>
                     <input type="text" name="coprop1_name"
                         value="{{ old('coprop1_name', $owner?->coprop1_name) }}"
                         class="{{ $inputClass }}">
@@ -89,13 +93,15 @@
                         class="{{ $inputClass }}">
                 </label>
                 <label class="text-sm font-medium text-gray-700">
-                    {{ __('admin.owners.form.coprop1_email') }}
+                    {{ __('admin.owners.form.coprop1_email') }} <span class="text-red-600"
+                        aria-hidden="true">*</span>
                     <input type="email" name="coprop1_email"
                         value="{{ old('coprop1_email', $owner?->coprop1_email) }}"
                         class="{{ $inputClass }}">
                 </label>
                 <label class="text-sm font-medium text-gray-700">
-                    {{ __('admin.owners.form.language') }}
+                    {{ __('admin.owners.form.language') }} <span class="text-red-600"
+                        aria-hidden="true">*</span>
                     <select name="language" class="{{ $inputClass }}">
                         <option value="eu" @selected(old('language', $owner?->language) === 'eu')>
                             {{ __('general.language.eu') }}</option>

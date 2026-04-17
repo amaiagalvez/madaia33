@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Voting;
 use App\SupportedLocales;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
+use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
 use App\Support\VotingEligibilityService;
 
@@ -15,14 +15,16 @@ class PublicVotingController extends Controller
 
     public const IN_PERSON_OWNER_SESSION_KEY = 'in_person_voting_owner_id';
 
-    public function index(): View
+    public function index(): Response
     {
         $hasOpenVotings = Voting::query()->publishedOpen()->exists();
         $hasPendingDelegations = app(VotingEligibilityService::class)->ownersWithPendingDelegations()->isNotEmpty();
 
         abort_unless($hasOpenVotings || $hasPendingDelegations, 404);
 
-        return view('public.votings');
+        return response()
+            ->view('public.votings')
+            ->header('Cache-Control', 'no-cache, private, must-revalidate');
     }
 
     public function clearDelegatedVoting(Request $request): RedirectResponse

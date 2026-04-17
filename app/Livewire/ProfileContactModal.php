@@ -67,11 +67,13 @@ class ProfileContactModal extends Component
     {
         $this->reset(['message', 'statusType', 'statusMessage']);
         $this->showModal = true;
+        $this->dispatch('profile-contact-modal-opened');
     }
 
     public function close(): void
     {
         $this->showModal = false;
+        $this->dispatch('profile-contact-modal-closed');
     }
 
     public function submit(): void
@@ -80,17 +82,18 @@ class ProfileContactModal extends Component
 
         $user = Auth::user();
         $settings = $this->settings();
-        $mailSubject = $this->buildSubject($settings);
+        $userMailSubject = $this->buildUserSubject($settings);
+        $adminMailSubject = $this->buildAdminSubject($userMailSubject);
 
         $contactMessage = ContactMessage::create([
             'user_id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'subject' => $mailSubject,
+            'subject' => $adminMailSubject,
             'message' => $this->message,
         ]);
 
-        $emailFailed = $this->sendEmails($contactMessage, $settings, $mailSubject);
+        $emailFailed = $this->sendEmails($contactMessage, $settings, $userMailSubject);
 
         $this->message = '';
 
@@ -99,6 +102,7 @@ class ProfileContactModal extends Component
             $this->statusMessage = __('profile.contact_modal.email_error');
         } else {
             $this->showModal = false;
+            $this->dispatch('profile-contact-modal-closed');
             $this->statusType = 'success';
             $this->statusMessage = __('profile.contact_modal.success');
         }
@@ -107,11 +111,14 @@ class ProfileContactModal extends Component
     /**
      * @param  array<string, string>  $settings
      */
-    private function buildSubject(array $settings): string
+    private function buildUserSubject(array $settings): string
     {
-        $base = Setting::localizedStringFrom($settings, 'contact_form_subject') ?? '';
+        return Setting::localizedStringFrom($settings, 'contact_form_subject') ?? '';
+    }
 
-        return '[' . __('profile.contact_modal.message_subject') . '] ' . $base;
+    private function buildAdminSubject(string $baseSubject): string
+    {
+        return '[' . __('profile.contact_modal.message_subject') . '] ' . $baseSubject;
     }
 
     /**

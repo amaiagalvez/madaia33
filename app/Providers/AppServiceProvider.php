@@ -46,20 +46,20 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Password::defaults(
-            fn(): ?Password => app()->isProduction()
+            fn (): ?Password => app()->isProduction()
                 ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised()
                 : null,
         );
     }
 
     protected function registerMessagingRateLimiters(): void
     {
-        RateLimiter::for('campaign-email-send', fn(): Limit => Limit::perMinute(10)->by('campaign-email-send'));
+        RateLimiter::for('campaign-email-send', fn (): Limit => Limit::perMinute(10)->by('campaign-email-send'));
     }
 
     /**
@@ -131,6 +131,6 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerLogViewerGate(): void
     {
-        Gate::define('viewLogViewer', fn($user) => $user->isSuperadmin());
+        Gate::define('viewLogViewer', fn ($user) => $user->isSuperadmin());
     }
 }

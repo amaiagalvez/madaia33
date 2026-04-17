@@ -2,6 +2,8 @@
 
 use App\Models\User;
 use App\SupportedLocales;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Support\Facades\Route;
 
 dataset('supported_locales', SupportedLocales::all());
@@ -38,6 +40,29 @@ it('private page shows centered responsive placeholder', function (string $local
     $response->assertSee('data-private-placeholder', false);
     $response->assertSee(__('general.private.guest_message'));
 })->with('supported_locales');
+
+it('private page login form exposes accessible error association and password toggle semantics', function () {
+    $response = test()->get(route(SupportedLocales::routeName('private', SupportedLocales::DEFAULT)));
+
+    $response->assertOk();
+    $response->assertSee('aria-controls="private-password"', false);
+    $response->assertSee("x-bind:aria-pressed=\"showPassword ? 'true' : 'false'\"", false);
+
+    $errors = new ViewErrorBag();
+    $errors->put('default', new MessageBag([
+        'email' => ['The email field is required.'],
+    ]));
+
+    $html = view('public.private', [
+        'errors' => $errors,
+    ])->render();
+
+    expect($html)
+        ->toContain('data-private-login-error')
+        ->toContain('id="private-login-error"')
+        ->toContain('aria-describedby="private-login-error"')
+        ->toContain('aria-invalid="true"');
+});
 
 it('private page redirects authenticated users to the admin dashboard', function () {
     $user = User::factory()->create();

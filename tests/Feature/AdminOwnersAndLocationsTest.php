@@ -767,6 +767,27 @@ it('shows only properties without active owners in owner property selectors', fu
         });
 });
 
+it('stores primary dni as null when admin owner edit sends empty dni', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Owner Dni Admin',
+        'coprop1_email' => 'owner.dni.admin@example.com',
+        'coprop1_dni' => '11223344A',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('openEditOwnerForm', $owner->id)
+        ->set('editCoprop1Name', 'Owner Dni Admin Updated')
+        ->set('editCoprop1Email', 'owner.dni.admin.updated@example.com')
+        ->set('editCoprop1Dni', '')
+        ->call('saveEditOwner')
+        ->assertHasNoErrors();
+
+    expect($owner->fresh()->coprop1_dni)->toBeNull();
+});
+
 it('renders owners list with inline expansion action instead of detail bars link', function () {
     $user = adminUser();
     $owner = Owner::factory()->create(['coprop1_name' => 'Inline Jabea']);

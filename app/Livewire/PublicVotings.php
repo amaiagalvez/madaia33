@@ -92,6 +92,8 @@ class PublicVotings extends Component
 
     public function mount(): void
     {
+        $this->enableBackButtonCache();
+
         $user = $this->currentUser();
         $delegatedOwnerId = (int) session()->get(PublicVotingController::DELEGATED_OWNER_SESSION_KEY, 0);
         $inPersonOwnerId = (int) session()->get(PublicVotingController::IN_PERSON_OWNER_SESSION_KEY, 0);

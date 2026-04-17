@@ -2,6 +2,7 @@
 - [ ] Repasa los feature test y los que se pueedan convertir en unit pasalos
 - [ ] Repasa la suit de test y completa los que falten
 - [ ] con el agente sorgina repasar el código y proponer mejoras (código repetido, test que faltan, ...)
+- [ ] con chatgpt pedirle que haga una auditoría de accesibilidad y pasarsela @lamia
 
 - [ ] sudo find /home/amaia/Dokumentuak/madaia33 -user root -exec chown amaia:amaia {} +
 - [ ] bash scripts/enforce-indent-4.sh 
@@ -13,12 +14,34 @@
 - [ ] reepasar estatistikak home
 - [ ] añadir papelera para poder reestaurar los borrrados
 - [ ] añadir tipo votaciones, una persona un voto / por porcentajes de participación
-
-- [ ] configurar el sentry
-- [ ] accesibilidad
+- [ ] repasar queries duplicadas que indica la debugbar
+- [ ] configurar el sentry (despues de publicar master)
 
 - votaciones resultados (suma de porcentajes)
-- spec kiro pendientes
+- spec kiro pendientes (obra)
+- en todos los sitios en lo que debe salir un modal, crear un dusk-test para que lo compruebe y así no tener riesgo de perder esa funcionalidad.
+- examinar la pestaña Queries del debugbar y analizar las consultas duplicadas
+  - Front
+    - iragarkiak
+    - argazki-bilduma
+    - kontaktua
+    - pribatua
+    - 
+  - Front logeado
+    - profila y las diferentes tabs que tiene
+    - bozketak
+  - Aginte-panela
+    - admin
+    - admin/avisos
+    - admin/imagenes
+    - admin/mensajes
+    - admin/campanas
+    - admin/campanas/{id}
+    - admin/portales
+    - admin/propietarias
+    - admin/votaciones
+    - admin/configuracion
+    - admin/usuarios
 
 # unificar terminología
 
@@ -27,22 +50,20 @@ properties: Propiedades => Fincas
 property_assignments => Propiedades
 owners => Propietarias
 
-- añadir en el formulario de owners el campo whathapp con el "Tienes whachapp" o "Whatcapp-a daukazu"? Añadelo en el formulario de los owners del panel y en perfil tanto al koop1 como al koop2
-- Cuando se haga un envio de campaña por whatchapp enviar solo a los que tengan ese nuevo campo activo
-
 # Home
 - [ ] Cookies sartu
 - [ ] config recaptcha, analitics
 - [ ] probar envio whatcapp en el movil
 
-- [ ] En el listado de bozketak añadir un botón para Enviar un email con los pdf delegado y presencial. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa votación. Debe de abrir el formulario de la campaña creada para que pueda añadir el texto a enviar.
+- [ ] En el listado de bozketak añadir un botón para Enviar un email con los pdf delegado y presencial. Crear una nueva campaña y añadir los pdf y los recipients. Los recipients serán los owners que puedan votar en esa votación. Debe de abrir el formulario de la campaña creada para que pueda añadir el texto a enviar. Es decir, las locations que hay en la bozketa y las que se deben crear para la campaña deben de ser las mismas.
 
 En el listado de admin/campanas
 - al pinchar en el botón programar, modal para pedir cuando programarlo
 - añadir nueva columna con el número de mensajes de abiertos
 
 - cuando se pulsa en el botón de enviar en un envío de whatcapp, actualizar la fecha de envió de esa campaña, ahora no se actualiza
-- 
+
+- en le perfil, en el enlace "Pasahitza aldatu", la ruta tiene que ir en fución del idioma en el que se está navengando.
 
 - [ ] campaña: añadir un botón, enviar prueba (como tenenmos en el formulario de los settings email_configuration) mostrar un modal para pedir un email y enviar a dicho email una prueba de como queda la campaña. Se enviarán dos emails de prueba, uno en euskera y otro en castellano al email indicado.
 

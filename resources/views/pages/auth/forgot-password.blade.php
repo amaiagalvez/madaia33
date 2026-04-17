@@ -1,4 +1,4 @@
-<x-layouts::shared.auth :title="__('admin.password_reset.request_title')">
+<x-layouts::shared.auth :title="__('admin.password_reset.request_title')" :description="__('admin.password_reset.request_description')">
     <x-auth.form-shell :title="__('admin.password_reset.request_title')" :description="__('admin.password_reset.request_description')">
         <form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-6">
             @csrf

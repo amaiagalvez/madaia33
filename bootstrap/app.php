@@ -1,5 +1,6 @@
 <?php
 
+use Sentry\Laravel\Integration;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\SecurityHeaders;
@@ -7,7 +8,7 @@ use App\Http\Middleware\EnsureHasAnyRole;
 use App\Http\Middleware\EnsureAdminPanelAccess;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Sentry\Laravel\Integration;
+use App\Http\Middleware\NormalizeVotingsCacheHeaders;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         __DIR__ . '/../app/Console/Commands',
     ])
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(NormalizeVotingsCacheHeaders::class);
+
         $middleware->alias([
             'admin.panel' => EnsureAdminPanelAccess::class,
             'role' => EnsureHasAnyRole::class,

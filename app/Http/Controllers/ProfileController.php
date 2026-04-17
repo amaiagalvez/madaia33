@@ -7,12 +7,12 @@ use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\Setting;
 use App\SupportedLocales;
+use App\Validations\OwnerFormValidation;
 use Illuminate\View\View;
 use App\Models\VotingBallot;
 use Illuminate\Http\Request;
 use App\Models\ContactMessage;
 use Illuminate\Support\Carbon;
-use Illuminate\Validation\Rule;
 use App\Models\UserLoginSession;
 use App\Models\CampaignRecipient;
 use Illuminate\Support\Collection;
@@ -40,7 +40,7 @@ class ProfileController extends Controller
 
         $activeAssignments = $this->activeAssignments($owner);
         $pendingAssignments = $activeAssignments->filter(
-            static fn ($assignment): bool => ! (bool) $assignment->owner_validated,
+            static fn($assignment): bool => ! (bool) $assignment->owner_validated,
         );
 
         $requiresTermsAcceptance = $owner !== null && $owner->accepted_terms_at === null;
@@ -161,18 +161,21 @@ class ProfileController extends Controller
 
         abort_if($owner === null, 403);
 
-        $validated = $request->validate([
-            'coprop1_name' => ['required', 'string', 'max:255'],
-            'coprop1_email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'coprop1_phone' => ['nullable', 'string', 'max:20'],
-            'language' => ['required', 'in:eu,es'],
-            'coprop2_name' => ['nullable', 'string', 'max:255'],
-            'coprop2_dni' => ['nullable', 'string', 'max:20'],
-            'coprop2_phone' => ['nullable', 'string', 'max:20'],
-            'coprop2_email' => ['nullable', 'email', 'max:255'],
-        ]);
+        $validated = $request->validate(OwnerFormValidation::profileUpdateRules($user->id));
 
-        $owner->update($validated);
+        $owner->update([
+            'coprop1_name' => $validated['coprop1_name'],
+            'coprop1_surname' => $validated['coprop1_surname'] ?: null,
+            'coprop1_dni' => $validated['coprop1_dni'] ?: null,
+            'coprop1_email' => $validated['coprop1_email'],
+            'coprop1_phone' => $validated['coprop1_phone'] ?: null,
+            'language' => $validated['language'],
+            'coprop2_name' => $validated['coprop2_name'] ?: null,
+            'coprop2_surname' => $validated['coprop2_surname'] ?: null,
+            'coprop2_dni' => $validated['coprop2_dni'] ?: null,
+            'coprop2_phone' => $validated['coprop2_phone'] ?: null,
+            'coprop2_email' => $validated['coprop2_email'] ?: null,
+        ]);
 
         return redirect()
             ->route(SupportedLocales::routeName('profile'), ['tab' => 'owner'])
@@ -187,8 +190,8 @@ class ProfileController extends Controller
         abort_if($owner === null, 403);
 
         $assignmentIds = collect((array) $request->input('assignment_ids', []))
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->filter(static fn (int $id): bool => $id > 0)
+            ->map(static fn(mixed $id): int => (int) $id)
+            ->filter(static fn(int $id): bool => $id > 0)
             ->values();
 
         if ($assignmentIds->isEmpty()) {
@@ -223,7 +226,7 @@ class ProfileController extends Controller
         }
 
         return $owner->assignments
-            ->filter(static fn ($assignment): bool => $assignment->end_date === null)
+            ->filter(static fn($assignment): bool => $assignment->end_date === null)
             ->values();
     }
 
@@ -273,7 +276,7 @@ class ProfileController extends Controller
             ->with('voting:id,name_eu,name_es,starts_at,ends_at')
             ->orderByDesc('voted_at')
             ->get(['id', 'voting_id', 'voted_at'])
-            ->map(static fn (VotingBallot $ballot): array => [
+            ->map(static fn(VotingBallot $ballot): array => [
                 'id' => $ballot->id,
                 'voting_name' => $ballot->voting->name,
                 'voted_at' => Carbon::parse($ballot->voted_at),
@@ -293,7 +296,7 @@ class ProfileController extends Controller
             ->where('user_id', $userId)
             ->orderByDesc('created_at')
             ->get(['id', 'subject', 'message', 'is_read', 'created_at', 'read_at'])
-            ->map(static fn (ContactMessage $message): array => [
+            ->map(static fn(ContactMessage $message): array => [
                 'id' => $message->id,
                 'subject' => $message->subject,
                 'message' => $message->message,
@@ -322,7 +325,7 @@ class ProfileController extends Controller
             ])
             ->orderByDesc('id')
             ->get(['id', 'campaign_id', 'owner_id', 'status', 'created_at'])
-            ->filter(static fn (CampaignRecipient $recipient): bool => $recipient->campaign !== null)
+            ->filter(static fn(CampaignRecipient $recipient): bool => $recipient->campaign !== null)
             ->map(function (CampaignRecipient $recipient): array {
                 /** @var object $campaign */
                 $campaign = $recipient->campaign;
@@ -363,7 +366,7 @@ class ProfileController extends Controller
         return VotingBallot::query()
             ->where('owner_id', $owner->id)
             ->pluck('voting_id')
-            ->map(static fn (mixed $votingId): int => (int) $votingId)
+            ->map(static fn(mixed $votingId): int => (int) $votingId)
             ->unique()
             ->values();
     }
@@ -380,9 +383,9 @@ class ProfileController extends Controller
 
         return $this->votingEligibilityService
             ->openEligibleVotingsForOwner($owner)
-            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
             ->values()
-            ->map(static fn (Voting $voting): array => [
+            ->map(static fn(Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),
@@ -406,10 +409,10 @@ class ProfileController extends Controller
             ->with('locations.location')
             ->orderByDesc('ends_at')
             ->get(['id', 'name_eu', 'name_es', 'starts_at', 'ends_at'])
-            ->reject(fn (Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
-            ->filter(fn (Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
+            ->reject(fn(Voting $voting): bool => $ownerBallotVotingIds->contains($voting->id))
+            ->filter(fn(Voting $voting): bool => $this->votingEligibilityService->ownerCanVoteAtVotingDate($voting, $owner))
             ->values()
-            ->map(static fn (Voting $voting): array => [
+            ->map(static fn(Voting $voting): array => [
                 'id' => $voting->id,
                 'voting_name' => $voting->name,
                 'starts_at' => Carbon::parse($voting->starts_at),

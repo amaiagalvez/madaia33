@@ -14,20 +14,20 @@
             <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2" data-home-callouts>
                 @if ($hasOpenVotings)
                     <section
-                        class="section-shell overflow-hidden border border-[#d9755b]/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6 {{ !auth()->check() ? 'lg:col-span-2' : '' }}"
+                        class="section-shell overflow-hidden border border-brand-600/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6 {{ !auth()->check() ? 'lg:col-span-2' : '' }}"
                         data-home-votings-callout>
                         <div
                             class="flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex items-start gap-4">
                                 <div
-                                    class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#d9755b]/25 bg-gradient-to-br from-[#f1bd4d]/35 via-white to-[#edd2c7]/60 text-[#793d3d] shadow-sm ring-4 ring-white/40">
+                                    class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-brand-600/25 bg-linear-to-br from-[#f1bd4d]/35 via-white to-[#edd2c7]/60 text-[#793d3d] shadow-sm ring-4 ring-white/40">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.8" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3Zm2.25 4.5h6m-6 3h6m-6 3h3" />
                                     </svg>
                                     <span
-                                        class="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 rounded-full bg-[#d9755b]"></span>
+                                        class="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 rounded-full bg-brand-600"></span>
                                 </div>
                                 <div>
                                     <p
@@ -55,13 +55,13 @@
 
                 @auth
                     <section
-                        class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#d9755b]/10 p-5 sm:p-6 {{ !$hasOpenVotings ? 'lg:col-span-2' : '' }}"
+                        class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-brand-600/10 p-5 sm:p-6 {{ !$hasOpenVotings ? 'lg:col-span-2' : '' }}"
                         data-home-profile-callout>
                         <div
                             class="flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex items-start gap-4">
                                 <div
-                                    class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#793d3d]/20 bg-gradient-to-br from-[#edd2c7]/60 via-white to-[#d9755b]/25 text-[#793d3d] shadow-sm ring-4 ring-white/40">
+                                    class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#793d3d]/20 bg-linear-to-br from-[#edd2c7]/60 via-white to-brand-600/25 text-[#793d3d] shadow-sm ring-4 ring-white/40">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.8" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -103,7 +103,7 @@
                         {{ __('home.notices') }}
                     </h2>
 
-                    @if ($generalNotices->isNotEmpty())                    
+                    @if ($generalNotices->isNotEmpty())
                         <div class="mt-4 grid grid-cols-1 gap-3 sm:gap-6"
                             data-latest-notices-general>
                             @foreach ($generalNotices as $notice)
@@ -113,7 +113,7 @@
                     @else
                         <div
                             class="mt-4 text-center py-10 rounded-xl border border-dashed border-gray-300 bg-gray-50">
-                            <p class="text-sm text-gray-500">{{ __('home.no_notices') }}</p>
+                            <p class="text-sm text-gray-600">{{ __('home.no_notices') }}</p>
                         </div>
                     @endif
                 </section>
@@ -131,7 +131,7 @@
                     @else
                         <div
                             class="mt-4 text-center py-10 rounded-xl border border-dashed border-gray-300 bg-gray-50">
-                            <p class="text-sm text-gray-500">{{ __('home.no_notices') }}</p>
+                            <p class="text-sm text-gray-600">{{ __('home.no_notices') }}</p>
                         </div>
                     @endif
                 </section>
@@ -146,7 +146,7 @@
                 <div class="mt-4 space-y-3" data-home-history-images>
                     @foreach ($historyImageUrls as $historyImageUrl)
                         <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
-                            <img src="{{ $historyImageUrl }}" alt="{{ __('home.history_title') }}"
+                            <img src="{{ $historyImageUrl }}" alt="" aria-hidden="true"
                                 class="h-36 w-full object-cover sm:h-44" loading="lazy" />
                         </div>
                     @endforeach
@@ -156,7 +156,7 @@
                 </div>
 
                 <a href="mailto:{{ $frontPrimaryEmail }}"
-                    class="elevated-card mt-4 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 lg:mt-auto"
+                    class="elevated-card mt-4 group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 lg:mt-auto"
                     data-home-history-photos-callout>
                     <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -170,11 +170,11 @@
                             class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
                             {{ __('home.history_photos_title') }}
                         </p>
-                        <p class="mt-0.5 text-xs text-gray-500 leading-relaxed">
+                        <p class="mt-0.5 text-xs text-gray-600 leading-relaxed">
                             {{ $photoRequestText }}
                         </p>
                     </div>
-                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
+                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-brand-600"
                         fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -201,7 +201,7 @@
         <section class="section-shell mt-8 overflow-hidden p-6 sm:p-8" data-page-hero="home">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" data-home-quick-links>
                 <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
-                    class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                    class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/30 p-4 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
                     <div class="page-icon-amber shrink-0 h-10 w-10 rounded-lg">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -214,11 +214,11 @@
                             class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
                             {{ __('home.explore_notices') }}
                         </p>
-                        <p class="mt-0.5 text-xs text-gray-500 line-clamp-2">
+                        <p class="mt-0.5 text-xs text-gray-600 line-clamp-2">
                             {{ __('notices.subtitle') }}
                         </p>
                     </div>
-                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
+                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-brand-600"
                         fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -226,7 +226,7 @@
                     </svg>
                 </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
-                    class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/20 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                    class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#edd2c7]/20 p-4 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
                     <div class="page-icon-emerald shrink-0 h-10 w-10 rounded-lg">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -239,11 +239,11 @@
                             class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
                             {{ __('home.explore_gallery') }}
                         </p>
-                        <p class="mt-0.5 text-xs text-gray-500 line-clamp-2">
+                        <p class="mt-0.5 text-xs text-gray-600 line-clamp-2">
                             {{ __('gallery.subtitle') }}
                         </p>
                     </div>
-                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
+                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-brand-600"
                         fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -251,7 +251,7 @@
                     </svg>
                 </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('contact')) }}"
-                    class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#f1bd4d]/15 p-4 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                    class="elevated-card group flex items-start gap-3 bg-linear-to-br from-white to-[#f1bd4d]/15 p-4 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
                     <div class="page-icon-indigo shrink-0 h-10 w-10 rounded-lg">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -264,11 +264,11 @@
                             class="text-sm font-semibold text-gray-900 group-hover:text-[#793d3d] transition-colors">
                             {{ __('home.contact_us') }}
                         </p>
-                        <p class="mt-0.5 text-xs text-gray-500 line-clamp-2">
+                        <p class="mt-0.5 text-xs text-gray-600 line-clamp-2">
                             {{ __('contact.subtitle') }}
                         </p>
                     </div>
-                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#d9755b]"
+                    <svg class="ml-auto h-5 w-5 shrink-0 text-gray-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-brand-600"
                         fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"

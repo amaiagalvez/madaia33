@@ -61,6 +61,5 @@ return [
         'change_password_option' => 'Cambiar contraseña',
         'show_password' => 'Mostrar contraseña',
         'hide_password' => 'Ocultar contraseña',
-        'form_note' => 'Este formulario muestra únicamente el diseño por ahora; las funcionalidades se activarán en una fase posterior.',
     ],
 ];

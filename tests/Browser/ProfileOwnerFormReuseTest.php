@@ -38,7 +38,8 @@ test('profile owner tab renders a single shared owner form block', function () {
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($owner) {
-        $browser->loginAs($owner->user)
+        $browser->resize(1440, 1024)
+            ->loginAs($owner->user)
             ->visit('/eu/profila?tab=owner')
             ->waitFor('[data-profile-panel="owner"]', 5)
             ->assertPresent('[data-profile-owner-edit-form]')
@@ -49,10 +50,38 @@ test('profile owner tab renders a single shared owner form block', function () {
             ->assertPresent('[data-profile-owner-audit-log]')
             ->assertPresent('[data-profile-owner-audit-row]')
             ->assertPresent('[data-profile-owner-validation-help]')
+            ->assertPresent('[data-profile-owner-properties-grid]')
             ->assertPresent('[data-profile-owner-property-percentages]')
             ->assertScript(
                 'return document.querySelectorAll("[data-owner-shared-form=\"true\"]").length;',
                 1,
+            )
+            ->assertScript(
+                '(() => {'
+                . 'var checks = Array.from(document.querySelectorAll("[data-profile-owner-assignment-checkbox]"));'
+                . 'if (checks.length === 0) return false;'
+                . 'return checks.every(function (check) { return check.checked === false; });'
+                . '})()',
+                true,
+            )
+            ->assertScript(
+                '(() => {'
+                . 'var checks = Array.from(document.querySelectorAll("[data-profile-owner-assignment-checkbox]"));'
+                . 'if (checks.length === 0) return false;'
+                . 'return checks.every(function (check) {'
+                . 'return check.classList.contains("h-6") && check.classList.contains("w-6");'
+                . '});'
+                . '})()',
+                true,
+            )
+            ->assertScript(
+                '(() => {'
+                . 'var grid = document.querySelector("[data-profile-owner-properties-grid]");'
+                . 'if (!grid) return false;'
+                . 'var cols = window.getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).length;'
+                . 'return cols === 3;'
+                . '})()',
+                true,
             );
     });
 });

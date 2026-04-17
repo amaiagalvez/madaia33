@@ -8,6 +8,7 @@ use Livewire\Component;
 use App\SupportedLocales;
 use Livewire\WithPagination;
 use App\Models\OwnerAuditLog;
+use App\Validations\OwnerFormValidation;
 use Illuminate\Contracts\View\View;
 use App\Support\OwnerAuditFieldLabel;
 use App\Services\CreateOwnerFormService;
@@ -290,7 +291,7 @@ class Owners extends Component
         $this->editingOwnerId = $ownerId;
         $this->editCoprop1Name = $owner->coprop1_name;
         $this->editCoprop1Surname = $owner->coprop1_surname ?? '';
-        $this->editCoprop1Dni = $owner->coprop1_dni;
+        $this->editCoprop1Dni = $owner->coprop1_dni ?? '';
         $this->editCoprop1Phone = $owner->coprop1_phone ?? '';
         $this->editCoprop1Email = $owner->coprop1_email;
         $this->editLanguage = $owner->language ?? SupportedLocales::BASQUE;
@@ -306,38 +307,18 @@ class Owners extends Component
 
     public function saveEditOwner(): void
     {
-        $this->validate([
-            'editCoprop1Name' => ['required', 'string', 'max:255'],
-            'editCoprop1Surname' => ['nullable', 'string', 'max:255'],
-            'editCoprop1Dni' => ['required', 'string', 'max:20'],
-            'editCoprop1Phone' => ['nullable', 'string', 'max:20'],
-            'editCoprop1Email' => ['required', 'email', 'max:255'],
-            'editLanguage' => ['required', 'string', 'in:eu,es'],
-            'editCoprop2Name' => ['nullable', 'string', 'max:255'],
-            'editCoprop2Surname' => ['nullable', 'string', 'max:255'],
-            'editCoprop2Dni' => ['nullable', 'string', 'max:20'],
-            'editCoprop2Phone' => ['nullable', 'string', 'max:20'],
-            'editCoprop2Email' => ['nullable', 'email', 'max:255'],
-        ], [], [
-            'editCoprop1Name' => __('admin.owners.form.coprop1_name'),
-            'editCoprop1Surname' => __('admin.owners.form.coprop1_surname'),
-            'editCoprop1Dni' => __('admin.owners.form.coprop1_dni'),
-            'editCoprop1Phone' => __('admin.owners.form.coprop1_phone'),
-            'editCoprop1Email' => __('admin.owners.form.coprop1_email'),
-            'editLanguage' => __('admin.owners.form.language'),
-            'editCoprop2Name' => __('admin.owners.form.coprop2_name'),
-            'editCoprop2Surname' => __('admin.owners.form.coprop2_surname'),
-            'editCoprop2Dni' => __('admin.owners.form.coprop2_dni'),
-            'editCoprop2Phone' => __('admin.owners.form.coprop2_phone'),
-            'editCoprop2Email' => __('admin.owners.form.coprop2_email'),
-        ]);
-
         $owner = Owner::findOrFail((int) $this->editingOwnerId);
+
+        $this->validate(
+            OwnerFormValidation::adminEditRules($owner->user_id),
+            [],
+            OwnerFormValidation::adminEditAttributes(),
+        );
 
         $owner->update([
             'coprop1_name' => $this->editCoprop1Name,
             'coprop1_surname' => $this->editCoprop1Surname ?: null,
-            'coprop1_dni' => $this->editCoprop1Dni,
+            'coprop1_dni' => $this->editCoprop1Dni ?: null,
             'coprop1_phone' => $this->editCoprop1Phone ?: null,
             'coprop1_email' => $this->editCoprop1Email,
             'language' => $this->editLanguage,

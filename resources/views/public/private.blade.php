@@ -27,8 +27,9 @@
                 </p>
 
                 @if ($errors->has('email'))
-                    <div class="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
-                        role="alert" data-private-login-error>
+                    <div id="private-login-error"
+                        class="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+                        aria-live="polite" role="alert" data-private-login-error>
                         {{ $errors->first('email') }}
                     </div>
                 @endif
@@ -42,9 +43,10 @@
                             {{ __('general.private.username') }}
                         </label>
                         <input id="private-username" name="email" type="text"
-                            autocomplete="username"
-                            class="block w-full min-h-11 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
+                            autocomplete="username" required
+                            class="block w-full min-h-11 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
                             value="{{ old('email') }}"
+                            @if ($errors->has('email')) aria-describedby="private-login-error" aria-invalid="true" @endif
                             placeholder="{{ __('general.private.username_placeholder') }}" />
                     </div>
 
@@ -56,11 +58,13 @@
                         <div class="relative">
                             <input id="private-password" name="password"
                                 x-bind:type="showPassword ? 'text' : 'password'"
-                                autocomplete="current-password"
-                                class="block w-full min-h-11 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-12 text-sm text-gray-900 shadow-sm transition-colors focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
+                                autocomplete="current-password" required
+                                class="block w-full min-h-11 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-12 text-sm text-gray-900 shadow-sm transition-colors focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
                                 placeholder="••••••••" />
                             <button type="button" @click="showPassword = !showPassword"
-                                class="absolute inset-y-0 right-0 inline-flex min-h-11 items-center justify-center px-3 text-gray-500 transition-colors hover:text-[#793d3d] focus:outline-none focus:ring-2 focus:ring-[#d9755b]/40"
+                                class="absolute inset-y-0 right-0 inline-flex min-h-11 items-center justify-center px-3 text-gray-500 transition-colors hover:text-[#793d3d] focus:outline-none focus:ring-2 focus:ring-brand-600/40"
+                                x-bind:aria-pressed="showPassword ? 'true' : 'false'"
+                                aria-controls="private-password"
                                 :aria-label="showPassword ? '{{ __('general.private.hide_password') }}' :
                                     '{{ __('general.private.show_password') }}'"
                                 :title="showPassword ? '{{ __('general.private.hide_password') }}' :
@@ -96,16 +100,12 @@
                     @if (\Illuminate\Support\Facades\Route::has('password.request'))
                         <div class="pt-1 text-center">
                             <a href="{{ route(\App\SupportedLocales::routeName('password.request')) }}"
-                                class="text-sm font-medium text-[#793d3d] underline decoration-[#d9755b]/50 underline-offset-4 transition-colors hover:text-[#d9755b] focus:outline-none focus:ring-2 focus:ring-[#d9755b]/40">
+                                class="text-sm font-medium text-[#793d3d] underline decoration-brand-600/50 underline-offset-4 transition-colors hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/40">
                                 {{ __('general.private.change_password_option') }}
                             </a>
                         </div>
                     @endif
                 </form>
-
-                <p class="mt-4 text-center text-xs text-gray-500">
-                    {{ __('general.private.form_note') }}
-                </p>
             </div>
         </div>
     </div>

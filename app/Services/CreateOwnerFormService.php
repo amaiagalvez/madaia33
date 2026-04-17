@@ -43,7 +43,7 @@ class CreateOwnerFormService
             'owner_id' => $this->nullableInt($validated['ownerId'] ?? null),
             'coprop1_name' => $validated['coprop1Name'],
             'coprop1_surname' => $this->nullableString($validated['coprop1Surname'] ?? null),
-            'coprop1_dni' => $validated['coprop1Dni'],
+            'coprop1_dni' => $this->nullableString($validated['coprop1Dni'] ?? null),
             'coprop1_phone' => $this->nullableString($validated['coprop1Phone'] ?? null),
             'coprop1_email' => $validated['coprop1Email'],
             'language' => $validated['language'],

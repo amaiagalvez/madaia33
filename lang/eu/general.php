@@ -61,6 +61,5 @@ return [
         'change_password_option' => 'Pasahitza aldatu',
         'show_password' => 'Pasahitza erakutsi',
         'hide_password' => 'Pasahitza ezkutatu',
-        'form_note' => 'Formulario honek oraingoz diseinua bakarrik erakusten du; funtzioak hurrengo fasean aktibatuko dira.',
     ],
 ];

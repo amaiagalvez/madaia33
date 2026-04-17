@@ -34,8 +34,8 @@
     --color-brand-600: #d9755b;
     --color-brand-900: #793d3d;
 
-    --color-brand: var(--color-brand-600);
-    --color-brand-hover: var(--color-brand-900);
+    --color-brand: var(--color-brand-900);
+    --color-brand-hover: #5f2f2f;
     --color-brand-light: var(--color-brand-100);
     --color-brand-border: var(--color-brand-500);
     --color-brand-text: var(--color-brand-900);
@@ -62,6 +62,11 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+
+    :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+        outline: 2px solid var(--color-brand-600);
+        outline-offset: 2px;
     }
 }
 
@@ -140,14 +145,14 @@
 
     /* Rich-text content from settings: style embedded links with brand palette */
     .rich-content a {
-        color: var(--color-brand-600);
+        color: var(--color-brand-900);
         text-decoration: underline;
         text-underline-offset: 3px;
         transition: color 0.15s ease;
     }
 
     .rich-content a:hover {
-        color: var(--color-brand-900);
+        color: var(--color-brand-hover);
     }
 
     .rich-content a:focus-visible {
