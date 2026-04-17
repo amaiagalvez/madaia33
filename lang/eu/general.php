@@ -37,6 +37,11 @@ return [
         'legal_notice' => 'Lege-oharra',
         'cookie_policy' => 'Cookie politika',
     ],
+    'cookies' => [
+        'banner_message' => 'Web honek cookie teknikoak soilik erabiltzen ditu, gunearen funtzionamendurako beharrezkoak (saioa, segurtasuna eta barne-errore jarraipena). Ez dira kanpoko iragarki edo jarraipenerako cookierik erabiltzen.',
+        'understood' => 'Ulertu dut',
+        'more_info' => 'Informazio gehiago',
+    ],
     'pagination' => [
         'previous' => 'Aurrekoa',
         'next' => 'Hurrengoa',

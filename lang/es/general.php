@@ -37,6 +37,11 @@ return [
         'legal_notice' => 'Aviso legal',
         'cookie_policy' => 'Política de cookies',
     ],
+    'cookies' => [
+        'banner_message' => 'Esta web utiliza únicamente cookies técnicas, necesarias para el funcionamiento del sitio (sesión, seguridad y seguimiento de errores interno). No se usan cookies publicitarias ni de rastreo externo.',
+        'understood' => 'Entendido',
+        'more_info' => 'Más información',
+    ],
     'pagination' => [
         'previous' => 'Anterior',
         'next' => 'Siguiente',

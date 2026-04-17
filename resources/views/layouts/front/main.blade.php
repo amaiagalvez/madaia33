@@ -273,6 +273,39 @@
         </div>
     </footer>
 
+    <div x-data="{
+        accepted: false,
+        init() {
+            this.accepted = document.cookie.split(';').some((entry) => entry.trim().startsWith('madaia_cookie_consent=1'));
+        },
+        dismiss() {
+            document.cookie = 'madaia_cookie_consent=1; Max-Age=31536000; Path=/; SameSite=Lax';
+            this.accepted = true;
+        }
+    }" x-show="!accepted" x-cloak
+        class="fixed inset-x-0 bottom-0 z-80 border-t border-brand-600/30 bg-stone-900 px-4 py-4 shadow-lg"
+        data-cookie-consent-banner>
+        <div class="mx-auto flex w-full max-w-7xl flex-col gap-3 sm:flex-row sm:items-start sm:gap-6">
+            <p class="flex-1 text-sm text-stone-300" data-cookie-consent-message>
+                {{ __('general.cookies.banner_message') }}
+            </p>
+
+            <div class="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
+                <a href="{{ route(\App\SupportedLocales::routeName('cookie-policy')) }}"
+                    class="inline-flex min-h-9 items-center justify-center rounded-md border border-brand-600/40 px-4 py-2 text-sm font-medium text-[#793d3d] transition hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+                    data-cookie-policy-link>
+                    {{ __('general.cookies.more_info') }}
+                </a>
+
+                <button type="button" @click="dismiss()"
+                    class="inline-flex min-h-9 items-center justify-center rounded-md bg-[#793d3d] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#5e2f2f] focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+                    data-cookie-consent-understood>
+                    {{ __('general.cookies.understood') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
     @fluxScripts
     <script>
         document.addEventListener('alpine:init', () => {
