@@ -163,6 +163,8 @@ class ProfileController extends Controller
 
         abort_if($owner === null, 403);
 
+        $request->merge($this->sanitizeOwnerIdentityPayload($request->all()));
+
         $validated = $request->validate(OwnerFormValidation::profileUpdateRules($user->id));
 
         $owner->update([
@@ -206,6 +208,27 @@ class ProfileController extends Controller
             'coprop2_has_whatsapp' => (bool) ($validated['coprop2_has_whatsapp'] ?? false),
             'coprop2_email' => $validated['coprop2_email'] ?: null,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function sanitizeOwnerIdentityPayload(array $payload): array
+    {
+        foreach (['coprop1_dni', 'coprop2_dni'] as $field) {
+            if (array_key_exists($field, $payload)) {
+                $payload[$field] = strtoupper((string) preg_replace('/[^0-9A-Za-z]/', '', trim((string) $payload[$field])));
+            }
+        }
+
+        foreach (['coprop1_phone', 'coprop2_phone'] as $field) {
+            if (array_key_exists($field, $payload)) {
+                $payload[$field] = (string) preg_replace('/[^0-9]/', '', trim((string) $payload[$field]));
+            }
+        }
+
+        return $payload;
     }
 
     public function validateAssignments(Request $request): RedirectResponse

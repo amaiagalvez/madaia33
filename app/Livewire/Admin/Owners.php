@@ -10,6 +10,7 @@ use Livewire\WithPagination;
 use App\Models\OwnerAuditLog;
 use Illuminate\Contracts\View\View;
 use App\Support\OwnerAuditFieldLabel;
+use App\Support\OwnerIdentitySanitizer;
 use App\Services\CreateOwnerFormService;
 use App\Validations\OwnerFormValidation;
 use App\Actions\Owners\CreateOwnerAction;
@@ -252,6 +253,7 @@ class Owners extends Component
     public function createOwner(): void
     {
         $this->warningMessage = '';
+        $this->sanitizeCreateOwnerIdentityFields();
 
         $data = $this->validate(
             $this->ownerCreationRules(),
@@ -351,6 +353,7 @@ class Owners extends Component
     public function saveEditOwner(): void
     {
         $owner = Owner::findOrFail((int) $this->editingOwnerId);
+        $this->sanitizeEditOwnerIdentityFields();
 
         $this->validate(
             OwnerFormValidation::adminEditRules($owner->user_id),
@@ -395,6 +398,22 @@ class Owners extends Component
             'coprop2_has_whatsapp' => $this->editCoprop2HasWhatsapp,
             'coprop2_email' => $this->editCoprop2Email ?: null,
         ];
+    }
+
+    private function sanitizeCreateOwnerIdentityFields(): void
+    {
+        $this->coprop1Dni = OwnerIdentitySanitizer::sanitizeDni($this->coprop1Dni);
+        $this->coprop1Phone = OwnerIdentitySanitizer::sanitizePhone($this->coprop1Phone);
+        $this->coprop2Dni = OwnerIdentitySanitizer::sanitizeDni($this->coprop2Dni);
+        $this->coprop2Phone = OwnerIdentitySanitizer::sanitizePhone($this->coprop2Phone);
+    }
+
+    private function sanitizeEditOwnerIdentityFields(): void
+    {
+        $this->editCoprop1Dni = OwnerIdentitySanitizer::sanitizeDni($this->editCoprop1Dni);
+        $this->editCoprop1Phone = OwnerIdentitySanitizer::sanitizePhone($this->editCoprop1Phone);
+        $this->editCoprop2Dni = OwnerIdentitySanitizer::sanitizeDni($this->editCoprop2Dni);
+        $this->editCoprop2Phone = OwnerIdentitySanitizer::sanitizePhone($this->editCoprop2Phone);
     }
 
     public function cancelEditOwner(): void

@@ -842,6 +842,64 @@ it('stores primary dni as null when admin owner edit sends empty dni', function 
     expect($owner->fresh()->coprop1_dni)->toBeNull();
 });
 
+it('sanitizes dni and phone fields when creating owner from admin list', function () {
+    Mail::fake();
+
+    $adminUser = adminUser();
+    $portal = Location::factory()->portal()->create(['code' => '33-S', 'name' => 'Portal 33-S']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '3C']);
+
+    Livewire::actingAs($adminUser)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->set('coprop1Name', 'Sanitized Owner')
+        ->set('coprop1Dni', '11.22-33 44a')
+        ->set('coprop1Email', 'sanitize-owner@example.com')
+        ->set('coprop1Phone', '600 12-31.23')
+        ->set('newAssignments.0.property_id', (string) $property->id)
+        ->set('newAssignments.0.start_date', '2026-01-01')
+        ->call('createOwner')
+        ->assertHasNoErrors();
+
+    $owner = Owner::query()->where('coprop1_email', 'sanitize-owner@example.com')->first();
+
+    expect($owner)->not->toBeNull()
+        ->and($owner?->coprop1_dni)->toBe('11223344A')
+        ->and($owner?->coprop1_phone)->toBe('600123123');
+});
+
+it('sanitizes dni and phone fields when editing owner from admin list', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Owner Dni Phone Admin',
+        'coprop1_email' => 'owner.dni.phone.admin@example.com',
+        'coprop1_dni' => '11223344A',
+        'coprop1_phone' => '600111222',
+        'coprop2_dni' => '22334455B',
+        'coprop2_phone' => '611222333',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('openEditOwnerForm', $owner->id)
+        ->set('editCoprop1Name', 'Owner Dni Phone Admin Updated')
+        ->set('editCoprop1Email', 'owner.dni.phone.admin.updated@example.com')
+        ->set('editCoprop1Dni', '11.22-33 44z')
+        ->set('editCoprop1Phone', '600 99-88.77')
+        ->set('editCoprop2Dni', ' 99.88-77 66x')
+        ->set('editCoprop2Phone', '611-00 11.22')
+        ->call('saveEditOwner')
+        ->assertHasNoErrors();
+
+    $owner->refresh();
+
+    expect($owner->coprop1_dni)->toBe('11223344Z')
+        ->and($owner->coprop1_phone)->toBe('600998877')
+        ->and($owner->coprop2_dni)->toBe('99887766X')
+        ->and($owner->coprop2_phone)->toBe('611001122');
+});
+
 it('updates has_whatsapp fields and shows invalid-contact warnings in admin owner edit', function () {
     $user = adminUser();
 
