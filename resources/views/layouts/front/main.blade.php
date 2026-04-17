@@ -285,7 +285,8 @@
     }" x-show="!accepted" x-cloak
         class="fixed inset-x-0 bottom-0 z-80 border-t border-brand-600/30 bg-stone-900 px-4 py-4 shadow-lg"
         data-cookie-consent-banner>
-        <div class="mx-auto flex w-full max-w-7xl flex-col gap-3 sm:flex-row sm:items-start sm:gap-6">
+        <div
+            class="mx-auto flex w-full max-w-7xl flex-col gap-3 sm:flex-row sm:items-start sm:gap-6">
             <p class="flex-1 text-sm text-stone-300" data-cookie-consent-message>
                 {{ __('general.cookies.banner_message') }}
             </p>

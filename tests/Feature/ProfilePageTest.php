@@ -102,6 +102,30 @@ it('renders profile page for users without owner profile', function () {
         ->assertSee(__('profile.tabs.owner'));
 });
 
+it('shows ballot history when the related voting is soft deleted', function () {
+    $user = User::factory()->create([
+        'name' => 'Archived Voting User',
+    ]);
+
+    $voting = Voting::factory()->create([
+        'name_eu' => 'Artxibatutako bozketa',
+        'name_es' => 'Votacion archivada',
+    ]);
+
+    VotingBallot::factory()->create([
+        'voting_id' => $voting->id,
+        'cast_by_user_id' => $user->id,
+        'voted_at' => now()->subHour(),
+    ]);
+
+    $voting->delete();
+
+    test()->actingAs($user)
+        ->get(route('profile.eu', ['tab' => 'votings']))
+        ->assertOk()
+        ->assertSee('Artxibatutako bozketa');
+});
+
 it('shows only messages sent by logged user in messages tab', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();
