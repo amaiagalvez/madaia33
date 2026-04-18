@@ -318,3 +318,55 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - Los tests de propiedad (tarea 15) usan Pest nativo con `fake()` y `->repeat(2)` — sin dependencias adicionales
 - Cada tarea referencia los requisitos específicos para trazabilidad
 - Los checkpoints garantizan validación incremental antes de avanzar a la siguiente capa
+
+## Implementation Plan
+
+### Goal
+
+- [ ] Entregar `construction-management` de forma incremental y segura, priorizando primero núcleo funcional (rol, etiquetas, obras, permisos, rutas públicas y formularios) y dejando los tests opcionales de propiedad para una fase posterior de endurecimiento.
+- [ ] Ejecutar las tareas exactamente en el orden del documento, una por una, sin saltos y marcando avance solo tras validación.
+
+### Technical Decisions
+
+- [ ] Mantener arquitectura existente Laravel 13 + Livewire 4 + Flux UI v2 sin nuevas dependencias.
+- [ ] Priorizar tests Unit para lógica pura y usar Feature/Livewire solo cuando haya integración real (DB/HTTP/UI).
+- [ ] Aplicar enfoque de rendimiento: reducir ejemplos aleatorios opcionales y ejecutar primero suite mínima afectada para feedback rápido.
+- [ ] Reutilizar patrones existentes (`AdminNoticeManager`, `AdminMessageInbox`, `PublicVotingController`, `NoticeDocument`) para evitar divergencias de diseño.
+- [ ] Aplicar seguridad en doble capa en reglas críticas (autorización app + restricciones de BD cuando aplique).
+- [ ] No cerrar ninguna tarea sin completar su validación local (tests afectados + formato) y sin respetar los checkpoints 5, 9, 14 y 16.
+
+### Execution Steps
+
+- [ ] 1. Ejecutar tarea 1 completa (1.1 -> 1.4*), validar y marcar.
+- [ ] 2. Ejecutar tarea 2 completa (2.1 -> 2.8*), validar y marcar.
+- [ ] 3. Ejecutar tarea 3 completa (3.1 -> 3.2*), validar y marcar.
+- [ ] 4. Ejecutar tarea 4 completa (4.1 -> 4.3*), validar y marcar.
+- [ ] 5. Ejecutar checkpoint 5 (tests hasta aquí) antes de seguir.
+- [ ] 6. Ejecutar tarea 6 completa (6.1 -> 6.4*), validar y marcar.
+- [ ] 7. Ejecutar tarea 7 completa (7.1 -> 7.4*), validar y marcar.
+- [ ] 8. Ejecutar tarea 8 completa (8.1 -> 8.3*), validar y marcar.
+- [ ] 9. Ejecutar checkpoint 9 (tests hasta aquí) antes de seguir.
+- [ ] 10. Ejecutar tarea 10 completa (10.1 -> 10.3*), validar y marcar.
+- [ ] 11. Ejecutar tarea 11 completa (11.1 -> 11.4*), validar y marcar.
+- [ ] 12. Ejecutar tarea 12 completa (12.1 -> 12.2*), validar y marcar.
+- [ ] 13. Ejecutar tarea 13 completa (13.1 -> 13.2*), validar y marcar.
+- [ ] 14. Ejecutar checkpoint 14 (tests hasta aquí) antes de seguir.
+- [ ] 15. Ejecutar tarea 15 (opcionales de property-based según prioridad acordada), validar y marcar.
+- [ ] 16. Ejecutar checkpoint final 16 con `composer quality` y cierre.
+
+### Work Items
+
+- [ ] Backend dominio: `app/Models`, `database/migrations`, `app/Observers`, `app/Policies`.
+- [ ] Admin Livewire/Blade: `app/Livewire/Admin*`, `resources/views/livewire/admin/**`.
+- [ ] Frontend público: `app/Http/Controllers/PublicConstructionController.php`, `resources/views/public/constructions/**`, `app/Livewire/PublicConstructionInquiryForm.php`.
+- [ ] Documentos y descargas: `app/Http/Controllers/NoticeDocumentController.php`, rutas en `routes/web.php`.
+- [ ] Correos y notificaciones: `app/Mail/*ConstructionInquiry*`, vistas `resources/views/mail/**`.
+- [ ] Testing progresivo: `tests/Unit/**`, `tests/Feature/**`, `tests/Browser/**` (si se tocan flujos sensibles en Blade).
+
+### Validation
+
+- [ ] TDD por bloque cuando sea viable (test rojo -> implementación mínima -> refactor).
+- [ ] Formato obligatorio tras cambios PHP: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`.
+- [ ] Verificación mínima por bloque: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact <tests-afectados>`.
+- [ ] Si hay cambios en `resources/views/**`, cubrir con Dusk focalizado antes de cerrar.
+- [ ] Puerta de calidad final obligatoria: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.

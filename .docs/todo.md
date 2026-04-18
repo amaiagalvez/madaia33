@@ -43,7 +43,7 @@
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
 - [ ] config recaptcha, analitics
 - [ ] manual de usuaria
-crar una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación añadir una ruta al menú del panel tiene que estar en dos idiomas eu y es
+crear una nueva ruta con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación añadir una ruta al menú del panel tiene que estar en dos idiomas eu y es
 añadir una regla al agente amalur para que lo mantenga actualizado
 - [ ] Cómo se envian los mensajes programados?
 - [ ] crear dusk-test para todas las pantallas
