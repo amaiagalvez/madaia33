@@ -14,7 +14,7 @@
     {{-- Trigger button --}}
     <button type="button" wire:click="open" @click="openModal()" x-ref="triggerButton"
         data-test="profile-contact-modal-trigger"
-        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-brand-600 hover:text-[#793d3d]">
+        class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-brand-600 hover:text-[#793d3d] sm:w-auto">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round"

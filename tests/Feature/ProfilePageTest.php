@@ -194,13 +194,15 @@ it('renders expandable controls for long messages in sent and received tabs', fu
         ->get(route('profile.eu', ['tab' => 'messages']))
         ->assertOk()
         ->assertSeeHtml('data-profile-message-expandable="' . $sentMessage->id . '"')
-        ->assertSee(__('profile.messages.show_more'));
+        ->assertSeeHtml('data-profile-message-toggle="' . $sentMessage->id . '"')
+        ->assertSeeHtml('data-profile-message-preview="' . $sentMessage->id . '"');
 
     test()->actingAs($user)
         ->get(route('profile.eu', ['tab' => 'received']))
         ->assertOk()
         ->assertSeeHtml('data-profile-received-expandable="' . $recipient->id . '"')
-        ->assertSee(__('profile.received.show_more'));
+        ->assertSeeHtml('data-profile-received-toggle="' . $recipient->id . '"')
+        ->assertSeeHtml('data-profile-received-preview="' . $recipient->id . '"');
 });
 
 it('shows only received campaign messages for the linked owner in profile', function () {

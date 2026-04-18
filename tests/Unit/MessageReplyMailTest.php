@@ -32,7 +32,8 @@ it('renders message reply mail with contact data and reply body', function () {
         ->and($content->view)->toBe('mail.message-reply')
         ->and($content->with['reply'])->toBe($reply)
         ->and($content->with['contactMessage'])->toBe($contactMessage)
+        ->and(array_key_exists('legalText', $content->with))->toBeTrue()
         ->and($rendered)->toContain('Eskerrik asko zure mezuagatik. Laster jarriko gara zurekin harremanetan.')
-        ->and($rendered)->toContain('Zure mezua:')
-        ->and($rendered)->toContain('Mensaje original de contacto');
+        ->and($rendered)->toContain('Mensaje original de contacto')
+        ->and($rendered)->toContain('max-width: 600px');
 });

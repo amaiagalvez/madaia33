@@ -3,22 +3,26 @@
 namespace App\Actions\Campaigns;
 
 use Throwable;
-use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Process\Process;
 
 class RunQueueWorkStopWhenEmptyAction
 {
     public function execute(): bool
     {
         try {
-            Artisan::call('queue:work', [
-                '--stop-when-empty' => true,
-            ]);
+            $process = new Process(
+                [PHP_BINARY, 'artisan', 'queue:work', '--stop-when-empty'],
+                base_path(),
+            );
+
+            $process->setTimeout(300);
+            $process->run();
+
+            return $process->isSuccessful();
         } catch (Throwable $throwable) {
             report($throwable);
 
             return false;
         }
-
-        return true;
     }
 }

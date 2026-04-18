@@ -82,6 +82,19 @@
             font-size: 12px;
         }
 
+        .explanation-columns {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 18px;
+        }
+
+        .explanation-column {
+            width: 50%;
+            vertical-align: top;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+        }
+
         .voting-block {
             border: 1px solid #d1d5db;
             border-radius: 4px;
@@ -161,6 +174,19 @@
             </td>
         </tr>
     </table>
+
+    @if ($votingsExplanationEuHtml !== '' || $votingsExplanationEsHtml !== '')
+        <table class="explanation-columns">
+            <tr>
+                <td class="explanation-column">
+                    {!! $votingsExplanationEuHtml !!}
+                </td>
+                <td class="explanation-column">
+                    {!! $votingsExplanationEsHtml !!}
+                </td>
+            </tr>
+        </table>
+    @endif
 
     @forelse ($votings as $voting)
         <section class="voting-block">

@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Voting;
 use App\Models\Setting;
-use App\Models\Location;
 use App\Models\VotingOption;
 use App\Models\VotingLocation;
 use Illuminate\Support\Carbon;
@@ -25,6 +24,8 @@ class VotingPdfBuilder
             'votings_pdf_delegated_text_es',
             'votings_pdf_in_person_text_eu',
             'votings_pdf_in_person_text_es',
+            'votings_explanation_text_eu',
+            'votings_explanation_text_es',
         ]);
 
         $siteName = $this->resolveSiteName($settings);
@@ -39,6 +40,8 @@ class VotingPdfBuilder
             'rightHeader' => 'Comunidad de Propietarios/a ' . $siteName . $locationSuffix,
             'introEuHtml' => (string) ($settings[$textPrefix . '_eu'] ?? ''),
             'introEsHtml' => (string) ($settings[$textPrefix . '_es'] ?? ''),
+            'votingsExplanationEuHtml' => (string) ($settings['votings_explanation_text_eu'] ?? ''),
+            'votingsExplanationEsHtml' => (string) ($settings['votings_explanation_text_es'] ?? ''),
             'faviconDataUri' => $this->faviconDataUri(),
             'votings' => $this->buildVotingsForDocument($selectedVotingIds),
         ];

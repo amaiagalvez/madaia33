@@ -20,7 +20,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
 use App\Models\CampaignTrackingEvent;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\Messaging\DispatchCampaignJob;
 use App\Services\Messaging\RecipientResolver;
@@ -158,7 +157,7 @@ it('opens and closes the shared confirmation modal for campaign table actions', 
         ->assertSet('showActionModal', false);
 });
 
-it('starts queue worker when sending a campaign from the manager', function () {
+it('sends campaign synchronously from the manager', function () {
     $user = adminUser();
 
     $campaign = Campaign::factory()->create([
@@ -173,17 +172,11 @@ it('starts queue worker when sending a campaign from the manager', function () {
 
     Bus::fake();
 
-    Artisan::shouldReceive('call')
-        ->once()
-        ->with('queue:work', [
-            '--stop-when-empty' => true,
-        ]);
-
     Livewire::actingAs($user)
         ->test('admin-campaign-manager')
         ->call('sendCampaign', $campaign->id);
 
-    Bus::assertDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
+    Bus::assertDispatchedSync(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
 });
 
 it('shows edit and delete actions only for draft or scheduled campaigns', function () {

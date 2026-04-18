@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\MessageReply;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use App\Support\EmailLegalText;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
@@ -41,6 +42,7 @@ class MessageReplyMail extends Mailable
             with: [
                 'reply' => $this->reply,
                 'contactMessage' => $this->reply->message,
+                'legalText' => EmailLegalText::resolve(),
             ],
         );
     }

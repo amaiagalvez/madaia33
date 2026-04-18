@@ -6,13 +6,10 @@
 
 - [ ] sudo find /home/amaia/Dokumentuak/madaia33 -user root -exec chown amaia:amaia {} +
 - [ ] bash scripts/enforce-indent-4.sh 
-- [ ] docker => reformat eta quality
+- [ ] docker => npm
+- [ ] docker => pint & quality
 - [ ] docker => pentest
 - [ ] dusk-test
-
-# Despues de publicar master
-- [ ] añalizar cookiena chatgpt-rekin
-- [ ] probar envio whatchapp en el movil
 
 # Code
 - spec kiro pendientes (obra)
@@ -39,7 +36,6 @@
 - [ ] traducciones repetidas
 - [ ] seo
 - [ ] twilio https://www.twilio.com/docs/whatsapp
-- [ ] en el skill db-schema separar las tablas de las votoaciones en otro bloque
 - [ ] añadir papelera para poder reestaurar los borrrados
 - [ ] añadir tipo votaciones, una persona un voto / por porcentajes de participación
 - [ ] en todos los sitios en lo que debe salir un modal, crear un dusk-test para que lo compruebe y así no tener riesgo de perder esa funcionalidad.
