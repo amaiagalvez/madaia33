@@ -12,6 +12,9 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         app()->useStoragePath(sys_get_temp_dir() . '/madaia33-storage-tests-' . getmypid());
+
+        config()->set('mail.from.address', 'noreply@example.test');
+        config()->set('mail.from.name', 'Madaia 33 Test');
     }
 
     protected function skipUnlessFortifyFeature(string $feature, ?string $message = null): void
