@@ -2,7 +2,6 @@
 
 use App\Models\Owner;
 use App\Models\Voting;
-use App\Models\UserLoginSession;
 use Tests\DuskTestCase;
 use App\Models\Campaign;
 use App\Models\Property;
@@ -10,6 +9,7 @@ use Laravel\Dusk\Browser;
 use App\Models\VotingBallot;
 use App\Models\OwnerAuditLog;
 use App\Models\ContactMessage;
+use App\Models\UserLoginSession;
 use App\Models\CampaignRecipient;
 use App\Models\PropertyAssignment;
 

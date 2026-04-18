@@ -20,7 +20,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
 use App\Models\CampaignTrackingEvent;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\Messaging\DispatchCampaignJob;
 use App\Services\Messaging\RecipientResolver;
@@ -177,7 +176,7 @@ it('sends campaign synchronously from the manager', function () {
         ->test('admin-campaign-manager')
         ->call('sendCampaign', $campaign->id);
 
-    Bus::assertDispatchedSync(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
+    Bus::assertDispatchedSync(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $campaign->id);
 });
 
 it('shows edit and delete actions only for draft or scheduled campaigns', function () {

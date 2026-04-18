@@ -1,18 +1,19 @@
 <?php
 
+use Mockery;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Support\Facades\Artisan;
+use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
 
 it('allows superadmin to run queue worker until queue is empty', function () {
     $csrfToken = 'queue-action-token';
     $user = adminUser();
 
-    Artisan::shouldReceive('call')
+    $actionMock = Mockery::mock(RunQueueWorkStopWhenEmptyAction::class);
+    $actionMock->shouldReceive('execute')
         ->once()
-        ->with('queue:work', [
-            '--stop-when-empty' => true,
-        ]);
+        ->andReturn(true);
+    app()->instance(RunQueueWorkStopWhenEmptyAction::class, $actionMock);
 
     test()->withSession(['_token' => $csrfToken])
         ->actingAs($user)

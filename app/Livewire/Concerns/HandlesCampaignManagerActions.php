@@ -5,11 +5,11 @@ namespace App\Livewire\Concerns;
 use App\Models\User;
 use App\Models\Campaign;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\Messaging\DispatchCampaignJob;
 use App\Services\Messaging\RecipientResolver;
 use App\Actions\Campaigns\DuplicateCampaignAction;
-use Illuminate\Support\Facades\Bus;
 
 trait HandlesCampaignManagerActions
 {
