@@ -34,10 +34,25 @@ class CampaignAdminOptions
      */
     public function templateOptions(): array
     {
-        return CampaignTemplate::query()
-            ->orderBy('name')
+        $accessScope = $this->user?->campaignAccessScope() ?? 'none';
+
+        $query = CampaignTemplate::query()->orderBy('name');
+
+        if ($accessScope === 'managed-locations') {
+            $managedLocationIds = $this->user?->managedLocations()
+                ->pluck('locations.id')
+                ->all() ?? [];
+
+            if ($managedLocationIds === []) {
+                return [];
+            }
+
+            $query->whereIn('location_id', $managedLocationIds);
+        }
+
+        return $query
             ->get()
-            ->map(static fn (CampaignTemplate $template): array => [
+            ->map(static fn(CampaignTemplate $template): array => [
                 'value' => (string) $template->id,
                 'label' => $template->name,
             ])
@@ -104,7 +119,7 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->filter(static fn (mixed $value): bool => is_string($value) && $value !== '')
+            ->filter(static fn(mixed $value): bool => is_string($value) && $value !== '')
             ->values()
             ->all();
     }
@@ -116,8 +131,8 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->map(static fn (mixed $value): int => (int) $value)
-            ->filter(static fn (int $value): bool => $value > 0)
+            ->map(static fn(mixed $value): int => (int) $value)
+            ->filter(static fn(int $value): bool => $value > 0)
             ->values()
             ->all();
     }
@@ -145,8 +160,8 @@ class CampaignAdminOptions
 
         if (str_contains($value, ':')) {
             $legacyLabels = collect(explode(',', $value))
-                ->map(static fn (string $token): string => trim($token))
-                ->filter(static fn (string $token): bool => $token !== '' && str_contains($token, ':'))
+                ->map(static fn(string $token): string => trim($token))
+                ->filter(static fn(string $token): bool => $token !== '' && str_contains($token, ':'))
                 ->map(function (string $token): string {
                     [$type, $code] = explode(':', $token, 2);
 

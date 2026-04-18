@@ -2,12 +2,14 @@
 
 namespace App\Livewire;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
 use Livewire\Component;
 use App\Models\Campaign;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class AdminInvalidContactsList extends Component
 {
@@ -48,15 +50,33 @@ class AdminInvalidContactsList extends Component
      */
     private function rows(): array
     {
-        $owners = Owner::query()
+        $user = $this->currentUser();
+        $query = Owner::query()
             ->where(function ($query): void {
                 $query->where('coprop1_email_invalid', true)
                     ->orWhere('coprop1_phone_invalid', true)
                     ->orWhere('coprop2_email_invalid', true)
                     ->orWhere('coprop2_phone_invalid', true);
-            })
-            ->orderByDesc('last_contact_error_at')
-            ->get();
+            });
+
+        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+            $managedLocationIds = $user->managedLocations()
+                ->pluck('locations.id')
+                ->all();
+
+            if ($managedLocationIds === []) {
+                return [];
+            }
+
+            $query->whereHas('assignments', function (Builder $q) use ($managedLocationIds): void {
+                $q->whereNull('end_date')
+                    ->whereHas('property', function (Builder $q2) use ($managedLocationIds): void {
+                        $q2->whereIn('location_id', $managedLocationIds);
+                    });
+            });
+        }
+
+        $owners = $query->orderByDesc('last_contact_error_at')->get();
 
         $rows = [];
 

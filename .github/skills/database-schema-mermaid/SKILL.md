@@ -33,33 +33,34 @@ Use this skill to keep a single up-to-date Mermaid ER diagram for the current La
 
 ```mermaid
 flowchart LR
-    USERS --> OWNERS
-    USERS --> SESSIONS
-    USERS --> USER_LOGIN_SESSIONS
-    USERS --> OWNER_AUDIT_LOGS
-    USERS --> ROLE_USER
-    ROLES --> ROLE_USER
-    USERS --> LOCATION_USER
-    LOCATIONS --> LOCATION_USER
-    OWNERS --> PROPERTY_ASSIGNMENTS
-    OWNERS --> OWNER_AUDIT_LOGS
-    LOCATIONS --> PROPERTIES
-    PROPERTIES --> PROPERTY_ASSIGNMENTS
-    NOTICES --> NOTICE_LOCATIONS
-    LOCATIONS --> NOTICE_LOCATIONS
-    VOTINGS --> VOTING_OPTIONS
-    VOTINGS --> VOTING_LOCATIONS
-    LOCATIONS --> VOTING_LOCATIONS
-    VOTINGS --> VOTING_BALLOTS
-    OWNERS --> VOTING_BALLOTS
-    USERS --> VOTING_BALLOTS
-    VOTING_BALLOTS --> VOTING_SELECTIONS
-    VOTING_OPTIONS --> VOTING_SELECTIONS
-    VOTINGS --> VOTING_OPTION_TOTALS
-    VOTING_OPTIONS --> VOTING_OPTION_TOTALS
+    AUTH["Auth & access\nusers, roles, sessions"]:::auth
+    OWNERSHIP["Ownership\nowners, locations, properties, assignments"]:::ownership
+    VOTINGS_G["Votings\nvotings, ballots, selections, totals"]:::votings
+    CAMPAIGNS_G["Campaigns\ncampaigns, recipients, documents, templates"]:::campaigns
+    CONTENT["Content & settings\nnotices, images, contact messages, settings"]:::content
+
+    AUTH -->|identity and permissions| OWNERSHIP
+    AUTH -->|acting users| VOTINGS_G
+    AUTH -->|authors and senders| CAMPAIGNS_G
+
+    OWNERSHIP -->|owners and locations| VOTINGS_G
+    OWNERSHIP -->|owners and locations| CAMPAIGNS_G
+    OWNERSHIP -->|location-scoped notices| CONTENT
+
+    classDef auth      fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    classDef ownership fill:#dcfce7,stroke:#22c55e,color:#14532d
+    classDef votings   fill:#fef9c3,stroke:#eab308,color:#713f12
+    classDef campaigns fill:#ffe4e6,stroke:#f43f5e,color:#881337
+    classDef content   fill:#f3e8ff,stroke:#a855f7,color:#581c87
 ```
 
-### 2) Core domain (community ownership)
+### 2a) Core domain — ownership (owners, locations, properties)
+
+```mermaid
+flowchart LR
+    A["Auth & access + Ownership domain"]:::ownership
+    classDef ownership fill:#dcfce7,stroke:#22c55e,color:#14532d
+```
 
 ```mermaid
 erDiagram
@@ -151,6 +152,50 @@ erDiagram
         text new_value
     }
 
+    USERS ||--o{ OWNERS : has_many
+    USERS ||--o{ SESSIONS : has_many
+    USERS ||--o{ OWNER_AUDIT_LOGS : changed_by
+    USERS ||--o{ USER_LOGIN_SESSIONS : login_events
+    USERS ||--o{ ROLE_USER : has_many
+    ROLES ||--o{ ROLE_USER : has_many
+    USERS ||--o{ LOCATION_USER : manages
+    OWNERS ||--o{ PROPERTY_ASSIGNMENTS : has_many
+    OWNERS ||--o{ OWNER_AUDIT_LOGS : has_many
+    LOCATIONS ||--o{ PROPERTIES : has_many
+    LOCATIONS ||--o{ LOCATION_USER : has_many
+    PROPERTIES ||--o{ PROPERTY_ASSIGNMENTS : has_many
+```
+
+### 2b) Core domain — votings
+
+```mermaid
+flowchart LR
+    A["Votings domain"]:::votings
+    classDef votings fill:#fef9c3,stroke:#eab308,color:#713f12
+```
+
+```mermaid
+erDiagram
+    OWNERS {
+        bigint id
+        bigint user_id
+        string coprop1_name
+        datetime deleted_at
+    }
+
+    USERS {
+        bigint id
+        string name
+        datetime deleted_at
+    }
+
+    LOCATIONS {
+        bigint id
+        string code
+        string name
+        datetime deleted_at
+    }
+
     VOTINGS {
         bigint id
         string name_eu
@@ -210,32 +255,139 @@ erDiagram
         datetime deleted_at
     }
 
-    USERS ||--o{ OWNERS : has_many
-    USERS ||--o{ SESSIONS : has_many
-    USERS ||--o{ OWNER_AUDIT_LOGS : changed_by
-    USERS ||--o{ USER_LOGIN_SESSIONS : login_events
-    USERS ||--o{ ROLE_USER : has_many
-    ROLES ||--o{ ROLE_USER : has_many
-    USERS ||--o{ LOCATION_USER : manages
-    OWNERS ||--o{ PROPERTY_ASSIGNMENTS : has_many
-    OWNERS ||--o{ OWNER_AUDIT_LOGS : has_many
-    OWNERS ||--o{ VOTING_BALLOTS : has_many
-    LOCATIONS ||--o{ PROPERTIES : has_many
-    LOCATIONS ||--o{ LOCATION_USER : has_many
-    PROPERTIES ||--o{ PROPERTY_ASSIGNMENTS : has_many
-    USERS ||--o{ VOTING_BALLOTS : delegated_by
     VOTINGS ||--o{ VOTING_OPTIONS : has_many
     VOTINGS ||--o{ VOTING_LOCATIONS : has_many
     VOTINGS ||--o{ VOTING_BALLOTS : has_many
     VOTINGS ||--o{ VOTING_SELECTIONS : has_many
     VOTINGS ||--o{ VOTING_OPTION_TOTALS : has_many
     LOCATIONS ||--o{ VOTING_LOCATIONS : has_many
+    OWNERS ||--o{ VOTING_BALLOTS : has_many
+    USERS ||--o{ VOTING_BALLOTS : delegated_by
     VOTING_OPTIONS ||--o{ VOTING_SELECTIONS : has_many
     VOTING_OPTIONS ||--o{ VOTING_OPTION_TOTALS : has_many
     VOTING_BALLOTS ||--o{ VOTING_SELECTIONS : has_many
 ```
 
+### 2c) Core domain — campaigns
+
+```mermaid
+flowchart LR
+    A["Campaigns domain"]:::campaigns
+    classDef campaigns fill:#ffe4e6,stroke:#f43f5e,color:#881337
+```
+
+```mermaid
+erDiagram
+    USERS {
+        bigint id
+        string name
+        datetime deleted_at
+    }
+
+    OWNERS {
+        bigint id
+        bigint user_id
+        string coprop1_name
+        datetime deleted_at
+    }
+
+    LOCATIONS {
+        bigint id
+        string code
+        string name
+        datetime deleted_at
+    }
+
+    CAMPAIGNS {
+        bigint id
+        bigint created_by_user_id
+        string subject_eu
+        string subject_es
+        text body_eu
+        text body_es
+        string channel
+        string status
+        timestamp scheduled_at
+        timestamp sent_at
+        datetime deleted_at
+    }
+
+    CAMPAIGN_LOCATIONS {
+        bigint id
+        bigint campaign_id
+        bigint location_id
+        datetime deleted_at
+    }
+
+    CAMPAIGN_RECIPIENTS {
+        bigint id
+        bigint campaign_id
+        bigint owner_id
+        string slot
+        string contact
+        string tracking_token
+        string status
+        string message_subject
+        text message_body
+        timestamp sent_at
+        bigint sent_by_user_id
+        text error_message
+        datetime deleted_at
+    }
+
+    CAMPAIGN_DOCUMENTS {
+        bigint id
+        bigint campaign_id
+        string filename
+        string path
+        string mime_type
+        bigint size_bytes
+        boolean is_public
+        datetime deleted_at
+    }
+
+    CAMPAIGN_TRACKING_EVENTS {
+        bigint id
+        bigint campaign_recipient_id
+        bigint campaign_document_id
+        string event_type
+        text url
+        string ip_address
+    }
+
+    CAMPAIGN_TEMPLATES {
+        bigint id
+        bigint created_by_user_id
+        bigint location_id
+        string name
+        string subject_eu
+        string subject_es
+        longtext body_eu
+        longtext body_es
+        string channel
+        datetime deleted_at
+    }
+
+    USERS ||--o{ CAMPAIGNS : created_by
+    CAMPAIGNS ||--o{ CAMPAIGN_LOCATIONS : has_many
+    LOCATIONS ||--o{ CAMPAIGN_LOCATIONS : has_many
+    CAMPAIGNS ||--o{ CAMPAIGN_RECIPIENTS : has_many
+    OWNERS ||--o{ CAMPAIGN_RECIPIENTS : has_many
+    USERS ||--o{ CAMPAIGN_RECIPIENTS : sent_by
+    CAMPAIGNS ||--o{ CAMPAIGN_DOCUMENTS : has_many
+    CAMPAIGN_RECIPIENTS ||--o{ CAMPAIGN_TRACKING_EVENTS : has_many
+    CAMPAIGN_DOCUMENTS ||--o{ CAMPAIGN_TRACKING_EVENTS : has_many
+    USERS ||--o{ CAMPAIGN_TEMPLATES : created_by
+    LOCATIONS ||--o{ CAMPAIGN_TEMPLATES : has_many
+```
+
 ### 3) Content and settings domain
+
+```mermaid
+flowchart LR
+    A["Content & settings domain"]:::content
+    classDef content fill:#f3e8ff,stroke:#a855f7,color:#581c87
+```
 
 ```mermaid
 erDiagram
@@ -287,6 +439,12 @@ erDiagram
 ```
 
 ### 4) Framework tables
+
+```mermaid
+flowchart LR
+    A["Framework tables"]:::framework
+    classDef framework fill:#f1f5f9,stroke:#94a3b8,color:#334155
+```
 
 ```mermaid
 erDiagram

@@ -21,6 +21,7 @@ class CampaignTemplate extends Model
         'body_es',
         'channel',
         'created_by_user_id',
+        'location_id',
     ];
 
     /**
@@ -29,6 +30,14 @@ class CampaignTemplate extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
+    }
+
+    /**
+     * @return BelongsTo<Location, $this>
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
     }
 
     protected static function newFactory(): CampaignTemplateFactory

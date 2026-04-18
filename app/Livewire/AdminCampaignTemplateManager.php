@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Role;
 use App\Models\User;
 use Livewire\Component;
 use App\Models\Campaign;
@@ -11,6 +12,7 @@ use App\Models\CampaignTemplate;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Concerns\BuildsLocaleFieldConfigs;
+use Illuminate\Database\Eloquent\Builder;
 
 class AdminCampaignTemplateManager extends Component
 {
@@ -86,9 +88,15 @@ class AdminCampaignTemplateManager extends Component
             $template = CampaignTemplate::query()->findOrFail($this->editingId);
             $template->update($this->payload());
         } else {
+            $user = $this->currentUser();
+            $locationId = null;
+            if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+                $locationId = $user->managedLocations()->value('locations.id');
+            }
             CampaignTemplate::query()->create([
                 ...$this->payload(),
-                'created_by_user_id' => $this->currentUser()?->id,
+                'created_by_user_id' => $user?->id,
+                'location_id' => $locationId,
             ]);
         }
 
@@ -138,7 +146,7 @@ class AdminCampaignTemplateManager extends Component
         $this->authorizeViewAny();
 
         return view('livewire.admin.campaign-template-manager', [
-            'templates' => CampaignTemplate::query()->latest()->paginate(12),
+            'templates' => $this->templatesQuery()->latest()->paginate(12),
             'channelOptions' => [
                 ['value' => 'email', 'label' => __('campaigns.admin.channels.email')],
                 // ['value' => 'sms', 'label' => __('campaigns.admin.channels.sms')],
@@ -181,6 +189,29 @@ class AdminCampaignTemplateManager extends Component
         $this->bodyEs = '';
         $this->channel = 'email';
         $this->resetValidation();
+    }
+
+    /**
+     * @return Builder<CampaignTemplate>
+     */
+    private function templatesQuery(): Builder
+    {
+        $user = $this->currentUser();
+        $query = CampaignTemplate::query();
+
+        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+            $managedLocationIds = $user->managedLocations()
+                ->pluck('locations.id')
+                ->all();
+
+            if ($managedLocationIds === []) {
+                return $query->whereRaw('1 = 0');
+            }
+
+            return $query->whereIn('location_id', $managedLocationIds);
+        }
+
+        return $query;
     }
 
     private function authorizeViewAny(): void

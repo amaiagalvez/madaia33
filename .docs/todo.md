@@ -24,7 +24,6 @@
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 - [ ] https://whatsapp.com/channel/0029VbCTbySGOj9pCe3Pnd47 Botoi bat iragarkiak honea bidaltzeko
-
     
 # Copilot
 - [ ] repasar agente lamia
@@ -33,7 +32,7 @@
 - [ ] cómo le digo al agente "amalurra" que primero siempre haga caso a lo que hay en el agent.md y luego con lo suyo propio?
 
 # Code Refactor && Hobekuntzak
-- [ ] crear un componente, si todavía no lo hay, para que todas los listados tablas tengan la missma estructura
+- [ ] crear un componente, si todavía no lo hay, para que todas los listados tablas tengan la misma estructura
 - [ ] el formato de todos los formularios tanto de crear como editar tienen que tener el mismo aspecto que el de crear un nuevo anuncio, crear un componente si no lo hay
 - [ ] Ordena los ficheros dentro de la carpeta Livewire en subcarpetas Admin y Front
 - [ ] componente para inputs del formulario
