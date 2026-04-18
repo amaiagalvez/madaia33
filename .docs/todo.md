@@ -12,7 +12,7 @@
 
 # Despues de publicar master
 - [ ] añalizar cookiena chatgpt-rekin
-- [ ] probar envio whatcapp en el movil
+- [ ] probar envio whatchapp en el movil
 
 # Code
 - spec kiro pendientes (obra)
