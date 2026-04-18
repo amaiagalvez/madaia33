@@ -28,8 +28,11 @@ class OwnerWelcomeMail extends Mailable
         public readonly string $resetUrl,
         public readonly ?string $trackingPixelUrl = null,
         public readonly ?string $trackedResetUrl = null,
+        public readonly ?string $recipientLocale = null,
     ) {
-        $this->legalText = EmailLegalText::resolve();
+        $this->locale($this->recipientLocale);
+
+        $this->legalText = EmailLegalText::resolve(locale: $this->recipientLocale);
     }
 
     public function envelope(): Envelope

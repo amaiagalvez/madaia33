@@ -2,6 +2,7 @@
 
 namespace App\Actions\Properties;
 
+use App\Actions\Owners\CreateOwnerAction;
 use App\Models\Owner;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
@@ -10,6 +11,10 @@ use Illuminate\Validation\ValidationException;
 
 class AssignPropertyAction
 {
+    public function __construct(
+        private readonly CreateOwnerAction $createOwnerAction,
+    ) {}
+
     /**
      * @throws ValidationException
      */
@@ -52,6 +57,8 @@ class AssignPropertyAction
             ]);
 
             $owner->user()->update(['is_active' => true]);
+
+            $this->createOwnerAction->sendWelcomeMailToOwner($owner);
 
             return $assignment;
         });

@@ -1,3 +1,4 @@
+- In Laravel mailables, do not declare a property named `locale`; `Illuminate\Mail\Mailable` already defines it. Use a different name like `recipientLocale` and call `$this->locale(...)` explicitly when per-recipient localization is needed.
 - After each correction response, include `Aprendizajes:` with root cause + prevention, and save that learning in memory for the next correction.
 - For admin-only email subject prefixes, persist the canonical subject in DB and derive the prefixed admin subject only at send time; otherwise internal labels leak into user-facing history and audits.
 - When adding PHPMD suppressions, use quoted syntax `@SuppressWarnings("PHPMD.RuleName")`; unquoted `@SuppressWarnings(PHPMD.RuleName)` can break PHPStan with `phpDoc.parseError`.
