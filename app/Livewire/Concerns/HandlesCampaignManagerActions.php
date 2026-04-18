@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Jobs\Messaging\DispatchCampaignJob;
 use App\Services\Messaging\RecipientResolver;
 use App\Actions\Campaigns\DuplicateCampaignAction;
-use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
+use Illuminate\Support\Facades\Bus;
 
 trait HandlesCampaignManagerActions
 {
@@ -32,7 +32,7 @@ trait HandlesCampaignManagerActions
         $this->redirectRoute('admin.campaigns', ['editCampaign' => $newCampaign->id], navigate: true);
     }
 
-    public function sendCampaign(int $id, RunQueueWorkStopWhenEmptyAction $runQueueWorkStopWhenEmptyAction, RecipientResolver $recipientResolver): void
+    public function sendCampaign(int $id, RecipientResolver $recipientResolver): void
     {
         $this->authorizeViewAny();
 
@@ -48,9 +48,7 @@ trait HandlesCampaignManagerActions
             return;
         }
 
-        dispatch(new DispatchCampaignJob($campaign->id));
-
-        $runQueueWorkStopWhenEmptyAction->execute();
+        Bus::dispatchSync(new DispatchCampaignJob($campaign->id));
     }
 
     public function scheduleCampaign(int $id, ?string $scheduledAt = null): void
@@ -199,7 +197,6 @@ trait HandlesCampaignManagerActions
     }
 
     public function doAction(
-        RunQueueWorkStopWhenEmptyAction $runQueueWorkStopWhenEmptyAction,
         DuplicateCampaignAction $duplicateCampaignAction,
         RecipientResolver $recipientResolver,
     ): void {
@@ -214,7 +211,7 @@ trait HandlesCampaignManagerActions
 
         match ($action) {
             'duplicate' => $this->duplicateCampaign($campaignId, $duplicateCampaignAction),
-            'send' => $this->sendCampaign($campaignId, $runQueueWorkStopWhenEmptyAction, $recipientResolver),
+            'send' => $this->sendCampaign($campaignId, $recipientResolver),
             'schedule' => $this->scheduleCampaign($campaignId),
             'cancel_schedule' => $this->cancelSchedule($campaignId),
             default => null,

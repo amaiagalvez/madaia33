@@ -12,7 +12,8 @@
 
 # Despues de publicar master
 - [ ] añalizar cookiena chatgpt-rekin
-- [ ] probar envio whatchapp en el movil
+- [ ] añadir el texto de explicación de las votaciones en los PDF
+- [ ] no se ejecuta el queue
 
 # Code
 - spec kiro pendientes (obra)
