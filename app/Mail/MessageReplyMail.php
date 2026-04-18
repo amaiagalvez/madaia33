@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\MessageReply;
+use App\Support\EmailLegalText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -41,6 +42,7 @@ class MessageReplyMail extends Mailable
             with: [
                 'reply' => $this->reply,
                 'contactMessage' => $this->reply->message,
+                'legalText' => EmailLegalText::resolve(),
             ],
         );
     }
