@@ -2,12 +2,14 @@
 
 namespace App\Livewire;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
 use Livewire\Component;
 use App\Models\Campaign;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class AdminInvalidContactsList extends Component
 {
@@ -48,42 +50,75 @@ class AdminInvalidContactsList extends Component
      */
     private function rows(): array
     {
-        $owners = Owner::query()
+        $user = $this->currentUser();
+        $query = Owner::query()
             ->where(function ($query): void {
                 $query->where('coprop1_email_invalid', true)
                     ->orWhere('coprop1_phone_invalid', true)
                     ->orWhere('coprop2_email_invalid', true)
                     ->orWhere('coprop2_phone_invalid', true);
-            })
-            ->orderByDesc('last_contact_error_at')
-            ->get();
+            });
+
+        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
+            $managedLocationIds = $user->managedLocations()->pluck('locations.id')->all();
+
+            if ($managedLocationIds === []) {
+                return [];
+            }
+
+            $this->applyCommunityAdminScope($query, $managedLocationIds);
+        }
 
         $rows = [];
 
-        foreach ($owners as $owner) {
-            foreach (['coprop1', 'coprop2'] as $slot) {
-                foreach (['email', 'phone'] as $channel) {
-                    $invalidField = $slot . '_' . $channel . '_invalid';
-                    $errorCountField = $slot . '_' . $channel . '_error_count';
-                    $contactField = $slot . '_' . $channel;
-                    $nameField = $slot . '_name';
+        foreach ($query->orderByDesc('last_contact_error_at')->get() as $owner) {
+            array_push($rows, ...$this->ownerRows($owner));
+        }
 
-                    if (! $owner->{$invalidField}) {
-                        continue;
-                    }
+        return $rows;
+    }
 
-                    $rows[] = [
-                        'owner_id' => $owner->id,
-                        'name' => $owner->{$nameField} ?: __('campaigns.admin.unknown_owner'),
-                        'slot' => $slot,
-                        'slot_label' => __('campaigns.admin.' . $slot),
-                        'contact' => $owner->{$contactField},
-                        'channel' => $channel,
-                        'channel_label' => __('campaigns.admin.channels.' . ($channel === 'phone' ? 'sms' : $channel)),
-                        'errors' => (int) $owner->{$errorCountField},
-                        'last_error_at' => $owner->last_contact_error_at,
-                    ];
+    /**
+     * @param  Builder<Owner>  $query
+     * @param  array<int>  $managedLocationIds
+     */
+    private function applyCommunityAdminScope(Builder $query, array $managedLocationIds): void
+    {
+        $query->whereHas('assignments', function (Builder $q) use ($managedLocationIds): void {
+            $q->whereNull('end_date')
+                ->whereHas('property', function (Builder $q2) use ($managedLocationIds): void {
+                    $q2->whereIn('location_id', $managedLocationIds);
+                });
+        });
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function ownerRows(Owner $owner): array
+    {
+        $rows = [];
+
+        foreach (['coprop1', 'coprop2'] as $slot) {
+            foreach (['email', 'phone'] as $channel) {
+                $invalidField = $slot . '_' . $channel . '_invalid';
+
+                if (! $owner->{$invalidField}) {
+                    continue;
                 }
+
+                $errorCountField = $slot . '_' . $channel . '_error_count';
+                $rows[] = [
+                    'owner_id' => $owner->id,
+                    'name' => $owner->{$slot . '_name'} ?: __('campaigns.admin.unknown_owner'),
+                    'slot' => $slot,
+                    'slot_label' => __('campaigns.admin.' . $slot),
+                    'contact' => $owner->{$slot . '_' . $channel},
+                    'channel' => $channel,
+                    'channel_label' => __('campaigns.admin.channels.' . ($channel === 'phone' ? 'sms' : $channel)),
+                    'errors' => (int) $owner->{$errorCountField},
+                    'last_error_at' => $owner->last_contact_error_at,
+                ];
             }
         }
 

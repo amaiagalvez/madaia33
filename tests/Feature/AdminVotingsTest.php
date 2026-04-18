@@ -230,10 +230,11 @@ it('shows active votings with census and votes in admin component', function () 
     Livewire::actingAs($admin)
         ->test(Votings::class)
         ->call('openCensus', $voting->id)
+        ->assertSet('ownersModalContext', 'census')
         ->assertSee('Presupuesto 2026')
-        ->assertSee('Opcion 1')
-        ->assertDontSee('Viernes')
-        ->assertDontSee('19:30');
+        ->assertDontSee('data-owners-modal-vote-column', false)
+        ->assertDontSee('data-owners-modal-delegate-dni-column', false)
+        ->assertDontSee('data-owners-modal-delegated-by-column', false);
 });
 
 it('shows delegated voter name in voters modal for audit visibility', function () {
@@ -284,10 +285,59 @@ it('shows delegated voter name in voters modal for audit visibility', function (
         ->call('openVoters', $voting->id)
         ->assertSet('showOwnersModal', true)
         ->assertSee('Jabe Delegatua')
-        ->assertSee('Opcion 1')
-        ->assertDontSee('Viernes')
-        ->assertDontSee('19:30')
+        ->assertSee('Viernes a las 19:30')
         ->assertSee('Admin Delegatua');
+});
+
+it('shows casting user name in voters modal for in-person ballots', function () {
+    app()->setLocale('es');
+
+    $admin = User::factory()->create(['name' => 'Admin Presentziala']);
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    $owner = Owner::factory()->create(['coprop1_name' => 'Jabe Presentziala']);
+    $portal = Location::factory()->portal()->create(['code' => 'PRES-01']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    $option = VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    $ballot = VotingBallot::create([
+        'voting_id' => $voting->id,
+        'owner_id' => $owner->id,
+        'cast_by_user_id' => $admin->id,
+        'is_in_person' => true,
+        'voted_at' => now(),
+    ]);
+
+    VotingSelection::create([
+        'voting_id' => $voting->id,
+        'voting_ballot_id' => $ballot->id,
+        'owner_id' => $owner->id,
+        'voting_option_id' => $option->id,
+    ]);
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->call('openVoters', $voting->id)
+        ->assertSet('showOwnersModal', true)
+        ->assertSet('ownersModalRows.0.delegated_by', 'Admin Presentziala')
+        ->assertSee('Jabe Presentziala')
+        ->assertSee('Admin Presentziala');
 });
 
 it('keeps historical eligible owners in census modal and only voters in voters modal', function () {
@@ -359,7 +409,7 @@ it('keeps historical eligible owners in census modal and only voters in voters m
         ->call('openVoters', $voting->id)
         ->assertSee('Propietaria Historica 1')
         ->assertDontSee('Propietaria Historica 2')
-        ->assertSee('Opcion 1');
+        ->assertSee('Lunes a las 18:00');
 });
 
 it('forbids admin voting manager access for owner accounts', function () {
@@ -731,3 +781,21 @@ it('persists bilingual questions and allows creating a second voting', function 
         ->and($secondVoting->question_eu)->toBe('<p>Bigarren galdera EU</p>')
         ->and($secondVoting->question_es)->toBe('<p>Segunda pregunta ES</p>');
 });
+
+it('forbids non-superadmin users from opening in-person and delegated vote modals', function (string $role) {
+    $admin = User::factory()->create();
+    $admin->assignRole($role);
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->call('openInPersonVoteModal')
+        ->assertForbidden();
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->call('openDelegatedVoteModal')
+        ->assertForbidden();
+})->with([
+    Role::GENERAL_ADMIN,
+    Role::COMMUNITY_ADMIN,
+]);

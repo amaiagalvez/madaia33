@@ -25,7 +25,6 @@ class CampaignFactory extends Factory
             'body_eu' => fake()->paragraph(),
             'body_es' => fake()->paragraph(),
             'channel' => fake()->randomElement(['email', 'sms', 'whatsapp', 'telegram']),
-            'recipient_filter' => 'all',
             'status' => 'draft',
             'scheduled_at' => null,
             'sent_at' => null,

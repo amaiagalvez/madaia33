@@ -17,8 +17,24 @@ class VotingSelection extends Model
         'voting_id',
         'voting_ballot_id',
         'owner_id',
+        'pct_total',
         'voting_option_id',
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'pct_total' => 'decimal:4',
+        ];
+    }
+
+    protected static function newFactory(): VotingSelectionFactory
+    {
+        return VotingSelectionFactory::new();
+    }
 
     /**
      * @return BelongsTo<Voting, $this>

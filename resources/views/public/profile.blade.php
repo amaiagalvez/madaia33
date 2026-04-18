@@ -31,30 +31,36 @@
         @endif
 
         @if ($requiresTermsAcceptance)
-            <div class="fixed inset-0 z-80 bg-black/50" aria-hidden="true"></div>
-            <section class="fixed inset-0 z-90 grid place-items-center p-4"
-                data-profile-terms-modal>
-                <div
-                    class="w-full max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-2xl">
-                    <h2 class="text-base font-semibold text-amber-900">
-                        {{ __('profile.terms.title') }}
-                    </h2>
-                    <div
-                        class="prose prose-sm mt-3 max-h-72 overflow-y-auto max-w-none text-amber-900">
-                        {!! $termsHtml !!}
-                    </div>
+            <div x-data>
+                <template x-teleport="body">
+                    <div class="fixed inset-0 z-110" data-profile-terms-modal>
+                        <div class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
+                        <section class="relative m-0 grid h-full w-full place-items-center overflow-y-auto p-4">
+                            <div
+                                class="my-auto w-full max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-2xl"
+                                data-profile-terms-modal-card>
+                                <h2 class="text-base font-semibold text-amber-900">
+                                    {{ __('profile.terms.title') }}
+                                </h2>
+                                <div
+                                    class="prose prose-sm mt-3 max-h-72 overflow-y-auto max-w-none text-amber-900">
+                                    {!! $termsHtml !!}
+                                </div>
 
-                    <form method="POST"
-                        action="{{ route(\App\SupportedLocales::routeName('profile.terms.accept')) }}"
-                        class="mt-5">
-                        @csrf
-                        <button type="submit"
-                            class="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#793d3d] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#5d2e2e]">
-                            {{ __('profile.terms.accept_button') }}
-                        </button>
-                    </form>
-                </div>
-            </section>
+                                <form method="POST"
+                                    action="{{ route(\App\SupportedLocales::routeName('profile.terms.accept')) }}"
+                                    class="mt-5">
+                                    @csrf
+                                    <button type="submit"
+                                        class="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#793d3d] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#5d2e2e]">
+                                        {{ __('profile.terms.accept_button') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </template>
+            </div>
         @endif
 
         <div
@@ -105,7 +111,7 @@
                         </article>
                     </div>
 
-                    <a href="{{ route('security.edit') }}"
+                    <a href="{{ route(\App\SupportedLocales::routeName('password.request')) }}"
                         class="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-[#d9755b] hover:text-[#793d3d]">
                         {{ __('profile.overview.change_password') }}
                     </a>
@@ -350,14 +356,38 @@
                                             {{ __('profile.received.status') }}</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-100 bg-white">
+                                <tbody class="bg-white">
                                     @foreach ($receivedMessages as $receivedMessage)
-                                        <tr data-profile-received-row>
+                                        <tr class="border-b border-gray-200 even:bg-gray-50/40 align-top last:border-b-0" data-profile-received-row>
                                             <td
                                                 class="px-4 py-3 text-sm font-medium text-gray-800">
                                                 {{ $receivedMessage['subject'] }}</td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
-                                                {{ $receivedMessage['message'] }}</td>
+                                                @php($receivedMessageText = (string) ($receivedMessage['message'] ?? ''))
+                                                @php($hasLongReceivedMessage = \Illuminate\Support\Str::length($receivedMessageText) > 160)
+
+                                                @if (!$hasLongReceivedMessage)
+                                                    <p class="whitespace-pre-line">
+                                                        {{ $receivedMessageText }}</p>
+                                                @else
+                                                    <details class="group max-w-[32rem]"
+                                                        data-profile-received-expandable="{{ $receivedMessage['id'] }}">
+                                                        <summary
+                                                            class="cursor-pointer list-none whitespace-pre-line text-gray-700 marker:content-none"
+                                                            data-profile-received-toggle="{{ $receivedMessage['id'] }}">
+                                                            <span
+                                                                data-profile-received-preview="{{ $receivedMessage['id'] }}">{{ \Illuminate\Support\Str::limit($receivedMessageText, 160) }}</span>
+                                                            <span
+                                                                class="ml-2 text-xs font-semibold text-[#793d3d] group-open:hidden">{{ __('profile.received.show_more') }}</span>
+                                                            <span
+                                                                class="ml-2 hidden text-xs font-semibold text-[#793d3d] group-open:inline">{{ __('profile.received.show_less') }}</span>
+                                                        </summary>
+                                                        <p class="mt-2 whitespace-pre-line"
+                                                            data-profile-received-full="{{ $receivedMessage['id'] }}">
+                                                            {{ $receivedMessageText }}</p>
+                                                    </details>
+                                                @endif
+                                            </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $receivedMessage['sent_at']->format('Y-m-d H:i:s') }}
                                             </td>
@@ -406,14 +436,38 @@
                                             {{ __('profile.messages.status') }}</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-100 bg-white">
+                                <tbody class="bg-white">
                                     @foreach ($userMessages as $userMessage)
-                                        <tr data-profile-message-row>
+                                        <tr class="border-b border-gray-200 even:bg-gray-50/40 align-top last:border-b-0" data-profile-message-row>
                                             <td
                                                 class="px-4 py-3 text-sm font-medium text-gray-800">
                                                 {{ $userMessage['subject'] }}</td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
-                                                {{ $userMessage['message'] }}</td>
+                                                @php($userMessageText = (string) ($userMessage['message'] ?? ''))
+                                                @php($hasLongUserMessage = \Illuminate\Support\Str::length($userMessageText) > 160)
+
+                                                @if (!$hasLongUserMessage)
+                                                    <p class="whitespace-pre-line">
+                                                        {{ $userMessageText }}</p>
+                                                @else
+                                                    <details class="group max-w-[32rem]"
+                                                        data-profile-message-expandable="{{ $userMessage['id'] }}">
+                                                        <summary
+                                                            class="cursor-pointer list-none whitespace-pre-line text-gray-700 marker:content-none"
+                                                            data-profile-message-toggle="{{ $userMessage['id'] }}">
+                                                            <span
+                                                                data-profile-message-preview="{{ $userMessage['id'] }}">{{ \Illuminate\Support\Str::limit($userMessageText, 160) }}</span>
+                                                            <span
+                                                                class="ml-2 text-xs font-semibold text-[#793d3d] group-open:hidden">{{ __('profile.messages.show_more') }}</span>
+                                                            <span
+                                                                class="ml-2 hidden text-xs font-semibold text-[#793d3d] group-open:inline">{{ __('profile.messages.show_less') }}</span>
+                                                        </summary>
+                                                        <p class="mt-2 whitespace-pre-line"
+                                                            data-profile-message-full="{{ $userMessage['id'] }}">
+                                                            {{ $userMessageText }}</p>
+                                                    </details>
+                                                @endif
+                                            </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $userMessage['created_at']->format('Y-m-d H:i:s') }}
                                             </td>
@@ -465,11 +519,13 @@
                             data-profile-owner-audit-log>
                             <summary
                                 class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-zinc-800">
-                                <span>{{ __('admin.owners.audit.title') }}
-                                    ({{ count($ownerAuditLogs) }})</span>
-                                <span class="text-xs font-medium text-zinc-500">
-                                    {{ __('admin.owners.audit.latest_limit', ['count' => count($ownerAuditLogs)]) }}
-                                </span>
+                                <span>{{ __('admin.owners.audit.title') }}</span>
+                                <svg class="h-4 w-4 text-zinc-500" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                    aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
                             </summary>
 
                             <div class="border-t border-zinc-200 px-4 py-4">
@@ -556,22 +612,23 @@
                                     {{ __('profile.owner.validation_help') }}
                                 </div>
 
-                                <div class="space-y-3">
+                                <div class="grid grid-cols-1 gap-3 md:grid-cols-3"
+                                    data-profile-owner-properties-grid>
                                     @foreach ($activeAssignments as $assignment)
                                         <label
                                             class="flex items-start gap-3 rounded-xl border border-gray-200 p-4">
                                             @if (!$assignment->owner_validated)
                                                 <input type="checkbox" name="assignment_ids[]"
                                                     value="{{ $assignment->id }}"
-                                                    class="mt-1 h-4 w-4 rounded border-gray-300 text-[#793d3d] focus:ring-[#d9755b]"
-                                                    checked>
+                                                    class="mt-0.5 h-6 w-6 rounded border-gray-300 text-[#793d3d] focus:ring-brand-600"
+                                                    data-profile-owner-assignment-checkbox>
                                             @endif
                                             <span class="block">
                                                 <span
-                                                    class="block text-sm font-semibold text-gray-900">{{ $assignment->property ? ($assignment->property->location?->code ? $assignment->property->location->code . ' — ' : '') . $assignment->property->name : __('profile.owner.unknown_property') }}</span>
+                                                    class="block text-sm font-semibold text-gray-900">{{ $assignment->property ? ($assignment->property->location?->code ? $assignment->property->location->code . '  ' : '') . $assignment->property->name : __('profile.owner.unknown_property') }}</span>
                                                 <span
-                                                    class="mt-1 block text-xs text-gray-600">{{ __('profile.owner.assignment_dates', ['start' => $assignment->start_date?->format('Y-m-d') ?? '—']) }}</span>
-                                                <span class="mt-1 block text-xs text-gray-600"
+                                                    class="mt-1 block text-sm text-gray-900">{{ __('profile.owner.assignment_dates', ['start' => $assignment->start_date?->format('Y-m-d') ?? '—']) }}</span>
+                                                <span class="mt-1 block text-sm text-gray-900"
                                                     data-profile-owner-property-percentages>
                                                     {{ __('profile.owner.community_pct') }}:
                                                     {{ $assignment->property?->community_pct !== null ? number_format((float) $assignment->property->community_pct, 2, ',', '.') . '%' : '-' }}
@@ -580,7 +637,7 @@
                                                     {{ $assignment->property?->location_pct !== null ? number_format((float) $assignment->property->location_pct, 2, ',', '.') . '%' : '-' }}
                                                 </span>
                                                 <span
-                                                    class="mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $assignment->owner_validated ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800' }}">
+                                                    class="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium {{ $assignment->owner_validated ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800' }}">
                                                     {{ $assignment->owner_validated ? __('profile.owner.validated') : __('profile.owner.pending_validation') }}
                                                 </span>
                                             </span>

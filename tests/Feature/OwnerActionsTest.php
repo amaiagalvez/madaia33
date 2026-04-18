@@ -5,6 +5,7 @@ use App\Models\Owner;
 use App\Models\Location;
 use App\Models\Property;
 use App\Mail\OwnerWelcomeMail;
+use App\Models\CampaignRecipient;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Mail;
 use App\Actions\Owners\CreateOwnerAction;
@@ -83,6 +84,17 @@ describe('CreateOwnerAction', function () {
                 && str_contains($mail->bodyHtml, 'Kaixo Miren Etxeberria')
                 && str_contains($mail->bodyHtml, '33-A 1A');
         });
+
+        $recipient = CampaignRecipient::query()
+            ->where('campaign_id', 1)
+            ->where('owner_id', $owner->id)
+            ->latest('id')
+            ->first();
+
+        expect($recipient)->not->toBeNull()
+            ->and($recipient?->status)->toBe('sent')
+            ->and($recipient?->message_subject)->toBe('Ongi etorri Madaia 33ra')
+            ->and($recipient?->tracking_token)->not->toBe('');
     });
 
     it('creates owner with optional second co-owner data', function () {

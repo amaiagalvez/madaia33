@@ -23,6 +23,7 @@ class VotingSelectionFactory extends Factory
             'voting_id' => Voting::factory(),
             'voting_ballot_id' => VotingBallot::factory(),
             'owner_id' => Owner::factory(),
+            'pct_total' => fake()->randomFloat(4, 0, 100),
             'voting_option_id' => VotingOption::factory(),
         ];
     }

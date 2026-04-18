@@ -11,14 +11,14 @@ use Laravel\Dusk\Browser;
 test('admin can create, publish, verify public, unpublish and delete a notice', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
     $title = 'Dusk Test Iragarkia ' . now()->timestamp;
-    $adminNoticesPath = '/admin/avisos';
+    $adminNoticesPath = '/admin/iragarkiak';
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $title, $adminNoticesPath) {
         // Login and go to notices admin
         $browser->loginAs($admin)
             ->visit($adminNoticesPath)
-            ->assertSee('Iragarkiak');
+            ->waitForText('Sortu berria');
 
         // Create notice (draft, not public)
         $browser->press('Sortu berria')

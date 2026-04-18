@@ -13,12 +13,19 @@
 
     @if (request()->route()?->getName())
         @php($__baseName = \App\SupportedLocales::baseRouteName(request()->route()->getName()))
+        @php($__routeParameters = request()->route()?->parameters() ?? [])
         @foreach (\App\SupportedLocales::all() as $altLocale)
-            <link rel="alternate" hreflang="{{ $altLocale }}"
-                href="{{ route(\App\SupportedLocales::routeName($__baseName, $altLocale)) }}" />
+            @php($__alternateRouteName = \App\SupportedLocales::routeName($__baseName, $altLocale))
+            @if (\Illuminate\Support\Facades\Route::has($__alternateRouteName))
+                <link rel="alternate" hreflang="{{ $altLocale }}"
+                    href="{{ route($__alternateRouteName, $__routeParameters) }}" />
+            @endif
         @endforeach
-        <link rel="alternate" hreflang="x-default"
-            href="{{ route(\App\SupportedLocales::routeName($__baseName, \App\SupportedLocales::default())) }}" />
+        @php($__defaultRouteName = \App\SupportedLocales::routeName($__baseName, \App\SupportedLocales::default()))
+        @if (\Illuminate\Support\Facades\Route::has($__defaultRouteName))
+            <link rel="alternate" hreflang="x-default"
+                href="{{ route($__defaultRouteName, $__routeParameters) }}" />
+        @endif
     @endif
 
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -26,7 +33,14 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    <link rel="preload" as="style"
+        href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600">
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"
+        media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600">
+    </noscript>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
@@ -37,6 +51,12 @@
     @php($showVotingsLink = $showVotingsLink ?? false)
     @php($isImpersonating = session()->has('impersonator_user_id'))
     @php($showPrivateLink = !auth()->check() || !auth()->user()?->hasOnlyOwnerRole())
+    @php($isHomeRoute = request()->routeIs('home.*'))
+    @php($isNoticesRoute = request()->routeIs('notices.*'))
+    @php($isGalleryRoute = request()->routeIs('gallery.*'))
+    @php($isContactRoute = request()->routeIs('contact.*'))
+    @php($isVotingsRoute = request()->routeIs('votings.*'))
+    @php($isPrivateRoute = request()->routeIs('private.*'))
 
     <a href="#main-content"
         class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-gray-900 focus:shadow-md focus:ring-2 focus:ring-gray-500 focus:outline-none">
@@ -44,7 +64,7 @@
     </a>
 
     {{-- Brand top bar --}}
-    <div class="h-1 bg-linear-to-r from-[#793d3d] via-[#d9755b] to-[#f1bd4d]" aria-hidden="true">
+    <div class="h-1 bg-linear-to-r from-[#793d3d] via-brand-600 to-[#f1bd4d]" aria-hidden="true">
     </div>
 
     {{-- Header / Navigation --}}
@@ -61,36 +81,36 @@
                 <nav class="hidden flex-1 items-center justify-center gap-1 px-2 py-1.5 transition-all duration-200 md:flex"
                     aria-label="{{ __('general.nav.main') ?? 'Nabigazio nagusia' }}">
                     <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
-                        class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('home.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
-                        aria-current="{{ request()->routeIs('home.*') ? 'page' : 'false' }}">
+                        class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 {{ $isHomeRoute ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                        @if ($isHomeRoute) aria-current="page" @endif>
                         {{ __('general.nav.home') }}
                     </a>
                     <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
-                        class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('notices.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
-                        aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}">
+                        class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 {{ $isNoticesRoute ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                        @if ($isNoticesRoute) aria-current="page" @endif>
                         {{ __('general.nav.notices') }}
                     </a>
                     <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
-                        class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('gallery.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
-                        aria-current="{{ request()->routeIs('gallery.*') ? 'page' : 'false' }}">
+                        class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 {{ $isGalleryRoute ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                        @if ($isGalleryRoute) aria-current="page" @endif>
                         {{ __('general.nav.gallery') }}
                     </a>
                     <a href="{{ route(\App\SupportedLocales::routeName('contact')) }}"
-                        class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('contact.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
-                        aria-current="{{ request()->routeIs('contact.*') ? 'page' : 'false' }}">
+                        class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 {{ $isContactRoute ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                        @if ($isContactRoute) aria-current="page" @endif>
                         {{ __('general.nav.contact') }}
                     </a>
                     @if ($showVotingsLink)
                         <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('votings.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
-                            aria-current="{{ request()->routeIs('votings.*') ? 'page' : 'false' }}">
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 {{ $isVotingsRoute ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                            @if ($isVotingsRoute) aria-current="page" @endif>
                             {{ __('general.nav.votings') }}
                         </a>
                     @endif
                     @if ($showPrivateLink)
                         <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
-                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 {{ request()->routeIs('private.*') ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
-                            aria-current="{{ request()->routeIs('private.*') ? 'page' : 'false' }}">
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 {{ $isPrivateRoute ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                            @if ($isPrivateRoute) aria-current="page" @endif>
                             {{ __('general.nav.private') }}
                         </a>
                     @endif
@@ -109,8 +129,11 @@
 
                     {{-- Mobile menu button (hidden on md and above) --}}
                     <button type="button"
-                        class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors min-h-11 min-w-11"
-                        aria-label="Menua ireki / Abrir menú" data-hamburger-button x-data
+                        class="md:hidden min-h-11 min-w-11 rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+                        aria-label="Menua ireki / Abrir menú" data-hamburger-button
+                        aria-controls="public-mobile-menu" x-data="{ mobileMenuOpen: false }"
+                        x-bind:aria-expanded="mobileMenuOpen ? 'true' : 'false'"
+                        @mobile-menu-state-changed.window="mobileMenuOpen = !!$event.detail?.open"
                         @click="$dispatch('toggle-mobile-menu'); setTimeout(() => { const firstItem = document.querySelector('[data-mobile-menu] [data-first-menu-item]'); if (firstItem && getComputedStyle(firstItem).display !== 'none') { firstItem.focus(); } }, 180)">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
@@ -123,7 +146,8 @@
         </div>
 
         {{-- Mobile navigation (visible only on md breakpoint below) --}}
-        <div class="md:hidden border-t border-gray-200 bg-white max-h-[calc(100vh-4rem-env(safe-area-inset-top))] overflow-y-auto"
+        <div id="public-mobile-menu"
+            class="md:hidden border-t border-gray-200 bg-white max-h-[calc(100vh-4rem-env(safe-area-inset-top))] overflow-y-auto"
             data-mobile-menu x-cloak x-data="mobileMenu()"
             @toggle-mobile-menu.window="toggleMenu()"
             @keydown.escape.window="if (open) { toggleMenu() }" @keydown.tab="trapMenuFocus($event)"
@@ -131,38 +155,38 @@
             <nav class="px-4 py-3 flex flex-col gap-1" x-ref="mobileNav"
                 aria-label="{{ __('general.nav.main') ?? 'Nabigazio nagusia' }}">
                 <a href="{{ route(\App\SupportedLocales::routeName('home')) }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('home.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
-                    aria-current="{{ request()->routeIs('home.*') ? 'page' : 'false' }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ $isHomeRoute ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
+                    @if ($isHomeRoute) aria-current="page" @endif
                     data-first-menu-item x-ref="firstMenuItem">
                     {{ __('general.nav.home') }}
                 </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('notices')) }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('notices.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
-                    aria-current="{{ request()->routeIs('notices.*') ? 'page' : 'false' }}"
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ $isNoticesRoute ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
+                    @if ($isNoticesRoute) aria-current="page" @endif
                     data-mobile-notices-link>
                     {{ __('general.nav.notices') }}
                 </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('gallery')) }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('gallery.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
-                    aria-current="{{ request()->routeIs('gallery.*') ? 'page' : 'false' }}">
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ $isGalleryRoute ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
+                    @if ($isGalleryRoute) aria-current="page" @endif>
                     {{ __('general.nav.gallery') }}
                 </a>
                 <a href="{{ route(\App\SupportedLocales::routeName('contact')) }}"
-                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('contact.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
-                    aria-current="{{ request()->routeIs('contact.*') ? 'page' : 'false' }}">
+                    class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ $isContactRoute ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
+                    @if ($isContactRoute) aria-current="page" @endif>
                     {{ __('general.nav.contact') }}
                 </a>
                 @if ($showVotingsLink)
                     <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
-                        class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('votings.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
-                        aria-current="{{ request()->routeIs('votings.*') ? 'page' : 'false' }}">
+                        class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ $isVotingsRoute ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
+                        @if ($isVotingsRoute) aria-current="page" @endif>
                         {{ __('general.nav.votings') }}
                     </a>
                 @endif
                 @if ($showPrivateLink)
                     <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
-                        class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ request()->routeIs('private.*') ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
-                        aria-current="{{ request()->routeIs('private.*') ? 'page' : 'false' }}">
+                        class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ $isPrivateRoute ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
+                        @if ($isPrivateRoute) aria-current="page" @endif>
                         {{ __('general.nav.private') }}
                     </a>
                 @endif
@@ -210,7 +234,7 @@
             class="pointer-events-none absolute -left-32 top-20 -z-10 h-72 w-72 rounded-full bg-[#f1bd4d]/20 blur-3xl">
         </div>
         <div aria-hidden="true"
-            class="pointer-events-none absolute -right-24 top-112 -z-10 h-80 w-80 rounded-full bg-[#d9755b]/18 blur-3xl">
+            class="pointer-events-none absolute -right-24 top-112 -z-10 h-80 w-80 rounded-full bg-brand-600/18 blur-3xl">
         </div>
         <div aria-hidden="true"
             class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-linear-to-b from-white/90 to-transparent">
@@ -223,7 +247,7 @@
     {{-- Footer --}}
     <footer
         class="mt-auto border-t border-gray-200 bg-gray-50/90 pb-[env(safe-area-inset-bottom)]">
-        <div class="h-0.5 bg-linear-to-r from-[#793d3d] via-[#d9755b] to-[#f1bd4d]"></div>
+        <div class="h-0.5 bg-linear-to-r from-[#793d3d] via-brand-600 to-[#f1bd4d]"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div
                 class="flex flex-col items-stretch gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -231,30 +255,64 @@
                     class="glass-panel w-full max-w-md px-4 py-3 sm:w-auto" />
                 <nav class="grid gap-3 sm:grid-cols-2" aria-label="Footer">
                     <a href="{{ route(\App\SupportedLocales::routeName('privacy-policy')) }}"
-                        class="hero-frame px-4 py-3 transition-colors hover:border-[#d9755b]/60 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                        class="hero-frame px-4 py-3 transition-colors hover:border-brand-600/60 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
                         <p class="text-sm font-semibold text-gray-800">
                             {{ __('general.footer.privacy_policy') }}</p>
                     </a>
                     <a href="{{ route(\App\SupportedLocales::routeName('legal-notice')) }}"
-                        class="hero-frame px-4 py-3 transition-colors hover:border-[#d9755b]/60 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                        class="hero-frame px-4 py-3 transition-colors hover:border-brand-600/60 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
                         <p class="text-sm font-semibold text-gray-800">
                             {{ __('general.footer.legal_notice') }}</p>
                     </a>
                     <a href="{{ route(\App\SupportedLocales::routeName('cookie-policy')) }}"
-                        class="hero-frame px-4 py-3 transition-colors hover:border-[#d9755b]/60 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 sm:col-span-2">
+                        class="hero-frame px-4 py-3 transition-colors hover:border-brand-600/60 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 sm:col-span-2">
                         <p class="text-sm font-semibold text-gray-800">
                             {{ __('general.footer.cookie_policy') }}</p>
                     </a>
                 </nav>
                 <a href="mailto:info@amaia.eus"
-                    class="inline-flex items-center self-end lg:self-center focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                    class="inline-flex items-center self-end lg:self-center focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
                     aria-label="Contact with Amaia">
-                    <img src="{{ asset('amaia-footer.png') }}" alt="Amaia logo"
-                        class="h-10 w-auto object-contain sm:h-11" />
+                    <img src="{{ asset('amaia-footer.png') }}" alt="Amaia Galvez Itarte"
+                        aria-hidden="true" class="h-10 w-auto object-contain sm:h-11" />
                 </a>
             </div>
         </div>
     </footer>
+
+    <div x-data="{
+        accepted: false,
+        init() {
+            this.accepted = document.cookie.split(';').some((entry) => entry.trim().startsWith('madaia_cookie_consent=1'));
+        },
+        dismiss() {
+            document.cookie = 'madaia_cookie_consent=1; Max-Age=31536000; Path=/; SameSite=Lax';
+            this.accepted = true;
+        }
+    }" x-show="!accepted" x-cloak
+        class="fixed inset-x-0 bottom-0 z-80 border-t border-brand-600/30 bg-stone-900 px-4 py-4 shadow-lg"
+        data-cookie-consent-banner>
+        <div
+            class="mx-auto flex w-full max-w-7xl flex-col gap-3 sm:flex-row sm:items-start sm:gap-6">
+            <p class="flex-1 text-sm text-stone-300" data-cookie-consent-message>
+                {{ __('general.cookies.banner_message') }}
+            </p>
+
+            <div class="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
+                <a href="{{ route(\App\SupportedLocales::routeName('cookie-policy')) }}"
+                    class="inline-flex min-h-9 items-center justify-center rounded-md border border-brand-600/40 px-4 py-2 text-sm font-medium text-[#793d3d] transition hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+                    data-cookie-policy-link>
+                    {{ __('general.cookies.more_info') }}
+                </a>
+
+                <button type="button" @click="dismiss()"
+                    class="inline-flex min-h-9 items-center justify-center rounded-md bg-[#793d3d] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#5e2f2f] focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+                    data-cookie-consent-understood>
+                    {{ __('general.cookies.understood') }}
+                </button>
+            </div>
+        </div>
+    </div>
 
     @fluxScripts
     <script>
@@ -262,8 +320,22 @@
             Alpine.data('mobileMenu', () => ({
                 open: false,
 
+                init() {
+                    this.dispatchMenuState();
+                },
+
+                dispatchMenuState() {
+                    window.dispatchEvent(new CustomEvent(
+                        'mobile-menu-state-changed', {
+                            detail: {
+                                open: this.open,
+                            },
+                        }));
+                },
+
                 toggleMenu() {
                     this.open = !this.open;
+                    this.dispatchMenuState();
 
                     if (!this.open) {
                         this.$nextTick(() => document.querySelector(

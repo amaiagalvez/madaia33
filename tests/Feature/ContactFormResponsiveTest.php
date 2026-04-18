@@ -59,6 +59,15 @@ it('renders validation error classes with stable spacing', function () {
         ->assertSeeHtml('text-red-600 text-sm mt-1');
 });
 
+it('associates counters and legal modal text accessibly in contact form', function () {
+    Livewire::test('contact-form')
+        ->assertSeeHtml('aria-describedby="contact-subject-counter"')
+        ->assertSeeHtml('aria-describedby="contact-message-counter"')
+        ->assertSeeHtml('aria-labelledby="contact-legal-label"')
+        ->assertSeeHtml('aria-labelledby="contact-legal-modal-title"')
+        ->assertSeeHtml('aria-describedby="contact-legal-modal-content"');
+});
+
 it('includes recaptcha adaptive action for narrow screens', function () {
     createSetting('recaptcha_site_key', 'test-site-key');
 

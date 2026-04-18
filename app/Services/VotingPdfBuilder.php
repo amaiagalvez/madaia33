@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Voting;
 use App\Models\Setting;
+use App\Models\Location;
 use App\Models\VotingOption;
+use App\Models\VotingLocation;
 use Illuminate\Support\Carbon;
 use App\Models\VotingOptionTotal;
 use Illuminate\Database\Eloquent\Collection;
@@ -26,14 +28,15 @@ class VotingPdfBuilder
         ]);
 
         $siteName = $this->resolveSiteName($settings);
+        $locationSuffix = $this->resolveLocationSuffix($selectedVotingIds);
 
         $textPrefix = $type === 'in_person' ? 'votings_pdf_in_person_text' : 'votings_pdf_delegated_text';
 
         return [
             'documentType' => $type,
             'siteName' => $siteName,
-            'leftHeader' => $siteName . ' Jabeen Erkidegoa',
-            'rightHeader' => 'Comunidad de Propietarios/a ' . $siteName,
+            'leftHeader' => $siteName . $locationSuffix . ' Jabeen Erkidegoa',
+            'rightHeader' => 'Comunidad de Propietarios/a ' . $siteName . $locationSuffix,
             'introEuHtml' => (string) ($settings[$textPrefix . '_eu'] ?? ''),
             'introEsHtml' => (string) ($settings[$textPrefix . '_es'] ?? ''),
             'faviconDataUri' => $this->faviconDataUri(),
@@ -52,15 +55,47 @@ class VotingPdfBuilder
         ]);
 
         $siteName = $this->resolveSiteName($settings);
+        $locationSuffix = $this->resolveLocationSuffix($selectedVotingIds);
         $votings = $this->buildVotingsForResults($selectedVotingIds);
 
         return [
             'siteName' => $siteName,
-            'leftHeader' => $siteName . ' Jabeen Erkidegoa',
-            'rightHeader' => 'Comunidad de Propietarios/a ' . $siteName,
+            'leftHeader' => $siteName . $locationSuffix . ' Jabeen Erkidegoa',
+            'rightHeader' => 'Comunidad de Propietarios/a ' . $siteName . $locationSuffix,
             'faviconDataUri' => $this->faviconDataUri(),
             'votings' => $votings,
         ];
+    }
+
+    /**
+     * Returns a formatted string " – LocationA, LocationB" with unique location names
+     * from the given voting IDs, or empty string if none.
+     *
+     * @param  array<int, int>  $selectedVotingIds
+     */
+    private function resolveLocationSuffix(array $selectedVotingIds): string
+    {
+        if ($selectedVotingIds === []) {
+            return '';
+        }
+
+        $locationNames = VotingLocation::query()
+            ->whereIn('voting_id', $selectedVotingIds)
+            ->whereNull('deleted_at')
+            ->with('location')
+            ->get()
+            ->map(fn (VotingLocation $vl): string => trim((string) ($vl->location->name ?? $vl->location->code ?? '')))
+            ->filter(fn (string $name): bool => $name !== '')
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        if ($locationNames === []) {
+            return '';
+        }
+
+        return ' – ' . implode(', ', $locationNames);
     }
 
     /**

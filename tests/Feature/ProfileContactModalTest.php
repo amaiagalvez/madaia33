@@ -2,13 +2,15 @@
 
 // Feature: profile contact modal
 // Validates: Profile page contact form modal — sends ContactConfirmation to user
-// and ContactNotification to admin, stored as ContactMessage with PERFIL subject prefix.
+// and ContactNotification to admin, with PERFIL prefix only in admin subject.
 
 use App\Models\User;
+use App\Models\Owner;
 use Livewire\Livewire;
 use App\Models\ContactMessage;
 use App\Mail\ContactConfirmation;
 use App\Mail\ContactNotification;
+use App\Models\CampaignRecipient;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 
@@ -59,19 +61,52 @@ it('stores a ContactMessage on successful submission', function () {
     expect($msg->name)->toBe('Ane Test');
     expect($msg->email)->toBe('ane@test.com');
     expect($msg->user_id)->toBe($user->id);
-    expect($msg->subject)->toContain(__('profile.contact_modal.message_subject'));
+    expect($msg->subject)->toBe('Gaia EU');
     expect($msg->message)->toBe('Nire datuak ez daude ondo.');
 });
 
 it('sends ContactConfirmation to the logged-in user', function () {
     Mail::fake();
     $user = User::factory()->create(['email' => 'ane@test.com']);
+    $owner = Owner::factory()->create(['user_id' => $user->id]);
 
     Livewire::actingAs($user)->test('profile-contact-modal')
         ->set('message', 'Proba mezua.')
         ->call('submit');
 
     Mail::assertSent(ContactConfirmation::class, fn ($mail) => $mail->hasTo('ane@test.com'));
+
+    $message = ContactMessage::query()->firstOrFail();
+    $recipient = CampaignRecipient::query()
+        ->where('campaign_id', 1)
+        ->where('owner_id', $owner->id)
+        ->latest('id')
+        ->first();
+
+    expect($recipient)->not->toBeNull()
+        ->and($recipient?->status)->toBe('sent')
+        ->and($recipient?->message_subject)->toBe('[Konfirmazioa] Gaia EU');
+});
+
+it('stores localized confirmation prefix in recipient subject for spanish locale', function () {
+    Mail::fake();
+    app()->setLocale('es');
+
+    $user = User::factory()->create(['email' => 'ane@test.com']);
+    $owner = Owner::factory()->create(['user_id' => $user->id]);
+
+    Livewire::actingAs($user)->test('profile-contact-modal')
+        ->set('message', 'Mensaje de prueba.')
+        ->call('submit');
+
+    $recipient = CampaignRecipient::query()
+        ->where('campaign_id', 1)
+        ->where('owner_id', $owner->id)
+        ->latest('id')
+        ->first();
+
+    expect($recipient)->not->toBeNull()
+        ->and($recipient?->message_subject)->toBe('[Confirmación] Asunto ES');
 });
 
 it('sends ContactNotification to admin email from settings', function () {
@@ -85,7 +120,7 @@ it('sends ContactNotification to admin email from settings', function () {
     Mail::assertSent(ContactNotification::class, fn ($mail) => $mail->hasTo('admin@example.com'));
 });
 
-it('prepends PERFIL to the subject', function () {
+it('prepends PERFIL prefix only in admin notification subject', function () {
     Mail::fake();
     $user = User::factory()->create(['email' => 'ane@test.com']);
 
@@ -93,7 +128,8 @@ it('prepends PERFIL to the subject', function () {
         ->set('message', 'Proba mezua.')
         ->call('submit');
 
-    Mail::assertSent(ContactConfirmation::class, fn ($mail) => str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
+    Mail::assertSent(ContactNotification::class, fn ($mail) => str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
+    Mail::assertSent(ContactConfirmation::class, fn ($mail) => ! str_starts_with($mail->messageSubject, '[' . __('profile.contact_modal.message_subject') . ']'));
 });
 
 it('resets fields and closes modal after successful submission', function () {
@@ -105,4 +141,13 @@ it('resets fields and closes modal after successful submission', function () {
         ->call('submit')
         ->assertSet('message', '')
         ->assertSet('showModal', false);
+});
+
+it('renders dialog labelling and message focus hook when opened', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)->test('profile-contact-modal')
+        ->call('open')
+        ->assertSeeHtml('aria-labelledby="profile-contact-modal-title"')
+        ->assertSeeHtml('aria-describedby="profile-contact-modal-description"');
 });

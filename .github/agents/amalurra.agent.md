@@ -117,6 +117,7 @@ When the user confirms execution:
 **Primary rule**: whenever possible, prioritize **Unit tests** (`tests/Unit/`) without database for pure logic:
 
 - **Amalurra priority rule (mandatory)**: when Amalurra proposes or executes testing work, it must prioritize Unit tests first and only keep or add Feature tests for scenarios that genuinely require database, HTTP, or Livewire integration.
+- **Amalurra i18n testing rule (mandatory)**: when translations exist for the asserted content, do not use hardcoded translated literals in tests; set the target locale and assert against translation keys/helpers (for example `__('group.key')`) so tests remain stable when copy changes.
 
 - **Pure logic** (validation rules, formatters, enums, transformers, calculations): `tests/Unit/`
 - **Integration flows** (HTTP, Livewire reactivity, database, side effects): `tests/Feature/`
@@ -242,6 +243,7 @@ Before implementation, load the relevant skill for the scope touched by the spec
 - **Voting integrity rule**: enforce one-choice-per-ballot DB unique constraint (`voting_ballot_id`) alongside app validation
 - **Admin aggregation rule**: avoid per-row count/query in lists; use a single aggregate query or one in-memory map to prevent N+1
 - **Quality gate before task close (mandatory)**: before marking any spec task as `[x]`, run `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality` and confirm it exits with code 0. Do not mark the task complete if the quality gate fails; fix first.
+- **Browser tests workflow rule (mandatory)**: do not rely on plain `php artisan test tests/Browser`; use the selenium workflow from `.github/skills/dusk-testing/SKILL.md` (seeded sqlite + in-container app server + `APP_URL=http://dusk-app:8000`).
 
 ---
 

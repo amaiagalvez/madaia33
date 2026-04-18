@@ -4,6 +4,7 @@ use App\Models\Owner;
 use App\Models\Campaign;
 use App\Models\Location;
 use App\Models\Property;
+use App\Models\CampaignLocation;
 use App\Models\PropertyAssignment;
 use App\Services\Messaging\RecipientResolver;
 
@@ -41,7 +42,6 @@ it('resolves all recipients with valid email contacts', function () {
 
     $campaign = Campaign::factory()->create([
         'channel' => 'email',
-        'recipient_filter' => 'all',
     ]);
 
     $resolver = new RecipientResolver;
@@ -87,7 +87,11 @@ it('filters recipients by portal code', function () {
 
     $campaign = Campaign::factory()->create([
         'channel' => 'email',
-        'recipient_filter' => 'portal:P-02',
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $portalIncluded->id,
     ]);
 
     $resolver = new RecipientResolver;
@@ -130,7 +134,11 @@ it('filters recipients by garage code', function () {
 
     $campaign = Campaign::factory()->create([
         'channel' => 'email',
-        'recipient_filter' => 'garage:G-10',
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $garageIncluded->id,
     ]);
 
     $resolver = new RecipientResolver;
@@ -140,6 +148,66 @@ it('filters recipients by garage code', function () {
     expect($recipients)->toHaveCount(1)
         ->and($recipients->first()['owner_id'])->toBe($ownerIncluded->id)
         ->and($recipients->first()['contact'])->toBe('garage-included@example.test');
+});
+
+it('filters recipients by multiple locations', function () {
+    $portalIncluded = Location::factory()->portal()->create(['code' => 'P-20']);
+    $garageIncluded = Location::factory()->garage()->create(['code' => 'G-20']);
+    $portalExcluded = Location::factory()->portal()->create(['code' => 'P-21']);
+
+    $ownerPortal = Owner::factory()->create([
+        'coprop1_email' => 'portal-multi@example.test',
+        'coprop1_email_invalid' => false,
+    ]);
+
+    $ownerGarage = Owner::factory()->create([
+        'coprop1_email' => 'garage-multi@example.test',
+        'coprop1_email_invalid' => false,
+    ]);
+
+    $ownerExcluded = Owner::factory()->create([
+        'coprop1_email' => 'excluded-multi@example.test',
+        'coprop1_email_invalid' => false,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerPortal->id,
+        'property_id' => Property::factory()->create(['location_id' => $portalIncluded->id])->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerGarage->id,
+        'property_id' => Property::factory()->create(['location_id' => $garageIncluded->id])->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerExcluded->id,
+        'property_id' => Property::factory()->create(['location_id' => $portalExcluded->id])->id,
+        'end_date' => null,
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'email',
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $portalIncluded->id,
+    ]);
+
+    CampaignLocation::factory()->create([
+        'campaign_id' => $campaign->id,
+        'location_id' => $garageIncluded->id,
+    ]);
+
+    $resolver = new RecipientResolver;
+
+    $recipients = $resolver->resolve($campaign);
+
+    expect($recipients)->toHaveCount(2)
+        ->and($recipients->pluck('owner_id')->all())->toBe([$ownerPortal->id, $ownerGarage->id]);
 });
 
 it('generates zero one or two recipients depending on available contacts', function () {
@@ -178,7 +246,6 @@ it('generates zero one or two recipients depending on available contacts', funct
 
     $campaign = Campaign::factory()->create([
         'channel' => 'email',
-        'recipient_filter' => 'all',
     ]);
 
     $resolver = new RecipientResolver;
@@ -189,4 +256,100 @@ it('generates zero one or two recipients depending on available contacts', funct
         ->and($recipients->where('owner_id', $ownerZero->id))->toHaveCount(0)
         ->and($recipients->where('owner_id', $ownerOne->id))->toHaveCount(1)
         ->and($recipients->where('owner_id', $ownerTwo->id))->toHaveCount(2);
+});
+
+it('only resolves whatsapp recipients for owners with whatsapp enabled', function () {
+    $location = Location::factory()->portal()->create(['code' => 'P-09']);
+
+    $ownerWithWhatsapp = Owner::factory()->create([
+        'coprop1_phone' => '600100100',
+        'coprop1_phone_invalid' => false,
+        'coprop1_has_whatsapp' => true,
+    ]);
+
+    $ownerWithoutWhatsapp = Owner::factory()->create([
+        'coprop1_phone' => '600200200',
+        'coprop1_phone_invalid' => false,
+        'coprop1_has_whatsapp' => false,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerWithWhatsapp->id,
+        'property_id' => Property::factory()->create(['location_id' => $location->id])->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerWithoutWhatsapp->id,
+        'property_id' => Property::factory()->create(['location_id' => $location->id])->id,
+        'end_date' => null,
+    ]);
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'whatsapp',
+    ]);
+
+    $resolver = new RecipientResolver;
+
+    $recipients = $resolver->resolve($campaign);
+
+    expect($recipients)->toHaveCount(1)
+        ->and($recipients->first()['owner_id'])->toBe($ownerWithWhatsapp->id)
+        ->and($recipients->first()['contact'])->toBe('600100100');
+});
+
+it('resolves manual recipients only for coprop1 without email and without digital channels', function () {
+    $location = Location::factory()->portal()->create(['code' => 'P-10']);
+
+    $ownerWithoutPhoneAndEmail = Owner::factory()->create([
+        'coprop1_email' => 'manual-no-phone@example.test',
+        'coprop1_phone' => null,
+        'coprop1_has_whatsapp' => false,
+    ]);
+
+    $ownerWithPhoneWithoutWhatsappAndEmail = Owner::factory()->create([
+        'coprop1_email' => 'manual-no-whatsapp@example.test',
+        'coprop1_phone' => '600300300',
+        'coprop1_has_whatsapp' => false,
+    ]);
+
+    $ownerWithEmail = Owner::factory()->create([
+        'coprop1_email' => 'has-email@example.test',
+        'coprop1_phone' => null,
+        'coprop1_has_whatsapp' => false,
+    ]);
+
+    $ownerWithWhatsapp = Owner::factory()->create([
+        'coprop1_email' => 'manual-has-whatsapp@example.test',
+        'coprop1_phone' => '600400400',
+        'coprop1_has_whatsapp' => true,
+    ]);
+
+    Owner::query()->whereKey($ownerWithoutPhoneAndEmail->id)->update(['coprop1_email' => '']);
+    Owner::query()->whereKey($ownerWithPhoneWithoutWhatsappAndEmail->id)->update(['coprop1_email' => '']);
+    Owner::query()->whereKey($ownerWithWhatsapp->id)->update(['coprop1_email' => '']);
+
+    foreach ([$ownerWithoutPhoneAndEmail, $ownerWithPhoneWithoutWhatsappAndEmail, $ownerWithEmail, $ownerWithWhatsapp] as $owner) {
+        PropertyAssignment::factory()->create([
+            'owner_id' => $owner->id,
+            'property_id' => Property::factory()->create(['location_id' => $location->id])->id,
+            'end_date' => null,
+        ]);
+    }
+
+    $campaign = Campaign::factory()->create([
+        'channel' => 'manual',
+    ]);
+
+    $resolver = new RecipientResolver;
+
+    $recipients = $resolver->resolve($campaign);
+
+    expect($recipients)->toHaveCount(2)
+        ->and($recipients->pluck('owner_id')->all())->toBe([
+            $ownerWithoutPhoneAndEmail->id,
+            $ownerWithPhoneWithoutWhatsappAndEmail->id,
+        ])
+        ->and($recipients->pluck('slot')->unique()->all())->toBe(['coprop1'])
+        ->and($recipients->pluck('contact')->unique()->all())->toBe(['manual']);
 });

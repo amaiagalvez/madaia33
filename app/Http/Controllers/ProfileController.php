@@ -12,16 +12,18 @@ use App\Models\VotingBallot;
 use Illuminate\Http\Request;
 use App\Models\ContactMessage;
 use Illuminate\Support\Carbon;
-use Illuminate\Validation\Rule;
 use App\Models\UserLoginSession;
 use App\Models\CampaignRecipient;
 use Illuminate\Support\Collection;
 use App\Support\OwnerAuditFieldLabel;
 use Illuminate\Http\RedirectResponse;
+use App\Validations\OwnerFormValidation;
 use App\Support\VotingEligibilityService;
 
 class ProfileController extends Controller
 {
+    private const DIRECT_MESSAGES_CAMPAIGN_ID = 1;
+
     public function __construct(private VotingEligibilityService $votingEligibilityService) {}
 
     public function show(Request $request): View
@@ -161,22 +163,72 @@ class ProfileController extends Controller
 
         abort_if($owner === null, 403);
 
-        $validated = $request->validate([
-            'coprop1_name' => ['required', 'string', 'max:255'],
-            'coprop1_email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'coprop1_phone' => ['nullable', 'string', 'max:20'],
-            'language' => ['required', 'in:eu,es'],
-            'coprop2_name' => ['nullable', 'string', 'max:255'],
-            'coprop2_dni' => ['nullable', 'string', 'max:20'],
-            'coprop2_phone' => ['nullable', 'string', 'max:20'],
-            'coprop2_email' => ['nullable', 'email', 'max:255'],
-        ]);
+        $request->merge($this->sanitizeOwnerIdentityPayload($request->all()));
 
-        $owner->update($validated);
+        $validated = $request->validate(OwnerFormValidation::profileUpdateRules($user->id));
+
+        $owner->update([
+            ...$this->ownerPrimaryFieldsFromValidated($validated),
+            ...$this->ownerSecondaryFieldsFromValidated($validated),
+        ]);
 
         return redirect()
             ->route(SupportedLocales::routeName('profile'), ['tab' => 'owner'])
             ->with('status', __('profile.owner.profile_updated'));
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function ownerPrimaryFieldsFromValidated(array $validated): array
+    {
+        return [
+            'coprop1_name' => $validated['coprop1_name'],
+            'coprop1_surname' => $validated['coprop1_surname'] ?: null,
+            'coprop1_dni' => $validated['coprop1_dni'] ?: null,
+            'coprop1_email' => $validated['coprop1_email'],
+            'coprop1_phone' => $validated['coprop1_phone'] ?: null,
+            'coprop1_has_whatsapp' => (bool) ($validated['coprop1_has_whatsapp'] ?? false),
+            'language' => $validated['language'],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function ownerSecondaryFieldsFromValidated(array $validated): array
+    {
+        return [
+            'coprop2_name' => $validated['coprop2_name'] ?: null,
+            'coprop2_surname' => $validated['coprop2_surname'] ?: null,
+            'coprop2_dni' => $validated['coprop2_dni'] ?: null,
+            'coprop2_phone' => $validated['coprop2_phone'] ?: null,
+            'coprop2_has_whatsapp' => (bool) ($validated['coprop2_has_whatsapp'] ?? false),
+            'coprop2_email' => $validated['coprop2_email'] ?: null,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function sanitizeOwnerIdentityPayload(array $payload): array
+    {
+        foreach (['coprop1_dni', 'coprop2_dni'] as $field) {
+            if (array_key_exists($field, $payload)) {
+                $payload[$field] = strtoupper((string) preg_replace('/[^0-9A-Za-z]/', '', trim((string) $payload[$field])));
+            }
+        }
+
+        foreach (['coprop1_phone', 'coprop2_phone'] as $field) {
+            if (array_key_exists($field, $payload)) {
+                $payload[$field] = (string) preg_replace('/[^0-9]/', '', trim((string) $payload[$field]));
+            }
+        }
+
+        return $payload;
     }
 
     public function validateAssignments(Request $request): RedirectResponse
@@ -270,12 +322,18 @@ class ProfileController extends Controller
 
         return VotingBallot::query()
             ->where('cast_by_user_id', $userId)
-            ->with('voting:id,name_eu,name_es,starts_at,ends_at')
+            ->with([
+                'voting' => static function ($query): void {
+                    $query
+                        ->withTrashed()
+                        ->select(['id', 'name_eu', 'name_es', 'starts_at', 'ends_at']);
+                },
+            ])
             ->orderByDesc('voted_at')
             ->get(['id', 'voting_id', 'voted_at'])
             ->map(static fn (VotingBallot $ballot): array => [
                 'id' => $ballot->id,
-                'voting_name' => $ballot->voting->name,
+                'voting_name' => (string) data_get($ballot->voting, 'name', '—'),
                 'voted_at' => Carbon::parse($ballot->voted_at),
             ]);
     }
@@ -307,6 +365,8 @@ class ProfileController extends Controller
 
     /**
      * @return array<int, array{id: int, subject: string, message: string, status_label: string, sent_at: Carbon}>
+     *
+     * @SuppressWarnings("PHPMD.CyclomaticComplexity")
      */
     private function receivedMessages(?Owner $owner): array
     {
@@ -321,19 +381,23 @@ class ProfileController extends Controller
                 'trackingEvents:campaign_recipient_id,event_type',
             ])
             ->orderByDesc('id')
-            ->get(['id', 'campaign_id', 'owner_id', 'status', 'created_at'])
+            ->get(['id', 'campaign_id', 'owner_id', 'status', 'message_subject', 'message_body', 'sent_at', 'created_at'])
             ->filter(static fn (CampaignRecipient $recipient): bool => $recipient->campaign !== null)
             ->map(function (CampaignRecipient $recipient): array {
                 /** @var object $campaign */
                 $campaign = $recipient->campaign;
                 $locale = SupportedLocales::normalize(app()->getLocale());
                 $isOpened = $recipient->trackingEvents->contains('event_type', 'open');
-                $subject = $locale === SupportedLocales::SPANISH
+                $campaignSubject = $locale === SupportedLocales::SPANISH
                     ? (string) data_get($campaign, 'subject_es', '')
                     : (string) data_get($campaign, 'subject_eu', '');
-                $body = $locale === SupportedLocales::SPANISH
+                $campaignBody = $locale === SupportedLocales::SPANISH
                     ? (string) data_get($campaign, 'body_es', '')
                     : (string) data_get($campaign, 'body_eu', '');
+                $hasDirectMessageContent = filled($recipient->message_subject) || filled($recipient->message_body);
+                $isDirectMessage = $recipient->campaign_id === self::DIRECT_MESSAGES_CAMPAIGN_ID && $hasDirectMessageContent;
+                $subject = $isDirectMessage ? (string) ($recipient->message_subject ?? '') : $campaignSubject;
+                $body = $isDirectMessage ? (string) ($recipient->message_body ?? '') : $campaignBody;
 
                 return [
                     'id' => $recipient->id,
@@ -342,9 +406,11 @@ class ProfileController extends Controller
                     'status_label' => $isOpened
                         ? __('profile.received.opened')
                         : __('campaigns.admin.statuses.' . $recipient->status),
-                    'sent_at' => data_get($campaign, 'sent_at') !== null
-                        ? Carbon::parse((string) data_get($campaign, 'sent_at'))
-                        : Carbon::parse($recipient->created_at),
+                    'sent_at' => $recipient->sent_at !== null
+                        ? Carbon::parse((string) $recipient->sent_at)
+                        : (data_get($campaign, 'sent_at') !== null
+                            ? Carbon::parse((string) data_get($campaign, 'sent_at'))
+                            : Carbon::parse($recipient->created_at)),
                 ];
             })
             ->values()

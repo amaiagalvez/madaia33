@@ -22,9 +22,10 @@ class CampaignAdminOptions
     {
         return [
             ['value' => 'email', 'label' => __('campaigns.admin.channels.email')],
-            ['value' => 'sms', 'label' => __('campaigns.admin.channels.sms')],
+            // ['value' => 'sms', 'label' => __('campaigns.admin.channels.sms')],
             ['value' => 'whatsapp', 'label' => __('campaigns.admin.channels.whatsapp')],
-            ['value' => 'telegram', 'label' => __('campaigns.admin.channels.telegram')],
+            ['value' => 'manual', 'label' => __('campaigns.admin.channels.manual')],
+            // ['value' => 'telegram', 'label' => __('campaigns.admin.channels.telegram')],
         ];
     }
 
@@ -33,8 +34,23 @@ class CampaignAdminOptions
      */
     public function templateOptions(): array
     {
-        return CampaignTemplate::query()
-            ->orderBy('name')
+        $accessScope = $this->user?->campaignAccessScope() ?? 'none';
+
+        $query = CampaignTemplate::query()->orderBy('name');
+
+        if ($accessScope === 'managed-locations') {
+            $managedLocationIds = $this->user?->managedLocations()
+                ->pluck('locations.id')
+                ->all() ?? [];
+
+            if ($managedLocationIds === []) {
+                return [];
+            }
+
+            $query->whereIn('location_id', $managedLocationIds);
+        }
+
+        return $query
             ->get()
             ->map(static fn (CampaignTemplate $template): array => [
                 'value' => (string) $template->id,
@@ -85,11 +101,11 @@ class CampaignAdminOptions
             ->get();
 
         foreach ($locations as $location) {
-            $value = $location->type . ':' . $location->code;
+            $value = (string) $location->id;
 
             $options[] = [
                 'value' => $value,
-                'label' => $this->labelForRecipientFilter($value),
+                'label' => $this->locationLabel((string) $location->type) . ' ' . (string) $location->code,
             ];
         }
 
@@ -109,49 +125,70 @@ class CampaignAdminOptions
     }
 
     /**
-     * @return array<int, string>
+     * @return array<int, int>
      */
-    public function allowedManagedLocationCodes(): array
+    public function allowedManagedLocationIds(): array
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->filter(static fn (mixed $value): bool => is_string($value) && str_contains($value, ':'))
-            ->map(static fn (string $value): string => explode(':', $value, 2)[1])
+            ->map(static fn (mixed $value): int => (int) $value)
+            ->filter(static fn (int $value): bool => $value > 0)
             ->values()
             ->all();
     }
 
     public function defaultRecipientFilter(): string
     {
-        $firstAllowedFilter = collect($this->recipientFilterOptions())
-            ->pluck('value')
-            ->first(fn (mixed $value): bool => is_string($value) && $value !== '');
+        return $this->defaultRecipientFilters()[0] ?? '';
+    }
 
-        if (is_string($firstAllowedFilter) && $firstAllowedFilter !== '') {
-            return $firstAllowedFilter;
-        }
-
-        return match ($this->user?->campaignAccessScope()) {
-            'all-filters', 'all-only' => 'all',
-            default => '',
-        };
+    /**
+     * @return array<int, string>
+     */
+    public function defaultRecipientFilters(): array
+    {
+        return [];
     }
 
     public function labelForRecipientFilter(?string $filter): string
     {
         $value = trim((string) $filter);
 
-        if ($value === '' || $value === 'all') {
+        if ($value === '' || $value === 'all' || $value === 'locations') {
             return __('campaigns.admin.filters.all');
         }
 
-        if (! str_contains($value, ':')) {
+        if (str_contains($value, ':')) {
+            $legacyLabels = collect(explode(',', $value))
+                ->map(static fn (string $token): string => trim($token))
+                ->filter(static fn (string $token): bool => $token !== '' && str_contains($token, ':'))
+                ->map(function (string $token): string {
+                    [$type, $code] = explode(':', $token, 2);
+
+                    if ($code === '') {
+                        return $token;
+                    }
+
+                    return $this->locationLabel($type) . ' ' . $code;
+                })
+                ->implode(', ');
+
+            return $legacyLabels !== '' ? $legacyLabels : $value;
+        }
+
+        if (! ctype_digit($value)) {
             return $value;
         }
 
-        [$type, $code] = explode(':', $value, 2);
+        $location = Location::query()
+            ->select(['id', 'type', 'code'])
+            ->find((int) $value);
 
-        return $this->locationLabel($type) . ' ' . $code;
+        if (! $location instanceof Location) {
+            return __('campaigns.admin.filters.all');
+        }
+
+        return $this->locationLabel((string) $location->type) . ' ' . (string) $location->code;
     }
 
     public function previewText(?string $textEu, ?string $textEs): string

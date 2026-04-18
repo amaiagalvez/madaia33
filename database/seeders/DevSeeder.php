@@ -44,6 +44,7 @@ class DevSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             LocationSeeder::class,
+            DirectMessagesCampaignSeeder::class,
             CampaignTemplateSeeder::class,
         ]);
 
@@ -206,6 +207,8 @@ class DevSeeder extends Seeder
         foreach (range(1, 12) as $_) {
             Property::factory()->create([
                 'location_id' => $locationIds->random(),
+                'community_pct' => fake()->randomFloat(2, 0.1, 5.0),
+                'location_pct' => fake()->randomFloat(2, 0.1, 10.0),
             ]);
         }
 
@@ -601,6 +604,7 @@ class DevSeeder extends Seeder
                             'voting_id' => $voting->id,
                             'voting_ballot_id' => $ballot->id,
                             'owner_id' => $owner->id,
+                            'pct_total' => $ownerPct,
                             'voting_option_id' => $option->id,
                         ]);
                     }

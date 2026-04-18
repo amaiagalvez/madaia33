@@ -24,7 +24,7 @@
                     @if ($value !== null && $label !== null)
                         <label class="cursor-pointer select-none"
                             data-admin-pill-option="{{ $value }}">
-                            <input type="checkbox" wire:model="{{ $model }}"
+                            <input type="checkbox" wire:model.live="{{ $model }}"
                                 value="{{ $value }}" class="sr-only peer" />
                             <span
                                 class="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:border-[#d9755b] peer-checked:bg-[#d9755b] peer-checked:text-white peer-checked:hover:bg-[#793d3d] peer-checked:hover:border-[#793d3d] peer-checked:hover:text-white border-gray-300 text-gray-600 hover:border-[#d9755b]/50 hover:bg-[#edd2c7]/20">

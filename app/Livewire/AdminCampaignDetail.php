@@ -11,9 +11,12 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\Messaging\SendCampaignMessageJob;
 use App\Actions\Campaigns\DuplicateCampaignAction;
+use App\Livewire\Concerns\HandlesCampaignDetailWhatsapp;
 
 class AdminCampaignDetail extends Component
 {
+    use HandlesCampaignDetailWhatsapp;
+
     public Campaign $campaign;
 
     public ?int $expandedRecipientId = null;
@@ -91,6 +94,25 @@ class AdminCampaignDetail extends Component
         $this->resendToUnopened();
     }
 
+    public function markManualRecipientSent(int $recipientId): void
+    {
+        $this->authorizeViewAny();
+        $this->authorize('view', $this->campaign);
+
+        abort_unless($this->campaign->channel === 'manual', 403);
+
+        $recipient = CampaignRecipient::query()
+            ->where('campaign_id', $this->campaign->id)
+            ->findOrFail($recipientId);
+
+        $recipient->status = 'sent';
+        $recipient->sent_at = now();
+        $recipient->error_message = null;
+        $recipient->save();
+
+        session()->flash('message', __('campaigns.admin.messages.manual_marked_sent'));
+    }
+
     public function resendToUnopened(): void
     {
         $this->authorizeViewAny();
@@ -156,8 +178,12 @@ class AdminCampaignDetail extends Component
         $recipients = $this->campaign->recipients;
         $openedRecipients = $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'open'))->count();
 
+        $sentTotal = $this->campaign->channel === 'whatsapp'
+            ? $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'))->count()
+            : $recipients->count();
+
         $this->metrics = [
-            'total' => $recipients->count(),
+            'total' => $sentTotal,
             'opens' => $openedRecipients,
             'clicks' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'click'))->count(),
             'downloads' => $recipients->filter(fn (CampaignRecipient $recipient): bool => $recipient->trackingEvents->contains('event_type', 'download'))->count(),
@@ -196,7 +222,13 @@ class AdminCampaignDetail extends Component
                 'owner_id' => $recipient->owner?->id,
                 'owner_edit_url' => $this->ownerEditUrl($recipient),
                 'name' => $this->recipientName($recipient),
+                'message_subject' => $recipient->message_subject,
                 'contact' => $recipient->contact,
+                'can_send_whatsapp' => $this->campaign->channel === 'whatsapp' && ! $this->isWhatsappContactBlocked($recipient),
+                'whatsapp_sent' => $recipient->trackingEvents->contains('event_type', 'whatsapp_sent'),
+                'whatsapp_blocked' => $this->campaign->channel === 'whatsapp' && $this->isWhatsappContactBlocked($recipient),
+                'can_mark_manual_sent' => $this->campaign->channel === 'manual' && $recipient->status !== 'sent',
+                'manual_sent' => $this->campaign->channel === 'manual' && $recipient->status === 'sent',
                 'status' => $recipient->status,
                 'status_label' => __('campaigns.admin.statuses.' . $recipient->status),
                 'opened' => $recipient->trackingEvents->contains('event_type', 'open'),

@@ -24,6 +24,7 @@ class VotingFactory extends Factory
             'ends_at' => today()->addWeek(),
             'is_published' => true,
             'is_anonymous' => false,
+            'show_results' => false,
         ];
     }
 

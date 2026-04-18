@@ -40,6 +40,15 @@ test('localized password request routes can be rendered', function (string $loca
         ->assertSee(__('admin.password_reset.request_title'));
 })->with('supported_locales');
 
+test('password request screen exposes a specific meta description and decorative brand image', function () {
+    $response = test()->get(route(SupportedLocales::routeName('password.request', SupportedLocales::SPANISH)));
+
+    $response->assertOk()
+        ->assertSee('<meta name="description" content="' . e(__('admin.password_reset.request_description')) . '">', false)
+        ->assertSee('data-auth-shell', false)
+        ->assertSee('alt=""', false);
+});
+
 test('reset password link can be requested', function () {
     Notification::fake();
 
@@ -50,6 +59,18 @@ test('reset password link can be requested', function () {
 
     Notification::assertSentTo($user, ResetPasswordNotification::class);
 });
+
+test('password reset request status is localized', function (string $locale) {
+    Notification::fake();
+
+    $user = User::factory()->create();
+
+    test()->get(route(SupportedLocales::routeName('password.request', $locale)));
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('password.email'), ['email' => $user->email])
+        ->assertSessionHas('status', __('passwords.sent', locale: $locale));
+})->with('supported_locales');
 
 test('reset password link can be requested with coproprietary email 1', function () {
     Notification::fake();
@@ -107,6 +128,7 @@ test('reset password screen can be rendered', function () {
         $response->assertOk()
             ->assertSee('data-auth-shell', false)
             ->assertSee(__('admin.password_reset.reset_title'))
+            ->assertSee('<meta name="description" content="' . e(__('admin.password_reset.reset_description')) . '">', false)
             ->assertSee(__('admin.password_reset.reset_description'));
 
         return true;

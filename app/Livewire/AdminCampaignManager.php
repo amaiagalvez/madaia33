@@ -2,26 +2,40 @@
 
 namespace App\Livewire;
 
+use App\Models\Role;
+use App\Models\Owner;
+use App\Models\Setting;
 use Livewire\Component;
 use App\Models\Campaign;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use App\Models\CampaignDocument;
+use App\Models\CampaignLocation;
 use App\Models\CampaignTemplate;
+use App\Models\CampaignRecipient;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
 use App\Support\CampaignAdminOptions;
+use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use App\Concerns\BuildsLocaleFieldConfigs;
+use App\Contracts\Messaging\EmailProvider;
 use App\Services\Messaging\RecipientResolver;
+use App\Services\Messaging\MessageVariableResolver;
 use App\Livewire\Concerns\HandlesCampaignManagerActions;
+use App\Livewire\Concerns\HandlesCampaignManagerPayload;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
+/**
+ * @SuppressWarnings("PHPMD.ExcessiveClassLength")
+ */
 class AdminCampaignManager extends Component
 {
     use BuildsLocaleFieldConfigs;
     use HandlesCampaignManagerActions;
+    use HandlesCampaignManagerPayload;
     use WithFileUploads;
     use WithPagination;
 
@@ -37,7 +51,8 @@ class AdminCampaignManager extends Component
 
     public string $channel = 'email';
 
-    public string $recipientFilter = 'all';
+    /** @var array<int, string> */
+    public array $recipientFilters = [];
 
     public string $selectedTemplateId = '';
 
@@ -73,11 +88,33 @@ class AdminCampaignManager extends Component
 
     public bool $showActionModal = false;
 
+    public ?int $schedulingCampaignId = null;
+
+    public string $scheduleAtInput = '';
+
+    public bool $showScheduleModal = false;
+
+    public bool $showTestEmailModal = false;
+
+    public string $testEmailAddress = '';
+
+    public bool $hasUnsavedChanges = false;
+
+    /** @var array<string, mixed> */
+    public array $savedFormSnapshot = [];
+
+    private RecipientResolver $recipientResolver;
+
+    public function boot(RecipientResolver $recipientResolver): void
+    {
+        $this->recipientResolver = $recipientResolver;
+    }
+
     public function mount(): void
     {
         $this->authorizeViewAny();
 
-        $this->recipientFilter = $this->options()->defaultRecipientFilter();
+        $this->recipientFilters = $this->options()->defaultRecipientFilters();
 
         $editCampaignId = (int) request()->integer('editCampaign');
 
@@ -88,6 +125,32 @@ class AdminCampaignManager extends Component
         }
 
         $this->recalculateRecipients();
+        $this->syncSavedFormSnapshot();
+    }
+
+    public function updated(string $property): void
+    {
+        if (in_array($property, [
+            'editingId',
+            'showForm',
+            'showDeleteModal',
+            'confirmingDeleteId',
+            'confirmingActionId',
+            'confirmingAction',
+            'showActionModal',
+            'schedulingCampaignId',
+            'scheduleAtInput',
+            'showScheduleModal',
+            'showTestEmailModal',
+            'testEmailAddress',
+            'sortColumn',
+            'sortDir',
+            'recipientCountTotal',
+        ], true) || str_starts_with($property, 'recipientCountBySlot.')) {
+            return;
+        }
+
+        $this->refreshUnsavedChangesState();
     }
 
     /**
@@ -99,7 +162,8 @@ class AdminCampaignManager extends Component
 
         return [
             ...$this->contentRules(),
-            'recipientFilter' => ['required', 'string', Rule::in($this->options()->allowedRecipientFilters())],
+            'recipientFilters' => ['required', 'array', 'min:1'],
+            'recipientFilters.*' => ['required', 'string', Rule::in($this->options()->allowedRecipientFilters())],
             'selectedTemplateId' => ['nullable', 'string', Rule::exists('campaign_templates', 'id')],
             'scheduledAt' => ['nullable', 'date'],
             'attachments' => ['array'],
@@ -119,7 +183,12 @@ class AdminCampaignManager extends Component
     {
         $this->authorizeViewAny();
 
-        $campaign = Campaign::query()->with('documents')->findOrFail($id);
+        // Bloquear acceso a campaign id=1 para no SUPER_ADMIN
+        if ($id === 1 && ! $this->currentUser()?->hasRole(Role::SUPER_ADMIN)) {
+            abort(403);
+        }
+
+        $campaign = Campaign::query()->with(['documents', 'locations'])->findOrFail($id);
 
         abort_unless($this->canMutateCampaign($campaign), 403);
 
@@ -129,7 +198,15 @@ class AdminCampaignManager extends Component
         $this->bodyEu = (string) ($campaign->body_eu ?? '');
         $this->bodyEs = (string) ($campaign->body_es ?? '');
         $this->channel = (string) $campaign->channel;
-        $this->recipientFilter = (string) $campaign->recipient_filter;
+        $this->recipientFilters = $campaign->locations
+            ->pluck('location_id')
+            ->map(static fn (int $locationId): string => (string) $locationId)
+            ->values()
+            ->all();
+
+        if ($this->recipientFilters === []) {
+            $this->recipientFilters = ['all'];
+        }
 
         $scheduledAt = (string) ($campaign->scheduled_at ?? '');
         $this->scheduledAt = $scheduledAt !== '' && strtotime($scheduledAt) !== false
@@ -147,6 +224,7 @@ class AdminCampaignManager extends Component
         $this->showForm = true;
 
         $this->recalculateRecipients();
+        $this->syncSavedFormSnapshot();
     }
 
     public function saveCampaign(): void
@@ -154,6 +232,8 @@ class AdminCampaignManager extends Component
         $this->validate();
 
         $campaign = $this->upsertCampaign();
+
+        $this->syncCampaignLocations($campaign);
 
         $this->storeAttachments($campaign);
 
@@ -176,6 +256,121 @@ class AdminCampaignManager extends Component
         $this->selectedTemplateId = (string) $template->id;
 
         session()->flash('message', __('general.messages.saved'));
+    }
+
+    public function openTestEmailModal(): void
+    {
+        $this->authorizeTestEmailAction();
+
+        if (! $this->ensureNoUnsavedChangesBeforeTestEmail()) {
+            return;
+        }
+
+        $this->testEmailAddress = '';
+        $this->showTestEmailModal = true;
+    }
+
+    public function closeTestEmailModal(): void
+    {
+        $this->showTestEmailModal = false;
+        $this->testEmailAddress = '';
+    }
+
+    /**
+     * @SuppressWarnings("PHPMD.ExcessiveMethodLength")
+     */
+    public function sendTestEmail(): void
+    {
+        $this->authorizeTestEmailAction();
+
+        if (! $this->ensureNoUnsavedChangesBeforeTestEmail()) {
+            return;
+        }
+
+        $this->validate([
+            ...$this->contentRules(),
+            'testEmailAddress' => ['required', 'email'],
+        ]);
+
+        if ($this->channel !== 'email') {
+            $this->addError('channel', __('campaigns.admin.test_email.only_email_channel'));
+
+            return;
+        }
+
+        $mailSettings = Setting::stringValues([
+            'from_address',
+            'from_name',
+            'smtp_host',
+            'smtp_port',
+            'smtp_username',
+            'smtp_password',
+            'smtp_encryption',
+        ]);
+
+        if (trim($mailSettings['smtp_host'] ?? '') === '') {
+            $this->addError('testEmailAddress', __('campaigns.admin.test_email.smtp_not_configured'));
+
+            return;
+        }
+
+        $fromAddress = trim((string) ($mailSettings['from_address'] ?? config('mail.from.address', '')));
+        $fromName = trim((string) ($mailSettings['from_name'] ?? config('mail.from.name', '')));
+
+        if ($fromAddress === '') {
+            $this->addError('testEmailAddress', __('campaigns.admin.test_email.from_not_configured'));
+
+            return;
+        }
+
+        app(ConfiguredMailSettings::class)->apply($mailSettings);
+
+        $campaignForPreview = $this->campaignForPreview();
+        $previewRecipientData = $this->previewRecipientData($campaignForPreview);
+        $resolver = app(MessageVariableResolver::class);
+        $emailProvider = app(EmailProvider::class);
+
+        $initialLocale = app()->getLocale();
+
+        try {
+            foreach (['eu', 'es'] as $locale) {
+                app()->setLocale($locale);
+
+                [$subjectText, $htmlBody] = $this->localizedTestEmailContent($locale);
+
+                if ($previewRecipientData !== null) {
+                    $subjectText = $resolver->resolve(
+                        $subjectText,
+                        $previewRecipientData['owner'],
+                        $previewRecipientData['slot'],
+                    );
+
+                    $htmlBody = $resolver->resolve(
+                        $htmlBody,
+                        $previewRecipientData['owner'],
+                        $previewRecipientData['slot'],
+                    );
+                }
+
+                $prefixedSubject = $this->prefixedTestSubject($subjectText, $locale);
+
+                $previewRecipient = $this->buildPreviewRecipient(
+                    $campaignForPreview,
+                    $previewRecipientData['owner'] ?? null,
+                    $previewRecipientData['slot'] ?? 'coprop1',
+                    $this->testEmailAddress,
+                );
+
+                $emailProvider->send($previewRecipient, $prefixedSubject, $htmlBody);
+            }
+
+            session()->flash('message', __('campaigns.admin.test_email.sent'));
+            $this->closeTestEmailModal();
+        } catch (\Throwable $exception) {
+            $this->addError('testEmailAddress', __('campaigns.admin.test_email.failed', ['error' => $exception->getMessage()]));
+        } finally {
+            app()->setLocale($initialLocale);
+        }
     }
 
     public function cancelForm(): void
@@ -201,7 +396,7 @@ class AdminCampaignManager extends Component
         $this->recalculateRecipients();
     }
 
-    public function updatedRecipientFilter(): void
+    public function updatedRecipientFilters(): void
     {
         $this->recalculateRecipients();
     }
@@ -217,6 +412,7 @@ class AdminCampaignManager extends Component
         unset($this->attachments[$index]);
 
         $this->attachments = array_values($this->attachments);
+        $this->refreshUnsavedChangesState();
     }
 
     public function removeStoredAttachment(int $documentId): void
@@ -245,6 +441,8 @@ class AdminCampaignManager extends Component
             static fn (array $attachment): bool => (int) $attachment['id'] !== $documentId,
         ));
 
+        $this->syncSavedFormSnapshot();
+
         session()->flash('message', __('general.messages.deleted'));
     }
 
@@ -267,6 +465,7 @@ class AdminCampaignManager extends Component
         $this->channel = (string) $template->channel;
 
         $this->recalculateRecipients();
+        $this->refreshUnsavedChangesState();
     }
 
     public function render(): View
@@ -277,9 +476,22 @@ class AdminCampaignManager extends Component
         $sortColumn = in_array($this->sortColumn, $allowedSortColumns, true) ? $this->sortColumn : 'created_at';
         $sortDir = in_array($this->sortDir, ['asc', 'desc'], true) ? $this->sortDir : 'desc';
 
-        $campaignsQuery = Campaign::query()->withCount('recipients');
+        $campaignsQuery = Campaign::query()->withCount([
+            'recipients',
+            'recipients as opened_recipients_count' => fn (Builder $query): Builder => $query->whereHas(
+                'trackingEvents',
+                fn (Builder $events): Builder => $events->where('event_type', 'open'),
+            ),
+        ]);
+
+        $campaignsQuery->with(['locations.location']);
 
         $this->applyCampaignVisibilityScope($campaignsQuery);
+
+        // Filtrar campaign id=1 solo para SUPER_ADMIN
+        if (! $this->currentUser()?->hasRole(Role::SUPER_ADMIN)) {
+            $campaignsQuery->where('id', '!=', 1);
+        }
 
         $campaigns = $campaignsQuery
             ->orderBy($sortColumn, $sortDir)
@@ -303,132 +515,21 @@ class AdminCampaignManager extends Component
         $this->recipientCountTotal = 0;
         $this->recipientCountBySlot = ['coprop1' => 0, 'coprop2' => 0];
 
-        if ($this->channel === '' || $this->recipientFilter === '') {
-            return;
-        }
-
-        $filters = $this->options()->allowedRecipientFilters();
-
-        if (! in_array($this->recipientFilter, $filters, true)) {
+        if ($this->channel === '' || $this->recipientFilters === []) {
             return;
         }
 
         $campaign = new Campaign([
             'channel' => $this->channel,
-            'recipient_filter' => $this->recipientFilter,
         ]);
 
-        $rows = app(RecipientResolver::class)->resolve($campaign);
+        $campaign->setRelation('locations', $this->campaignLocationRelationRows());
+
+        $rows = $this->recipientResolver->resolve($campaign);
 
         $this->recipientCountTotal = $rows->count();
         $this->recipientCountBySlot['coprop1'] = $rows->where('slot', 'coprop1')->count();
         $this->recipientCountBySlot['coprop2'] = $rows->where('slot', 'coprop2')->count();
-    }
-
-    private function upsertCampaign(): Campaign
-    {
-        if ($this->editingId !== null) {
-            $campaign = Campaign::query()->findOrFail($this->editingId);
-
-            abort_unless($this->canMutateCampaign($campaign), 403);
-
-            $campaign->update($this->campaignPayload());
-
-            return $campaign;
-        }
-
-        return Campaign::query()->create([
-            ...$this->campaignPayload(),
-            'created_by_user_id' => $this->currentUser()?->id,
-            'status' => 'draft',
-            'sent_at' => null,
-        ]);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function campaignPayload(): array
-    {
-        return [
-            ...$this->contentPayload(),
-            'recipient_filter' => $this->recipientFilter,
-            'scheduled_at' => $this->scheduledAt !== null && $this->scheduledAt !== '' ? $this->scheduledAt : null,
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function templatePayload(): array
-    {
-        return [
-            ...$this->contentPayload(),
-            'name' => $this->templateName(),
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function contentPayload(): array
-    {
-        return [
-            'subject_eu' => $this->normalizeNullableValue($this->subjectEu),
-            'subject_es' => $this->normalizeNullableValue($this->subjectEs),
-            'body_eu' => $this->normalizeNullableValue($this->bodyEu),
-            'body_es' => $this->normalizeNullableValue($this->bodyEs),
-            'channel' => $this->channel,
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function contentRules(): array
-    {
-        return [
-            'subjectEu' => ['nullable', 'string', 'max:255', 'required_without:subjectEs'],
-            'subjectEs' => ['nullable', 'string', 'max:255', 'required_without:subjectEu'],
-            'bodyEu' => ['nullable', 'string', 'required_without:bodyEs'],
-            'bodyEs' => ['nullable', 'string', 'required_without:bodyEu'],
-            'channel' => ['required', 'string', Rule::in(['email', 'sms', 'whatsapp', 'telegram'])],
-        ];
-    }
-
-    private function templateName(): string
-    {
-        $subject = $this->normalizeNullableValue($this->subjectEu)
-            ?? $this->normalizeNullableValue($this->subjectEs);
-
-        if ($subject !== null) {
-            return mb_substr($subject, 0, 255);
-        }
-
-        return __('campaigns.admin.template') . ' ' . now()->format('Y-m-d H:i');
-    }
-
-    private function normalizeNullableValue(string $value): ?string
-    {
-        $trimmed = trim($value);
-
-        return $trimmed === '' ? null : $trimmed;
-    }
-
-    private function storeAttachments(Campaign $campaign): void
-    {
-        foreach ($this->attachments as $attachment) {
-            $path = $attachment->store('campaign-documents/' . $campaign->id, 'public');
-
-            CampaignDocument::query()->create([
-                'campaign_id' => $campaign->id,
-                'filename' => $attachment->getClientOriginalName(),
-                'path' => $path,
-                'mime_type' => (string) $attachment->getClientMimeType(),
-                'size_bytes' => (int) $attachment->getSize(),
-                'is_public' => false,
-            ]);
-        }
     }
 
     private function resetForm(): void
@@ -439,16 +540,206 @@ class AdminCampaignManager extends Component
         $this->bodyEu = '';
         $this->bodyEs = '';
         $this->channel = 'email';
+        $this->recipientFilters = $this->options()->defaultRecipientFilters();
         $this->selectedTemplateId = '';
         $this->scheduledAt = null;
         $this->attachments = [];
         $this->storedAttachments = [];
         $this->confirmingDeleteId = null;
         $this->showDeleteModal = false;
-        $this->recipientFilter = $this->options()->defaultRecipientFilter();
+        $this->showTestEmailModal = false;
+        $this->testEmailAddress = '';
+        $this->hasUnsavedChanges = false;
+        $this->savedFormSnapshot = [];
 
         $this->resetValidation();
         $this->recalculateRecipients();
+        $this->syncSavedFormSnapshot();
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function localizedTestEmailContent(string $locale): array
+    {
+        $subject = $locale === 'eu'
+            ? $this->fallbackLocalizedValue($this->subjectEu, $this->subjectEs)
+            : $this->fallbackLocalizedValue($this->subjectEs, $this->subjectEu);
+
+        $body = $locale === 'eu'
+            ? $this->fallbackLocalizedValue($this->bodyEu, $this->bodyEs)
+            : $this->fallbackLocalizedValue($this->bodyEs, $this->bodyEu);
+
+        return [$subject, $body];
+    }
+
+    private function fallbackLocalizedValue(?string $primary, ?string $fallback): string
+    {
+        return (string) ($this->normalizeNullableValue((string) ($primary ?? ''))
+            ?? $this->normalizeNullableValue((string) ($fallback ?? ''))
+            ?? '');
+    }
+
+    private function prefixedTestSubject(string $subject, string $locale): string
+    {
+        $prefix = $locale === 'eu' ? '[FROGA]' : '[PRUEBA]';
+        $trimmedSubject = trim($subject);
+
+        if ($trimmedSubject === '') {
+            return $prefix;
+        }
+
+        return $prefix . ' ' . $trimmedSubject;
+    }
+
+    private function campaignForPreview(): Campaign
+    {
+        $campaign = $this->editingId !== null
+            ? Campaign::query()->with(['documents', 'locations'])->findOrFail($this->editingId)
+            : new Campaign;
+
+        $campaign->forceFill($this->contentPayload());
+
+        $campaign->setRelation('locations', $this->campaignLocationRelationRows());
+
+        if (! $campaign->relationLoaded('documents')) {
+            $campaign->setRelation('documents', collect());
+        }
+
+        return $campaign;
+    }
+
+    /**
+     * @return array{owner: Owner, slot: string}|null
+     */
+    private function previewRecipientData(Campaign $campaign): ?array
+    {
+        $recipientRow = $this->recipientResolver->resolve($campaign)->first();
+
+        if (! is_array($recipientRow)) {
+            return null;
+        }
+
+        $ownerId = (int) $recipientRow['owner_id'];
+        $slot = (string) $recipientRow['slot'];
+
+        if ($ownerId <= 0 || ! in_array($slot, ['coprop1', 'coprop2'], true)) {
+            return null;
+        }
+
+        $owner = Owner::query()->find($ownerId);
+
+        if (! $owner instanceof Owner) {
+            return null;
+        }
+
+        return [
+            'owner' => $owner,
+            'slot' => $slot,
+        ];
+    }
+
+    private function buildPreviewRecipient(Campaign $campaign, ?Owner $owner, string $slot, string $contact): CampaignRecipient
+    {
+        $recipient = new CampaignRecipient([
+            'campaign_id' => $campaign->id,
+            'owner_id' => $owner?->id,
+            'slot' => $slot,
+            'contact' => $contact,
+            'tracking_token' => bin2hex(random_bytes(32)),
+            'status' => 'pending',
+            'error_message' => null,
+        ]);
+
+        $recipient->setRelation('campaign', $campaign);
+
+        if ($owner instanceof Owner) {
+            $recipient->setRelation('owner', $owner);
+        }
+
+        return $recipient;
+    }
+
+    private function authorizeTestEmailAction(): void
+    {
+        $user = $this->currentUser();
+
+        abort_if($user === null, 403);
+
+        if ($this->editingId !== null) {
+            $campaign = Campaign::query()->findOrFail($this->editingId);
+
+            $this->authorize('update', $campaign);
+
+            return;
+        }
+
+        $this->authorize('create', Campaign::class);
+    }
+
+    private function ensureNoUnsavedChangesBeforeTestEmail(): bool
+    {
+        if (! $this->hasUnsavedChanges) {
+            return true;
+        }
+
+        $this->addError('sendTestEmail', __('admin.settings_form.save_before_test_email'));
+
+        return false;
+    }
+
+    private function refreshUnsavedChangesState(): void
+    {
+        $this->hasUnsavedChanges = $this->currentFormSnapshot() !== $this->savedFormSnapshot;
+
+        if (! $this->hasUnsavedChanges) {
+            $this->resetErrorBag('sendTestEmail');
+        }
+    }
+
+    private function syncSavedFormSnapshot(): void
+    {
+        $this->savedFormSnapshot = $this->currentFormSnapshot();
+        $this->hasUnsavedChanges = false;
+        $this->resetErrorBag('sendTestEmail');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function currentFormSnapshot(): array
+    {
+        return [
+            'campaign' => $this->campaignPayload(),
+            'recipient_filters' => $this->normalizedRecipientFilters(),
+            'stored_attachment_ids' => collect($this->storedAttachments)
+                ->pluck('id')
+                ->map(static fn (mixed $id): int => (int) $id)
+                ->sort()
+                ->values()
+                ->all(),
+            'pending_attachment_names' => collect($this->attachments)
+                ->map(static fn ($attachment): string => $attachment->getClientOriginalName())
+                ->sort()
+                ->values()
+                ->all(),
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function normalizedRecipientFilters(): array
+    {
+        if (in_array('all', $this->recipientFilters, true)) {
+            return ['all'];
+        }
+
+        return collect($this->selectedLocationIds())
+            ->map(static fn (int $locationId): string => (string) $locationId)
+            ->sort()
+            ->values()
+            ->all();
     }
 
     /**
@@ -459,7 +750,7 @@ class AdminCampaignManager extends Component
         $accessScope = $this->currentUser()?->campaignAccessScope() ?? 'none';
 
         if ($accessScope === 'all-only') {
-            $query->where('recipient_filter', 'all');
+            $query->whereDoesntHave('locations');
 
             return;
         }
@@ -468,20 +759,112 @@ class AdminCampaignManager extends Component
             return;
         }
 
-        $allowedCodes = $this->options()->allowedManagedLocationCodes();
+        $allowedLocationIds = $this->options()->allowedManagedLocationIds();
 
-        if ($allowedCodes === []) {
+        if ($allowedLocationIds === []) {
             $query->whereRaw('1 = 0');
 
             return;
         }
 
-        $query->where(function (Builder $filterQuery) use ($allowedCodes): void {
-            foreach ($allowedCodes as $locationCode) {
-                $filterQuery->orWhere('recipient_filter', 'portal:' . $locationCode)
-                    ->orWhere('recipient_filter', 'garage:' . $locationCode);
-            }
-        });
+        $query
+            ->whereHas('locations', function (Builder $locationsQuery): void {
+                $locationsQuery->whereNull('campaign_locations.deleted_at');
+            })
+            ->whereDoesntHave('locations', function (Builder $locationsQuery) use ($allowedLocationIds): void {
+                $locationsQuery
+                    ->whereNull('campaign_locations.deleted_at')
+                    ->whereNotIn('location_id', $allowedLocationIds);
+            });
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function selectedLocationIds(): array
+    {
+        $allowedFilters = collect($this->options()->allowedRecipientFilters())
+            ->map(static fn (string $filter): int => (int) $filter)
+            ->filter(static fn (int $filter): bool => $filter > 0)
+            ->values()
+            ->all();
+
+        return collect($this->recipientFilters)
+            ->map(static fn (string $value): int => (int) $value)
+            ->filter(static fn (int $locationId): bool => in_array($locationId, $allowedFilters, true))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return Collection<int, CampaignLocation>
+     */
+    private function campaignLocationRelationRows()
+    {
+        return collect($this->selectedLocationIds())
+            ->map(static function (int $locationId): CampaignLocation {
+                return new CampaignLocation([
+                    'location_id' => $locationId,
+                    'deleted_at' => null,
+                ]);
+            })
+            ->values();
+    }
+
+    private function softDeleteAllCampaignLocations(Campaign $campaign): void
+    {
+        CampaignLocation::query()
+            ->where('campaign_id', $campaign->id)
+            ->whereNull('deleted_at')
+            ->update([
+                'deleted_at' => now(),
+                'updated_at' => now(),
+            ]);
+    }
+
+    private function syncCampaignLocations(Campaign $campaign): void
+    {
+        if (in_array('all', $this->recipientFilters, true)) {
+            $this->softDeleteAllCampaignLocations($campaign);
+
+            return;
+        }
+
+        $locationIds = $this->selectedLocationIds();
+
+        if ($locationIds === []) {
+            $this->softDeleteAllCampaignLocations($campaign);
+
+            return;
+        }
+
+        CampaignLocation::query()
+            ->where('campaign_id', $campaign->id)
+            ->whereNull('deleted_at')
+            ->whereNotIn('location_id', $locationIds)
+            ->update([
+                'deleted_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        $upsertRows = collect($locationIds)
+            ->map(static function (int $locationId) use ($campaign): array {
+                return [
+                    'campaign_id' => $campaign->id,
+                    'location_id' => $locationId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'deleted_at' => null,
+                ];
+            })
+            ->all();
+
+        CampaignLocation::upsert(
+            $upsertRows,
+            ['campaign_id', 'location_id'],
+            ['updated_at', 'deleted_at'],
+        );
     }
 
     private function options(): CampaignAdminOptions

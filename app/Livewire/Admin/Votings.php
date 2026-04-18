@@ -18,6 +18,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use App\Support\VotingCensusCalculator;
+use App\Support\AdminVotingAccessService;
 use App\Support\VotingEligibilityService;
 use Illuminate\Database\Eloquent\Builder;
 use App\Concerns\BuildsLocaleFieldConfigs;
@@ -33,6 +34,8 @@ class Votings extends Component
     private VotingEligibilityService $eligibilityService;
 
     private VotingCensusCalculator $censusCalculator;
+
+    private AdminVotingAccessService $adminVotingAccessService;
 
     public bool $showCreateForm = false;
 
@@ -75,9 +78,17 @@ class Votings extends Component
 
     public bool $ownersModalIsAnonymous = false;
 
+    public string $ownersModalContext = 'voters';
+
     public bool $showDeleteModal = false;
 
     public ?int $confirmingDeleteVotingId = null;
+
+    public bool $showResultsModal = false;
+
+    public ?int $confirmingResultsId = null;
+
+    public string $resultsAction = '';
 
     public string $ownersModalTitle = '';
 
@@ -114,10 +125,13 @@ class Votings extends Component
 
     public string $inPersonSearch = '';
 
-    public function boot(VotingEligibilityService $eligibilityService): void
-    {
+    public function boot(
+        VotingEligibilityService $eligibilityService,
+        AdminVotingAccessService $adminVotingAccessService,
+    ): void {
         $this->eligibilityService = $eligibilityService;
         $this->censusCalculator = app(VotingCensusCalculator::class);
+        $this->adminVotingAccessService = $adminVotingAccessService;
     }
 
     public function mount(): void
@@ -267,6 +281,37 @@ class Votings extends Component
 
         session()->flash('message', __('general.messages.deleted'));
         $this->cancelDeleteVoting();
+    }
+
+    public function confirmShowResults(int $votingId, bool $show): void
+    {
+        abort_unless($this->canManageAdminVotings(), 403);
+
+        $this->confirmingResultsId = $votingId;
+        $this->resultsAction = $show ? 'show' : 'hide';
+        $this->showResultsModal = true;
+    }
+
+    public function doShowResults(): void
+    {
+        if ($this->confirmingResultsId === null) {
+            return;
+        }
+
+        $voting = Voting::query()->findOrFail($this->confirmingResultsId);
+
+        abort_unless($this->canAccessVoting($voting), 403);
+
+        $voting->update(['show_results' => $this->resultsAction === 'show']);
+
+        $this->cancelShowResults();
+    }
+
+    public function cancelShowResults(): void
+    {
+        $this->confirmingResultsId = null;
+        $this->resultsAction = '';
+        $this->showResultsModal = false;
     }
 
     public function downloadDelegatedPdf(): void
@@ -584,9 +629,7 @@ class Votings extends Component
 
     private function canManageAdminVotings(): bool
     {
-        $user = $this->currentUser();
-
-        return $user?->hasAnyRole([Role::SUPER_ADMIN, Role::GENERAL_ADMIN, Role::COMMUNITY_ADMIN]) ?? false;
+        return $this->adminVotingAccessService->canManage($this->currentUser());
     }
 
     private function canAccessVoting(Voting $voting): bool
@@ -597,25 +640,7 @@ class Votings extends Component
             return false;
         }
 
-        if ($user->hasRole(Role::SUPER_ADMIN)) {
-            return true;
-        }
-
-        if ($user->hasRole(Role::GENERAL_ADMIN)) {
-            return ! $voting->locations()->exists();
-        }
-
-        if (! $user->hasRole(Role::COMMUNITY_ADMIN)) {
-            return false;
-        }
-
-        $managedLocationIds = $this->managedLocationIds($user)->all();
-
-        if ($managedLocationIds === []) {
-            return false;
-        }
-
-        return $voting->locations()->whereIn('location_id', $managedLocationIds)->exists();
+        return $this->adminVotingAccessService->canAccess($user, $voting);
     }
 
     private function canSeeOwnerNamesInVotingModals(): bool
@@ -637,29 +662,7 @@ class Votings extends Component
 
         abort_unless($user !== null, 403);
 
-        $query = Voting::query();
-
-        if ($user->hasRole(Role::SUPER_ADMIN)) {
-            return $query;
-        }
-
-        if ($user->hasRole(Role::GENERAL_ADMIN)) {
-            return $query->whereDoesntHave('locations');
-        }
-
-        if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
-            $managedLocationIds = $this->managedLocationIds($user)->all();
-
-            if ($managedLocationIds === []) {
-                return $query->whereRaw('1 = 0');
-            }
-
-            return $query->whereHas('locations', function ($locationsQuery) use ($managedLocationIds): void {
-                $locationsQuery->whereIn('location_id', $managedLocationIds);
-            });
-        }
-
-        return $query->whereRaw('1 = 0');
+        return $this->adminVotingAccessService->queryForUser($user);
     }
 
     /**

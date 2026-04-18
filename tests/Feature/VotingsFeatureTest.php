@@ -289,6 +289,11 @@ it('allows an eligible owner to vote once and stores auditable rows', function (
         ->where('voting_option_id', $option->id)
         ->count())->toBe(1);
 
+    expect(VotingSelection::query()
+        ->where('voting_id', $voting->id)
+        ->where('owner_id', $owner->id)
+        ->value('pct_total'))->toBe('1.5000');
+
     expect(VotingOptionTotal::query()
         ->where('voting_id', $voting->id)
         ->where('voting_option_id', $option->id)
@@ -345,7 +350,7 @@ it('shows already voted notice and hides voting options when owner already voted
         ->call('vote', $voting->id)
         ->assertHasNoErrors()
         ->assertSee(__('votings.front.already_voted'))
-        ->assertDontSee(__('votings.front.vote_button'))
+        ->assertDontSeeHtml('data-vote-submit="' . $voting->id . '"')
         ->assertDontSee('Bai');
 });
 
@@ -786,8 +791,8 @@ it('hides delegated action buttons when delegated mode is active', function () {
     Livewire::actingAs($delegatedUser)
         ->test(PublicVotings::class)
         ->assertSet('isDelegated', true)
-        ->assertDontSee(__('votings.front.in_person_vote_button'))
-        ->assertDontSee(__('votings.front.delegated_vote_button'))
+        ->assertDontSeeHtml('data-open-front-in-person-modal')
+        ->assertDontSeeHtml('data-open-front-delegated-modal')
         ->assertSee(__('votings.front.leave_delegated_mode'));
 });
 

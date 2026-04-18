@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Owner;
 use App\Models\Setting;
 use Livewire\Component;
 use App\Rules\NoScriptTags;
@@ -14,6 +15,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
+use App\Support\ContactConfirmationSubject;
+use App\Support\Messaging\CampaignTrackingUrlBuilder;
+use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
 class ProfileContactModal extends Component
 {
@@ -67,11 +71,13 @@ class ProfileContactModal extends Component
     {
         $this->reset(['message', 'statusType', 'statusMessage']);
         $this->showModal = true;
+        $this->dispatch('profile-contact-modal-opened');
     }
 
     public function close(): void
     {
         $this->showModal = false;
+        $this->dispatch('profile-contact-modal-closed');
     }
 
     public function submit(): void
@@ -80,17 +86,18 @@ class ProfileContactModal extends Component
 
         $user = Auth::user();
         $settings = $this->settings();
-        $mailSubject = $this->buildSubject($settings);
+        $userMailSubject = $this->buildUserSubject($settings);
+        $adminMailSubject = $this->buildAdminSubject($userMailSubject);
 
         $contactMessage = ContactMessage::create([
             'user_id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'subject' => $mailSubject,
+            'subject' => $userMailSubject,
             'message' => $this->message,
         ]);
 
-        $emailFailed = $this->sendEmails($contactMessage, $settings, $mailSubject);
+        $emailFailed = $this->sendEmails($contactMessage, $settings, $userMailSubject, $adminMailSubject);
 
         $this->message = '';
 
@@ -99,6 +106,7 @@ class ProfileContactModal extends Component
             $this->statusMessage = __('profile.contact_modal.email_error');
         } else {
             $this->showModal = false;
+            $this->dispatch('profile-contact-modal-closed');
             $this->statusType = 'success';
             $this->statusMessage = __('profile.contact_modal.success');
         }
@@ -107,17 +115,20 @@ class ProfileContactModal extends Component
     /**
      * @param  array<string, string>  $settings
      */
-    private function buildSubject(array $settings): string
+    private function buildUserSubject(array $settings): string
     {
-        $base = Setting::localizedStringFrom($settings, 'contact_form_subject') ?? '';
+        return Setting::localizedStringFrom($settings, 'contact_form_subject') ?? '';
+    }
 
-        return '[' . __('profile.contact_modal.message_subject') . '] ' . $base;
+    private function buildAdminSubject(string $baseSubject): string
+    {
+        return '[' . __('profile.contact_modal.message_subject') . '] ' . $baseSubject;
     }
 
     /**
      * @param  array<string, string>  $settings
      */
-    private function sendEmails(ContactMessage $contactMessage, array $settings, string $mailSubject): bool
+    private function sendEmails(ContactMessage $contactMessage, array $settings, string $mailSubject, string $adminMailSubject): bool
     {
         try {
             app(ConfiguredMailSettings::class)->apply($settings);
@@ -125,6 +136,20 @@ class ProfileContactModal extends Component
             $adminEmail = $settings['admin_email'] ?: (string) config('mail.from.address');
             $fromAddress = $settings['from_address'] ?: (string) config('mail.from.address');
             $fromName = ($settings['from_name'] ?? '') !== '' ? $settings['from_name'] : (string) config('mail.from.name');
+            $owner = Auth::user()?->owner;
+            $trackingPixelUrl = null;
+
+            if ($owner instanceof Owner) {
+                $recipient = app(RecordDirectMessageRecipientAction::class)->execute(
+                    owner: $owner,
+                    contact: (string) Auth::user()?->email,
+                    subject: ContactConfirmationSubject::forAudit($mailSubject),
+                    body: $this->message,
+                    sentByUserId: Auth::id(),
+                );
+
+                $trackingPixelUrl = app(CampaignTrackingUrlBuilder::class)->openPixelUrl($recipient->tracking_token);
+            }
 
             Mail::to(Auth::user()->email)->send(new ContactConfirmation(
                 new ContactMailData(
@@ -134,9 +159,13 @@ class ProfileContactModal extends Component
                 ),
                 $fromAddress,
                 $fromName,
+                $trackingPixelUrl,
             ));
 
-            Mail::to($adminEmail)->send(new ContactNotification($contactMessage, null, $fromAddress, $fromName));
+            $adminContactMessage = $contactMessage->replicate();
+            $adminContactMessage->subject = $adminMailSubject;
+
+            Mail::to($adminEmail)->send(new ContactNotification($adminContactMessage, null, $fromAddress, $fromName));
 
             return false;
         } catch (\Throwable $e) {

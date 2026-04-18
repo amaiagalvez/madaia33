@@ -1,4 +1,4 @@
-<x-mail.layout :legal-text="$legalText">
+<x-mail.layout :legal-text="$legalText" :tracking-pixel-url="$trackingPixelUrl">
     <p style="margin: 0 0 16px 0;">{{ __('contact.mail.greeting', ['name' => $visitorName]) }}</p>
 
     <p style="margin: 0 0 16px 0;">{{ __('contact.mail.confirmation_intro') }}</p>

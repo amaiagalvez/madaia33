@@ -39,6 +39,14 @@ it('private page shows centered responsive placeholder', function (string $local
     $response->assertSee(__('general.private.guest_message'));
 })->with('supported_locales');
 
+it('private page login form exposes accessible error association and password toggle semantics', function () {
+    $response = test()->get(route(SupportedLocales::routeName('private', SupportedLocales::DEFAULT)));
+
+    $response->assertOk();
+    $response->assertSee('aria-controls="private-password"', false);
+    $response->assertSee("x-bind:aria-pressed=\"showPassword ? 'true' : 'false'\"", false);
+});
+
 it('private page redirects authenticated users to the admin dashboard', function () {
     $user = User::factory()->create();
 

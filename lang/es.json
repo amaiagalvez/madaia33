@@ -1,4 +1,6 @@
 {
+    "Confirm password": "Confirmar contraseña",
+    "We have emailed your password reset link.": "Te hemos enviado por correo electronico el enlace para restablecer tu contrasena.",
     "Reset your password": "Restablece tu contraseña",
     "Reset Password Notification": "Notificación de restablecimiento de contraseña",
     "You are receiving this email because we received a password reset request for your account.": "Recibes este correo porque hemos recibido una solicitud para restablecer la contraseña de tu cuenta.",

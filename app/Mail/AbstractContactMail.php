@@ -28,10 +28,13 @@ abstract class AbstractContactMail extends Mailable
 
     public readonly ?string $fromName;
 
+    public readonly ?string $trackingPixelUrl;
+
     public function __construct(
         ContactMailData $mailData,
         ?string $fromAddress = null,
         ?string $fromName = null,
+        ?string $trackingPixelUrl = null,
     ) {
         $this->visitorName = $mailData->visitorName;
         $this->messageSubject = $mailData->messageSubject;
@@ -39,6 +42,7 @@ abstract class AbstractContactMail extends Mailable
         $this->legalText = $mailData->legalText ?? EmailLegalText::resolve();
         $this->fromAddress = $fromAddress;
         $this->fromName = $fromName;
+        $this->trackingPixelUrl = $trackingPixelUrl;
     }
 
     public function envelope(): Envelope
@@ -53,6 +57,9 @@ abstract class AbstractContactMail extends Mailable
     {
         return new Content(
             view: $this->viewName(),
+            with: [
+                'trackingPixelUrl' => $this->trackingPixelUrl,
+            ],
         );
     }
 

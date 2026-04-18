@@ -13,14 +13,23 @@ use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Mail\VotingConfirmationMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Support\VotingEligibilityService;
+use App\Support\ContactConfirmationSubject;
 use Illuminate\Validation\ValidationException;
+use App\Support\Messaging\CampaignTrackingUrlBuilder;
+use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
+/**
+ * @SuppressWarnings("PHPMD.CouplingBetweenObjects")
+ */
 class CastVotingBallotAction
 {
     public function __construct(
         private readonly VotingEligibilityService $eligibilityService,
+        private readonly RecordDirectMessageRecipientAction $recordDirectMessageRecipientAction,
+        private readonly CampaignTrackingUrlBuilder $trackingUrlBuilder,
     ) {}
 
     /**
@@ -115,6 +124,8 @@ class CastVotingBallotAction
         VotingOption $option,
         CastVotingData $castData,
     ): VotingBallot {
+        $ownerPct = $this->ownerActiveCommunityPct($owner);
+
         $ballot = VotingBallot::create([
             'voting_id' => $voting->id,
             'owner_id' => $owner->id,
@@ -132,22 +143,18 @@ class CastVotingBallotAction
                 'voting_id' => $voting->id,
                 'voting_ballot_id' => $ballot->id,
                 'owner_id' => $owner->id,
+                'pct_total' => $ownerPct,
                 'voting_option_id' => $option->id,
             ]);
         }
 
-        $this->incrementVotingTotal($voting, $option, $owner);
+        $this->incrementVotingTotal($voting, $option, $ownerPct);
 
         return $ballot;
     }
 
-    private function incrementVotingTotal(Voting $voting, VotingOption $option, Owner $owner): void
+    private function incrementVotingTotal(Voting $voting, VotingOption $option, float $ownerPct): void
     {
-        $owner->loadMissing('activeAssignments.property');
-
-        $ownerPct = $owner->activeAssignments
-            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
-
         $total = VotingOptionTotal::query()
             ->where('voting_id', $voting->id)
             ->where('voting_option_id', $option->id)
@@ -167,6 +174,14 @@ class CastVotingBallotAction
         }
     }
 
+    private function ownerActiveCommunityPct(Owner $owner): float
+    {
+        $owner->loadMissing('activeAssignments.property');
+
+        return (float) $owner->activeAssignments
+            ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+    }
+
     private function sendConfirmationMail(Owner $owner, Voting $voting): void
     {
         $owner->loadMissing('user');
@@ -176,7 +191,25 @@ class CastVotingBallotAction
         }
 
         try {
-            Mail::to($owner->user->email)->send(new VotingConfirmationMail($owner, $voting));
+            $subject = __('votings.mail.subject');
+            $body = __('votings.mail.greeting', ['name' => $owner->coprop1_name]) . "\n"
+                . __('votings.mail.body', ['voting' => $voting->name]) . "\n"
+                . __('votings.mail.thanks');
+
+            $recipient = $this->recordDirectMessageRecipientAction->execute(
+                owner: $owner,
+                contact: $owner->user->email,
+                subject: ContactConfirmationSubject::forAudit($subject),
+                body: $body,
+                sentByUserId: Auth::id(),
+            );
+
+            Mail::to($owner->user->email)->send(new VotingConfirmationMail(
+                $owner,
+                $voting,
+                null,
+                $this->trackingUrlBuilder->openPixelUrl($recipient->tracking_token),
+            ));
         } catch (\Throwable $throwable) {
             Log::warning('Unable to send voting confirmation mail.', [
                 'owner_id' => $owner->id,

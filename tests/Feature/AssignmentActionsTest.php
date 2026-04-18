@@ -62,7 +62,10 @@ describe('AssignPropertyAction', function () {
 
 describe('UnassignPropertyAction', function () {
     it('sets end_date on an active assignment and deactivates user when no active assignments remain', function () {
-        $assignment = PropertyAssignment::factory()->create(['end_date' => null]);
+        $assignment = PropertyAssignment::factory()->create([
+            'start_date' => '2026-03-01',
+            'end_date' => null,
+        ]);
         $assignment->owner->user()->update(['is_active' => true]);
 
         $action = new UnassignPropertyAction;
@@ -78,11 +81,13 @@ describe('UnassignPropertyAction', function () {
 
         $assignmentToClose = PropertyAssignment::factory()->create([
             'owner_id' => $owner->id,
+            'start_date' => '2026-03-01',
             'end_date' => null,
         ]);
 
         PropertyAssignment::factory()->create([
             'owner_id' => $owner->id,
+            'start_date' => '2026-03-01',
             'end_date' => null,
         ]);
 

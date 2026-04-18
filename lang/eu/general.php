@@ -37,6 +37,11 @@ return [
         'legal_notice' => 'Lege-oharra',
         'cookie_policy' => 'Cookie politika',
     ],
+    'cookies' => [
+        'banner_message' => 'Web honek cookie teknikoak soilik erabiltzen ditu, gunearen funtzionamendurako beharrezkoak (saioa, segurtasuna eta barne-errore jarraipena). Ez dira kanpoko iragarki edo jarraipenerako cookierik erabiltzen.',
+        'understood' => 'Ulertu dut',
+        'more_info' => 'Informazio gehiago',
+    ],
     'pagination' => [
         'previous' => 'Aurrekoa',
         'next' => 'Hurrengoa',
@@ -56,11 +61,10 @@ return [
         'seo_description' => 'Komunitateko eremu pribatura sartzeko, saioa hasi eta zure kudeaketa pertsonalak kontsultatu.',
         'form_title' => 'Eremu pribatuan sartu',
         'username' => 'Erabiltzailea',
-        'username_placeholder' => 'Adibidez: bizilaguna01',
+        'username_placeholder' => '',
         'password' => 'Pasahitza',
         'change_password_option' => 'Pasahitza aldatu',
         'show_password' => 'Pasahitza erakutsi',
         'hide_password' => 'Pasahitza ezkutatu',
-        'form_note' => 'Formulario honek oraingoz diseinua bakarrik erakusten du; funtzioak hurrengo fasean aktibatuko dira.',
     ],
 ];

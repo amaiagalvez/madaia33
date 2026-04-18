@@ -105,4 +105,17 @@ test('dev seeder creates owners, role users and seeded voting ballots', function
     expect(VotingBallot::query()->whereNotNull('cast_by_user_id')->count())->toBeGreaterThan(0);
     expect(VotingSelection::query()->count())->toBeGreaterThan(0);
     expect(VotingOptionTotal::query()->sum('votes_count'))->toBe(VotingBallot::query()->count());
+
+    $hasCommunityPctWithMoreThanTwoDecimals = Property::query()
+        ->whereNotNull('community_pct')
+        ->get(['community_pct'])
+        ->contains(static fn (Property $property): bool => abs(((float) $property->community_pct * 100) - round((float) $property->community_pct * 100)) > 0.000001);
+
+    $hasLocationPctWithMoreThanTwoDecimals = Property::query()
+        ->whereNotNull('location_pct')
+        ->get(['location_pct'])
+        ->contains(static fn (Property $property): bool => abs(((float) $property->location_pct * 100) - round((float) $property->location_pct * 100)) > 0.000001);
+
+    expect($hasCommunityPctWithMoreThanTwoDecimals)->toBeFalse();
+    expect($hasLocationPctWithMoreThanTwoDecimals)->toBeFalse();
 });

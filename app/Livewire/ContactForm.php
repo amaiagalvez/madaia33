@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use App\Models\Owner;
 use App\Models\Setting;
 use Livewire\Component;
 use App\SupportedLocales;
@@ -16,6 +17,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Support\ConfiguredMailSettings;
 use App\Validations\ContactFormValidation;
+use App\Support\ContactConfirmationSubject;
+use App\Support\Messaging\CampaignTrackingUrlBuilder;
+use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
 class ContactForm extends Component
 {
@@ -149,6 +153,20 @@ class ContactForm extends Component
             $fromName = ($emailSettings['from_name'] ?? '') !== '' ? $emailSettings['from_name'] : (string) config('mail.from.name');
             $legalText = Setting::localizedStringFrom($emailSettings, 'legal_text');
             $mailSubject = Setting::localizedStringFrom($emailSettings, 'contact_form_subject', $this->subject);
+            $trackingPixelUrl = null;
+            $owner = $contactMessage->user?->owner;
+
+            if ($owner instanceof Owner) {
+                $recipient = app(RecordDirectMessageRecipientAction::class)->execute(
+                    owner: $owner,
+                    contact: $this->email,
+                    subject: ContactConfirmationSubject::forAudit((string) $mailSubject),
+                    body: $this->message,
+                    sentByUserId: null,
+                );
+
+                $trackingPixelUrl = app(CampaignTrackingUrlBuilder::class)->openPixelUrl($recipient->tracking_token);
+            }
 
             Mail::to($this->email)->send(new ContactConfirmation(
                 new ContactMailData(
@@ -159,6 +177,7 @@ class ContactForm extends Component
                 ),
                 $fromAddress,
                 $fromName,
+                $trackingPixelUrl,
             ));
 
             Mail::to($adminEmail)->send(new ContactNotification($contactMessage, $legalText, $fromAddress, $fromName));

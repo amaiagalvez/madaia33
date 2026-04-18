@@ -37,6 +37,11 @@ return [
         'legal_notice' => 'Aviso legal',
         'cookie_policy' => 'Política de cookies',
     ],
+    'cookies' => [
+        'banner_message' => 'Esta web utiliza únicamente cookies técnicas, necesarias para el funcionamiento del sitio (sesión, seguridad y seguimiento de errores interno). No se usan cookies publicitarias ni de rastreo externo.',
+        'understood' => 'Entendido',
+        'more_info' => 'Más información',
+    ],
     'pagination' => [
         'previous' => 'Anterior',
         'next' => 'Siguiente',
@@ -56,11 +61,10 @@ return [
         'seo_description' => 'Accede a la zona privada de la comunidad para iniciar sesion y gestionar tu area personal.',
         'form_title' => 'Acceso a la zona privada',
         'username' => 'Usuaria/o',
-        'username_placeholder' => 'Por ejemplo: vecino01',
+        'username_placeholder' => '',
         'password' => 'Contraseña',
         'change_password_option' => 'Cambiar contraseña',
         'show_password' => 'Mostrar contraseña',
         'hide_password' => 'Ocultar contraseña',
-        'form_note' => 'Este formulario muestra únicamente el diseño por ahora; las funcionalidades se activarán en una fase posterior.',
     ],
 ];

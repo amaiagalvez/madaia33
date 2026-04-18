@@ -3,23 +3,19 @@
 namespace App\Providers;
 
 use Throwable;
-use App\Models\Owner;
 use App\Models\Setting;
 use Carbon\CarbonImmutable;
-use Illuminate\Auth\Events\Login;
-use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
-use App\Observers\OwnerAuditObserver;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\ServiceProvider;
-use App\Listeners\RecordUserLoginSession;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Validation\Rules\Password;
-use App\Listeners\RecordUserLogoutSession;
+use Illuminate\Support\Facades\RateLimiter;
 use App\Http\Composers\BrandingSettingsComposer;
 use App\Http\Composers\VotingsNavigationComposer;
 
@@ -31,12 +27,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->registerMessagingRateLimiters();
         $this->applyConfiguredMailSettings();
         $this->registerLegacyBladeComponentAliases();
         $this->registerViewComposers();
-        $this->registerAuthSessionListeners();
-
-        Owner::observe(OwnerAuditObserver::class);
+        $this->registerLogViewerGate();
     }
 
     /**
@@ -60,6 +55,11 @@ class AppServiceProvider extends ServiceProvider
                     ->uncompromised()
                 : null,
         );
+    }
+
+    protected function registerMessagingRateLimiters(): void
+    {
+        RateLimiter::for('campaign-email-send', fn (): Limit => Limit::perMinute(10)->by('campaign-email-send'));
     }
 
     /**
@@ -129,9 +129,8 @@ class AppServiceProvider extends ServiceProvider
         ], BrandingSettingsComposer::class);
     }
 
-    protected function registerAuthSessionListeners(): void
+    protected function registerLogViewerGate(): void
     {
-        Event::listen(Login::class, RecordUserLoginSession::class);
-        Event::listen(Logout::class, RecordUserLogoutSession::class);
+        Gate::define('viewLogViewer', fn ($user) => $user->isSuperadmin());
     }
 }
