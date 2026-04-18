@@ -11,17 +11,17 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class MessageReplyFactory extends Factory
 {
-  /**
-   * Define the model's default state.
-   *
-   * @return array<string, mixed>
-   */
-  public function definition(): array
-  {
-    return [
-      'contact_message_id' => ContactMessage::factory(),
-      'reply_body' => fake()->paragraph(),
-      'sent_at' => now(),
-    ];
-  }
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'contact_message_id' => ContactMessage::factory(),
+            'reply_body' => fake()->paragraph(),
+            'sent_at' => now(),
+        ];
+    }
 }

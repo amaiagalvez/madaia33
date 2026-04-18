@@ -44,7 +44,7 @@ class ContactMessage extends Model
     }
 
     /**
-     * @return HasOne<MessageReply>
+     * @return HasOne<MessageReply, $this>
      */
     public function reply(): HasOne
     {
