@@ -85,7 +85,7 @@ class CampaignPolicy
     {
         if ($campaign->relationLoaded('locations')) {
             return $campaign->locations
-                ->contains(static fn (CampaignLocation $location): bool => $location->deleted_at === null);
+                ->contains(static fn(CampaignLocation $location): bool => $location->deleted_at === null);
         }
 
         return CampaignLocation::query()
@@ -101,20 +101,20 @@ class CampaignPolicy
     {
         $locationIds = $campaign->relationLoaded('locations')
             ? $campaign->locations
-                ->filter(static fn (CampaignLocation $location): bool => $location->deleted_at === null)
-                ->pluck('location_id')
-                ->map(static fn (int $locationId): int => $locationId)
-                ->unique()
-                ->values()
-                ->all()
+            ->filter(static fn(CampaignLocation $location): bool => $location->deleted_at === null)
+            ->pluck('location_id')
+            ->map(static fn(int $locationId): int => $locationId)
+            ->unique()
+            ->values()
+            ->all()
             : CampaignLocation::query()
-                ->where('campaign_id', $campaign->id)
-                ->whereNull('deleted_at')
-                ->pluck('location_id')
-                ->map(static fn (int $locationId): int => $locationId)
-                ->unique()
-                ->values()
-                ->all();
+            ->where('campaign_id', $campaign->id)
+            ->whereNull('deleted_at')
+            ->pluck('location_id')
+            ->map(static fn(int $locationId): int => $locationId)
+            ->unique()
+            ->values()
+            ->all();
 
         if ($locationIds === []) {
             return false;

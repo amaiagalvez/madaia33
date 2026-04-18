@@ -25,13 +25,6 @@
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 - [ ] https://whatsapp.com/channel/0029VbCTbySGOj9pCe3Pnd47 Botoi bat iragarkiak honea bidaltzeko
 
-Permisos COMMUNITY_ADMIN (+locations)
-    - Bidalketak Txantiloiak: bakarrik bere locations dauzkatenak ikusi dezake
-    - Bidalketa formularioa: en el select de Txantiloiak: bakarrik bere locations dauzkatenak ikusi dezake
-    - Bidalketak Kontakttu baliogagbeak: bakarrik bere locations-enak ikusi dezake
-    - Bozketak zerrenda: solo puede ver las que tengan asigndas locations que tenga el usuario logeado  
-    - Bozketak zerrenda PDF Boto delegatua botoia: en el encabezado del PDF despues del nombre del config, añadir el location que tengan las votaciones seleccionadas, sin repetir.
-    - Bozketak zerrenda PDF Emaitzak botoia: en el encabezado del PDF despues del nombre del config, añadir el location que tengan las votaciones seleccionadas, sin repetir.
     
 # Copilot
 - [ ] repasar agente lamia

@@ -798,5 +798,4 @@ it('forbids non-superadmin users from opening in-person and delegated vote modal
 })->with([
     Role::GENERAL_ADMIN,
     Role::COMMUNITY_ADMIN,
-]);
-;
+]);;
