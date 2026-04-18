@@ -2,6 +2,7 @@
 
 use App\Models\Owner;
 use App\Models\Voting;
+use App\Models\UserLoginSession;
 use Tests\DuskTestCase;
 use App\Models\Campaign;
 use App\Models\Property;
@@ -205,28 +206,121 @@ test('profile messages and received tabs allow expanding long message content', 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($owner, $sentMessage, $receivedRecipient) {
         $browser->loginAs($owner->user)
+            ->resize(1280, 900)
             ->visit('/eu/profila?tab=messages')
             ->waitFor('[data-profile-panel="messages"]', 5)
             ->assertPresent('[data-profile-message-expandable="' . $sentMessage->id . '"]')
             ->assertScript(
-                'return document.querySelector("[data-profile-message-expandable=\"' . $sentMessage->id . '\"]")?.open === false;',
+                'return Array.from(document.querySelectorAll("[data-profile-message-expandable=\"' . $sentMessage->id . '\"]"))'
+                    . '.find((element) => element.offsetParent !== null)?.open === false;',
                 true,
             )
-            ->click('[data-profile-message-toggle="' . $sentMessage->id . '"]')
             ->assertScript(
-                'return document.querySelector("[data-profile-message-expandable=\"' . $sentMessage->id . '\"]")?.open === true;',
+                '(() => {'
+                    . 'const previews = document.querySelectorAll("[data-profile-message-preview=\"' . $sentMessage->id . '\"]");'
+                    . 'const visible = Array.from(previews).find((element) => element.offsetParent !== null);'
+                    . 'if (!visible) return false;'
+                    . 'return window.getComputedStyle(visible).display !== "none";'
+                    . '})()',
+                true,
+            );
+
+        $browser->script(
+            'Array.from(document.querySelectorAll("[data-profile-message-toggle=\"' . $sentMessage->id . '\"]"))'
+                . '.find((element) => element.offsetParent !== null)?.click();',
+        );
+
+        $browser
+            ->assertScript(
+                'return Array.from(document.querySelectorAll("[data-profile-message-expandable=\"' . $sentMessage->id . '\"]"))'
+                    . '.find((element) => element.offsetParent !== null)?.open === true;',
+                true,
+            )
+            ->assertScript(
+                '(() => {'
+                    . 'const previews = document.querySelectorAll("[data-profile-message-preview=\"' . $sentMessage->id . '\"]");'
+                    . 'const hidden = Array.from(previews).find((element) => window.getComputedStyle(element).display === "none");'
+                    . 'return hidden !== undefined;'
+                    . '})()',
+                true,
+            );
+
+        $browser->script(
+            'Array.from(document.querySelectorAll("[data-profile-message-toggle=\"' . $sentMessage->id . '\"]"))'
+                . '.find((element) => element.offsetParent !== null)?.click();',
+        );
+
+        $browser
+            ->assertScript(
+                'return Array.from(document.querySelectorAll("[data-profile-message-expandable=\"' . $sentMessage->id . '\"]"))'
+                    . '.find((element) => element.offsetParent !== null)?.open === false;',
+                true,
+            )
+            ->assertScript(
+                '(() => {'
+                    . 'const previews = document.querySelectorAll("[data-profile-message-preview=\"' . $sentMessage->id . '\"]");'
+                    . 'const visible = Array.from(previews).find((element) => element.offsetParent !== null);'
+                    . 'if (!visible) return false;'
+                    . 'return window.getComputedStyle(visible).display !== "none";'
+                    . '})()',
                 true,
             )
             ->visit('/eu/profila?tab=received')
             ->waitFor('[data-profile-panel="received"]', 5)
             ->assertPresent('[data-profile-received-expandable="' . $receivedRecipient->id . '"]')
             ->assertScript(
-                'return document.querySelector("[data-profile-received-expandable=\"' . $receivedRecipient->id . '\"]")?.open === false;',
+                'return Array.from(document.querySelectorAll("[data-profile-received-expandable=\"' . $receivedRecipient->id . '\"]"))'
+                    . '.find((element) => element.offsetParent !== null)?.open === false;',
                 true,
             )
-            ->click('[data-profile-received-toggle="' . $receivedRecipient->id . '"]')
             ->assertScript(
-                'return document.querySelector("[data-profile-received-expandable=\"' . $receivedRecipient->id . '\"]")?.open === true;',
+                '(() => {'
+                    . 'const previews = document.querySelectorAll("[data-profile-received-preview=\"' . $receivedRecipient->id . '\"]");'
+                    . 'const visible = Array.from(previews).find((element) => element.offsetParent !== null);'
+                    . 'if (!visible) return false;'
+                    . 'return window.getComputedStyle(visible).display !== "none";'
+                    . '})()',
+                true,
+            );
+
+        $browser->script(
+            'Array.from(document.querySelectorAll("[data-profile-received-toggle=\"' . $receivedRecipient->id . '\"]"))'
+                . '.find((element) => element.offsetParent !== null)?.click();',
+        );
+
+        $browser
+            ->assertScript(
+                'return Array.from(document.querySelectorAll("[data-profile-received-expandable=\"' . $receivedRecipient->id . '\"]"))'
+                    . '.find((element) => element.offsetParent !== null)?.open === true;',
+                true,
+            )
+            ->assertScript(
+                '(() => {'
+                    . 'const previews = document.querySelectorAll("[data-profile-received-preview=\"' . $receivedRecipient->id . '\"]");'
+                    . 'const hidden = Array.from(previews).find((element) => window.getComputedStyle(element).display === "none");'
+                    . 'return hidden !== undefined;'
+                    . '})()',
+                true,
+            );
+
+        $browser->script(
+            'Array.from(document.querySelectorAll("[data-profile-received-toggle=\"' . $receivedRecipient->id . '\"]"))'
+                . '.find((element) => element.offsetParent !== null)?.click();',
+        );
+
+        $browser
+            ->assertScript(
+                'return Array.from(document.querySelectorAll("[data-profile-received-expandable=\"' . $receivedRecipient->id . '\"]"))'
+                    . '.find((element) => element.offsetParent !== null)?.open === false;',
+                true,
+            )
+            ->assertScript(
+                '(() => {'
+                    . 'const previews = document.querySelectorAll("[data-profile-received-preview=\"' . $receivedRecipient->id . '\"]");'
+                    . 'const visible = Array.from(previews).find((element) => element.offsetParent !== null);'
+                    . 'if (!visible) return false;'
+                    . 'return window.getComputedStyle(visible).display !== "none";'
+                    . '})()',
                 true,
             );
     });
@@ -278,11 +372,14 @@ test('profile sent and received tables apply clear row separation styles', funct
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($owner) {
         $browser->loginAs($owner->user)
+            ->resize(1280, 900)
             ->visit('/eu/profila?tab=messages')
             ->waitFor('[data-profile-panel="messages"]', 5)
             ->assertScript(
                 '(() => {'
-                    . 'const rows = Array.from(document.querySelectorAll("[data-profile-message-row]"));'
+                    . 'const table = document.querySelector("[data-profile-messages-table]");'
+                    . 'if (!table || window.getComputedStyle(table).display === "none") return false;'
+                    . 'const rows = Array.from(table.querySelectorAll("tbody tr[data-profile-message-row]"));'
                     . 'if (rows.length < 2) return false;'
                     . 'return rows.every((row) => row.classList.contains("border-b") && row.classList.contains("border-gray-200") && row.classList.contains("even:bg-gray-50/40"));'
                     . '})()',
@@ -292,10 +389,120 @@ test('profile sent and received tables apply clear row separation styles', funct
             ->waitFor('[data-profile-panel="received"]', 5)
             ->assertScript(
                 '(() => {'
-                    . 'const rows = Array.from(document.querySelectorAll("[data-profile-received-row]"));'
+                    . 'const table = document.querySelector("[data-profile-received-table]");'
+                    . 'if (!table || window.getComputedStyle(table).display === "none") return false;'
+                    . 'const rows = Array.from(table.querySelectorAll("tbody tr[data-profile-received-row]"));'
                     . 'if (rows.length < 2) return false;'
                     . 'return rows.every((row) => row.classList.contains("border-b") && row.classList.contains("border-gray-200") && row.classList.contains("even:bg-gray-50/40"));'
                     . '})()',
+                true,
+            );
+    });
+});
+
+test('profile mobile layout keeps header content inside card and shows card-based sessions without overflow', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    UserLoginSession::factory()->closed()->create([
+        'user_id' => $owner->user_id,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner) {
+        $browser->resize(375, 812)
+            ->loginAs($owner->user)
+            ->visit('/eu/profila?tab=sessions')
+            ->waitFor('[data-profile-panel="sessions"]', 5)
+            ->assertScript(
+                '(() => {'
+                    . 'const card = document.querySelector("[data-profile-header-card]");'
+                    . 'const helper = document.querySelector("[data-profile-contact-helper-text]");'
+                    . 'if (!card || !helper) return false;'
+                    . 'const cardRect = card.getBoundingClientRect();'
+                    . 'const helperRect = helper.getBoundingClientRect();'
+                    . 'return helperRect.left >= cardRect.left && helperRect.right <= cardRect.right;'
+                    . '})()',
+                true,
+            )
+            ->assertScript(
+                '(() => {'
+                    . 'const tabs = document.querySelector("[data-profile-tabs-list]");'
+                    . 'const ownerTab = document.querySelector("[data-profile-tab=\"owner\"]");'
+                    . 'if (!tabs || !ownerTab) return false;'
+                    . 'const ownerRect = ownerTab.getBoundingClientRect();'
+                    . 'return tabs.scrollWidth <= tabs.clientWidth && ownerRect.right <= window.innerWidth;'
+                    . '})()',
+                true,
+            )
+            ->assertScript(
+                '(() => {'
+                    . 'const cards = document.querySelector("[data-profile-sessions-cards]");'
+                    . 'const tableWrap = document.querySelector("[data-profile-sessions-table-wrap]");'
+                    . 'if (!cards || !tableWrap) return false;'
+                    . 'const cardsDisplay = window.getComputedStyle(cards).display;'
+                    . 'const tableDisplay = window.getComputedStyle(tableWrap).display;'
+                    . 'return cardsDisplay !== "none" && tableDisplay === "none";'
+                    . '})()',
+                true,
+            );
+    });
+});
+
+test('profile mobile data panels fit viewport without horizontal page overflow', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $participatedVoting = Voting::factory()->create([
+        'name_eu' => 'Bozketa oso luzea mugikorrerako probetan',
+        'name_es' => 'Votacion extensa para pruebas moviles',
+    ]);
+
+    VotingBallot::factory()->create([
+        'voting_id' => $participatedVoting->id,
+        'owner_id' => $owner->id,
+        'cast_by_user_id' => $owner->user_id,
+        'voted_at' => now()->subHour(),
+    ]);
+
+    UserLoginSession::factory()->closed()->create([
+        'user_id' => $owner->user_id,
+    ]);
+
+    ContactMessage::factory()->create([
+        'user_id' => $owner->user_id,
+        'subject' => 'Mezu luzea mobile txarteletan ondo sartzeko',
+        'message' => str_repeat('Mezu test luzea. ', 12),
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner) {
+        $browser->resize(375, 812)
+            ->loginAs($owner->user)
+            ->visit('/eu/profila?tab=votings')
+            ->waitFor('[data-profile-panel="votings"]', 5)
+            ->assertScript(
+                'return document.documentElement.scrollWidth <= window.innerWidth + 1;',
+                true,
+            )
+            ->visit('/eu/profila?tab=sessions')
+            ->waitFor('[data-profile-panel="sessions"]', 5)
+            ->assertScript(
+                'return document.documentElement.scrollWidth <= window.innerWidth + 1;',
+                true,
+            )
+            ->visit('/eu/profila?tab=received')
+            ->waitFor('[data-profile-panel="received"]', 5)
+            ->assertScript(
+                'return document.documentElement.scrollWidth <= window.innerWidth + 1;',
+                true,
+            )
+            ->visit('/eu/profila?tab=messages')
+            ->waitFor('[data-profile-panel="messages"]', 5)
+            ->assertScript(
+                'return document.documentElement.scrollWidth <= window.innerWidth + 1;',
                 true,
             );
     });

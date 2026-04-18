@@ -14,6 +14,7 @@
 - [ ] añalizar cookiena chatgpt-rekin
 - [ ] añadir el texto de explicación de las votaciones en los PDF
 - [ ] no se ejecuta el queue
+- 
 
 # Code
 - spec kiro pendientes (obra)

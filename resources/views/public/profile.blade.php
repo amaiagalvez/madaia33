@@ -4,18 +4,20 @@
     @endpush
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-page="profile-page">
-        <header
-            class="mb-8 rounded-2xl border border-[#d9755b]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#f1bd4d]/15 p-6">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-                <div>
+        <header data-profile-header-card
+            class="mb-8 rounded-2xl border border-brand-600/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#f1bd4d]/15 p-4 sm:p-6">
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div class="min-w-0 flex-1">
                     <p class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
                         {{ __('profile.kicker') }}</p>
                     <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">
                         {{ __('profile.heading') }}</h1>
-                    <p class="mt-2 text-sm text-gray-600">{{ __('profile.summary') }}</p>
+                    <p class="mt-2 max-w-3xl wrap-break-word text-sm leading-relaxed text-gray-600">
+                        {{ __('profile.summary') }}</p>
                 </div>
-                <div class="shrink-0 self-center">
-                    <p class="mb-2 max-w-xs text-xs text-gray-600" data-profile-contact-helper-text>
+                <div class="w-full md:w-auto md:max-w-xs">
+                    <p class="mb-2 max-w-full wrap-break-word text-xs leading-relaxed text-gray-600"
+                        data-profile-contact-helper-text>
                         {{ __('profile.contact_modal.description') }}
                     </p>
                     @livewire('profile-contact-modal')
@@ -35,9 +37,9 @@
                 <template x-teleport="body">
                     <div class="fixed inset-0 z-110" data-profile-terms-modal>
                         <div class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
-                        <section class="relative m-0 grid h-full w-full place-items-center overflow-y-auto p-4">
-                            <div
-                                class="my-auto w-full max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-2xl"
+                        <section
+                            class="relative m-0 grid h-full w-full place-items-center overflow-y-auto p-4">
+                            <div class="my-auto w-full max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6 shadow-2xl"
                                 data-profile-terms-modal-card>
                                 <h2 class="text-base font-semibold text-amber-900">
                                     {{ __('profile.terms.title') }}
@@ -65,14 +67,14 @@
 
         <div
             class="{{ $requiresTermsAcceptance ? 'pointer-events-none select-none blur-sm' : '' }}">
-            <nav class="mb-6 overflow-x-auto" aria-label="{{ __('profile.tabs_aria') }}">
-                <ul
-                    class="flex min-w-max items-center gap-2 rounded-xl border border-gray-200 bg-white p-2">
+            <nav class="mb-6" aria-label="{{ __('profile.tabs_aria') }}">
+                <ul class="flex flex-wrap items-stretch gap-2 rounded-xl border border-gray-200 bg-white p-2"
+                    data-profile-tabs-list>
                     @php($tabs = $requiresTermsAcceptance ? ['owner'] : ['overview', 'votings', 'sessions', 'received', 'messages', 'owner'])
                     @foreach ($tabs as $tab)
-                        <li>
+                        <li class="flex grow sm:grow-0">
                             <a href="{{ route(\App\SupportedLocales::routeName('profile'), ['tab' => $tab]) }}"
-                                class="inline-flex min-h-10 items-center rounded-lg px-3 py-2 text-sm font-medium transition {{ $activeTab === $tab ? 'bg-[#793d3d] text-white' : 'text-gray-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                                class="inline-flex min-h-10 w-full items-center justify-center rounded-lg px-3 py-2 text-xs font-medium transition sm:text-sm {{ $activeTab === $tab ? 'bg-[#793d3d] text-white' : 'text-gray-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
                                 data-profile-tab="{{ $tab }}">
                                 {{ __('profile.tabs.' . $tab) }}
                             </a>
@@ -82,7 +84,7 @@
             </nav>
 
             @if ($activeTab === 'overview')
-                <section class="rounded-2xl border border-gray-200 bg-white p-6"
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
                     data-profile-panel="overview">
                     <h2 class="text-xl font-semibold text-gray-900">
                         {{ __('profile.overview.title') }}
@@ -112,14 +114,14 @@
                     </div>
 
                     <a href="{{ route(\App\SupportedLocales::routeName('password.request')) }}"
-                        class="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-[#d9755b] hover:text-[#793d3d]">
+                        class="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-brand-600 hover:text-[#793d3d]">
                         {{ __('profile.overview.change_password') }}
                     </a>
                 </section>
             @endif
 
             @if ($activeTab === 'votings')
-                <section class="rounded-2xl border border-gray-200 bg-white p-6"
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
                     data-profile-panel="votings">
                     <h2 class="text-xl font-semibold text-gray-900">
                         {{ __('profile.votings.title') }}
@@ -138,8 +140,31 @@
                                         {{ __('profile.votings.empty') }}</p>
                                 </div>
                             @else
-                                <div class="mt-3 overflow-x-auto rounded-xl border border-gray-200">
-                                    <table class="min-w-full divide-y divide-gray-200">
+                                <div class="mt-3 space-y-3 md:hidden"
+                                    data-profile-votings-participated-cards>
+                                    @foreach ($userBallots as $ballot)
+                                        <article
+                                            class="rounded-xl border border-gray-200 bg-white p-4 shadow-xs"
+                                            data-profile-votings-participated-row>
+                                            <p
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.votings.voting') }}</p>
+                                            <p
+                                                class="mt-1 text-sm font-medium text-gray-900 wrap-break-word">
+                                                {{ $ballot['voting_name'] }}</p>
+                                            <p
+                                                class="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.votings.voted_at') }}</p>
+                                            <p class="mt-1 text-sm text-gray-700">
+                                                {{ $ballot['voted_at']?->format('Y-m-d H:i:s') ?? '—' }}
+                                            </p>
+                                        </article>
+                                    @endforeach
+                                </div>
+
+                                <div
+                                    class="mt-3 hidden overflow-x-auto rounded-xl border border-gray-200 md:block">
+                                    <table class="min-w-lg divide-y divide-gray-200 sm:min-w-full">
                                         <thead class="bg-gray-50">
                                             <tr>
                                                 <th
@@ -181,13 +206,48 @@
                                 <div class="mt-3">
                                     <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
                                         data-profile-votings-pending-link
-                                        class="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#d9755b] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#793d3d]">
+                                        class="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#793d3d]">
                                         {{ __('profile.votings.go_to_front') }}
                                     </a>
                                 </div>
 
-                                <div class="mt-3 overflow-x-auto rounded-xl border border-gray-200">
-                                    <table class="min-w-full divide-y divide-gray-200">
+                                <div class="mt-3 space-y-3 md:hidden"
+                                    data-profile-votings-pending-cards>
+                                    @foreach ($pendingActiveVotings as $voting)
+                                        <article
+                                            class="rounded-xl border border-gray-200 bg-white p-4 shadow-xs"
+                                            data-profile-votings-pending-row>
+                                            <p
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.votings.voting') }}</p>
+                                            <p
+                                                class="mt-1 text-sm font-medium text-gray-900 wrap-break-word">
+                                                {{ $voting['voting_name'] }}</p>
+                                            <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                        {{ __('profile.votings.starts_at') }}</p>
+                                                    <p class="mt-1 text-sm text-gray-700">
+                                                        {{ $voting['starts_at']?->format('Y-m-d') ?? '—' }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                        {{ __('profile.votings.ends_at') }}</p>
+                                                    <p class="mt-1 text-sm text-gray-700">
+                                                        {{ $voting['ends_at']?->format('Y-m-d') ?? '—' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    @endforeach
+                                </div>
+
+                                <div
+                                    class="mt-3 hidden overflow-x-auto rounded-xl border border-gray-200 md:block">
+                                    <table class="min-w-160 divide-y divide-gray-200 sm:min-w-full">
                                         <thead class="bg-gray-50">
                                             <tr>
                                                 <th
@@ -232,8 +292,45 @@
                                         {{ __('profile.votings.missed_closed_empty') }}</p>
                                 </div>
                             @else
-                                <div class="mt-3 overflow-x-auto rounded-xl border border-gray-200">
-                                    <table class="min-w-full divide-y divide-gray-200">
+                                <div class="mt-3 space-y-3 md:hidden"
+                                    data-profile-votings-missed-cards>
+                                    @foreach ($missedClosedVotings as $voting)
+                                        <article
+                                            class="rounded-xl border border-gray-200 bg-white p-4 shadow-xs"
+                                            data-profile-votings-missed-row>
+                                            <p
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.votings.voting') }}</p>
+                                            <p
+                                                class="mt-1 text-sm font-medium text-gray-900 wrap-break-word">
+                                                {{ $voting['voting_name'] }}</p>
+                                            <div
+                                                class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                        {{ __('profile.votings.starts_at') }}</p>
+                                                    <p class="mt-1 text-sm text-gray-700">
+                                                        {{ $voting['starts_at']?->format('Y-m-d') ?? '—' }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                        {{ __('profile.votings.ends_at') }}</p>
+                                                    <p class="mt-1 text-sm text-gray-700">
+                                                        {{ $voting['ends_at']?->format('Y-m-d') ?? '—' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    @endforeach
+                                </div>
+
+                                <div
+                                    class="mt-3 hidden overflow-x-auto rounded-xl border border-gray-200 md:block">
+                                    <table
+                                        class="min-w-160 divide-y divide-gray-200 sm:min-w-full">
                                         <thead class="bg-gray-50">
                                             <tr>
                                                 <th
@@ -270,7 +367,7 @@
             @endif
 
             @if ($activeTab === 'sessions')
-                <section class="rounded-2xl border border-gray-200 bg-white p-6"
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
                     data-profile-panel="sessions">
                     <h2 class="text-xl font-semibold text-gray-900">
                         {{ __('profile.sessions.title') }}
@@ -279,11 +376,54 @@
                     @if ($loginSessions === [])
                         <div
                             class="mt-4 rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center">
-                            <p class="text-sm text-gray-500">{{ __('profile.sessions.empty') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('profile.sessions.empty') }}
+                            </p>
                         </div>
                     @else
-                        <div class="mt-4 overflow-x-auto rounded-xl border border-gray-200">
-                            <table class="min-w-full divide-y divide-gray-200">
+                        <div class="mt-4 space-y-3 md:hidden" data-profile-sessions-cards>
+                            @foreach ($loginSessions as $session)
+                                <article
+                                    class="rounded-xl border border-gray-200 bg-white p-4 shadow-xs">
+                                    <dl class="space-y-3">
+                                        <div>
+                                            <dt
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.sessions.logged_in_at') }}</dt>
+                                            <dd class="mt-1 text-sm text-gray-800">
+                                                {{ $session['logged_in_at']?->format('Y-m-d H:i:s') ?? '—' }}
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.sessions.logged_out_at') }}</dt>
+                                            <dd class="mt-1 text-sm text-gray-800">
+                                                {{ $session['logged_out_at']?->format('Y-m-d H:i:s') ?? __('profile.sessions.active') }}
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.sessions.duration') }}</dt>
+                                            <dd class="mt-1 text-sm text-gray-800">
+                                                {{ $session['duration'] ?? __('profile.sessions.in_progress') }}
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.sessions.ip') }}</dt>
+                                            <dd class="mt-1 text-sm text-gray-800 wrap-break-word">
+                                                {{ $session['ip_address'] ?? '—' }}</dd>
+                                        </div>
+                                    </dl>
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-4 hidden overflow-x-auto rounded-xl border border-gray-200 md:block"
+                            data-profile-sessions-table-wrap>
+                            <table class="min-w-3xl divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th
@@ -324,7 +464,7 @@
             @endif
 
             @if ($activeTab === 'received')
-                <section class="rounded-2xl border border-gray-200 bg-white p-6"
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
                     data-profile-panel="received">
                     <h2 class="text-xl font-semibold text-gray-900">
                         {{ __('profile.received.title') }}
@@ -337,9 +477,78 @@
                             </p>
                         </div>
                     @else
-                        <div class="mt-4 overflow-x-auto rounded-xl border border-gray-200"
+                        <div class="mt-4 space-y-3 md:hidden" data-profile-received-cards>
+                            @foreach ($receivedMessages as $receivedMessage)
+                                @php($receivedMessageText = (string) ($receivedMessage['message'] ?? ''))
+                                @php($hasLongReceivedMessage = \Illuminate\Support\Str::length($receivedMessageText) > 160)
+                                <article
+                                    class="rounded-xl border border-gray-200 bg-white p-4 shadow-xs"
+                                    data-profile-received-row>
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        {{ __('profile.received.subject') }}</p>
+                                    <p
+                                        class="mt-1 text-sm font-medium text-gray-900 wrap-break-word">
+                                        {{ $receivedMessage['subject'] }}</p>
+
+                                    <p
+                                        class="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        {{ __('profile.received.message') }}</p>
+                                    @if (!$hasLongReceivedMessage)
+                                        <p class="mt-1 text-sm text-gray-700 whitespace-pre-line">
+                                            {{ $receivedMessageText }}</p>
+                                    @else
+                                        <details class="group mt-1"
+                                            data-profile-received-expandable="{{ $receivedMessage['id'] }}">
+                                            <summary
+                                                class="flex cursor-pointer list-none items-start gap-2 whitespace-pre-line text-sm text-gray-700 marker:content-none"
+                                                data-profile-received-toggle="{{ $receivedMessage['id'] }}">
+                                                <span class="flex-1 group-open:hidden"
+                                                    data-profile-received-preview="{{ $receivedMessage['id'] }}">{{ \Illuminate\Support\Str::limit($receivedMessageText, 160) }}</span>
+                                                <span
+                                                    class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-200 text-[#793d3d]">
+                                                    <svg class="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
+                                                        fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="2" stroke="currentColor"
+                                                        aria-hidden="true">
+                                                        <path stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                    </svg>
+                                                    <span
+                                                        class="sr-only">{{ __('profile.received.show_more') }}</span>
+                                                </span>
+                                            </summary>
+                                            <p class="mt-2 whitespace-pre-line text-sm text-gray-700"
+                                                data-profile-received-full="{{ $receivedMessage['id'] }}">
+                                                {{ $receivedMessageText }}</p>
+                                        </details>
+                                    @endif
+
+                                    <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        <div>
+                                            <p
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.received.sent_at') }}</p>
+                                            <p class="mt-1 text-sm text-gray-700">
+                                                {{ $receivedMessage['sent_at']->format('Y-m-d H:i:s') }}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.received.status') }}</p>
+                                            <p class="mt-1 text-sm text-gray-700">
+                                                {{ $receivedMessage['status_label'] }}</p>
+                                        </div>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-4 hidden overflow-x-auto rounded-xl border border-gray-200 md:block"
                             data-profile-received-table>
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-4xl divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th
@@ -358,7 +567,8 @@
                                 </thead>
                                 <tbody class="bg-white">
                                     @foreach ($receivedMessages as $receivedMessage)
-                                        <tr class="border-b border-gray-200 even:bg-gray-50/40 align-top last:border-b-0" data-profile-received-row>
+                                        <tr class="border-b border-gray-200 even:bg-gray-50/40 align-top last:border-b-0"
+                                            data-profile-received-row>
                                             <td
                                                 class="px-4 py-3 text-sm font-medium text-gray-800">
                                                 {{ $receivedMessage['subject'] }}</td>
@@ -370,17 +580,28 @@
                                                     <p class="whitespace-pre-line">
                                                         {{ $receivedMessageText }}</p>
                                                 @else
-                                                    <details class="group max-w-[32rem]"
+                                                    <details class="group max-w-lg"
                                                         data-profile-received-expandable="{{ $receivedMessage['id'] }}">
                                                         <summary
-                                                            class="cursor-pointer list-none whitespace-pre-line text-gray-700 marker:content-none"
+                                                            class="flex cursor-pointer list-none items-start gap-2 whitespace-pre-line text-gray-700 marker:content-none"
                                                             data-profile-received-toggle="{{ $receivedMessage['id'] }}">
-                                                            <span
+                                                            <span class="flex-1 group-open:hidden"
                                                                 data-profile-received-preview="{{ $receivedMessage['id'] }}">{{ \Illuminate\Support\Str::limit($receivedMessageText, 160) }}</span>
                                                             <span
-                                                                class="ml-2 text-xs font-semibold text-[#793d3d] group-open:hidden">{{ __('profile.received.show_more') }}</span>
-                                                            <span
-                                                                class="ml-2 hidden text-xs font-semibold text-[#793d3d] group-open:inline">{{ __('profile.received.show_less') }}</span>
+                                                                class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-200 text-[#793d3d]">
+                                                                <svg class="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                    stroke-width="2"
+                                                                    stroke="currentColor"
+                                                                    aria-hidden="true">
+                                                                    <path stroke-linecap="round"
+                                                                        stroke-linejoin="round"
+                                                                        d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                                </svg>
+                                                                <span
+                                                                    class="sr-only">{{ __('profile.received.show_more') }}</span>
+                                                            </span>
                                                         </summary>
                                                         <p class="mt-2 whitespace-pre-line"
                                                             data-profile-received-full="{{ $receivedMessage['id'] }}">
@@ -404,7 +625,7 @@
             @endif
 
             @if ($activeTab === 'messages')
-                <section class="rounded-2xl border border-gray-200 bg-white p-6"
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
                     data-profile-panel="messages">
                     <h2 class="text-xl font-semibold text-gray-900">
                         {{ __('profile.messages.title') }}
@@ -417,9 +638,79 @@
                             </p>
                         </div>
                     @else
-                        <div class="mt-4 overflow-x-auto rounded-xl border border-gray-200"
+                        <div class="mt-4 space-y-3 md:hidden" data-profile-messages-cards>
+                            @foreach ($userMessages as $userMessage)
+                                @php($userMessageText = (string) ($userMessage['message'] ?? ''))
+                                @php($hasLongUserMessage = \Illuminate\Support\Str::length($userMessageText) > 160)
+                                <article
+                                    class="rounded-xl border border-gray-200 bg-white p-4 shadow-xs"
+                                    data-profile-message-row>
+                                    <p
+                                        class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        {{ __('profile.messages.subject') }}</p>
+                                    <p
+                                        class="mt-1 text-sm font-medium text-gray-900 wrap-break-word">
+                                        {{ $userMessage['subject'] }}</p>
+
+                                    <p
+                                        class="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        {{ __('profile.messages.message') }}</p>
+                                    @if (!$hasLongUserMessage)
+                                        <p class="mt-1 text-sm text-gray-700 whitespace-pre-line">
+                                            {{ $userMessageText }}</p>
+                                    @else
+                                        <details class="group mt-1"
+                                            data-profile-message-expandable="{{ $userMessage['id'] }}">
+                                            <summary
+                                                class="flex cursor-pointer list-none items-start gap-2 whitespace-pre-line text-sm text-gray-700 marker:content-none"
+                                                data-profile-message-toggle="{{ $userMessage['id'] }}">
+                                                <span class="flex-1 group-open:hidden"
+                                                    data-profile-message-preview="{{ $userMessage['id'] }}">{{ \Illuminate\Support\Str::limit($userMessageText, 160) }}</span>
+                                                <span
+                                                    class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-200 text-[#793d3d]">
+                                                    <svg class="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
+                                                        fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="2" stroke="currentColor"
+                                                        aria-hidden="true">
+                                                        <path stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                    </svg>
+                                                    <span
+                                                        class="sr-only">{{ __('profile.messages.show_more') }}</span>
+                                                </span>
+                                            </summary>
+                                            <p class="mt-2 whitespace-pre-line text-sm text-gray-700"
+                                                data-profile-message-full="{{ $userMessage['id'] }}">
+                                                {{ $userMessageText }}</p>
+                                        </details>
+                                    @endif
+
+                                    <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        <div>
+                                            <p
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.messages.sent_at') }}</p>
+                                            <p class="mt-1 text-sm text-gray-700">
+                                                {{ $userMessage['created_at']->format('Y-m-d H:i:s') }}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                {{ __('profile.messages.status') }}</p>
+                                            <p class="mt-1 text-sm text-gray-700">
+                                                {{ $userMessage['is_read'] ? __('profile.messages.read') : __('profile.messages.pending') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-4 hidden overflow-x-auto rounded-xl border border-gray-200 md:block"
                             data-profile-messages-table>
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-4xl divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th
@@ -438,7 +729,8 @@
                                 </thead>
                                 <tbody class="bg-white">
                                     @foreach ($userMessages as $userMessage)
-                                        <tr class="border-b border-gray-200 even:bg-gray-50/40 align-top last:border-b-0" data-profile-message-row>
+                                        <tr class="border-b border-gray-200 even:bg-gray-50/40 align-top last:border-b-0"
+                                            data-profile-message-row>
                                             <td
                                                 class="px-4 py-3 text-sm font-medium text-gray-800">
                                                 {{ $userMessage['subject'] }}</td>
@@ -450,17 +742,28 @@
                                                     <p class="whitespace-pre-line">
                                                         {{ $userMessageText }}</p>
                                                 @else
-                                                    <details class="group max-w-[32rem]"
+                                                    <details class="group max-w-lg"
                                                         data-profile-message-expandable="{{ $userMessage['id'] }}">
                                                         <summary
-                                                            class="cursor-pointer list-none whitespace-pre-line text-gray-700 marker:content-none"
+                                                            class="flex cursor-pointer list-none items-start gap-2 whitespace-pre-line text-gray-700 marker:content-none"
                                                             data-profile-message-toggle="{{ $userMessage['id'] }}">
-                                                            <span
+                                                            <span class="flex-1 group-open:hidden"
                                                                 data-profile-message-preview="{{ $userMessage['id'] }}">{{ \Illuminate\Support\Str::limit($userMessageText, 160) }}</span>
                                                             <span
-                                                                class="ml-2 text-xs font-semibold text-[#793d3d] group-open:hidden">{{ __('profile.messages.show_more') }}</span>
-                                                            <span
-                                                                class="ml-2 hidden text-xs font-semibold text-[#793d3d] group-open:inline">{{ __('profile.messages.show_less') }}</span>
+                                                                class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-200 text-[#793d3d]">
+                                                                <svg class="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                    stroke-width="2"
+                                                                    stroke="currentColor"
+                                                                    aria-hidden="true">
+                                                                    <path stroke-linecap="round"
+                                                                        stroke-linejoin="round"
+                                                                        d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                                </svg>
+                                                                <span
+                                                                    class="sr-only">{{ __('profile.messages.show_more') }}</span>
+                                                            </span>
                                                         </summary>
                                                         <p class="mt-2 whitespace-pre-line"
                                                             data-profile-message-full="{{ $userMessage['id'] }}">
@@ -484,7 +787,7 @@
             @endif
 
             @if ($activeTab === 'owner')
-                <section class="rounded-2xl border border-gray-200 bg-white p-6"
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6"
                     data-profile-panel="owner">
                     <h2 class="text-xl font-semibold text-gray-900">
                         {{ __('profile.owner.title') }}
@@ -504,12 +807,12 @@
                             <div class="mt-2 flex flex-wrap items-center gap-3"
                                 data-profile-owner-form-actions>
                                 <button type="submit" data-profile-owner-save-button
-                                    class="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#d9755b] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#793d3d]">
+                                    class="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#793d3d]">
                                     {{ __('general.buttons.save') }}
                                 </button>
                                 <a href="{{ route(\App\SupportedLocales::routeName('profile'), ['tab' => 'owner']) }}"
                                     data-profile-owner-cancel-button
-                                    class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-[#d9755b] hover:text-[#793d3d]">
+                                    class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-brand-600 hover:text-[#793d3d]">
                                     {{ __('general.buttons.cancel') }}
                                 </a>
                             </div>
@@ -535,9 +838,10 @@
                                         {{ __('admin.owners.audit.empty') }}
                                     </div>
                                 @else
-                                    <div class="overflow-x-auto">
+                                    <div
+                                        class="overflow-x-auto [-webkit-overflow-scrolling:touch]">
                                         <table
-                                            class="min-w-full divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+                                            class="min-w-208 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white sm:min-w-full">
                                             <thead class="bg-gray-50">
                                                 <tr>
                                                     <th
