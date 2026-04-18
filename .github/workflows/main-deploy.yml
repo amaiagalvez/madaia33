@@ -31,7 +31,19 @@ jobs:
           coverage: none
 
       - name: Install PHP dependencies (production)
-        run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress
+          --optimize-autoloader
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
 
       - name: Normalize FTP server directory
         id: ftp_dir
@@ -170,7 +182,6 @@ jobs:
               --exclude-glob 'storage/framework/views/*' \
               --exclude 'storage/**' \
               --exclude 'composer.phar' \
-              --exclude 'public/build/**' \
               . '$FTP_SERVER_DIR';
             bye
           "
@@ -217,7 +228,6 @@ jobs:
               --exclude-glob 'storage/framework/views/*' \
               --exclude 'storage/**' \
               --exclude 'composer.phar' \
-              --exclude 'public/build/**' \
               . '$FTP_SERVER_DIR';
             bye
           "
