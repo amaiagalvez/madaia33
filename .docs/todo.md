@@ -11,9 +11,8 @@
 - [ ] dusk-test
 
 # Despues de publicar master
-- [ ] configurar el sentry
 - [ ] añalizar cookiena chatgpt-rekin
-- [ ] probar envio whatcapp en el movil
+- [ ] probar envio whatchapp en el movil
 
 # Code
 - spec kiro pendientes (obra)
@@ -21,7 +20,6 @@
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
-- [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 - [ ] https://whatsapp.com/channel/0029VbCTbySGOj9pCe3Pnd47 Botoi bat iragarkiak honea bidaltzeko
     

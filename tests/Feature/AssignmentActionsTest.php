@@ -2,18 +2,22 @@
 
 use App\Models\Owner;
 use App\Models\Property;
+use App\Mail\OwnerWelcomeMail;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use App\Actions\Properties\AssignPropertyAction;
 use App\Actions\Properties\UnassignPropertyAction;
 
 describe('AssignPropertyAction', function () {
+    beforeEach(fn () => Mail::fake());
+
     it('creates an active assignment for an unassigned property and activates owner user', function () {
         $property = Property::factory()->create();
         $owner = Owner::factory()->create();
         $owner->user()->update(['is_active' => false]);
 
-        $action = new AssignPropertyAction;
+        $action = app(AssignPropertyAction::class);
         $assignment = $action->execute($property, $owner, '2026-01-01');
 
         expect($assignment)->toBeInstanceOf(PropertyAssignment::class)
@@ -36,7 +40,7 @@ describe('AssignPropertyAction', function () {
             'end_date' => null,
         ]);
 
-        $action = new AssignPropertyAction;
+        $action = app(AssignPropertyAction::class);
 
         expect(fn () => $action->execute($property, $owner2, '2026-06-01'))
             ->toThrow(ValidationException::class);
@@ -52,11 +56,33 @@ describe('AssignPropertyAction', function () {
             'owner_id' => $owner1->id,
         ]);
 
-        $action = new AssignPropertyAction;
+        $action = app(AssignPropertyAction::class);
         $assignment = $action->execute($property, $owner2, '2026-06-01');
 
         expect($assignment->owner_id)->toBe($owner2->id)
             ->and($assignment->end_date)->toBeNull();
+    });
+
+    it('sends the welcome email using the owner language when creating a new active assignment', function () {
+        createSetting('owners_welcome_subject_eu', 'Ongi etorri');
+        createSetting('owners_welcome_subject_es', 'Bienvenida');
+        createSetting('owners_welcome_text_eu', '<p>Kaixo ##izena##</p>##info##');
+        createSetting('owners_welcome_text_es', '<p>Hola ##izena##</p>##info##');
+
+        $property = Property::factory()->create();
+        $owner = Owner::factory()->create([
+            'language' => 'es',
+            'coprop1_email' => 'owner@example.com',
+        ]);
+
+        $action = app(AssignPropertyAction::class);
+        $action->execute($property, $owner, '2026-06-01');
+
+        Mail::assertSent(OwnerWelcomeMail::class, function (OwnerWelcomeMail $mail): bool {
+            return $mail->hasTo('owner@example.com')
+                && $mail->subjectLine === 'Bienvenida'
+                && str_contains($mail->bodyHtml, 'Hola');
+        });
     });
 });
 

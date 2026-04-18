@@ -195,6 +195,8 @@ class CreateOwnerAction
      */
     private function sendWelcomeMail(Owner $owner, User $user, ?array $data = null): void
     {
+        $locale = SupportedLocales::normalize($owner->language);
+
         $settings = Setting::stringValues([
             'from_address',
             'from_name',
@@ -208,12 +210,14 @@ class CreateOwnerAction
             $settings,
             'owners_welcome_subject',
             __('admin.owners.email.default_subject'),
+            $locale,
         ) ?? __('admin.owners.email.default_subject'));
 
         $bodyTemplate = (string) (Setting::localizedStringFrom(
             $settings,
             'owners_welcome_text',
             __('admin.owners.email.default_body'),
+            $locale,
         ) ?? __('admin.owners.email.default_body'));
 
         $bodyHtml = str_replace(
@@ -248,6 +252,7 @@ class CreateOwnerAction
             $resetUrl,
             $trackingPixelUrl,
             $trackedResetUrl,
+            $locale,
         ));
     }
 

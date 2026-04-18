@@ -51,6 +51,10 @@
                     @endif
                 </x-admin.table-header-cell>
 
+                <x-admin.table-header-cell>
+                    {{ __('contact.admin.replied') }}
+                </x-admin.table-header-cell>
+
                 <x-admin.table-header-cell class="relative">
                     @if ($canDeleteMessages)
                         <span class="sr-only">{{ __('general.buttons.delete') }}</span>
@@ -81,6 +85,18 @@
                     <td class="px-6 py-4 text-sm text-gray-500">
                         {{ $msg->created_at->format('d/m/Y H:i') }}
                     </td>
+                    <td class="px-6 py-4 text-center text-sm" wire:click.stop>
+                        @if ($msg->reply && $msg->reply->sent_at)
+                            <span
+                                title="{{ __('contact.admin.replied_at', ['date' => $msg->reply->sent_at?->format('d/m/Y H:i')]) }}">
+                                <flux:icon.check-circle class="size-4 text-green-600" />
+                            </span>
+                        @else
+                            <span title="{{ __('contact.admin.not_replied') }}">
+                                <flux:icon.x-circle class="size-4 text-gray-300" />
+                            </span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4 text-right text-sm font-medium" wire:click.stop>
                         @if ($canDeleteMessages)
                             <x-admin.table-row-actions>
@@ -94,7 +110,7 @@
                 {{-- Expanded detail row --}}
                 @if ($openMessageId === $msg->id)
                     <tr wire:key="detail-{{ $msg->id }}" class="bg-gray-50">
-                        <td colspan="6" class="px-6 py-4">
+                        <td colspan="7" class="px-6 py-4">
                             <div
                                 class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                                 <div class="border-b border-gray-200 bg-white px-4 py-4 sm:px-5">
@@ -133,13 +149,39 @@
                                         {{ trim($msg->message) }}
                                     </div>
                                 </div>
+
+                                @if ($msg->reply && $msg->reply->sent_at)
+                                    <div
+                                        class="border-t border-gray-200 bg-green-50/80 px-3 py-3 sm:px-4">
+                                        <p
+                                            class="text-xs font-medium uppercase tracking-wide text-green-700">
+                                            {{ __('contact.admin.replied_at_label') }}
+                                            {{ $msg->reply->sent_at?->format('d/m/Y H:i') }}
+                                        </p>
+                                        <div
+                                            class="mt-2 whitespace-pre-line rounded-lg border border-green-200 bg-green-50 px-3 py-3 text-left text-sm leading-relaxed text-green-900 sm:px-4">
+                                            {{ trim($msg->reply->reply_body) }}
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <div
+                                    class="border-t border-gray-200 bg-gray-50 px-4 py-4 sm:flex sm:items-center sm:justify-end sm:gap-3">
+                                    @if (!$msg->reply || !$msg->reply->sent_at)
+                                        <button type="button"
+                                            wire:click="openReplyModal({{ $msg->id }})"
+                                            class="inline-flex items-center justify-center rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white hover:bg-[#c35f45] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2">
+                                            {{ __('contact.admin.reply_button') }}
+                                        </button>
+                                    @endif
+                                </div>
                             </div>
                         </td>
                     </tr>
                 @endif
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('contact.admin.inbox') }}
                     </td>
                 </tr>
@@ -232,6 +274,53 @@
                         {{ __('general.buttons.delete') }}
                     </button>
                 </x-admin.form-footer-actions>
+            </div>
+        </dialog>
+    @endif
+
+    {{-- Reply modal --}}
+    @if ($showReplyModal && $replyingMessageId)
+        <dialog open
+            class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4"
+            aria-labelledby="reply-modal-title">
+            <div class="mx-4 w-full max-w-2xl space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+                <div class="flex items-start justify-between">
+                    <h3 id="reply-modal-title" class="text-base font-semibold text-gray-900">
+                        {{ __('contact.admin.compose_reply') }}
+                    </h3>
+                    <button type="button" wire:click="cancelReply"
+                        class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d9755b] rounded">
+                        <span class="sr-only">{{ __('general.close') }}</span>
+                        <flux:icon.x-mark class="size-5" />
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="sendReply" class="space-y-4">
+                    <div>
+                        <label for="reply-body" class="block text-sm font-medium text-gray-900">
+                            {{ __('contact.admin.reply_body') }}
+                        </label>
+                        <textarea id="reply-body" wire:model="replyBody" rows="8"
+                            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
+                            placeholder="{{ __('contact.admin.reply_placeholder') }}"></textarea>
+                        @error('replyBody')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <x-admin.form-footer-actions class="mt-0 justify-end">
+                        <button type="button" wire:click="cancelReply"
+                            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                            {{ __('general.buttons.cancel') }}
+                        </button>
+                        <button type="submit"
+                            class="rounded-md bg-[#d9755b] px-4 py-2 text-sm font-medium text-white hover:bg-[#c35f45] focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                            wire:loading.attr="disabled">
+                            <span wire:loading.remove>{{ __('contact.admin.send_reply') }}</span>
+                            <span wire:loading>{{ __('general.sending') }}...</span>
+                        </button>
+                    </x-admin.form-footer-actions>
+                </form>
             </div>
         </dialog>
     @endif
