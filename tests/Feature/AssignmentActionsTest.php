@@ -2,15 +2,15 @@
 
 use App\Models\Owner;
 use App\Models\Property;
-use App\Models\PropertyAssignment;
 use App\Mail\OwnerWelcomeMail;
+use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use App\Actions\Properties\AssignPropertyAction;
 use App\Actions\Properties\UnassignPropertyAction;
-use Illuminate\Support\Facades\Mail;
 
 describe('AssignPropertyAction', function () {
-    beforeEach(fn() => Mail::fake());
+    beforeEach(fn () => Mail::fake());
 
     it('creates an active assignment for an unassigned property and activates owner user', function () {
         $property = Property::factory()->create();
@@ -42,7 +42,7 @@ describe('AssignPropertyAction', function () {
 
         $action = app(AssignPropertyAction::class);
 
-        expect(fn() => $action->execute($property, $owner2, '2026-06-01'))
+        expect(fn () => $action->execute($property, $owner2, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -128,7 +128,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn() => $action->execute($assignment, '2026-06-01'))
+        expect(fn () => $action->execute($assignment, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -137,7 +137,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn() => $action->execute($assignment, '2026-03-09'))
+        expect(fn () => $action->execute($assignment, '2026-03-09'))
             ->toThrow(ValidationException::class);
     });
 });

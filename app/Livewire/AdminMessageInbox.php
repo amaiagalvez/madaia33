@@ -5,10 +5,13 @@ namespace App\Livewire;
 use App\Models\Role;
 use App\Models\User;
 use Livewire\Component;
+use App\Models\MessageReply;
 use Livewire\WithPagination;
+use App\Mail\MessageReplyMail;
 use App\Models\ContactMessage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminMessageInbox extends Component
@@ -26,6 +29,12 @@ class AdminMessageInbox extends Component
     public string $readAction = '';
 
     public bool $showReadModal = false;
+
+    public ?int $replyingMessageId = null;
+
+    public string $replyBody = '';
+
+    public bool $showReplyModal = false;
 
     public string $sortColumn = 'created_at';
 
@@ -88,6 +97,69 @@ class AdminMessageInbox extends Component
         $this->confirmingReadId = null;
         $this->readAction = '';
         $this->showReadModal = false;
+    }
+
+    public function openReplyModal(int $messageId): void
+    {
+        $message = ContactMessage::query()
+            ->with('reply')
+            ->findOrFail($messageId);
+
+        if ($message->reply?->sent_at !== null) {
+            return;
+        }
+
+        $this->replyingMessageId = $messageId;
+        $this->replyBody = $message->reply?->reply_body ?? '';
+        $this->showReplyModal = true;
+    }
+
+    public function cancelReply(): void
+    {
+        $this->replyingMessageId = null;
+        $this->replyBody = '';
+        $this->showReplyModal = false;
+    }
+
+    public function sendReply(): void
+    {
+        $this->validate([
+            'replyBody' => 'required|string|min:10|max:5000',
+        ], [
+            'replyBody.required' => __('validation.required', ['attribute' => __('contact.admin.reply_body')]),
+            'replyBody.min' => __('validation.min.string', ['attribute' => __('contact.admin.reply_body'), 'min' => 10]),
+            'replyBody.max' => __('validation.max.string', ['attribute' => __('contact.admin.reply_body'), 'max' => 5000]),
+        ]);
+
+        if ($this->replyingMessageId === null) {
+            return;
+        }
+
+        $message = ContactMessage::query()
+            ->with('reply')
+            ->findOrFail($this->replyingMessageId);
+
+        if ($message->reply?->sent_at !== null) {
+            $this->cancelReply();
+
+            return;
+        }
+
+        $reply = $message->reply ?? new MessageReply([
+            'contact_message_id' => $message->id,
+        ]);
+        $reply->reply_body = $this->replyBody;
+        $reply->sent_at = null;
+        $reply->save();
+
+        Mail::to($message->email)->send(new MessageReplyMail($reply));
+
+        $reply->forceFill([
+            'sent_at' => now(),
+        ])->save();
+
+        $this->cancelReply();
+        $this->openMessageId = null;
     }
 
     public function sortBy(string $column): void
@@ -157,8 +229,9 @@ class AdminMessageInbox extends Component
         $sortDir = in_array($this->sortDir, ['asc', 'desc']) ? $this->sortDir : 'desc';
 
         return ContactMessage::query()
-            ->when($this->readFilter === 'read', fn ($query) => $query->where('is_read', true))
-            ->when($this->readFilter === 'unread', fn ($query) => $query->where('is_read', false))
+            ->with('reply')
+            ->when($this->readFilter === 'read', fn($query) => $query->where('is_read', true))
+            ->when($this->readFilter === 'unread', fn($query) => $query->where('is_read', false))
             ->when(trim($this->search) !== '', function ($query): void {
                 $term = '%' . trim($this->search) . '%';
 

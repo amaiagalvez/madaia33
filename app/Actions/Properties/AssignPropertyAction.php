@@ -2,11 +2,11 @@
 
 namespace App\Actions\Properties;
 
-use App\Actions\Owners\CreateOwnerAction;
 use App\Models\Owner;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
+use App\Actions\Owners\CreateOwnerAction;
 use Illuminate\Validation\ValidationException;
 
 class AssignPropertyAction
