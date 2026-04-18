@@ -15,17 +15,19 @@
         <div class="flex items-center justify-end gap-2">
             <x-admin.create-record-button wire:click="createVoting" />
 
-            <button type="button" wire:click="openInPersonVoteModal"
-                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
-                data-action="open-in-person-vote">
-                {{ __('votings.admin.in_person_vote') }}
-            </button>
+            @if (auth()->user()?->hasRole(App\Models\Role::SUPER_ADMIN))
+                <button type="button" wire:click="openInPersonVoteModal"
+                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                    data-action="open-in-person-vote">
+                    {{ __('votings.admin.in_person_vote') }}
+                </button>
 
-            <button type="button" wire:click="openDelegatedVoteModal"
-                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
-                data-action="open-delegated-vote">
-                {{ __('votings.admin.delegated_vote') }}
-            </button>
+                <button type="button" wire:click="openDelegatedVoteModal"
+                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                    data-action="open-delegated-vote">
+                    {{ __('votings.admin.delegated_vote') }}
+                </button>
+            @endif
         </div>
 
         <div class="flex items-center justify-end gap-2">
@@ -192,7 +194,8 @@
                     <td class="px-6 py-4 text-sm text-gray-500">
                         {{ $voting->locations->map(fn($vl) => $vl->location?->code)->filter()->join(', ') }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-600" data-voting-date-range="{{ $voting->id }}">
+                    <td class="px-6 py-4 text-sm text-gray-600"
+                        data-voting-date-range="{{ $voting->id }}">
                         {{ ($voting->starts_at?->format('Y-m-d') ?? '-') . ' - ' . ($voting->ends_at?->format('Y-m-d') ?? '-') }}
                     </td>
                     <td class="px-6 py-4 text-sm">
@@ -244,8 +247,10 @@
                             </button>
                         </div>
                     </td>
-                    <td class="sticky right-0 z-10 bg-white px-3 py-4 text-right text-sm font-medium">
-                        <x-admin.table-row-actions class="gap-1" data-voting-row-actions="{{ $voting->id }}">
+                    <td
+                        class="sticky right-0 z-10 bg-white px-3 py-4 text-right text-sm font-medium">
+                        <x-admin.table-row-actions class="gap-1"
+                            data-voting-row-actions="{{ $voting->id }}">
                             <a href="{{ route('admin.votings.results.show', ['voting' => $voting->id]) }}"
                                 class="rounded-full border border-transparent p-1.5 text-brand-600 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-brand-600"
                                 title="{{ __('votings.admin.open_results') }}"

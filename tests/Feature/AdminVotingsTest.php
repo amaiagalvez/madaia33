@@ -781,3 +781,22 @@ it('persists bilingual questions and allows creating a second voting', function 
         ->and($secondVoting->question_eu)->toBe('<p>Bigarren galdera EU</p>')
         ->and($secondVoting->question_es)->toBe('<p>Segunda pregunta ES</p>');
 });
+
+it('forbids non-superadmin users from opening in-person and delegated vote modals', function (string $role) {
+    $admin = User::factory()->create();
+    $admin->assignRole($role);
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->call('openInPersonVoteModal')
+        ->assertForbidden();
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->call('openDelegatedVoteModal')
+        ->assertForbidden();
+})->with([
+    Role::GENERAL_ADMIN,
+    Role::COMMUNITY_ADMIN,
+]);
+;

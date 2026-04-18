@@ -23,27 +23,16 @@
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 - [ ] Mezuak. Al abrir el mensaje, añade un botón para responderle. Guarda la respuesta en la base de datos y enviale el email. Añade una nueva columna en la taula que indique con iconos si está repondido o no.
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
+- [ ] https://whatsapp.com/channel/0029VbCTbySGOj9pCe3Pnd47 Botoi bat iragarkiak honea bidaltzeko
 
-Permisos:
-1. SUPER_ADMIN
-   - en el listado de Bidalketak, la que tiene el id=1 solo mostrarla al superadmin, el resto que no la vean
-2. GENERAL_ADMIN
-
-4. COMMUNITY_ADMIN (+locations)
-  - Bidalketak Txantiloiak: bakarrik bere locations dauzkatenak ikusi dezake
-  - Bidalketa formularioa: en el select de Txantiloiak: bakarrik bere locations dauzkatenak ikusi dezake
-  - Bidalketak Kontakttu baliogagbeak: bakarrik bere locations-enak ikusi dezake
-  - Bozketak zerrenda: solo puede ver las que tengan asigndas locations que tenga el usuario logeado
-  - Bozketak zerrenda Boto presentziala botoia: al pinchar en el botón "Boto presentziala", solo verá los owner de sus locations
-  - Bozketak zerrenda Boto delegatua botoia: al pinchar en el botón "Boto presentziala", solo verá los owner de sus locations
-  - Bozketak zerrenda PDF Boto delegatua botoia: en el encabezado del PDF despues del nombre del config, añadir el location que tengan las votaciones seleccionadas, sin repetir.
-  - Bozketak zerrenda PDF Emaitzak botoia: en el encabezado del PDF despues del nombre del config, añadir el location que tengan las votaciones seleccionadas, sin repetir.
-  - Konfigurazioa atala menuan ez da agertu behar
-5. PROPERTY_OWNER (+ property_assignments)
-6. DELEGATED_VOTE
-
-
-
+Permisos COMMUNITY_ADMIN (+locations)
+    - Bidalketak Txantiloiak: bakarrik bere locations dauzkatenak ikusi dezake
+    - Bidalketa formularioa: en el select de Txantiloiak: bakarrik bere locations dauzkatenak ikusi dezake
+    - Bidalketak Kontakttu baliogagbeak: bakarrik bere locations-enak ikusi dezake
+    - Bozketak zerrenda: solo puede ver las que tengan asigndas locations que tenga el usuario logeado  
+    - Bozketak zerrenda PDF Boto delegatua botoia: en el encabezado del PDF despues del nombre del config, añadir el location que tengan las votaciones seleccionadas, sin repetir.
+    - Bozketak zerrenda PDF Emaitzak botoia: en el encabezado del PDF despues del nombre del config, añadir el location que tengan las votaciones seleccionadas, sin repetir.
+    
 # Copilot
 - [ ] repasar agente lamia
 - [ ] agente para crear manuales de usuario

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Campaign;
 use App\Models\CampaignLocation;
@@ -15,6 +16,11 @@ class CampaignPolicy
 
     public function view(User $user, Campaign $campaign): bool
     {
+        // Campaign id=1 is reserved for direct messages and only visible to SUPER_ADMIN
+        if ($campaign->id === 1 && ! $user->hasRole(Role::SUPER_ADMIN)) {
+            return false;
+        }
+
         return $this->canAccessCampaign($user, $campaign);
     }
 

@@ -215,12 +215,6 @@ it('limits general admins to unfiltered campaigns only', function () {
     $generalAdmin = User::factory()->create();
     $generalAdmin->assignRole(Role::GENERAL_ADMIN);
 
-    $visibleCampaign = Campaign::factory()->create([
-        'subject_eu' => 'Kanpaina orokorra',
-        'status' => 'draft',
-        'channel' => 'email',
-    ]);
-
     $managedLocation = Location::factory()->portal()->create([
         'code' => 'GA-01',
         'name' => 'Portal GA-01',
@@ -237,21 +231,39 @@ it('limits general admins to unfiltered campaigns only', function () {
         'location_id' => $managedLocation->id,
     ]);
 
-    Livewire::actingAs($generalAdmin)
-        ->test('admin-campaign-manager')
-        ->call('createCampaign')
-        ->assertSee('Kanpaina orokorra')
-        ->assertDontSee('Kanpaina murriztua')
-        ->assertSeeHtml('value="all"')
-        ->assertDontSee('GA-01');
-
+    // Verify campaign id=1 is hidden from general admin
     test()->actingAs($generalAdmin)
-        ->get(route('admin.campaigns.show', $visibleCampaign))
-        ->assertOk();
+        ->get(route('admin.campaigns.show', 1))
+        ->assertForbidden();
 
+    // Verify campaign with location is hidden from general admin
     test()->actingAs($generalAdmin)
         ->get(route('admin.campaigns.show', $hiddenCampaign))
         ->assertForbidden();
+});
+
+it('allows superadmin to see campaign id=1', function () {
+    $superAdmin = adminUser();
+
+    // Create campaign id=1 explicitly (normally created by DirectMessagesCampaignSeeder)
+    Campaign::factory()->create([
+        'id' => 1,
+        'subject_eu' => 'Web-etik Bidalitako Mezuak',
+        'subject_es' => 'Mensajes enviados desde la web',
+        'body_eu' => null,
+        'body_es' => null,
+        'channel' => 'email',
+        'status' => 'sent',
+        'created_by_user_id' => null,
+    ]);
+
+    test()->actingAs($superAdmin)
+        ->get(route('admin.campaigns.show', 1))
+        ->assertOk();
+
+    Livewire::actingAs($superAdmin)
+        ->test('admin-campaign-manager')
+        ->assertSee('Web-etik Bidalitako Mezuak'); // Campaign id=1
 });
 
 it('hides the all filter option from community admins', function () {

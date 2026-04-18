@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Owner;
+use App\Models\Role;
 use App\Models\Setting;
 use Livewire\Component;
 use App\Models\Campaign;
@@ -182,6 +183,11 @@ class AdminCampaignManager extends Component
     {
         $this->authorizeViewAny();
 
+        // Bloquear acceso a campaign id=1 para no SUPER_ADMIN
+        if ($id === 1 && ! $this->currentUser()?->hasRole(Role::SUPER_ADMIN)) {
+            abort(403);
+        }
+
         $campaign = Campaign::query()->with(['documents', 'locations'])->findOrFail($id);
 
         abort_unless($this->canMutateCampaign($campaign), 403);
@@ -194,7 +200,7 @@ class AdminCampaignManager extends Component
         $this->channel = (string) $campaign->channel;
         $this->recipientFilters = $campaign->locations
             ->pluck('location_id')
-            ->map(static fn (int $locationId): string => (string) $locationId)
+            ->map(static fn(int $locationId): string => (string) $locationId)
             ->values()
             ->all();
 
@@ -209,7 +215,7 @@ class AdminCampaignManager extends Component
 
         $this->attachments = [];
         $this->storedAttachments = $campaign->documents
-            ->map(fn (CampaignDocument $document): array => [
+            ->map(fn(CampaignDocument $document): array => [
                 'id' => $document->id,
                 'filename' => $document->filename,
             ])
@@ -432,7 +438,7 @@ class AdminCampaignManager extends Component
 
         $this->storedAttachments = array_values(array_filter(
             $this->storedAttachments,
-            static fn (array $attachment): bool => (int) $attachment['id'] !== $documentId,
+            static fn(array $attachment): bool => (int) $attachment['id'] !== $documentId,
         ));
 
         $this->syncSavedFormSnapshot();
@@ -472,15 +478,20 @@ class AdminCampaignManager extends Component
 
         $campaignsQuery = Campaign::query()->withCount([
             'recipients',
-            'recipients as opened_recipients_count' => fn (Builder $query): Builder => $query->whereHas(
+            'recipients as opened_recipients_count' => fn(Builder $query): Builder => $query->whereHas(
                 'trackingEvents',
-                fn (Builder $events): Builder => $events->where('event_type', 'open'),
+                fn(Builder $events): Builder => $events->where('event_type', 'open'),
             ),
         ]);
 
         $campaignsQuery->with(['locations.location']);
 
         $this->applyCampaignVisibilityScope($campaignsQuery);
+
+        // Filtrar campaign id=1 solo para SUPER_ADMIN
+        if (! $this->currentUser()?->hasRole(Role::SUPER_ADMIN)) {
+            $campaignsQuery->where('id', '!=', 1);
+        }
 
         $campaigns = $campaignsQuery
             ->orderBy($sortColumn, $sortDir)
@@ -703,12 +714,12 @@ class AdminCampaignManager extends Component
             'recipient_filters' => $this->normalizedRecipientFilters(),
             'stored_attachment_ids' => collect($this->storedAttachments)
                 ->pluck('id')
-                ->map(static fn (mixed $id): int => (int) $id)
+                ->map(static fn(mixed $id): int => (int) $id)
                 ->sort()
                 ->values()
                 ->all(),
             'pending_attachment_names' => collect($this->attachments)
-                ->map(static fn ($attachment): string => $attachment->getClientOriginalName())
+                ->map(static fn($attachment): string => $attachment->getClientOriginalName())
                 ->sort()
                 ->values()
                 ->all(),
@@ -725,7 +736,7 @@ class AdminCampaignManager extends Component
         }
 
         return collect($this->selectedLocationIds())
-            ->map(static fn (int $locationId): string => (string) $locationId)
+            ->map(static fn(int $locationId): string => (string) $locationId)
             ->sort()
             ->values()
             ->all();
@@ -773,14 +784,14 @@ class AdminCampaignManager extends Component
     private function selectedLocationIds(): array
     {
         $allowedFilters = collect($this->options()->allowedRecipientFilters())
-            ->map(static fn (string $filter): int => (int) $filter)
-            ->filter(static fn (int $filter): bool => $filter > 0)
+            ->map(static fn(string $filter): int => (int) $filter)
+            ->filter(static fn(int $filter): bool => $filter > 0)
             ->values()
             ->all();
 
         return collect($this->recipientFilters)
-            ->map(static fn (string $value): int => (int) $value)
-            ->filter(static fn (int $locationId): bool => in_array($locationId, $allowedFilters, true))
+            ->map(static fn(string $value): int => (int) $value)
+            ->filter(static fn(int $locationId): bool => in_array($locationId, $allowedFilters, true))
             ->unique()
             ->values()
             ->all();
