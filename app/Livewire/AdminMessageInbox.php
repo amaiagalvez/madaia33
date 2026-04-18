@@ -230,8 +230,8 @@ class AdminMessageInbox extends Component
 
         return ContactMessage::query()
             ->with('reply')
-            ->when($this->readFilter === 'read', fn($query) => $query->where('is_read', true))
-            ->when($this->readFilter === 'unread', fn($query) => $query->where('is_read', false))
+            ->when($this->readFilter === 'read', fn ($query) => $query->where('is_read', true))
+            ->when($this->readFilter === 'unread', fn ($query) => $query->where('is_read', false))
             ->when(trim($this->search) !== '', function ($query): void {
                 $term = '%' . trim($this->search) . '%';
 
