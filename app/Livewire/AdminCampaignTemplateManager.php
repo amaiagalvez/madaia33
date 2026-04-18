@@ -11,8 +11,8 @@ use Illuminate\Validation\Rule;
 use App\Models\CampaignTemplate;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
-use App\Concerns\BuildsLocaleFieldConfigs;
 use Illuminate\Database\Eloquent\Builder;
+use App\Concerns\BuildsLocaleFieldConfigs;
 
 class AdminCampaignTemplateManager extends Component
 {

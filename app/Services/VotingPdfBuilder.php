@@ -6,8 +6,8 @@ use App\Models\Voting;
 use App\Models\Setting;
 use App\Models\Location;
 use App\Models\VotingOption;
-use Illuminate\Support\Carbon;
 use App\Models\VotingLocation;
+use Illuminate\Support\Carbon;
 use App\Models\VotingOptionTotal;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -84,8 +84,8 @@ class VotingPdfBuilder
             ->whereNull('deleted_at')
             ->with('location')
             ->get()
-            ->map(fn(VotingLocation $vl): string => trim((string) ($vl->location?->name ?? $vl->location?->code ?? '')))
-            ->filter(fn(string $name): bool => $name !== '')
+            ->map(fn (VotingLocation $vl): string => trim((string) ($vl->location->name ?? $vl->location->code ?? '')))
+            ->filter(fn (string $name): bool => $name !== '')
             ->unique()
             ->sort()
             ->values()
@@ -131,7 +131,7 @@ class VotingPdfBuilder
         return $votingQuery
             ->orderBy('starts_at')
             ->get()
-            ->map(fn(Voting $voting): array => $this->mapVotingForDocument($voting))
+            ->map(fn (Voting $voting): array => $this->mapVotingForDocument($voting))
             ->values()
             ->all();
     }
@@ -147,7 +147,7 @@ class VotingPdfBuilder
             'question_eu' => $voting->question_eu,
             'question_es' => (string) ($voting->question_es ?? ''),
             'options' => $voting->options
-                ->map(static fn(VotingOption $option): array => [
+                ->map(static fn (VotingOption $option): array => [
                     'label_eu' => $option->label_eu,
                     'label_es' => (string) ($option->label_es ?? ''),
                 ])
@@ -175,7 +175,7 @@ class VotingPdfBuilder
         $votingModels = $query->get();
 
         return $votingModels
-            ->map(fn(Voting $voting): array => $this->mapVotingForResults($voting))
+            ->map(fn (Voting $voting): array => $this->mapVotingForResults($voting))
             ->values()
             ->all();
     }
@@ -222,7 +222,7 @@ class VotingPdfBuilder
         $maxPct = (float) max(1, (float) $optionsCollection->max('pct_total'));
 
         return $optionsCollection
-            ->map(static fn(array $option): array => [
+            ->map(static fn (array $option): array => [
                 ...$option,
                 'vote_chart_percent' => round(($option['votes_count'] / $maxVotes) * 100, 2),
                 'pct_chart_percent' => round(($option['pct_total'] / $maxPct) * 100, 2),
