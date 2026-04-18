@@ -134,7 +134,8 @@
         </x-admin.side-panel-form>
     @endif
 
-    <x-admin.panel-table table-class="min-w-full divide-y divide-gray-200">
+    <x-admin.panel-table class="overflow-x-auto" data-votings-table-scroll
+        table-class="w-full min-w-[64rem] divide-y divide-gray-200" data-votings-table>
         <thead class="bg-gray-50">
             <tr>
                 <x-admin.table-header-cell class="w-12">
@@ -154,11 +155,8 @@
                 <x-admin.table-header-cell>
                     {{ __('votings.admin.locations') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
-                    {{ __('votings.admin.starts_at') }}
-                </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
-                    {{ __('votings.admin.ends_at') }}
+                <x-admin.table-header-cell data-votings-date-range-header>
+                    {{ __('votings.admin.date_range') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
                     {{ __('votings.admin.is_published') }}
@@ -175,7 +173,7 @@
                 <x-admin.table-header-cell>
                     {{ __('votings.admin.voters') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell class="relative">
+                <x-admin.table-header-cell class="sticky right-0 z-20 bg-gray-50 px-3">
                     <span class="sr-only">{{ __('general.buttons.edit') }}</span>
                 </x-admin.table-header-cell>
             </tr>
@@ -194,10 +192,9 @@
                     <td class="px-6 py-4 text-sm text-gray-500">
                         {{ $voting->locations->map(fn($vl) => $vl->location?->code)->filter()->join(', ') }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-600">
-                        {{ $voting->starts_at?->format('Y-m-d') }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">
-                        {{ $voting->ends_at?->format('Y-m-d') }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600" data-voting-date-range="{{ $voting->id }}">
+                        {{ ($voting->starts_at?->format('Y-m-d') ?? '-') . ' - ' . ($voting->ends_at?->format('Y-m-d') ?? '-') }}
+                    </td>
                     <td class="px-6 py-4 text-sm">
                         @if ($voting->is_published)
                             <flux:icon.check-circle class="size-4 text-green-600" />
@@ -225,10 +222,10 @@
                         </x-admin.action-link-confirm>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-700">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1.5">
                             <span>{{ $censusCounts[$voting->id] ?? 0 }}</span>
                             <button type="button" wire:click="openCensus({{ $voting->id }})"
-                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
+                                class="rounded-full border border-transparent p-1.5 text-brand-600 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-brand-600"
                                 title="{{ __('votings.admin.open_census') }}"
                                 data-action="open-census-{{ $voting->id }}">
                                 <flux:icon.users class="size-4" />
@@ -237,20 +234,20 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-700">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1.5">
                             <span>{{ $voting->ballots_count }}</span>
                             <button type="button" wire:click="openVoters({{ $voting->id }})"
-                                class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
+                                class="rounded-full border border-transparent p-1.5 text-brand-600 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-brand-600"
                                 title="{{ __('votings.admin.open_voters') }}">
                                 <flux:icon.list-bullet class="size-4" />
                                 <span class="sr-only">{{ __('votings.admin.open_voters') }}</span>
                             </button>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-right text-sm font-medium">
-                        <x-admin.table-row-actions>
+                    <td class="sticky right-0 z-10 bg-white px-3 py-4 text-right text-sm font-medium">
+                        <x-admin.table-row-actions class="gap-1" data-voting-row-actions="{{ $voting->id }}">
                             <a href="{{ route('admin.votings.results.show', ['voting' => $voting->id]) }}"
-                                class="rounded-full border border-transparent p-2 text-brand-600 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-brand-600"
+                                class="rounded-full border border-transparent p-1.5 text-brand-600 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-brand-600"
                                 title="{{ __('votings.admin.open_results') }}"
                                 data-voting-results-link="{{ $voting->id }}">
                                 <flux:icon.chart-bar class="size-4" />
@@ -268,7 +265,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="11" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('votings.admin.empty') }}</td>
                 </tr>
             @endforelse

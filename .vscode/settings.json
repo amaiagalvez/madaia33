@@ -66,7 +66,8 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "docker exec": true
+        "docker exec": true,
+        "set": true
     },
     "chat.promptFilesRecommendations": {
         "speckit.constitution": true,

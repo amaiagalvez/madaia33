@@ -55,9 +55,19 @@ test('census modal hides vote and delegation columns', function () {
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($admin, $voting): void {
         $selector = '[data-action="open-census-' . $voting->id . '"]';
+        $rowIconsSelector = '[data-voting-row-actions="' . $voting->id . '"]';
+        $dateRangeSelector = '[data-voting-date-range="' . $voting->id . '"]';
+        $rowIconsVisibleScript = "return (() => { const el = document.querySelector('[data-voting-row-actions]'); if (!el) { return false; } const rect = el.getBoundingClientRect(); return rect.left >= 0 && rect.right <= window.innerWidth; })();";
 
         $browser->loginAs($admin)
             ->visit('/admin/bozketak')
+            ->waitFor('[data-votings-table-scroll]', 10)
+            ->assertPresent('[data-votings-table-scroll]')
+            ->assertPresent('[data-votings-table]')
+            ->assertPresent('[data-votings-date-range-header]')
+            ->assertPresent($dateRangeSelector)
+            ->assertPresent($rowIconsSelector)
+            ->assertScript($rowIconsVisibleScript, true)
             ->waitFor($selector, 10)
             ->click($selector)
             ->waitFor('[data-owners-modal-table]', 10)
