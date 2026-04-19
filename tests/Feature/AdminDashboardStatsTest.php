@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\Role;
-use App\Models\Owner;
 use App\Models\User;
+use App\Models\Owner;
 
 it('shows invalid contacts owners stat in admin dashboard', function () {
     $user = adminUser();

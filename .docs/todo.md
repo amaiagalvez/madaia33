@@ -1,4 +1,4 @@
-# nohizbehinka egiteko 2026-04-11
+# nohizbehinka egiteko 2026-04-19
 - [ ] Repasa todos los feature test y los que se puedan convertir en unit test sin acceso a la base de datos pasalos
 - [ ] Repasa la suit de test y completa los que falten
 - [ ] con el agente sorgina repasar el código y proponer mejoras (código repetido, test que faltan, consultas a la base de datos repetidas, ...)
@@ -20,7 +20,6 @@
 - [ ] spec kiro pendientes (obra)
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
-
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 - [ ] https://whatsapp.com/channel/0029VbCTbySGOj9pCe3Pnd47 Botoi bat iragarkiak honea bidaltzeko

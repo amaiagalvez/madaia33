@@ -2,12 +2,12 @@
 
 namespace App\Livewire;
 
+use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Notice;
 use Livewire\Component;
 use App\Models\Location;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use App\Models\NoticeLocation;
@@ -207,32 +207,48 @@ class AdminNoticeManager extends Component
 
     private function resolvePublishedAt(?Notice $existingNotice = null): mixed
     {
-        $selectedPublishedAt = $this->publishedAt !== ''
-            ? Carbon::parse($this->publishedAt)->startOfDay()
-            : null;
+        $selectedPublishedAt = $this->selectedPublishedAt();
 
-        if (
-            $existingNotice !== null
-            && $selectedPublishedAt !== null
-            && $this->originalPublishedAt !== ''
-            && Carbon::parse($this->originalPublishedAt)->toDateString() === $selectedPublishedAt->toDateString()
-        ) {
-            return $existingNotice->published_at;
+        if ($this->shouldKeepOriginalPublishedAt($existingNotice, $selectedPublishedAt)) {
+            return $existingNotice?->published_at;
         }
 
         if ($selectedPublishedAt !== null) {
             return $selectedPublishedAt;
         }
 
-        if ($existingNotice !== null) {
-            if (! $this->isPublic) {
-                return $existingNotice->published_at;
-            }
+        return $this->fallbackPublishedAt($existingNotice);
+    }
 
-            return $existingNotice->published_at ?: now();
+    private function selectedPublishedAt(): ?Carbon
+    {
+        if ($this->publishedAt === '') {
+            return null;
         }
 
-        return $this->isPublic ? now() : null;
+        return Carbon::parse($this->publishedAt)->startOfDay();
+    }
+
+    private function shouldKeepOriginalPublishedAt(?Notice $existingNotice, ?Carbon $selectedPublishedAt): bool
+    {
+        if ($existingNotice === null || $selectedPublishedAt === null || $this->originalPublishedAt === '') {
+            return false;
+        }
+
+        return Carbon::parse($this->originalPublishedAt)->toDateString() === $selectedPublishedAt->toDateString();
+    }
+
+    private function fallbackPublishedAt(?Notice $existingNotice): mixed
+    {
+        if ($existingNotice === null) {
+            return $this->isPublic ? now() : null;
+        }
+
+        if (! $this->isPublic) {
+            return $existingNotice->published_at;
+        }
+
+        return $existingNotice->published_at ?: now();
     }
 
     public function publishNotice(int $id): void

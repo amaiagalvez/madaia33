@@ -6,6 +6,7 @@ use App\Models\Owner;
 use App\Models\Location;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Collection;
 use App\Support\AdminOwnersFilters;
 use App\Validations\OwnerFormValidation;
 use Illuminate\Database\Eloquent\Builder;

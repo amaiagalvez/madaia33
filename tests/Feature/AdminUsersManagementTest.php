@@ -6,13 +6,14 @@ use App\Models\Owner;
 use App\Models\Voting;
 use Livewire\Livewire;
 use App\Models\Location;
-use App\Mail\UserWelcomeMail;
 use App\Models\VotingBallot;
 use App\Livewire\Admin\Users;
+use App\Mail\UserWelcomeMail;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 beforeEach(function () {
     foreach (Role::names() as $roleName) {
@@ -390,7 +391,7 @@ it('allows login with the access code sent when user is created from admin panel
 
     test()->assertGuest();
 
-    test()->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class)
+    test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('login.store'), [
             'email' => $createdUser->email,
             'password' => (string) $createdUser->code,

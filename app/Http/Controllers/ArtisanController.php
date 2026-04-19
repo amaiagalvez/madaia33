@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
-use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
 use Illuminate\Database\ConnectionInterface;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;
 
 class ArtisanController extends Controller
 {
@@ -188,30 +188,7 @@ class ArtisanController extends Controller
                     echo sprintf("DROP TABLE IF EXISTS `%s`;\n", $escapedTable);
                     echo $createStatement . ";\n\n";
 
-                    foreach ($connection->table($tableName)->cursor() as $row) {
-                        $rowData = get_object_vars($row);
-
-                        if ($rowData === []) {
-                            continue;
-                        }
-
-                        $columns = array_map(
-                            fn(string $column): string => sprintf('`%s`', $this->escapeSqlIdentifier($column)),
-                            array_keys($rowData)
-                        );
-
-                        $values = array_map(
-                            fn(mixed $value): string => $this->quoteSqlValue($pdo, $value),
-                            array_values($rowData)
-                        );
-
-                        echo sprintf(
-                            "INSERT INTO `%s` (%s) VALUES (%s);\n",
-                            $escapedTable,
-                            implode(', ', $columns),
-                            implode(', ', $values)
-                        );
-                    }
+                    $this->dumpMysqlTableRows($connection, $pdo, $tableName, $escapedTable);
 
                     echo "\n";
                 }
@@ -221,6 +198,34 @@ class ArtisanController extends Controller
             $this->buildBackupFilename($databaseName . '-backup', 'sql'),
             ['Content-Type' => 'application/sql; charset=UTF-8']
         );
+    }
+
+    private function dumpMysqlTableRows(ConnectionInterface $connection, \PDO $pdo, string $tableName, string $escapedTable): void
+    {
+        foreach ($connection->table($tableName)->cursor() as $row) {
+            $rowData = get_object_vars($row);
+
+            if ($rowData === []) {
+                continue;
+            }
+
+            $columns = array_map(
+                fn (string $column): string => sprintf('`%s`', $this->escapeSqlIdentifier($column)),
+                array_keys($rowData)
+            );
+
+            $values = array_map(
+                fn (mixed $value): string => $this->quoteSqlValue($pdo, $value),
+                array_values($rowData)
+            );
+
+            echo sprintf(
+                "INSERT INTO `%s` (%s) VALUES (%s);\n",
+                $escapedTable,
+                implode(', ', $columns),
+                implode(', ', $values)
+            );
+        }
     }
 
     /**
