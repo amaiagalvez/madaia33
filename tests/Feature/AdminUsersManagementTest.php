@@ -363,8 +363,7 @@ it('sends welcome email with access code when creating a user from admin panel',
             && str_contains($mail->bodyHtml, (string) $createdUser->code)
             && ! str_contains($mail->bodyHtml, route('security.edit'))
             && ! str_contains($mail->bodyHtml, '##aldatu_pasahitza##')
-            && ! str_contains($mail->bodyHtml, 'Pasahitza aldatu')
-            && ! str_contains($mail->bodyHtml, 'Cambiar Contraseña');
+            && str_contains($mail->bodyHtml, __('profile.overview.change_password', locale: $createdUser->language));
     });
 });
 

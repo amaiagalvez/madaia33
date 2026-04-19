@@ -19,7 +19,7 @@ class PropertySeeder extends Seeder
                 $locationPct = $this->locationPctForType($location->type);
 
                 foreach ($propertyNames as $propertyName) {
-                    Property::withTrashed()->updateOrCreate(
+                    Property::withTrashed()->firstOrCreate(
                         [
                             'location_id' => $location->id,
                             'name' => $propertyName,
@@ -27,7 +27,6 @@ class PropertySeeder extends Seeder
                         [
                             'community_pct' => $communityPct,
                             'location_pct' => $locationPct,
-                            'deleted_at' => null,
                         ],
                     );
                 }

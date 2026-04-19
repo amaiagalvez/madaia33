@@ -363,7 +363,7 @@ return [
         'delegated_vote_terms_accepted' => 'Baldintzak',
         'welcome_email' => [
             'welcome_subject' => 'Ongi etorri - Zure sarbide-kodea',
-            'welcome_body' => '<p>Kaixo ##izena##,</p><p>Sisteman erregistratuta. Sartu hemen: <a href="https://madaia33.eus">madaia33.eus</a>. Zure sarbide-kodea hau da: <strong>##kodea##</strong></p><p>Sarbidea egin ondoren, zure profiletik pasahitza alda dezakezu.</p>',
+            'welcome_body' => '<p>Kaixo ##izena##,</p><p>Sisteman erregistratuta. Sartu hemen: <a href="https://madaia33.eus">madaia33.eus</a>. Zure sarbide-kodea hau da: <strong>##kodea##</strong></p><p>Sarbidea egin ondoren, segurtasunagatik, aldatu pasahitza zure profiletik "##aldatu_pasahitza##" botoia sakatuta.</p>',
         ],
     ],
     'votings' => [

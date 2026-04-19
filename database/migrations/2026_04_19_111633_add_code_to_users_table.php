@@ -13,10 +13,6 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('code', 9)->nullable()->after('password');
-        });
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('code', 9)->nullable(false)->change();
             $table->unique('code');
         });
     }

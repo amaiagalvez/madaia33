@@ -363,7 +363,7 @@ return [
         'delegated_vote_terms_accepted' => 'Condiciones',
         'welcome_email' => [
             'welcome_subject' => 'Bienvenida/a - Tu código de acceso',
-            'welcome_body' => '<p>Hola ##izena##,</p><p>Has sido registrada en el sistema. Entra en <a href="https://madaia33.eus">madaia33.eus</a>. Tu código de acceso es: <strong>##kodea##</strong></p><p>Después de entrar, por seguridad, te recomendamos cambiar tu contraseña desde tu perfil.</p>',
+            'welcome_body' => '<p>Hola ##izena##,</p><p>Has sido registrada en el sistema. Entra en <a href="https://madaia33.eus">madaia33.eus</a>. Tu código de acceso es: <strong>##kodea##</strong></p><p>Después de entrar, por seguridad, cambia tu contraseña desde tu perfil pulsando el botón "##aldatu_pasahitza##".</p>',
         ],
     ],
     'votings' => [

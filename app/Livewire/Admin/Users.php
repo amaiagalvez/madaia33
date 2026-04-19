@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use App\Models\UserLoginSession;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class Users extends Component
@@ -133,7 +134,7 @@ class Users extends Component
             $user->name = $validated['name'];
             $user->email = $validated['email'];
             $user->code = $accessCode;
-            $user->password = $accessCode;
+            $user->password = Hash::make($accessCode);
         }
 
         $user->is_active = (bool) $validated['isActive'];
@@ -424,10 +425,11 @@ class Users extends Component
         $subject = __('admin.users.welcome_email.welcome_subject', locale: $locale);
 
         $bodyTemplate = __('admin.users.welcome_email.welcome_body', locale: $locale);
+        $changePasswordButtonLabel = __('profile.overview.change_password', locale: $locale);
 
         $bodyHtml = str_replace(
             ['##izena##', '##kodea##', '##aldatu_pasahitza##'],
-            [$user->name, (string) ($user->code ?? ''), ''],
+            [$user->name, (string) ($user->code ?? ''), $changePasswordButtonLabel],
             $bodyTemplate,
         );
 
