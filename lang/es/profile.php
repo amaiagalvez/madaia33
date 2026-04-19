@@ -5,7 +5,7 @@ return [
     'seo_description' => 'Perfil de usuario: votaciones, sesiones y validacion de propiedades.',
     'kicker' => 'Area de usuario',
     'heading' => 'Mi perfil',
-    'summary' => 'Aqui puedes consultar tu actividad, sesiones y estado de tus propiedades.',
+    'summary' => 'Aqui puedes consultar tu actividad, sesiones y estado de tus datos.',
     'tabs_aria' => 'Pestanas del perfil',
     'tabs' => [
         'overview' => 'Resumen',

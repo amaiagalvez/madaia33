@@ -5,7 +5,7 @@ return [
     'seo_description' => 'Erabiltzailearen profila: bozketak, saioak eta jabetzen balidazioa.',
     'kicker' => 'Erabiltzaile-gunea',
     'heading' => 'Nire profila',
-    'summary' => 'Hemen zure jarduera, saioak eta jabetzen egoera ikus ditzakezu.',
+    'summary' => 'Hemen zure jarduera, saioak eta zure datuen egoera ikus ditzakezu.',
     'tabs_aria' => 'Profilaren fitxak',
     'tabs' => [
         'overview' => 'Laburpena',

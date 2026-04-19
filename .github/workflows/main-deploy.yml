@@ -252,15 +252,10 @@ jobs:
             echo "::warning::No FTP port responded during preflight. Continuing with deploy attempts (FTPS/FTP fallback)."
           fi
 
-      - name: Verify lftp is available
+      - name: Install lftp
         run: |
-          if ! command -v lftp >/dev/null 2>&1; then
-            echo "lftp is not installed on this self-hosted runner."
-            echo "Install it once on the runner host and re-run the workflow."
-            exit 1
-          fi
-
-          lftp --version | head -n 1
+          sudo apt-get update
+          sudo apt-get install -y lftp
 
       - name: Deploy files via FTPS
         timeout-minutes: 30
