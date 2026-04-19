@@ -57,6 +57,17 @@
                     {{ __('admin.log_viewer') }}
                 </a>
 
+                <a href="{{ route('admin.artisan.database_copy') }}"
+                    class="inline-flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-800 shadow-sm transition hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2"
+                    data-admin-download-database-copy>
+                    <svg class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 16.5V4.5m0 12 4.5-4.5M12 16.5l-4.5-4.5M3.75 19.5h16.5" />
+                    </svg>
+                    {{ __('admin.database_copy.download_button') }}
+                </a>
+
                 @if (session('status'))
                     <p class="mt-3 text-sm font-medium text-green-700">
                         {{ session('status') }}

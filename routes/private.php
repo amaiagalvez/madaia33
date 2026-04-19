@@ -120,6 +120,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::post('/artisan/queue-work-stop-when-empty', [ArtisanController::class, 'queueWorkStopWhenEmpty'])
         ->middleware('role:superadmin')
         ->name('artisan.queue_work_stop_when_empty');
+    Route::get('/artisan/database-copy', [ArtisanController::class, 'downloadDatabaseCopy'])
+        ->middleware('role:superadmin')
+        ->name('artisan.database_copy');
 });
 
 Route::middleware('auth')->post('/impostazioa/itzuli-nire-erabiltzailea', function (Request $request) {

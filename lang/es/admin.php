@@ -123,6 +123,17 @@ return [
         'status_finished' => 'Cola procesada hasta vaciarse.',
         'status_failed' => 'No se pudo ejecutar la cola.',
     ],
+    'database_copy' => [
+        'download_button' => 'Descargar copia de BD',
+        'errors' => [
+            'connection_not_found' => 'No se pudo encontrar la conexión de base de datos.',
+            'unsupported_driver' => 'Este tipo de base de datos no admite descarga de copia.',
+            'sqlite_in_memory' => 'No se puede descargar una copia cuando SQLite está en memoria.',
+            'sqlite_file_missing' => 'No se encontró el archivo de base de datos SQLite.',
+            'database_name_missing' => 'Falta el nombre de la base de datos en la configuración.',
+            'dump_failed' => 'No se pudo generar la copia de la base de datos.',
+        ],
+    ],
     'legal' => [
         'privacy_policy' => 'Política de privacidad',
         'legal_notice' => 'Aviso legal',

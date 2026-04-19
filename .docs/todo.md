@@ -11,16 +11,16 @@
 - [ ] docker => pentest
 - [ ] dusk-test
 
-# Code
 ==> probar queue (production)
+==> Botón para descargar copia de la base de datos a local (production)
 ==> comprobar public/build carpeta (production)
 
+# Code
 - [ ] crear un aviso para las votaciones activas
 - [ ] spec kiro pendientes (obra)
-- [ ] repasar estatistikak home
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
-- Botón para descargar copia de la base de datos a local
+
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 - [ ] https://whatsapp.com/channel/0029VbCTbySGOj9pCe3Pnd47 Botoi bat iragarkiak honea bidaltzeko

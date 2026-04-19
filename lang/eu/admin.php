@@ -123,6 +123,17 @@ return [
         'status_finished' => 'Ilara hustu arte prozesatu da.',
         'status_failed' => 'Ezin izan da ilara exekutatu.',
     ],
+    'database_copy' => [
+        'download_button' => 'Deskargatu DB kopia',
+        'errors' => [
+            'connection_not_found' => 'Ezin izan da datu-basearen konexioa aurkitu.',
+            'unsupported_driver' => 'Datu-base mota honek ez du deskarga onartzen.',
+            'sqlite_in_memory' => 'SQLite memoria-konexioan ezin da fitxategi kopiarik deskargatu.',
+            'sqlite_file_missing' => 'SQLite datu-base fitxategia ez da aurkitu.',
+            'database_name_missing' => 'Datu-basearen izena ez dago konfigurazioan.',
+            'dump_failed' => 'Ezin izan da datu-basearen kopia sortu.',
+        ],
+    ],
     'legal' => [
         'privacy_policy' => 'Pribatutasun-politika',
         'legal_notice' => 'Lege-oharra',
