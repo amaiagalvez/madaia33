@@ -349,6 +349,11 @@ return [
             'voto_delegado' => 'Boto delegatua',
         ],
         'delegated_vote_terms_accepted' => 'Baldintzak',
+        'welcome_email' => [
+            'welcome_subject' => 'Ongi etorri - Zure sarbide-kodea',
+            'welcome_body' => '<p>Kaixo ##izena##,</p><p>Sistemara erregistratu zara. Zure sarbide-kodea hau da: <strong>##kodea##</strong></p><p>Gomendatzen dizugu zure profilan sartu eta pasahitza aldatzea <strong>"Pasahitza aldatu"</strong> botoia erabiliz.</p><p>##aldatu_pasahitza##</p>',
+            'change_password_button' => 'Pasahitza aldatu',
+        ],
     ],
     'votings' => [
         'menu' => 'Bozketak',

@@ -13,10 +13,10 @@
 
 # Code
 -- probar queue goian
--- cambiar texto ongi etorri arriba
-al crear un usuario desde el panel admin/erabiltzaileak, mandarle un mensaje avisandole de que se le ha dado de alta y cual es su código para entrar. Decirle que cambie la contraseña desde su perfil pinchando en el botón "Cambiar Contraseña".
+-- comprobar public/build carpeta
+al crear un usuario desde el panel admin/erabiltzaileak, mandarle un mensaje avisandole de que se le ha dado de alta y cual es su código para entrar. Decirle que cambie la contraseña desde su perfil pinchando en el botón "Cambiar Contraseña". (frogatzeko)
 -- crear un aviso para las votaciones activas
--- jabeak zerrenda en las columnas atariak, localak, garajeak eta trastelekuak mostrar los porcentajes de cada propiedad asignada (community_pct | location_pct) si la asignación de la propiedad está validada mostrarlo en verde, sino en rojo
+-- jabeak zerrenda en el panel en las columnas atariak, localak, garajeak eta trastelekuak mostrar los porcentajes de cada propiedad asignada (community_pct | location_pct) si la asignación de la propiedad está validada mostrarlo en verde, sino en rojo
 
 - spec kiro pendientes (obra)
 - [ ] repasar estatistikak home

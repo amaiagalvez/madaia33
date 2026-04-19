@@ -6,9 +6,11 @@ use App\Models\Owner;
 use App\Models\Voting;
 use Livewire\Livewire;
 use App\Models\Location;
+use App\Mail\UserWelcomeMail;
 use App\Models\VotingBallot;
 use App\Livewire\Admin\Users;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
@@ -334,4 +336,31 @@ it('resets user password to default value after confirmation modal flow', functi
     $fresh = $targetUser->fresh();
     expect(Hash::check('123456789', $fresh->password))->toBeTrue()
         ->and($fresh->code)->toBeNull();
+});
+
+it('sends welcome email with access code when creating a user from admin panel', function () {
+    Mail::fake();
+
+    $manager = adminUser();
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('createUser')
+        ->set('name', 'Email Welcome User')
+        ->set('email', 'email-welcome-user@example.com')
+        ->set('isActive', true)
+        ->set('selectedRoles', [])
+        ->set('selectedManagedLocations', [])
+        ->call('saveUser')
+        ->assertHasNoErrors();
+
+    $createdUser = User::query()->where('email', 'email-welcome-user@example.com')->firstOrFail();
+
+    Mail::assertSent(UserWelcomeMail::class, function (UserWelcomeMail $mail) use ($createdUser): bool {
+        return $mail->hasTo('email-welcome-user@example.com')
+            && is_string($createdUser->code)
+            && str_contains($mail->bodyHtml, (string) $createdUser->code)
+            && str_contains($mail->bodyHtml, route('security.edit'))
+            && str_contains($mail->bodyHtml, 'Pasahitza aldatu');
+    });
 });

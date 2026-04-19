@@ -302,3 +302,4 @@
 - En tablas Blade largas, un parche parcial puede dejar etiquetas `<td>`/`<th>` duplicadas y romper HTML silenciosamente; tras mover columnas, revisar cierre de celdas y ejecutar un test focalizado del listado afectado.
 
 - Cuando el usuario corrige el alcance (por ejemplo, "no cambiar el orden"), aplica un ajuste mínimo: revierte solo las asunciones introducidas por la corrección anterior y conserva el objetivo funcional principal con un test de regresión focalizado.
+- In i18n arrays, never reuse a scalar key as a nested namespace (e.g., `admin.users.email` string and `admin.users.email.*` array). Use a distinct namespace like `welcome_email`; key-shape collisions can trigger Blade `htmlspecialchars(): array given` 500s on pages that render the scalar label.

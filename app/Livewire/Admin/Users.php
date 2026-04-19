@@ -5,16 +5,19 @@ namespace App\Livewire\Admin;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
+use App\Models\Setting;
 use Livewire\Component;
 use App\Models\Location;
 use App\SupportedLocales;
 use Illuminate\Support\Str;
 use App\Models\VotingBallot;
 use Livewire\WithPagination;
+use App\Mail\UserWelcomeMail;
 use Illuminate\Validation\Rule;
 use App\Models\UserLoginSession;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class Users extends Component
 {
@@ -123,7 +126,9 @@ class Users extends Component
 
         abort_if($user->id === 1, 403);
 
-        if ($this->editingUserId === null) {
+        $isNewUser = $this->editingUserId === null;
+
+        if ($isNewUser) {
             $user->name = $validated['name'];
             $user->email = $validated['email'];
             $user->password = Str::password(20);
@@ -133,6 +138,10 @@ class Users extends Component
 
         $user->save();
         $user->syncOwnerIdentity();
+
+        if ($isNewUser) {
+            $this->sendWelcomeMail($user);
+        }
 
         $this->syncUserRolesAndLocations($user);
 
@@ -398,6 +407,41 @@ class Users extends Component
                 ->values()
                 ->all(),
         ]);
+    }
+
+    private function sendWelcomeMail(User $user): void
+    {
+        if (! $user->email) {
+            return;
+        }
+
+        $locale = SupportedLocales::normalize($user->language ?? SupportedLocales::DEFAULT);
+
+        $settings = Setting::stringValues(['from_address', 'from_name']);
+
+        $subject = __('admin.users.welcome_email.welcome_subject', locale: $locale);
+
+        $changePasswordUrl = route('security.edit');
+        $buttonLabel = __('admin.users.welcome_email.change_password_button', locale: $locale);
+        $buttonHtml = '<a href="' . $changePasswordUrl . '" style="display:inline-block;padding:10px 20px;background-color:#793d3d;color:#ffffff;text-decoration:none;border-radius:4px;font-weight:bold;">' . $buttonLabel . '</a>';
+
+        $bodyTemplate = __('admin.users.welcome_email.welcome_body', locale: $locale);
+
+        $bodyHtml = str_replace(
+            ['##izena##', '##kodea##', '##aldatu_pasahitza##'],
+            [$user->name, (string) ($user->code ?? ''), $buttonHtml],
+            $bodyTemplate,
+        );
+
+        Mail::to($user->email)->send(
+            new UserWelcomeMail(
+                fromAddress: $settings['from_address'] ?? null,
+                fromName: $settings['from_name'] ?? null,
+                subjectLine: $subject,
+                bodyHtml: $bodyHtml,
+                recipientLocale: $locale,
+            ),
+        );
     }
 
     private function currentUser(): ?User

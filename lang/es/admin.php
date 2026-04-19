@@ -349,6 +349,11 @@ return [
             'voto_delegado' => 'Voto delegado',
         ],
         'delegated_vote_terms_accepted' => 'Condiciones',
+        'welcome_email' => [
+            'welcome_subject' => 'Bienvenida - Tu código de acceso',
+            'welcome_body' => '<p>Hola ##izena##,</p><p>Has sido registrada en el sistema. Tu código de acceso es: <strong>##kodea##</strong></p><p>Te recomendamos acceder a tu perfil y cambiar tu contraseña usando el botón <strong>"Cambiar Contraseña"</strong>.</p><p>##aldatu_pasahitza##</p>',
+            'change_password_button' => 'Cambiar Contraseña',
+        ],
     ],
     'votings' => [
         'menu' => 'Votaciones',
