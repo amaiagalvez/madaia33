@@ -100,6 +100,18 @@ jobs:
           else
             git diff --name-status --find-renames "$EVENT_BEFORE" "$EVENT_SHA" > "$changes_file"
 
+            if [[ ! -s "$changes_file" ]]; then
+              echo "No files found in before..sha diff. Falling back to current commit file list."
+              git show --name-status --find-renames --pretty='' "$EVENT_SHA" > "$changes_file"
+            fi
+
+            echo "Detected git changes:"
+            if [[ -s "$changes_file" ]]; then
+              cat "$changes_file"
+            else
+              echo "(none)"
+            fi
+
             while IFS=$'\t' read -r status first_path second_path; do
               [[ -n "$status" ]] || continue
 
@@ -122,10 +134,12 @@ jobs:
               esac
 
               if is_excluded_path "$current_path"; then
+                echo "Skipping excluded path: $current_path"
                 continue
               fi
 
               if [[ -f "$current_path" ]]; then
+                echo "Staging upload: $current_path"
                 stage_file_for_upload "$current_path"
               fi
 
