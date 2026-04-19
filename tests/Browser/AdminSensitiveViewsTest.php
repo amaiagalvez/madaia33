@@ -152,6 +152,77 @@ test('admin owners list uses compact bidalketak-style actions with titles', func
     });
 });
 
+test('admin owners list shows id with language and highlights invalid contacts with whatsapp markers', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Dusk Contacts Owner',
+        'language' => 'es',
+        'coprop1_phone' => '600111222',
+        'coprop1_has_whatsapp' => true,
+        'coprop1_phone_invalid' => true,
+        'coprop2_name' => 'Second Contact',
+        'coprop2_phone' => '600333444',
+        'coprop2_has_whatsapp' => true,
+        'coprop2_email' => 'bad-email@example.com',
+        'coprop2_email_invalid' => true,
+    ]);
+
+    $location = Location::factory()->portal()->create();
+
+    $property = Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '5A',
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $owner) {
+        $script = strtr(<<<'JS'
+            (() => {
+                const row = document.querySelector('[data-owner-id="OWNER_ID"]');
+
+                if (!row) {
+                    return false;
+                }
+
+                const idCell = row.querySelector('[data-owner-id-cell]');
+                const ownerLanguage = row.querySelector('[data-owner-language]');
+                const coprop1 = row.querySelector('[data-owner-coprop1]');
+                const coprop1Phone = row.querySelector('[data-owner-coprop1-phone]');
+                const coprop1Whatsapp = row.querySelector('[data-owner-coprop1-whatsapp]');
+                const coprop2Email = row.querySelector('[data-owner-coprop2-email]');
+                const coprop2Phone = row.querySelector('[data-owner-coprop2-phone]');
+                const coprop2Whatsapp = row.querySelector('[data-owner-coprop2-whatsapp]');
+
+                if (!idCell || !ownerLanguage || !coprop1 || !coprop1Phone || !coprop1Whatsapp || !coprop2Email || !coprop2Phone || !coprop2Whatsapp) {
+                    return false;
+                }
+
+                const languageMovedToId = ownerLanguage.textContent.trim() === '[es]'
+                    && !coprop1.textContent.includes('[es]');
+
+                return idCell.classList.contains('text-center')
+                    && languageMovedToId
+                    && coprop1Phone.classList.contains('text-red-600')
+                    && coprop2Email.classList.contains('text-red-600');
+            })();
+        JS, [
+            'OWNER_ID' => (string) $owner->id,
+        ]);
+
+        $browser->loginAs($admin)
+            ->visit('/admin/jabeak')
+            ->waitFor('[data-owner-id="' . $owner->id . '"]', 10)
+            ->assertScript($script, true);
+    });
+});
+
 test('admin top user menu dropdown opens from the desktop header', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 

@@ -60,3 +60,6 @@ añadir una regla al agente amalur para que lo mantenga actualizado
 1-A Amaia Galvez          672239752 info@amaia.eus
 33I Aitor                 629407916
 33  Idoia Asenjo          688894172
+
+//123456789
+$2y$12$uaKH0btUF6aJXzp.FXKSBOzqtSJER5FjViLkHfklpmcj2x/sJxqj2
