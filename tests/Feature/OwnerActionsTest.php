@@ -7,6 +7,7 @@ use App\Models\Property;
 use App\Mail\OwnerWelcomeMail;
 use App\Models\CampaignRecipient;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Actions\Owners\CreateOwnerAction;
 use App\Actions\Owners\DeactivateOwnerAction;
@@ -47,6 +48,8 @@ describe('CreateOwnerAction', function () {
         expect($user)->not->toBeNull()
             ->and($user->name)->toBe('Miren Etxeberria')
             ->and($user->email)->toBe('miren@example.com')
+            ->and($user->code)->toMatch('/^\d{9}$/')
+            ->and(Hash::check((string) $user->code, (string) $user->password))->toBeTrue()
             ->and($user->is_active)->toBeTrue();
     });
 
@@ -54,7 +57,7 @@ describe('CreateOwnerAction', function () {
         Mail::fake();
 
         createSetting('owners_welcome_subject_eu', 'Ongi etorri Madaia 33ra');
-        createSetting('owners_welcome_text_eu', '<p>Kaixo ##izena##</p>##info##');
+        createSetting('owners_welcome_text_eu', '<p>Kaixo ##izena##</p><p>Kodea: ##kodea##</p>##info##');
 
         $portal = Location::factory()->portal()->create(['code' => '33-A']);
         $property = Property::factory()->create([
@@ -76,13 +79,20 @@ describe('CreateOwnerAction', function () {
             ],
         ]);
 
-        expect($owner->fresh())->welcome->toBeTrue();
+        $owner->load('user');
+        $ownerCode = $owner->user?->code;
 
-        Mail::assertSent(OwnerWelcomeMail::class, function (OwnerWelcomeMail $mail): bool {
+        expect($owner->fresh())->welcome->toBeTrue();
+        expect($ownerCode)->toMatch('/^\d{9}$/');
+
+        Mail::assertSent(OwnerWelcomeMail::class, function (OwnerWelcomeMail $mail) use ($ownerCode): bool {
             return $mail->hasTo('miren@example.com')
                 && $mail->subjectLine === 'Ongi etorri Madaia 33ra'
                 && str_contains($mail->bodyHtml, 'Kaixo Miren Etxeberria')
-                && str_contains($mail->bodyHtml, '33-A 1A');
+                && str_contains($mail->bodyHtml, 'Kodea: ' . (string) $ownerCode)
+                && ! str_contains($mail->bodyHtml, '**** (zure pasahitza)')
+                && str_contains($mail->bodyHtml, '33-A 1A')
+                && ! str_contains($mail->render(), __('admin.owners.email.reset_action'));
         });
 
         $recipient = CampaignRecipient::query()
@@ -91,10 +101,67 @@ describe('CreateOwnerAction', function () {
             ->latest('id')
             ->first();
 
+        $recipientBody = (string) ($recipient?->message_body ?? '');
+
         expect($recipient)->not->toBeNull()
             ->and($recipient?->status)->toBe('sent')
             ->and($recipient?->message_subject)->toBe('Ongi etorri Madaia 33ra')
             ->and($recipient?->tracking_token)->not->toBe('');
+
+        expect(str_contains($recipientBody, 'Kodea: ' . (string) $ownerCode))->toBeTrue()
+            ->and(str_contains($recipientBody, '**** (zure pasahitza)'))->toBeFalse();
+    });
+
+    it('replaces the welcome password placeholder in spanish without exposing the generated code', function () {
+        Mail::fake();
+
+        createSetting('owners_welcome_subject_es', 'Bienvenida a Madaia 33');
+        createSetting('owners_welcome_text_es', '<p>Hola ##izena##</p><p>Clave: ##kodea##</p>##info##');
+
+        $action = new CreateOwnerAction;
+        $owner = $action->execute([
+            'coprop1_name' => 'Maria Perez',
+            'coprop1_dni' => '12345678Z',
+            'coprop1_email' => 'maria@example.com',
+            'language' => 'es',
+        ]);
+
+        $owner->load('user');
+        $ownerCode = $owner->user?->code;
+
+        expect($ownerCode)->toMatch('/^\d{9}$/');
+
+        Mail::assertSent(OwnerWelcomeMail::class, function (OwnerWelcomeMail $mail) use ($ownerCode): bool {
+            return $mail->hasTo('maria@example.com')
+                && $mail->subjectLine === 'Bienvenida a Madaia 33'
+                && str_contains($mail->bodyHtml, 'Clave: ' . (string) $ownerCode)
+                && ! str_contains($mail->bodyHtml, '***** (tu contraseña)');
+        });
+    });
+
+    it('shows placeholder in welcome email when user code is null', function () {
+        Mail::fake();
+
+        createSetting('owners_welcome_subject_eu', 'Ongi etorri');
+        createSetting('owners_welcome_text_eu', '<p>Kodea: ##kodea##</p>');
+
+        $action = new CreateOwnerAction;
+        $owner = $action->execute([
+            'coprop1_name' => 'Itziar Mendez',
+            'coprop1_dni' => '11111111A',
+            'coprop1_email' => 'itziar@example.com',
+        ]);
+
+        $owner->user?->update(['code' => null]);
+
+        Mail::fake();
+
+        (new CreateOwnerAction)->sendWelcomeMailToOwner($owner->fresh());
+
+        Mail::assertSent(OwnerWelcomeMail::class, function (OwnerWelcomeMail $mail): bool {
+            return $mail->hasTo('itziar@example.com')
+                && str_contains($mail->bodyHtml, 'Kodea: **** (zure pasahitza)');
+        });
     });
 
     it('creates owner with optional second co-owner data', function () {
@@ -176,7 +243,7 @@ describe('CreateOwnerAction', function () {
 
         $action = new CreateOwnerAction;
 
-        expect(fn () => $action->execute([
+        expect(fn() => $action->execute([
             'coprop1_name' => 'Miren Etxeberria',
             'coprop1_dni' => '12345678Z',
             'coprop1_email' => 'miren@example.com',

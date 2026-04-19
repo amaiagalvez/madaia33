@@ -303,7 +303,8 @@ return [
         ],
         'email' => [
             'default_subject' => 'Madaia 33 - Confirmación de propiedad',
-            'default_body' => '<p>Hola ##izena##,</p><p>Se te han asignado las siguientes propiedades:</p>##info##',
+            'default_body' => '<p>Hola ##izena##,</p><p>Tu codigo de acceso es: <strong>##kodea##</strong></p><p>Se te han asignado las siguientes propiedades:</p>##info##',
+            'password_placeholder' => '***** (tu contraseña)',
             'no_properties' => 'No hay propiedades asignadas.',
             'reset_action' => 'Configurar contraseña',
         ],

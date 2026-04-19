@@ -7,6 +7,7 @@ return [
     'after_or_equal' => 'El campo :attribute debe ser una fecha posterior o igual a :date.',
     'array' => 'El campo :attribute debe ser un array.',
     'boolean' => 'El campo :attribute debe ser verdadero o falso.',
+    'confirmed' => 'La confirmación de :attribute no coincide.',
     'date' => 'El campo :attribute debe ser una fecha valida.',
     'email' => 'El campo :attribute debe ser una direccion de correo valida.',
     'exists' => 'El :attribute seleccionado no es valido.',
@@ -59,5 +60,9 @@ return [
         'editCoprop1Email' => 'email',
         'inlineStartDate' => 'fecha de inicio',
         'inlineEndDate' => 'fecha fin',
+        'password' => 'contraseña',
+        'password_confirmation' => 'confirmación de contraseña',
+        'email' => 'correo electrónico',
+        'current_password' => 'contraseña actual',
     ],
 ];

@@ -67,7 +67,11 @@
             "matchCommandLine": true
         },
         "docker exec": true,
-        "set": true
+        "set": true,
+        "/^php -r 'require \"vendor/autoload\\.php\"; \\$app = require \"bootstrap/app\\.php\"; \\$app->loadEnvironmentFrom\\(\"\\.env\\.testing\"\\); \\$kernel = \\$app->make\\(\"Illuminate\\\\\\\\Contracts\\\\\\\\Console\\\\\\\\Kernel\"\\); \\$kernel->bootstrap\\(\\); config\\(\\[\"database\\.default\" => \"sqlite\", \"database\\.connections\\.sqlite\\.database\" => \":memory:\"\\]\\); Illuminate\\\\Support\\\\Facades\\\\Artisan::call\\(\"migrate\", \\[\"--force\" => true\\]\\); foreach \\(Illuminate\\\\Support\\\\Facades\\\\DB::select\\(\"PRAGMA table_info\\(users\\)\"\\) as \\$column\\) \\{ echo \\$column->name \\. \"\\|\" \\. \\$column->type \\. \"\\|\" \\. \\$column->notnull \\. PHP_EOL; \\}'$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     },
     "chat.promptFilesRecommendations": {
         "speckit.constitution": true,

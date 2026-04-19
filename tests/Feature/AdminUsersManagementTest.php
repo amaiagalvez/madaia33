@@ -317,6 +317,7 @@ it('resets user password to default value after confirmation modal flow', functi
     $manager = adminUser();
 
     $targetUser = User::factory()->create([
+        'code' => '123456789',
         'email' => 'reset-password-user@example.com',
         'password' => 'old-secret-pass',
     ]);
@@ -330,5 +331,7 @@ it('resets user password to default value after confirmation modal flow', functi
         ->assertSet('confirmingResetPasswordUserId', null)
         ->assertSet('showResetPasswordModal', false);
 
-    expect(Hash::check('123456789', $targetUser->fresh()->password))->toBeTrue();
+    $fresh = $targetUser->fresh();
+    expect(Hash::check('123456789', $fresh->password))->toBeTrue()
+        ->and($fresh->code)->toBeNull();
 });

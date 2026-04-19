@@ -304,7 +304,8 @@ return [
         ],
         'email' => [
             'default_subject' => 'Madaia 33 - Jabetza baieztapena',
-            'default_body' => '<p>Kaixo ##izena##,</p><p>Ondoko jabetzak esleitu zaizkizu:</p>##info##',
+            'default_body' => '<p>Kaixo ##izena##,</p><p>Zure sarbide-kodea hau da: <strong>##kodea##</strong></p><p>Ondoko jabetzak esleitu zaizkizu:</p>##info##',
+            'password_placeholder' => '**** (zure pasahitza)',
             'no_properties' => 'Ez dago esleitutako jabetzarik.',
             'reset_action' => 'Pasahitza ezarri',
         ],

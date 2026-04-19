@@ -8,14 +8,11 @@ use App\Models\Owner;
 use App\Models\Setting;
 use App\Models\Property;
 use App\SupportedLocales;
-use Illuminate\Support\Str;
 use App\Mail\OwnerWelcomeMail;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use App\Support\Messaging\CampaignTrackingUrlBuilder;
 use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
@@ -34,9 +31,7 @@ class CreateOwnerAction
      */
     public function execute(array $data): Owner
     {
-        $password = Str::password(16);
-
-        $result = DB::transaction(fn (): array => $this->createOwnerWithAssignments($data, $password));
+        $result = DB::transaction(fn(): array => $this->createOwnerWithAssignments($data));
 
         /** @var Owner $owner */
         $owner = $result['owner'];
@@ -54,9 +49,9 @@ class CreateOwnerAction
      * @param  array<string, mixed>  $data
      * @return array{owner: Owner, user: User}
      */
-    private function createOwnerWithAssignments(array $data, string $password): array
+    private function createOwnerWithAssignments(array $data): array
     {
-        $user = $this->createUser($data, $password);
+        $user = $this->createUser($data);
         $owner = $this->createOwner($user, $data);
 
         $this->createAssignments($owner, $data['assignments'] ?? []);
@@ -70,12 +65,15 @@ class CreateOwnerAction
     /**
      * @param  array<string, mixed>  $data
      */
-    private function createUser(array $data, string $password): User
+    private function createUser(array $data): User
     {
+        $code = User::generateUniqueCode();
+
         return User::create([
             'name' => $data['coprop1_name'],
             'email' => $data['coprop1_email'],
-            'password' => Hash::make($password),
+            'code' => $code,
+            'password' => $code,
             'is_active' => true,
             'language' => $data['language'] ?? SupportedLocales::default(),
         ]);
@@ -220,17 +218,19 @@ class CreateOwnerAction
             $locale,
         ) ?? __('admin.owners.email.default_body'));
 
+        $passwordDisplay = $user->code === null
+            ? __('admin.owners.email.password_placeholder', locale: $locale)
+            : $user->code;
+
         $bodyHtml = str_replace(
-            ['##izena##', '##info##'],
-            [(string) (($data['coprop1_name'] ?? null) ?: $owner->coprop1_name ?: $user->name), $this->buildAssignmentsInfoHtml($owner, $data)],
+            ['##izena##', '##info##', '##kodea##'],
+            [
+                (string) (($data['coprop1_name'] ?? null) ?: $owner->coprop1_name ?: $user->name),
+                $this->buildAssignmentsInfoHtml($owner, $data),
+                (string) $passwordDisplay,
+            ],
             $bodyTemplate,
         );
-
-        $resetToken = Password::createToken($user);
-        $resetUrl = route('password.reset', [
-            'token' => $resetToken,
-            'email' => $user->email,
-        ]);
 
         $recipient = $this->recordDirectMessageRecipientAction()->execute(
             owner: $owner,
@@ -241,7 +241,6 @@ class CreateOwnerAction
         );
 
         $trackedBodyHtml = $this->trackingUrlBuilder()->withTrackedLinks($bodyHtml, $recipient->tracking_token);
-        $trackedResetUrl = $this->trackingUrlBuilder()->trackedClickUrl($recipient->tracking_token, $resetUrl);
         $trackingPixelUrl = $this->trackingUrlBuilder()->openPixelUrl($recipient->tracking_token);
 
         Mail::to($user->email)->send(new OwnerWelcomeMail(
@@ -249,9 +248,7 @@ class CreateOwnerAction
             $settings['from_name'] ?? null,
             $subject,
             $trackedBodyHtml,
-            $resetUrl,
             $trackingPixelUrl,
-            $trackedResetUrl,
             $locale,
         ));
     }
@@ -293,7 +290,7 @@ class CreateOwnerAction
     {
         $propertyIds = collect($assignments)
             ->pluck('property_id')
-            ->map(static fn (int|string $propertyId): int => (int) $propertyId)
+            ->map(static fn(int|string $propertyId): int => (int) $propertyId)
             ->unique()
             ->values()
             ->all();
@@ -305,7 +302,7 @@ class CreateOwnerAction
             ->keyBy('id');
 
         return collect($assignments)
-            ->map(fn (array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
+            ->map(fn(array $assignment): ?string => $this->assignmentItemFromProperty($properties->get((int) $assignment['property_id'])))
             ->filter()
             ->values()
             ->all();
@@ -317,7 +314,7 @@ class CreateOwnerAction
     private function buildAssignmentItemsFromOwner(Owner $owner): array
     {
         return $owner->assignments
-            ->map(fn (PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
+            ->map(fn(PropertyAssignment $assignment): ?string => $this->assignmentItemFromProperty($assignment->property))
             ->filter()
             ->values()
             ->all();

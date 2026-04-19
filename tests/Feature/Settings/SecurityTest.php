@@ -71,6 +71,7 @@ test('two factor authentication disabled when confirmation abandoned between req
 
 test('password can be updated', function () {
     $user = User::factory()->create([
+        'code' => '123456789',
         'password' => Hash::make('password'),
     ]);
 
@@ -84,7 +85,8 @@ test('password can be updated', function () {
 
     $response->assertHasNoErrors();
 
-    expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
+    expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue()
+        ->and($user->code)->toBeNull();
 });
 
 test('correct password must be provided to update password', function () {
