@@ -2,10 +2,10 @@
 
 return [
     'title' => 'Nire profila',
-    'seo_description' => 'Erabiltzailearen profila: bozketak, saioak eta jabetzen balidazioa.',
+    'seo_description' => 'Erabiltzailearen profila: bozketak, saioak eta zure datuen balidazioa.',
     'kicker' => 'Erabiltzaile-gunea',
     'heading' => 'Nire profila',
-    'summary' => 'Hemen zure jarduera, saioak eta jabetzen egoera ikus ditzakezu.',
+    'summary' => 'Hemen zure jarduera, saioak eta zure datuen egoera ikus ditzakezu.',
     'tabs_aria' => 'Profilaren fitxak',
     'tabs' => [
         'overview' => 'Laburpena',
@@ -13,7 +13,7 @@ return [
         'sessions' => 'Saioak',
         'received' => 'Jasotako mezuak',
         'messages' => 'Bidalitako mezuak',
-        'owner' => 'Jabearen fitxa',
+        'owner' => 'Nire Datuak',
     ],
     'overview' => [
         'title' => 'Laburpena',
@@ -24,18 +24,18 @@ return [
         'change_password' => 'Pasahitza aldatu',
     ],
     'votings' => [
-        'title' => 'Nire bozketak',
-        'participated_title' => 'Egin dituzun bozketak',
+        'title' => 'Bozketak',
+        'participated_title' => 'Bozkatu dituzunak',
         'empty' => 'Oraindik ez duzu bozketarik egin.',
-        'pending_active_title' => 'Aktibo dauden eta egiteke dituzunak',
+        'pending_active_title' => 'Aktibo daudenak eta egiteke dituzunak',
         'pending_active_empty' => 'Ez duzu aktibo dagoen bozketa pendienterik.',
         'go_to_front' => 'Bozketetara joan',
-        'missed_closed_title' => 'Itxita dauden eta bozkatu ez zenituenak',
+        'missed_closed_title' => 'Itxita daudenak eta bozkatu ez zenituenak',
         'missed_closed_empty' => 'Ez duzu bozkatu gabe itxitako bozketa historikorik.',
         'voting' => 'Bozketa',
         'starts_at' => 'Hasiera',
         'ends_at' => 'Amaiera',
-        'voted_at' => 'Noiz bozkatu duzun',
+        'voted_at' => 'Noiz',
     ],
     'sessions' => [
         'title' => 'Zure saioak',
