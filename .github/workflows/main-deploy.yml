@@ -1,8 +1,5 @@
 name: Deploy to Dinahost (Web Hosting)
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 on:
   push:
     branches:
@@ -35,7 +32,7 @@ jobs:
           --optimize-autoloader
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
 
@@ -164,10 +161,11 @@ jobs:
             set ftp:prefer-epsv false;
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftps://$FTP_SERVER';
             echo 'Connected with FTPS';
-            mirror -R --delete --verbose \              
-              --include-glob 'public/build/**' \
-              --include-glob 'public/build/manifest.json' \
-              --exclude-glob '.git*' \
+              mirror -R --delete --verbose \
+              --exclude-glob '.git' \
+              --exclude-glob '.git/**' \
+              --exclude-glob '.gitattributes' \
+              --exclude-glob '.gitignore' \
               --exclude-glob '.github/**' \
               --exclude-glob '.docs/**' \
               --exclude-glob '.kiro/**' \
@@ -213,9 +211,10 @@ jobs:
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$fallback_port' 'ftp://$FTP_SERVER';
             echo 'Connected with FTP fallback';
             mirror -R --delete --verbose \
-              --include-glob 'public/build/**' \
-              --include-glob 'public/build/manifest.json' \
-              --exclude-glob '.git*' \
+              --exclude-glob '.git' \
+              --exclude-glob '.git/**' \
+              --exclude-glob '.gitattributes' \
+              --exclude-glob '.gitignore' \
               --exclude-glob '.github/**' \
               --exclude-glob '.docs/**' \
               --exclude-glob '.kiro/**' \
