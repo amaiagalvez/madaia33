@@ -10,7 +10,7 @@ class DirectMessagesCampaignSeeder extends Seeder
     public function run(): void
     {
         Campaign::unguarded(function (): void {
-            Campaign::query()->updateOrCreate(
+            Campaign::withTrashed()->firstOrCreate(
                 ['id' => 1],
                 [
                     'created_by_user_id' => null,

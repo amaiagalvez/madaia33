@@ -2,13 +2,14 @@
 
 namespace App\Actions\Campaigns;
 
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Queue;
 use Throwable;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Artisan;
 
 class RunQueueWorkStopWhenEmptyAction
 {
     private const MAX_JOBS_PER_REQUEST = 1000;
+
     private const MAX_SECONDS_PER_REQUEST = 300;
 
     public function execute(): bool

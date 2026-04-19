@@ -1,10 +1,13 @@
 <?php
 
 use Livewire\Livewire;
+use App\Models\Owner;
 use App\Models\Campaign;
 use App\Models\CampaignTemplate;
+use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\Messaging\DispatchCampaignJob;
+use Database\Seeders\DirectMessagesCampaignSeeder;
 use Database\Seeders\CampaignTemplateSeeder;
 
 it('seeds the owner welcome campaign template once', function () {
@@ -19,6 +22,61 @@ it('seeds the owner welcome campaign template once', function () {
         ->and($template?->subject_es)->toBe('Madaia 33 - Confirmación de propiedad')
         ->and($template?->channel)->toBe('email')
         ->and(CampaignTemplate::query()->where('name', 'Bienvenida propietaria')->count())->toBe(1);
+});
+
+it('does not overwrite an existing owner welcome campaign template when seeding', function () {
+    $template = CampaignTemplate::factory()->create([
+        'name' => 'Bienvenida propietaria',
+        'subject_eu' => 'Gaia pertsonalizatua',
+        'subject_es' => 'Asunto personalizado',
+        'body_eu' => 'Edukia pertsonalizatua',
+        'body_es' => 'Contenido personalizado',
+        'channel' => 'sms',
+    ]);
+
+    app(CampaignTemplateSeeder::class)->run();
+
+    expect($template->fresh())
+        ->not->toBeNull()
+        ->subject_eu->toBe('Gaia pertsonalizatua')
+        ->subject_es->toBe('Asunto personalizado')
+        ->body_eu->toBe('Edukia pertsonalizatua')
+        ->body_es->toBe('Contenido personalizado')
+        ->channel->toBe('sms');
+});
+
+it('does not overwrite the direct messages campaign when ensuring it exists', function () {
+    $campaign = Campaign::factory()->create([
+        'id' => 1,
+        'created_by_user_id' => null,
+        'subject_eu' => 'Kanpaina pertsonalizatua',
+        'subject_es' => 'Campana personalizada',
+        'body_eu' => 'Mezu pertsonalizatua',
+        'body_es' => 'Mensaje personalizado',
+        'channel' => 'email',
+        'status' => 'draft',
+        'sent_at' => null,
+    ]);
+
+    app(DirectMessagesCampaignSeeder::class)->run();
+
+    $owner = Owner::factory()->create();
+
+    app(RecordDirectMessageRecipientAction::class)->execute(
+        $owner,
+        $owner->coprop1_email,
+        'Asunto envio',
+        'Cuerpo envio',
+    );
+
+    expect($campaign->fresh())
+        ->not->toBeNull()
+        ->subject_eu->toBe('Kanpaina pertsonalizatua')
+        ->subject_es->toBe('Campana personalizada')
+        ->body_eu->toBe('Mezu pertsonalizatua')
+        ->body_es->toBe('Mensaje personalizado')
+        ->status->toBe('draft')
+        ->sent_at->toBeNull();
 });
 
 it('applies a template to the campaign manager form', function () {
@@ -62,8 +120,8 @@ it('dispatches only due scheduled campaigns and can cancel a schedule', function
     test()->artisan('campaigns:dispatch-scheduled')
         ->assertSuccessful();
 
-    Bus::assertDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $dueCampaign->id);
-    Bus::assertNotDispatched(DispatchCampaignJob::class, fn (DispatchCampaignJob $job): bool => $job->campaignId === $futureCampaign->id);
+    Bus::assertDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $dueCampaign->id);
+    Bus::assertNotDispatched(DispatchCampaignJob::class, fn(DispatchCampaignJob $job): bool => $job->campaignId === $futureCampaign->id);
 
     $dueCampaign->refresh();
     $futureCampaign->refresh();
