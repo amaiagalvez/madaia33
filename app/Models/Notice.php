@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Concerns\ResolvesLocalizedAttributes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Notice extends Model
@@ -24,6 +25,7 @@ class Notice extends Model
         'title_es',
         'content_eu',
         'content_es',
+        'notice_tag_id',
         'is_public',
         'published_at',
     ];
@@ -39,6 +41,22 @@ class Notice extends Model
     public function locations(): HasMany
     {
         return $this->hasMany(NoticeLocation::class);
+    }
+
+    /**
+     * @return BelongsTo<NoticeTag, $this>
+     */
+    public function tag(): BelongsTo
+    {
+        return $this->belongsTo(NoticeTag::class, 'notice_tag_id');
+    }
+
+    /**
+     * @return HasMany<NoticeDocument, $this>
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(NoticeDocument::class);
     }
 
     /**

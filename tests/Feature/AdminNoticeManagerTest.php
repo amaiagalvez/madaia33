@@ -9,6 +9,12 @@ use App\Models\Notice;
 use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
+use App\Models\NoticeTag;
+use App\Models\Construction;
+use App\Models\NoticeDocument;
+use Illuminate\Http\UploadedFile;
+use App\Models\NoticeDocumentDownload;
+use Illuminate\Support\Facades\Storage;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Property 8: Notice publish toggle is reversible
@@ -420,4 +426,108 @@ it('shows only managed-location notices to community admin users', function () {
         ->assertSee('Iragarki Kudeatua')
         ->assertDontSee('Iragarki Kanpokoa')
         ->assertDontSee('Iragarki Orokor CA');
+});
+
+it('shows only assigned construction tags to construction manager', function () {
+    foreach (Role::names() as $roleName) {
+        Role::query()->firstOrCreate(['name' => $roleName]);
+    }
+
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::CONSTRUCTION_MANAGER);
+
+    $assignedConstruction = Construction::factory()->create([
+        'title' => 'Obra A',
+        'slug' => 'obra-a',
+    ]);
+    $otherConstruction = Construction::factory()->create([
+        'title' => 'Obra B',
+        'slug' => 'obra-b',
+    ]);
+
+    $manager->constructions()->sync([$assignedConstruction->id]);
+
+    $assignedTag = NoticeTag::query()->where('slug', 'obra-' . $assignedConstruction->slug)->firstOrFail();
+    $otherTag = NoticeTag::query()->where('slug', 'obra-' . $otherConstruction->slug)->firstOrFail();
+
+    Livewire::actingAs($manager)
+        ->test('admin-notice-manager')
+        ->call('createNotice')
+        ->assertSee($assignedTag->name)
+        ->assertDontSee($otherTag->name);
+});
+
+it('forbids construction manager from assigning unowned construction tag', function () {
+    foreach (Role::names() as $roleName) {
+        Role::query()->firstOrCreate(['name' => $roleName]);
+    }
+
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::CONSTRUCTION_MANAGER);
+
+    $assignedConstruction = Construction::factory()->create([
+        'slug' => 'baimendua',
+    ]);
+    $otherConstruction = Construction::factory()->create([
+        'slug' => 'debekatua',
+    ]);
+
+    $manager->constructions()->sync([$assignedConstruction->id]);
+
+    $otherTag = NoticeTag::query()->where('slug', 'obra-' . $otherConstruction->slug)->firstOrFail();
+
+    Livewire::actingAs($manager)
+        ->test('admin-notice-manager')
+        ->set('titleEu', 'Manager test')
+        ->set('contentEu', 'Edukia')
+        ->set('selectedTagId', $otherTag->id)
+        ->call('saveNotice')
+        ->assertForbidden();
+});
+
+it('validates unsupported document mime type on notice save', function () {
+    Storage::fake('public');
+
+    $user = adminUser();
+
+    $invalidAttachment = UploadedFile::fake()->create('script.exe', 20, 'application/octet-stream');
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->set('titleEu', 'Iragarki MIME')
+        ->set('contentEu', 'Edukia')
+        ->set('attachments', [$invalidAttachment])
+        ->call('saveNotice')
+        ->assertHasErrors(['attachments.0' => 'mimes']);
+});
+
+it('shows notice downloads count in admin list', function () {
+    $user = adminUser();
+
+    $notice = Notice::factory()->create([
+        'title_eu' => 'Iragarki deskargak',
+    ]);
+
+    $document = NoticeDocument::factory()->create([
+        'notice_id' => $notice->id,
+    ]);
+
+    NoticeDocumentDownload::query()->create([
+        'notice_document_id' => $document->id,
+        'user_id' => $user->id,
+        'ip_address' => '127.0.0.1',
+        'downloaded_at' => now(),
+    ]);
+
+    NoticeDocumentDownload::query()->create([
+        'notice_document_id' => $document->id,
+        'user_id' => $user->id,
+        'ip_address' => '127.0.0.1',
+        'downloaded_at' => now(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->assertSeeHtml('data-notice-download-count="' . $notice->id . '"')
+        ->assertSee('2');
 });

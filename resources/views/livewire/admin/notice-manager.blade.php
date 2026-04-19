@@ -71,9 +71,63 @@
                     <x-admin.bilingual-rich-text-tabs :title="__('notices.admin.content')" :locale-configs="$this->localeConfigsFor('content', 'notices.admin.content')"
                         :required-primary="true" />
 
+                    <flux:field>
+                        <flux:label>{{ __('notices.admin.tag') }}</flux:label>
+                        <flux:select wire:model="selectedTagId" data-notice-tag-select>
+                            <option value="">{{ __('notices.admin.tag_none') }}</option>
+                            @foreach ($noticeTags as $tag)
+                                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                            @endforeach
+                        </flux:select>
+                        <flux:error name="selectedTagId" />
+                    </flux:field>
+
                     <x-admin.form-multi-checkbox-pills :legend="__('notices.admin.locations')" :options="$allLocations"
                         model="selectedLocations" value-key="code" label-key="label"
                         :empty-message="__('notices.admin.global_only')" />
+
+                    <flux:field>
+                        <flux:label>{{ __('notices.admin.documents') }}</flux:label>
+                        <input type="file" wire:model="attachments" multiple
+                            data-notice-documents-input
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700" />
+                        <flux:error name="attachments.*" />
+                        @if ($editingId)
+                            <div class="mt-2">
+                                <flux:button type="button" variant="primary"
+                                    wire:click="uploadDocument({{ $editingId }})">
+                                    {{ __('notices.admin.upload_documents') }}
+                                </flux:button>
+                            </div>
+                        @endif
+                    </flux:field>
+
+                    @if ($storedDocuments !== [])
+                        <div class="space-y-2" data-notice-documents-list>
+                            @foreach ($storedDocuments as $document)
+                                <div
+                                    class="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
+                                    <div class="text-sm text-gray-700">
+                                        <span>{{ $document['filename'] }}</span>
+                                        <span class="ml-2 text-xs text-gray-500">
+                                            {{ __('notices.admin.downloads_count') }}:
+                                            {{ $document['downloads_count'] }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <flux:button type="button" size="xs" variant="ghost"
+                                            wire:click="toggleDocumentPublic({{ $document['id'] }})">
+                                            {{ $document['is_public'] ? __('notices.admin.document_public') : __('notices.admin.document_private') }}
+                                        </flux:button>
+                                        <flux:button type="button" size="xs" variant="danger"
+                                            wire:click="removeDocument({{ $document['id'] }})">
+                                            {{ __('general.buttons.delete') }}
+                                        </flux:button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
 
                     <x-admin.form-boolean-toggle :label="__('notices.admin.is_public')" model="isPublic"
                         :value="$isPublic" :true-label="__('admin.common.yes')" :false-label="__('admin.common.no')" />
@@ -94,6 +148,10 @@
                 </x-admin.table-header-cell>
 
                 <x-admin.table-header-cell>
+                    {{ __('notices.admin.tag') }}
+                </x-admin.table-header-cell>
+
+                <x-admin.table-header-cell>
                     {{ __('notices.admin.locations') }}
                 </x-admin.table-header-cell>
 
@@ -111,6 +169,10 @@
                     @endif
                 </x-admin.table-header-cell>
 
+                <x-admin.table-header-cell>
+                    {{ __('notices.admin.downloads_count') }}
+                </x-admin.table-header-cell>
+
                 <x-admin.table-header-cell class="relative">
                     <span class="sr-only">{{ __('general.buttons.edit') }}</span>
                 </x-admin.table-header-cell>
@@ -121,6 +183,16 @@
                 <tr wire:key="notice-row-{{ $notice->id }}">
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">
                         {{ $notice->title_eu }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        @if ($notice->tag)
+                            <span
+                                class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                                {{ $notice->tag->name }}
+                            </span>
+                        @else
+                            <span class="text-gray-400">—</span>
+                        @endif
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
                         @if ($notice->locations->isNotEmpty())
@@ -151,6 +223,10 @@
                     <td class="px-6 py-4 text-sm text-gray-500">
                         {{ $notice->published_at?->format('d/m/Y') ?? '—' }}
                     </td>
+                    <td class="px-6 py-4 text-sm text-gray-500"
+                        data-notice-download-count="{{ $notice->id }}">
+                        {{ $notice->documents->sum('downloads_count') }}
+                    </td>
                     <td class="px-6 py-4 text-right text-sm font-medium">
                         <x-admin.table-row-actions>
                             <x-admin.icon-button-edit
@@ -162,7 +238,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('notices.empty') }}
                     </td>
                 </tr>
@@ -223,21 +299,24 @@
                     <div
                         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full {{ $publishAction === 'publish' ? 'bg-green-100' : 'bg-amber-100' }}">
                         @if ($publishAction === 'publish')
-                            <svg class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <svg class="h-5 w-5 text-green-600" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         @else
-                            <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <svg class="h-5 w-5 text-amber-600" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
                             </svg>
                         @endif
                     </div>
                     <div>
-                        <h3 id="publish-modal-title" class="text-base font-semibold text-gray-900">
+                        <h3 id="publish-modal-title"
+                            class="text-base font-semibold text-gray-900">
                             {{ $publishAction === 'publish' ? __('notices.admin.publish') : __('notices.admin.unpublish') }}
                         </h3>
                         <p class="mt-1 text-sm text-gray-600">

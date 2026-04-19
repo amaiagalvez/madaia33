@@ -67,7 +67,8 @@
             "matchCommandLine": true
         },
         "docker exec": true,
-        "set": true
+        "set": true,
+        "git stash": true
     },
     "chat.promptFilesRecommendations": {
         "speckit.constitution": true,

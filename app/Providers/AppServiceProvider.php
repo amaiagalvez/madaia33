@@ -5,12 +5,14 @@ namespace App\Providers;
 use Throwable;
 use App\Models\Setting;
 use Carbon\CarbonImmutable;
+use App\Models\Construction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
+use App\Observers\ConstructionObserver;
 use App\Support\ConfiguredMailSettings;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->registerModelObservers();
         $this->registerMessagingRateLimiters();
         $this->applyConfiguredMailSettings();
         $this->registerLegacyBladeComponentAliases();
@@ -60,6 +63,11 @@ class AppServiceProvider extends ServiceProvider
     protected function registerMessagingRateLimiters(): void
     {
         RateLimiter::for('campaign-email-send', fn (): Limit => Limit::perMinute(10)->by('campaign-email-send'));
+    }
+
+    protected function registerModelObservers(): void
+    {
+        Construction::observe(ConstructionObserver::class);
     }
 
     /**

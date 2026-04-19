@@ -128,6 +128,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Location::class);
     }
 
+    /**
+     * @return BelongsToMany<Construction, $this>
+     */
+    public function constructions(): BelongsToMany
+    {
+        return $this->belongsToMany(Construction::class);
+    }
+
     public function isSuperadmin(): bool
     {
         if ($this->id !== 1) {
@@ -167,6 +175,7 @@ class User extends Authenticatable
             Role::SUPER_ADMIN,
             Role::GENERAL_ADMIN,
             Role::COMMUNITY_ADMIN,
+            Role::CONSTRUCTION_MANAGER,
         ]);
     }
 
@@ -201,6 +210,16 @@ class User extends Authenticatable
             Role::SUPER_ADMIN,
             Role::GENERAL_ADMIN,
             Role::COMMUNITY_ADMIN,
+            Role::CONSTRUCTION_MANAGER,
+        ]);
+    }
+
+    public function canManageConstructions(): bool
+    {
+        return $this->hasAnyRole([
+            Role::SUPER_ADMIN,
+            Role::GENERAL_ADMIN,
+            Role::CONSTRUCTION_MANAGER,
         ]);
     }
 

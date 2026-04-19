@@ -12,6 +12,11 @@
 - [ ] dusk-test
 
 # Code
+- deploy. El mixmanifest también se tiene que sincronizar
+- iragarkiak. el formulario se queda debajo del nav de arriba ( en kokalekuak esta arreglado)
+- iragarikiak. añadir el campo published_at en el formulario 
+- sentry queue
+
 - spec kiro pendientes (obra)
 - [ ] repasar estatistikak home
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
