@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Role;
 use App\Models\Owner;
+use App\Models\User;
 
 it('shows invalid contacts owners stat in admin dashboard', function () {
     $user = adminUser();
@@ -31,4 +33,17 @@ it('shows invalid contacts owners stat in admin dashboard', function () {
         ->assertOk()
         ->assertSee(__('admin.stats.invalid_contacts_owners'))
         ->assertSee('2');
+});
+
+it('hides dashboard stats for non-superadmin admin users', function () {
+    Role::query()->firstOrCreate(['name' => Role::GENERAL_ADMIN]);
+
+    $user = User::factory()->create();
+    $user->assignRole(Role::GENERAL_ADMIN);
+
+    test()->actingAs($user)
+        ->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertDontSee(__('admin.stats.invalid_contacts_owners'))
+        ->assertDontSee('data-admin-stat-invalid-contacts', false);
 });

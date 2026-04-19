@@ -11,18 +11,18 @@ class AdminOwnersFilters
    * @param  array{status?: string, portal?: string, local?: string, garage?: string, storage?: string, search?: string, ownershipView?: string}  $filters
    * @return Builder<Owner>
    */
-  public static function apply(Builder $query, array $filters): Builder
-  {
+    public static function apply(Builder $query, array $filters): Builder
+    {
     $status = $filters['status'] ?? 'active';
 
     if ($status === 'active') {
-      $query->whereHas('activeAssignments');
+        $query->whereHas('activeAssignments');
     } elseif ($status === 'inactive') {
-      $query->whereDoesntHave('activeAssignments');
+        $query->whereDoesntHave('activeAssignments');
     }
 
     if (($filters['ownershipView'] ?? 'default') === 'without_properties') {
-      $query->whereDoesntHave('activeAssignments');
+        $query->whereDoesntHave('activeAssignments');
     }
 
     self::applyLocationFilter($query, $filters['portal'] ?? '', 'portal');
@@ -32,39 +32,39 @@ class AdminOwnersFilters
     self::applySearchFilter($query, $filters['search'] ?? '');
 
     return $query;
-  }
+    }
 
   /**
    * @param  Builder<Owner>  $query
    */
-  private static function applyLocationFilter(Builder $query, string $locationId, string $type): void
-  {
+    private static function applyLocationFilter(Builder $query, string $locationId, string $type): void
+    {
     if ($locationId === '') {
-      return;
+        return;
     }
 
     $query->whereHas('activeAssignments.property.location', function (Builder $locationQuery) use ($locationId, $type): void {
-      $locationQuery->where('type', $type)->where('id', $locationId);
+        $locationQuery->where('type', $type)->where('id', $locationId);
     });
-  }
+    }
 
   /**
    * @param  Builder<Owner>  $query
    */
-  private static function applySearchFilter(Builder $query, string $search): void
-  {
+    private static function applySearchFilter(Builder $query, string $search): void
+    {
     $term = trim($search);
 
     if ($term === '') {
-      return;
+        return;
     }
 
     $escapedTerm = addcslashes($term, '%_');
 
     $query->where(function (Builder $searchQuery) use ($escapedTerm, $term): void {
-      $like = '%' . $escapedTerm . '%';
+        $like = '%' . $escapedTerm . '%';
 
-      $searchQuery
+        $searchQuery
         ->where('coprop1_name', 'like', $like)
         ->orWhere('coprop1_surname', 'like', $like)
         ->orWhere('coprop1_dni', 'like', $like)
@@ -77,9 +77,9 @@ class AdminOwnersFilters
         ->orWhere('coprop2_email', 'like', $like)
         ->orWhere('language', 'like', $like);
 
-      if (is_numeric($term)) {
+        if (is_numeric($term)) {
         $searchQuery->orWhere('id', (int) $term);
-      }
+        }
     });
-  }
+    }
 }

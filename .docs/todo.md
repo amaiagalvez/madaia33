@@ -15,9 +15,6 @@
 ==> probar queue (production)
 ==> comprobar public/build carpeta (production)
 
-al crear un usuario desde el panel admin/erabiltzaileak, mandarle un mensaje avisandole de que se le ha dado de alta y cual es su código para entrar. Decirle que cambie la contraseña desde su perfil pinchando en el botón "Cambiar Contraseña". (frogatzeko)
-no entra, al crear un usuario desde el panel el password tiene que ser el código que se le asigna en el campo code.
-
 - [ ] crear un aviso para las votaciones activas
 - [ ] spec kiro pendientes (obra)
 - [ ] repasar estatistikak home
