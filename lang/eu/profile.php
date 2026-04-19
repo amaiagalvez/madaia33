@@ -24,7 +24,7 @@ return [
         'change_password' => 'Pasahitza aldatu',
     ],
     'votings' => [
-        'title' => 'Nire bozketak',
+        'title' => 'Bozketak',
         'participated_title' => 'Bozkatu dituzunak',
         'empty' => 'Oraindik ez duzu bozketarik egin.',
         'pending_active_title' => 'Aktibo daudenak eta egiteke dituzunak',
@@ -35,7 +35,7 @@ return [
         'voting' => 'Bozketa',
         'starts_at' => 'Hasiera',
         'ends_at' => 'Amaiera',
-        'voted_at' => 'Noiz bozkatu duzun',
+        'voted_at' => 'Noiz',
     ],
     'sessions' => [
         'title' => 'Zure saioak',
