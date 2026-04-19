@@ -2,10 +2,10 @@
 
 return [
     'title' => 'Mi perfil',
-    'seo_description' => 'Perfil de usuario: votaciones, sesiones y validacion de propiedades.',
+    'seo_description' => 'Perfil de usuario: votaciones, sesiones y validacion de tus datos.',
     'kicker' => 'Area de usuario',
     'heading' => 'Mi perfil',
-    'summary' => 'Aqui puedes consultar tu actividad, sesiones y estado de tus propiedades.',
+    'summary' => 'Aqui puedes consultar tu actividad, sesiones y estado de tus datos.',
     'tabs_aria' => 'Pestanas del perfil',
     'tabs' => [
         'overview' => 'Resumen',
@@ -13,7 +13,7 @@ return [
         'sessions' => 'Sesiones',
         'received' => 'Mensajes recibidos',
         'messages' => 'Mensajes enviados',
-        'owner' => 'Ficha de propietaria',
+        'owner' => 'Mis Datos',
     ],
     'overview' => [
         'title' => 'Resumen',
