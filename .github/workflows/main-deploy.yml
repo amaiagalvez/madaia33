@@ -165,6 +165,8 @@ jobs:
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftps://$FTP_SERVER';
             echo 'Connected with FTPS';
             mirror -R --delete --verbose --ignore-time \              
+              --include-glob 'public/build/**' \
+              --include-glob 'public/build/manifest.json' \
               --exclude-glob '.git*' \
               --exclude-glob '.github/**' \
               --exclude-glob '.docs/**' \
@@ -211,6 +213,8 @@ jobs:
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$fallback_port' 'ftp://$FTP_SERVER';
             echo 'Connected with FTP fallback';
             mirror -R --delete --verbose --ignore-time \
+              --include-glob 'public/build/**' \
+              --include-glob 'public/build/manifest.json' \
               --exclude-glob '.git*' \
               --exclude-glob '.github/**' \
               --exclude-glob '.docs/**' \

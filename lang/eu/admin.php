@@ -123,6 +123,17 @@ return [
         'status_finished' => 'Ilara hustu arte prozesatu da.',
         'status_failed' => 'Ezin izan da ilara exekutatu.',
     ],
+    'database_copy' => [
+        'download_button' => 'Deskargatu DB kopia',
+        'errors' => [
+            'connection_not_found' => 'Ezin izan da datu-basearen konexioa aurkitu.',
+            'unsupported_driver' => 'Datu-base mota honek ez du deskarga onartzen.',
+            'sqlite_in_memory' => 'SQLite memoria-konexioan ezin da fitxategi kopiarik deskargatu.',
+            'sqlite_file_missing' => 'SQLite datu-base fitxategia ez da aurkitu.',
+            'database_name_missing' => 'Datu-basearen izena ez dago konfigurazioan.',
+            'dump_failed' => 'Ezin izan da datu-basearen kopia sortu.',
+        ],
+    ],
     'legal' => [
         'privacy_policy' => 'Pribatutasun-politika',
         'legal_notice' => 'Lege-oharra',
@@ -288,6 +299,11 @@ return [
             'active' => 'Jabe aktiboak',
             'inactive' => 'Jabe inaktiboak',
             'all' => 'Guztiak',
+            'status_pdf' => 'Egoera',
+            'portal_pdf' => 'Ataria',
+            'garage_pdf' => 'Garajea',
+            'storage_pdf' => 'Trastelekua',
+            'local_pdf' => 'Lokala',
             'all_portals' => 'Atari guztiak',
             'all_locals' => 'Lokal guztiak',
             'all_garages' => 'Garaje guztiak',
@@ -312,6 +328,13 @@ return [
         'welcome_not_sent_missing_email' => 'Ongi etorriko mezua ez da bidali, jabeak ez duelako emailik.',
         'edit_owner' => 'Editatu jabea',
         'edit_submit' => 'Gorde aldaketak',
+        'download_pdf' => 'Deskargatu PDFa',
+        'pdf' => [
+            'title' => 'Jabeen zerrenda',
+            'filename' => 'jabeak-zerrenda',
+            'generated_at' => 'Sortze data',
+            'applied_filters' => 'Aplikatutako iragazkiak',
+        ],
         'audit' => [
             'title' => 'Aldaketen historia',
             'empty' => 'Oraindik ez dago jabe honentzat erregistratutako aldaketarik.',
@@ -342,7 +365,8 @@ return [
         ],
         'email' => [
             'default_subject' => 'Madaia 33 - Jabetza baieztapena',
-            'default_body' => '<p>Kaixo ##izena##,</p><p>Ondoko jabetzak esleitu zaizkizu:</p>##info##',
+            'default_body' => '<p>Kaixo ##izena##,</p><p>Zure sarbide-kodea hau da: <strong>##kodea##</strong></p><p>Ondoko jabetzak esleitu zaizkizu:</p>##info##',
+            'password_placeholder' => '**** (zure pasahitza)',
             'no_properties' => 'Ez dago esleitutako jabetzarik.',
             'reset_action' => 'Pasahitza ezarri',
         ],
@@ -372,6 +396,10 @@ return [
         'empty' => 'Ez dago erabiltzaile erregistrorik.',
         'delete_title' => 'Erabiltzailea ezabatu',
         'delete_confirmation' => 'Ekintza honek erabiltzailea ezabatuko du (soft delete).',
+        'reset_password_action' => 'Pasahitza berrezarri',
+        'reset_password_title' => 'Erabiltzailearen pasahitza berrezarri',
+        'reset_password_confirmation' => 'Ekintza honek pasahitza 123456789 baliora ezarriko du. Jarraitu nahi duzu?',
+        'password_reset_success' => 'Pasahitza berrezarri da.',
         'delete_blocked_has_votes' => 'Ezin da erabiltzailea ezabatu, haren jabeak dagoeneko bozkatu duelako bozketaren batean.',
         'delete_blocked_has_assignments' => 'Ezin da erabiltzailea ezabatu, haren jabeak jabetza esleituak dituelako (aktiboak edo historikoak).',
         'roles_labels' => [
@@ -382,6 +410,10 @@ return [
             'voto_delegado' => 'Boto delegatua',
         ],
         'delegated_vote_terms_accepted' => 'Baldintzak',
+        'welcome_email' => [
+            'welcome_subject' => 'Ongi etorri - Zure sarbide-kodea',
+            'welcome_body' => '<p>Kaixo ##izena##,</p><p>Sisteman erregistratuta. Sartu hemen: <a href="https://madaia33.eus">madaia33.eus</a>. Zure sarbide-kodea hau da: <strong>##kodea##</strong></p><p>Sarbidea egin ondoren, segurtasunagatik, aldatu pasahitza zure profiletik "##aldatu_pasahitza##" botoia sakatuta.</p>',
+        ],
     ],
     'votings' => [
         'menu' => 'Bozketak',

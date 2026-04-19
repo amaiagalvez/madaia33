@@ -9,7 +9,7 @@ class CampaignTemplateSeeder extends Seeder
 {
     public function run(): void
     {
-        CampaignTemplate::query()->updateOrCreate(
+        CampaignTemplate::withTrashed()->firstOrCreate(
             ['name' => 'Bienvenida propietaria'],
             [
                 'subject_eu' => __('admin.owners.email.default_subject', [], 'eu'),

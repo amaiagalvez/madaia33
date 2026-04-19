@@ -1,4 +1,10 @@
 <div>
+    @if (session()->has('message'))
+        <div class="mb-4 rounded-md bg-green-50 p-4 text-sm text-green-800">
+            {{ session('message') }}
+        </div>
+    @endif
+
     @if (session()->has('error'))
         <div class="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-800">
             {{ session('error') }}
@@ -14,7 +20,7 @@
                 {{ __('admin.users.role_filter') }}
             </label>
             <select id="users-role-filter" wire:model.live="roleFilter"
-                class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600">
                 <option value="all">{{ __('admin.users.role_filter_all') }}</option>
                 @foreach ($roleOptions as $roleOption)
                     <option value="{{ $roleOption['value'] }}">{{ $roleOption['label'] }}</option>
@@ -45,7 +51,7 @@
                 @if ($editingUserId !== null && $editingOwnerId !== null)
                     <div class="rounded-md border border-[#edd2c7] bg-[#edd2c7]/20 p-3">
                         <a href="{{ route('admin.owners.index', ['editOwner' => $editingOwnerId]) }}"
-                            class="inline-flex items-center rounded-md bg-[#793d3d] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5f2f2f]">
+                            class="inline-flex items-center rounded-md bg-[#793d3d] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover">
                             {{ __('admin.users.open_owner_profile') }}
                         </a>
                     </div>
@@ -199,8 +205,20 @@
                     <td class="px-6 py-4 text-right text-sm font-medium">
                         <x-admin.table-row-actions>
                             @if (auth()->user()?->isSuperadmin())
+                                <button type="button"
+                                    wire:click="confirmResetPassword({{ $user->id }})"
+                                    data-action="reset-user-password-{{ $user->id }}"
+                                    class="rounded-full border border-transparent p-2 text-brand-600 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-brand-600"
+                                    title="{{ __('admin.users.reset_password_action') }}">
+                                    <svg class="size-4" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="m15.75 5.25 3 3m0 0-3 3m3-3h-7.5m4.5 6H8.25m0 0-3-3m3 3 3 3M3 7.5A2.25 2.25 0 0 1 5.25 5.25h1.5A2.25 2.25 0 0 1 9 7.5v9A2.25 2.25 0 0 1 6.75 18.75h-1.5A2.25 2.25 0 0 1 3 16.5v-9Zm12 0A2.25 2.25 0 0 1 17.25 5.25h1.5A2.25 2.25 0 0 1 21 7.5v9a2.25 2.25 0 0 1-2.25 2.25h-1.5A2.25 2.25 0 0 1 15 16.5v-9Z" />
+                                    </svg>
+                                </button>
+
                                 <button type="button" wire:click="loginAs({{ $user->id }})"
-                                    class="rounded-full border border-transparent p-2 text-[#d9755b] transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-[#d9755b]"
+                                    class="rounded-full border border-transparent p-2 text-brand-600 transition-colors hover:border-brand-300/40 hover:bg-brand-100/40 hover:text-brand-600"
                                     title="{{ __('admin.users.login_as') }}">
                                     <flux:icon.arrow-right-start-on-rectangle class="size-4" />
                                 </button>
@@ -254,12 +272,50 @@
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" wire:click="cancelDelete"
-                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
                         {{ __('general.buttons.cancel') }}
                     </button>
                     <button type="button" wire:click="deleteUser"
                         class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
                         {{ __('general.buttons.delete') }}
+                    </button>
+                </div>
+            </div>
+        </dialog>
+    @endif
+
+    @if ($showResetPasswordModal)
+        <dialog open
+            class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4"
+            aria-labelledby="reset-password-user-modal-title" data-user-reset-password-modal>
+            <div class="mx-4 w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+                <div class="flex items-start gap-3">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                        <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 0h10.5A2.25 2.25 0 0 1 19.5 12.75v6A2.25 2.25 0 0 1 17.25 21h-10.5A2.25 2.25 0 0 1 4.5 18.75v-6a2.25 2.25 0 0 1 2.25-2.25Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 id="reset-password-user-modal-title"
+                            class="text-base font-semibold text-gray-900">
+                            {{ __('admin.users.reset_password_title') }}
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            {{ __('admin.users.reset_password_confirmation') }}</p>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" wire:click="cancelResetPassword"
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                        {{ __('general.buttons.cancel') }}
+                    </button>
+                    <button type="button" wire:click="resetUserPassword"
+                        data-action="confirm-reset-user-password"
+                        class="rounded-md bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        {{ __('general.buttons.confirm') }}
                     </button>
                 </div>
             </div>

@@ -42,7 +42,7 @@ class RecordDirectMessageRecipientAction
     private function resolveDirectMessagesCampaign(): Campaign
     {
         return Campaign::unguarded(function (): Campaign {
-            return Campaign::query()->updateOrCreate(
+            return Campaign::withTrashed()->firstOrCreate(
                 ['id' => self::DIRECT_MESSAGES_CAMPAIGN_ID],
                 [
                     'created_by_user_id' => null,

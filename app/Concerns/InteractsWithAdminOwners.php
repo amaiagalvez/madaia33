@@ -7,6 +7,7 @@ use App\Models\Location;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Collection;
+use App\Support\AdminOwnersFilters;
 use App\Validations\OwnerFormValidation;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -95,21 +96,15 @@ trait InteractsWithAdminOwners
             'assignments.property.location',
         ]);
 
-        if ($this->filterStatus === 'active') {
-            $query->whereHas('activeAssignments');
-        } elseif ($this->filterStatus === 'inactive') {
-            $query->whereDoesntHave('activeAssignments');
-        }
-
-        if ($this->ownershipView === 'without_properties') {
-            $query->whereDoesntHave('activeAssignments');
-        }
-
-        $this->applyLocationFilter($query, $this->filterPortal, 'portal');
-        $this->applyLocationFilter($query, $this->filterLocal, 'local');
-        $this->applyLocationFilter($query, $this->filterGarage, 'garage');
-        $this->applyLocationFilter($query, $this->filterStorage, 'storage');
-        $this->applySearchFilter($query, $this->filterSearch);
+        AdminOwnersFilters::apply($query, [
+            'status' => $this->filterStatus,
+            'portal' => $this->filterPortal,
+            'local' => $this->filterLocal,
+            'garage' => $this->filterGarage,
+            'storage' => $this->filterStorage,
+            'search' => $this->filterSearch,
+            'ownershipView' => $this->ownershipView,
+        ]);
 
         return $query;
     }
@@ -131,55 +126,6 @@ trait InteractsWithAdminOwners
                 ->orderBy('name')
                 ->get(),
         ];
-    }
-
-    /**
-     * @param  Builder<Owner>  $query
-     */
-    private function applyLocationFilter(Builder $query, string $locationId, string $type): void
-    {
-        if ($locationId === '') {
-            return;
-        }
-
-        $query->whereHas('activeAssignments.property.location', function (Builder $locationQuery) use ($locationId, $type): void {
-            $locationQuery->where('type', $type)->where('id', $locationId);
-        });
-    }
-
-    /**
-     * @param  Builder<Owner>  $query
-     */
-    private function applySearchFilter(Builder $query, string $search): void
-    {
-        $term = trim($search);
-
-        if ($term === '') {
-            return;
-        }
-
-        $escapedTerm = addcslashes($term, '%_');
-
-        $query->where(function (Builder $searchQuery) use ($escapedTerm, $term): void {
-            $like = '%' . $escapedTerm . '%';
-
-            $searchQuery
-                ->where('coprop1_name', 'like', $like)
-                ->orWhere('coprop1_surname', 'like', $like)
-                ->orWhere('coprop1_dni', 'like', $like)
-                ->orWhere('coprop1_phone', 'like', $like)
-                ->orWhere('coprop1_email', 'like', $like)
-                ->orWhere('coprop2_name', 'like', $like)
-                ->orWhere('coprop2_surname', 'like', $like)
-                ->orWhere('coprop2_dni', 'like', $like)
-                ->orWhere('coprop2_phone', 'like', $like)
-                ->orWhere('coprop2_email', 'like', $like)
-                ->orWhere('language', 'like', $like);
-
-            if (is_numeric($term)) {
-                $searchQuery->orWhere('id', (int) $term);
-            }
-        });
     }
 
     private function loadExpandedAssignments(): mixed

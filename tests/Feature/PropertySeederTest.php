@@ -55,3 +55,25 @@ it('is idempotent when run multiple times', function () {
 
     expect(Property::where('location_id', $portal->id)->count())->toBe(18);
 });
+
+it('does not modify existing property data when records already exist', function () {
+    $portal = Location::factory()->create([
+        'type' => 'portal',
+        'code' => '33-C',
+        'name' => 'Portal 33-C',
+    ]);
+
+    $existing = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => '1-A',
+        'community_pct' => 9.99,
+        'location_pct' => 8.88,
+    ]);
+
+    app(PropertySeeder::class)->run();
+
+    $existing->refresh();
+
+    expect((float) $existing->community_pct)->toBe(9.99)
+        ->and((float) $existing->location_pct)->toBe(8.88);
+});

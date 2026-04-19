@@ -129,8 +129,12 @@
                         </div>
                     @endif
 
-                    <x-admin.form-boolean-toggle :label="__('notices.admin.is_public')" model="isPublic"
-                        :value="$isPublic" :true-label="__('admin.common.yes')" :false-label="__('admin.common.no')" />
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <x-admin.form-date-input :label="__('notices.published_at')" model="publishedAt" />
+
+                        <x-admin.form-boolean-toggle :label="__('notices.admin.is_public')" model="isPublic"
+                            :value="$isPublic" :true-label="__('admin.common.yes')" :false-label="__('admin.common.no')" />
+                    </div>
                 </div>
 
                 <x-admin.form-footer-actions show-default-buttons :is-editing="(bool) $editingId"
@@ -277,7 +281,7 @@
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" wire:click="cancelDelete"
-                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
                         {{ __('general.buttons.cancel') }}
                     </button>
                     <button type="button" wire:click="deleteNotice"
@@ -326,7 +330,7 @@
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" wire:click="cancelPublish"
-                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b]">
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
                         {{ __('general.buttons.cancel') }}
                     </button>
                     <button type="button" wire:click="doPublish"

@@ -987,6 +987,112 @@ it('shows accepted terms indicator in owners list', function () {
         ->assertSee('data-owner-terms-accepted="' . $pendingOwner->id . '"', false);
 });
 
+it('shows assignment percentages in owner property-type columns with validation colors', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Owner Percentages',
+    ]);
+
+    $portal = Location::factory()->portal()->create(['code' => 'PT-02']);
+    $local = Location::factory()->local()->create(['code' => 'LC-02']);
+    $garage = Location::factory()->garage()->create(['code' => 'GR-02']);
+    $storage = Location::factory()->storage()->create(['code' => 'ST-02']);
+
+    $portalProperty = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'P-2',
+        'community_pct' => 11.5,
+        'location_pct' => 21.75,
+    ]);
+
+    $localProperty = Property::factory()->create([
+        'location_id' => $local->id,
+        'name' => 'L-2',
+        'community_pct' => 31,
+        'location_pct' => 41,
+    ]);
+
+    $garageProperty = Property::factory()->create([
+        'location_id' => $garage->id,
+        'name' => 'G-2',
+        'community_pct' => 6.25,
+        'location_pct' => 7.5,
+    ]);
+
+    $storageProperty = Property::factory()->create([
+        'location_id' => $storage->id,
+        'name' => 'S-2',
+        'community_pct' => 2,
+        'location_pct' => 3,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $portalProperty->id,
+        'end_date' => null,
+        'admin_validated' => true,
+        'owner_validated' => true,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $localProperty->id,
+        'end_date' => null,
+        'admin_validated' => false,
+        'owner_validated' => false,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $garageProperty->id,
+        'end_date' => null,
+        'admin_validated' => true,
+        'owner_validated' => true,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $storageProperty->id,
+        'end_date' => null,
+        'admin_validated' => false,
+        'owner_validated' => false,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->set('filterSearch', 'Owner Percentages')
+        ->assertSee('PT-02')
+        ->assertSee('P-2')
+        ->assertSee('21,75%')
+        ->assertSee('11,50%')
+        ->assertSee('GR-02')
+        ->assertSee('G-2')
+        ->assertSee('7,50%')
+        ->assertSee('6,25%')
+        ->assertSee('ST-02')
+        ->assertSee('S-2')
+        ->assertSee('3,00%')
+        ->assertSee('2,00%')
+        ->assertSee('LC-02')
+        ->assertSee('L-2')
+        ->assertSee('41,00%')
+        ->assertSee('31,00%')
+        ->assertSeeInOrder([
+            __('admin.owners.columns.portals'),
+            __('admin.owners.columns.garages'),
+            __('admin.owners.columns.storages'),
+            __('admin.owners.columns.locals'),
+        ])
+        ->assertSeeHtml('data-owner-assignment-type="portal"')
+        ->assertSeeHtml('data-owner-assignment-type="garage"')
+        ->assertSeeHtml('data-owner-assignment-type="storage"')
+        ->assertSeeHtml('data-owner-assignment-type="local"')
+        ->assertSeeHtml('text-green-600')
+        ->assertSeeHtml('text-red-500');
+});
+
 it('allows creating and editing owner assignments inline from owners list', function () {
     $user = adminUser();
 

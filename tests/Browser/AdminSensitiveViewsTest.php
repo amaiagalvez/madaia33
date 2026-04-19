@@ -152,6 +152,243 @@ test('admin owners list uses compact bidalketak-style actions with titles', func
     });
 });
 
+test('admin owners list shows id with language and highlights invalid contacts with whatsapp markers', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Dusk Contacts Owner',
+        'language' => 'es',
+        'coprop1_phone' => '600111222',
+        'coprop1_has_whatsapp' => true,
+        'coprop1_phone_invalid' => true,
+        'coprop2_name' => 'Second Contact',
+        'coprop2_phone' => '600333444',
+        'coprop2_has_whatsapp' => true,
+        'coprop2_email' => 'bad-email@example.com',
+        'coprop2_email_invalid' => true,
+    ]);
+
+    $location = Location::factory()->portal()->create();
+
+    $property = Property::factory()->create([
+        'location_id' => $location->id,
+        'name' => '5A',
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $owner) {
+        $script = strtr(<<<'JS'
+            (() => {
+                const row = document.querySelector('[data-owner-id="OWNER_ID"]');
+
+                if (!row) {
+                    return false;
+                }
+
+                const idCell = row.querySelector('[data-owner-id-cell]');
+                const ownerLanguage = row.querySelector('[data-owner-language]');
+                const coprop1 = row.querySelector('[data-owner-coprop1]');
+                const coprop1Phone = row.querySelector('[data-owner-coprop1-phone]');
+                const coprop1Whatsapp = row.querySelector('[data-owner-coprop1-whatsapp]');
+                const coprop2Email = row.querySelector('[data-owner-coprop2-email]');
+                const coprop2Phone = row.querySelector('[data-owner-coprop2-phone]');
+                const coprop2Whatsapp = row.querySelector('[data-owner-coprop2-whatsapp]');
+
+                if (!idCell || !ownerLanguage || !coprop1 || !coprop1Phone || !coprop1Whatsapp || !coprop2Email || !coprop2Phone || !coprop2Whatsapp) {
+                    return false;
+                }
+
+                const languageMovedToId = ownerLanguage.textContent.trim() === '[es]'
+                    && !coprop1.textContent.includes('[es]');
+
+                return idCell.classList.contains('text-center')
+                    && languageMovedToId
+                    && coprop1Phone.classList.contains('text-red-600')
+                    && coprop1Phone.classList.contains('line-through')
+                    && coprop2Email.classList.contains('text-red-600')
+                    && coprop2Email.classList.contains('line-through');
+            })();
+        JS, [
+            'OWNER_ID' => (string) $owner->id,
+        ]);
+
+        $browser->loginAs($admin)
+            ->visit('/admin/jabeak')
+            ->waitFor('[data-owner-id="' . $owner->id . '"]', 10)
+            ->assertScript($script, true);
+    });
+});
+
+test('admin owners list shows assignment percentages with validation colors by property type', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Dusk Percentages Owner',
+    ]);
+
+    $portal = Location::factory()->portal()->create(['code' => 'PT-01']);
+    $local = Location::factory()->local()->create(['code' => 'LC-01']);
+    $garage = Location::factory()->garage()->create(['code' => 'GR-01']);
+    $storage = Location::factory()->storage()->create(['code' => 'ST-01']);
+
+    $portalProperty = Property::factory()->create([
+        'location_id' => $portal->id,
+        'name' => 'P-1',
+        'community_pct' => 10.5,
+        'location_pct' => 20.75,
+    ]);
+
+    $localProperty = Property::factory()->create([
+        'location_id' => $local->id,
+        'name' => 'L-1',
+        'community_pct' => 30,
+        'location_pct' => 40,
+    ]);
+
+    $garageProperty = Property::factory()->create([
+        'location_id' => $garage->id,
+        'name' => 'G-1',
+        'community_pct' => 5.25,
+        'location_pct' => 6.5,
+    ]);
+
+    $storageProperty = Property::factory()->create([
+        'location_id' => $storage->id,
+        'name' => 'S-1',
+        'community_pct' => 1,
+        'location_pct' => 2,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $portalProperty->id,
+        'end_date' => null,
+        'admin_validated' => true,
+        'owner_validated' => true,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $localProperty->id,
+        'end_date' => null,
+        'admin_validated' => false,
+        'owner_validated' => false,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $garageProperty->id,
+        'end_date' => null,
+        'admin_validated' => true,
+        'owner_validated' => true,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $storageProperty->id,
+        'end_date' => null,
+        'admin_validated' => false,
+        'owner_validated' => false,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $owner) {
+        $script = strtr(<<<'JS'
+            (() => {
+                const row = document.querySelector('[data-owner-id="OWNER_ID"]');
+
+                if (!row) {
+                    return false;
+                }
+
+                const checks = [
+                    {
+                        selector: '[data-owner-assignment-type="portal"]',
+                        locationAndProperty: 'PT-01 P-1',
+                        percentages: '%Erakina 20,75% | %Komunidad 10,50%',
+                        colorClass: 'text-green-600',
+                    },
+                    {
+                        selector: '[data-owner-assignment-type="garage"]',
+                        locationAndProperty: 'GR-01 G-1',
+                        percentages: '%Erakina 6,50% | %Komunidad 5,25%',
+                        colorClass: 'text-green-600',
+                    },
+                    {
+                        selector: '[data-owner-assignment-type="storage"]',
+                        locationAndProperty: 'ST-01 S-1',
+                        percentages: '%Erakina 2,00% | %Komunidad 1,00%',
+                        colorClass: 'text-red-500',
+                    },
+                    {
+                        selector: '[data-owner-assignment-type="local"]',
+                        locationAndProperty: 'LC-01 L-1',
+                        percentages: '%Erakina 40,00% | %Komunidad 30,00%',
+                        colorClass: 'text-red-500',
+                    },
+                ];
+
+                return checks.every((check) => {
+                    const cell = row.querySelector(check.selector);
+
+                    if (!cell) {
+                        return false;
+                    }
+
+                    const assignment = Array.from(cell.querySelectorAll('[data-owner-assignment-line]'))
+                        .find((line) => {
+                            const normalized = line.textContent.replace(/\s+/g, ' ').trim();
+
+                            return normalized.includes(check.locationAndProperty)
+                                && normalized.includes(check.percentages);
+                        });
+
+                    return assignment && assignment.classList.contains(check.colorClass);
+                });
+            })();
+        JS, [
+            'OWNER_ID' => (string) $owner->id,
+        ]);
+
+        $browser->loginAs($admin)
+            ->visit('/admin/jabeak')
+            ->waitFor('[data-owner-id="' . $owner->id . '"]', 10)
+            ->assertScript($script, true);
+    });
+});
+
+test('admin owners list shows download pdf action button', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin) {
+        $browser->loginAs($admin)
+            ->visit('/admin/jabeak')
+            ->waitFor('[data-action="download-owners-pdf"]', 10)
+            ->assertPresent('[data-action="download-owners-pdf"]')
+            ->assertScript(<<<'JS'
+                (() => {
+                    const button = document.querySelector('[data-action="download-owners-pdf"]');
+
+                    if (!button) {
+                        return false;
+                    }
+
+                    const href = button.getAttribute('href') || '';
+
+                    return href.includes('/admin/jabeak/pdf')
+                        && href.includes('filter_status=active');
+                })();
+            JS, true);
+    });
+});
+
 test('admin top user menu dropdown opens from the desktop header', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 

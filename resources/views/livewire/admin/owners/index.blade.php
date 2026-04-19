@@ -7,6 +7,19 @@
     @endif
 
     <div class="mb-4 flex items-center justify-end gap-2">
+        <a href="{{ route('admin.owners.pdf', [
+            'filter_status' => $filterStatus,
+            'filter_portal' => $filterPortal,
+            'filter_local' => $filterLocal,
+            'filter_garage' => $filterGarage,
+            'filter_storage' => $filterStorage,
+            'filter_search' => $filterSearch,
+            'ownership_view' => $ownershipView,
+        ]) }}"
+            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+            data-action="download-owners-pdf">
+            {{ __('admin.owners.download_pdf') }}
+        </a>
         <x-admin.create-record-button wire:click="$set('showCreateForm', true)" />
     </div>
 
@@ -324,7 +337,7 @@
         class="overflow-x-auto" data-owner-table>
         <thead class="bg-gray-50">
             <tr>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="text-center">
                     {{ __('admin.owners.columns.num') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
@@ -337,13 +350,13 @@
                     {{ __('admin.owners.columns.portals') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
-                    {{ __('admin.owners.columns.locals') }}
-                </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
                     {{ __('admin.owners.columns.garages') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
                     {{ __('admin.owners.columns.storages') }}
+                </x-admin.table-header-cell>
+                <x-admin.table-header-cell>
+                    {{ __('admin.owners.columns.locals') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
                     {{ __('admin.owners.columns.welcome') }}
@@ -359,84 +372,89 @@
         <tbody class="divide-y divide-gray-200 bg-white">
             @forelse($owners as $owner)
                 <tr wire:key="owner-{{ $owner->id }}" data-owner-id="{{ $owner->id }}">
-                    <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap">
+                    <td class="px-2 py-2 text-center text-sm text-gray-500 whitespace-nowrap"
+                        data-owner-id-cell>
                         <span class="font-mono text-xs">{{ $owner->id }}</span>
+                        <span class="ml-1 text-xs leading-5 text-gray-500" data-owner-language>
+                            [{{ $owner->language }}]
+                        </span>
                     </td>
-                    <td class="px-2 py-2 text-sm text-gray-900">
+                    <td class="px-2 py-2 text-sm text-gray-900" data-owner-coprop1>
 
-                        <div class="font-medium"> {{ $owner->full_name1 }}
-                            <span class="text-xs leading-5 text-gray-500">
-                                [{{ $owner->language }}]
-                            </span>
-                        </div>
-                        <div class="mt-1 text-xs leading-5 text-gray-500">
+                        <div class="font-medium"> {{ $owner->full_name1 }}</div>
+                        <div class="mt-1 text-xs leading-5 {{ $owner->coprop1_email_invalid ? 'text-red-600 font-medium line-through decoration-2' : 'text-gray-500' }}"
+                            data-owner-coprop1-email>
                             {{ $owner->coprop1_email }}
                         </div>
-                        <div class="text-xs leading-5 text-gray-500">
-                            {{ $owner->coprop1_phone }}</div>
+                        <div class="text-xs leading-5 {{ $owner->coprop1_phone_invalid ? 'text-red-600 font-medium line-through decoration-2' : 'text-gray-500' }}"
+                            data-owner-coprop1-phone>
+                            <span>{{ $owner->coprop1_phone }}</span>
+                            @if ($owner->coprop1_has_whatsapp)
+                                <span class="ml-1 text-green-600" data-owner-coprop1-whatsapp
+                                    title="{{ __('admin.owners.form.has_whatsapp') }}"
+                                    aria-label="{{ __('admin.owners.form.has_whatsapp') }}">✓</span>
+                            @endif
+                        </div>
                     </td>
                     <td class="px-2 py-2 text-sm text-gray-500">
                         <div class="font-medium text-gray-900">{{ $owner->full_name2 }}
                         </div>
 
-                        <div class="mt-1 text-xs leading-5 text-gray-500">
+                        <div class="mt-1 text-xs leading-5 {{ $owner->coprop2_email_invalid ? 'text-red-600 font-medium line-through decoration-2' : 'text-gray-500' }}"
+                            data-owner-coprop2-email>
                             {{ $owner->coprop2_email }}
                         </div>
-                        <div class="text-xs leading-5 text-gray-500">
-                            {{ $owner->coprop2_phone }}</div>
+                        <div class="text-xs leading-5 {{ $owner->coprop2_phone_invalid ? 'text-red-600 font-medium line-through decoration-2' : 'text-gray-500' }}"
+                            data-owner-coprop2-phone>
+                            <span>{{ $owner->coprop2_phone }}</span>
+                            @if ($owner->coprop2_has_whatsapp)
+                                <span class="ml-1 text-green-600" data-owner-coprop2-whatsapp
+                                    title="{{ __('admin.owners.form.has_whatsapp') }}"
+                                    aria-label="{{ __('admin.owners.form.has_whatsapp') }}">✓</span>
+                            @endif
+                        </div>
                     </td>
-                    <td class="px-2 py-2 text-sm text-gray-500">
-                        @php
-                            $portalAssignments = $owner->assignments->filter(
+                    @php
+                        $assignmentGroups = [
+                            'portal' => $owner->assignments->filter(
                                 fn($a) => $a->property->location->type === 'portal',
-                            );
-                        @endphp
-                        @foreach ($portalAssignments as $a)
-                            <span
-                                class="{{ $a->isActive() ? 'text-green-600' : 'text-red-500' }}">
-                                {{ $a->property->location->code }} {{ $a->property->name }}
-                            </span><br>
-                        @endforeach
-                    </td>
-                    <td class="px-2 py-2 text-sm text-gray-500">
-                        @php
-                            $localAssignments = $owner->assignments->filter(
-                                fn($a) => $a->property->location->type === 'local',
-                            );
-                        @endphp
-                        @foreach ($localAssignments as $a)
-                            <span
-                                class="{{ $a->isActive() ? 'text-green-600' : 'text-red-500' }}">
-                                {{ $a->property->location->code }} {{ $a->property->name }}
-                            </span><br>
-                        @endforeach
-                    </td>
-                    <td class="px-2 py-2 text-sm text-gray-500">
-                        @php
-                            $garageAssignments = $owner->assignments->filter(
+                            ),
+                            'garage' => $owner->assignments->filter(
                                 fn($a) => $a->property->location->type === 'garage',
-                            );
-                        @endphp
-                        @foreach ($garageAssignments as $a)
-                            <span
-                                class="{{ $a->isActive() ? 'text-green-600' : 'text-red-500' }}">
-                                {{ $a->property->location->code }} {{ $a->property->name }}
-                            </span><br>
-                        @endforeach
-                    </td>
-                    <td class="px-2 py-2 text-sm text-gray-500">
-                        @php
-                            $storageAssignments = $owner->assignments->filter(
+                            ),
+                            'storage' => $owner->assignments->filter(
                                 fn($a) => $a->property->location->type === 'storage',
-                            );
-                        @endphp
-                        @foreach ($storageAssignments as $a)
-                            <span
-                                class="{{ $a->isActive() ? 'text-green-600' : 'text-red-500' }}">
-                                {{ $a->property->location->code }} {{ $a->property->name }}
-                            </span><br>
-                        @endforeach
-                    </td>
+                            ),
+                            'local' => $owner->assignments->filter(
+                                fn($a) => $a->property->location->type === 'local',
+                            ),
+                        ];
+                    @endphp
+                    @foreach ($assignmentGroups as $assignmentType => $assignments)
+                        <td class="px-2 py-2 text-sm text-gray-500"
+                            data-owner-assignment-type="{{ $assignmentType }}">
+                            @forelse ($assignments as $a)
+                                <span data-owner-assignment-line
+                                    class="{{ $a->admin_validated && $a->owner_validated ? 'text-green-600' : 'text-red-500' }}">
+                                    <span class="font-semibold">
+                                        {{ $a->property->location->code }}
+                                        {{ $a->property->name }}
+                                    </span>
+                                    <br>
+                                    <span class="text-xs">
+                                        {{ $a->property->location_pct !== null ? number_format((float) $a->property->location_pct, 2, ',', '.') . '%' : '-' }}
+                                        |
+                                        {{ $a->property->community_pct !== null ? number_format((float) $a->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                                    </span>
+                                </span>
+                                @if (!$loop->last)
+                                    <br>
+                                @endif
+                            @empty
+                                <span>-</span>
+                            @endforelse
+                        </td>
+                    @endforeach
                     <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap"
                         data-owner-welcome="{{ $owner->id }}">
                         <div class="flex items-center gap-1">
@@ -450,7 +468,6 @@
                             </button>
                         </div>
                     </td>
-                    <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap"
                     <td class="px-2 py-2 text-sm text-gray-500 whitespace-nowrap"
                         data-owner-terms-accepted="{{ $owner->id }}">
                         <x-admin.status-indicator :active="$owner->accepted_terms_at !== null" />

@@ -162,5 +162,9 @@ return [
         'selectedTemplateId' => 'txantiloia',
         'scheduledAt' => 'programatutako data',
         'attachments' => 'eranskinak',
+        'password' => 'pasahitza',
+        'password_confirmation' => 'pasahitza berrestea',
+        'email' => 'helbide elektronikoa',
+        'current_password' => 'uneko pasahitza',
     ],
 ];

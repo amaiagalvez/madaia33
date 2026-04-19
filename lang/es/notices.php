@@ -10,7 +10,7 @@ return [
     'filter_hint' => 'Elige una ubicación y encuentra antes la información que te afecta.',
     'empty' => 'No hay avisos disponibles en este momento.',
     'no_translation' => 'Este aviso no está disponible en castellano.',
-    'published_at' => 'Fecha de publicación',
+    'published_at' => 'Fecha',
     'portal' => 'Portal',
     'local' => 'Local',
     'garage' => 'Planta de garaje',

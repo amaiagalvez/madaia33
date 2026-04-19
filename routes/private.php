@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArtisanController;
 use App\Http\Controllers\VotingPdfController;
 use App\Http\Controllers\PublicVotingController;
+use App\Http\Controllers\Admin\OwnersPdfController;
 use App\Http\Controllers\Admin\VotingResultsController;
 use App\Http\Controllers\CampaignWhatsappCsvController;
 
@@ -87,6 +88,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/jabeak', fn() => view('admin.owners.index'))
         ->middleware('role:superadmin')
         ->name('owners.index');
+    Route::get('/jabeak/pdf', OwnersPdfController::class)
+        ->middleware('role:superadmin')
+        ->name('owners.pdf');
     Route::get('/bozketak', fn() => view('admin.votings'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings');
@@ -122,6 +126,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::post('/artisan/queue-work-stop-when-empty', [ArtisanController::class, 'queueWorkStopWhenEmpty'])
         ->middleware('role:superadmin')
         ->name('artisan.queue_work_stop_when_empty');
+    Route::get('/artisan/database-copy', [ArtisanController::class, 'downloadDatabaseCopy'])
+        ->middleware('role:superadmin')
+        ->name('artisan.database_copy');
 });
 
 Route::middleware('auth')->post('/impostazioa/itzuli-nire-erabiltzailea', function (Request $request) {

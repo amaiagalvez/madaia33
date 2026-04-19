@@ -7,6 +7,8 @@ use App\SupportedLocales;
 use Laravel\Fortify\Features;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
+dataset('supported_locales', SupportedLocales::all());
+
 beforeEach(function () {
     foreach (Role::names() as $roleName) {
         Role::query()->firstOrCreate([
@@ -199,6 +201,27 @@ test('users can not authenticate with invalid password', function () {
 
     test()->assertGuest();
 });
+
+test('invalid login shows translated error message on the login screen', function (string $locale) {
+    $user = User::factory()->create();
+
+    test()->get(route('private.' . $locale));
+
+    $response = test()->from(route('private.' . $locale))
+        ->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+    $response->assertRedirect(route('private.' . $locale));
+
+    test()->get(route('private.' . $locale))
+        ->assertOk()
+        ->assertSee(__('auth.failed', locale: $locale));
+
+    test()->assertGuest();
+})->with('supported_locales');
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
     test()->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
