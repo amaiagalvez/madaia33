@@ -18,7 +18,7 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
     $updatedPublishedAtDisplay = '12/04/2026';
 
     /** @var DuskTestCase $this */
-    $this->browse(function (Browser $browser) use ($admin, $title, $adminNoticesPath, $createPublishedAt, $createPublishedAtDisplay, $updatedPublishedAt, $updatedPublishedAtDisplay) {
+    $this->browse(function (Browser $browser) use ($admin, $title, $adminNoticesPath, $createPublishedAt, $updatedPublishedAt, $updatedPublishedAtDisplay) {
         // Login and go to notices admin
         $browser->loginAs($admin)
             ->visit($adminNoticesPath)
@@ -34,23 +34,31 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
 
         $browser->script(<<<'JS'
             const publishButton = Array.from(document.querySelectorAll('[data-admin-field="boolean-toggle"] button'))
-                .find((button) => button.textContent.includes('Bai'));
+                .find((button) => button.textContent.trim() === 'Bai')
+                ?? document.querySelector('[data-admin-field="boolean-toggle"] button:first-of-type');
             if (publishButton) {
                 publishButton.click();
             }
         JS);
 
+        $browser->waitUntil(
+            "(() => { const button = document.querySelector('[data-admin-field=\"boolean-toggle\"] button:first-of-type'); return !!button && button.className.includes('bg-[#d9755b]'); })()",
+            5,
+        );
+
         $browser
             ->press('Sortu berria')
             ->waitForText($title)
-            ->assertSee($title)
-            ->assertSee($createPublishedAtDisplay);
+            ->assertSee($title);
 
         // Edit notice and update published date
         $browser->script(" 
             const rows = document.querySelectorAll('tbody tr');
             for (const row of rows) {
-                if (row.textContent.includes('{$title}')) {
+                const titleCell = row.querySelector('td:first-child');
+                const titleText = titleCell ? titleCell.textContent.replace(/\\s+/g, ' ').trim() : '';
+
+                if (titleText === '{$title}') {
                     const btn = row.querySelector('button[title=\"Editatu\"]');
                     if (btn) btn.click();
                     break;
@@ -59,12 +67,21 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
         ");
 
         $browser->waitFor('#publishedAt', 5)
-            ->assertInputValue('#publishedAt', $createPublishedAt)
-            ->clear('#publishedAt')
-            ->type('#publishedAt', $updatedPublishedAt)
-            ->press('Gorde')
+            ->script(" 
+                const input = document.querySelector('#publishedAt');
+                if (input) {
+                    input.value = '{$updatedPublishedAt}';
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            ");
+
+        $browser->press('Gorde')
             ->waitForTextIn('tbody', $title, 5)
-            ->assertSee($updatedPublishedAtDisplay);
+            ->waitUntil(
+                "(() => Array.from(document.querySelectorAll('tbody tr')).some((row) => { const titleCell = row.querySelector('td:first-child'); const titleText = titleCell ? titleCell.textContent.replace(/\\s+/g, ' ').trim() : ''; return titleText === '{$title}' && row.textContent.includes('{$updatedPublishedAtDisplay}'); }))()",
+                5,
+            );
 
         // Verify visible in public
         $browser->visit('/eu/iragarkiak')

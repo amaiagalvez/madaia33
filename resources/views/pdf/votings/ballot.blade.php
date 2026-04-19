@@ -190,17 +190,17 @@
 
     @forelse ($votings as $voting)
         <section class="voting-block">
-            <h3 class="question-eu">{{ $voting['question_eu'] }}</h3>
+            <h3 class="question-eu">{!! $voting['question_eu'] !!}</h3>
             @if ($voting['question_es'] !== '')
-                <h4 class="question-es">{{ $voting['question_es'] }}</h4>
+                <h4 class="question-es">{!! $voting['question_es'] !!}</h4>
             @endif
 
             @foreach ($voting['options'] as $option)
                 <div class="option-row">
                     <span class="checkbox"></span>
-                    <span class="option-eu">{{ $option['label_eu'] }}</span>
+                    <span class="option-eu">{!! $option['label_eu'] !!}</span>
                     @if ($option['label_es'] !== '')
-                        <span class="option-es"> / {{ $option['label_es'] }}</span>
+                        <span class="option-es"> / {!! $option['label_es'] !!}</span>
                     @endif
                 </div>
             @endforeach
