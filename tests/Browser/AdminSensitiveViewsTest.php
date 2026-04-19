@@ -311,25 +311,25 @@ test('admin owners list shows assignment percentages with validation colors by p
                     {
                         selector: '[data-owner-assignment-type="portal"]',
                         locationAndProperty: 'PT-01 P-1',
-                        percentages: '%Erakina 20,75% | %Komunidad 10,50%',
+                        percentages: '20,75% | 10,50%',
                         colorClass: 'text-green-600',
                     },
                     {
                         selector: '[data-owner-assignment-type="garage"]',
                         locationAndProperty: 'GR-01 G-1',
-                        percentages: '%Erakina 6,50% | %Komunidad 5,25%',
+                        percentages: '6,50% | 5,25%',
                         colorClass: 'text-green-600',
                     },
                     {
                         selector: '[data-owner-assignment-type="storage"]',
                         locationAndProperty: 'ST-01 S-1',
-                        percentages: '%Erakina 2,00% | %Komunidad 1,00%',
+                        percentages: '2,00% | 1,00%',
                         colorClass: 'text-red-500',
                     },
                     {
                         selector: '[data-owner-assignment-type="local"]',
                         locationAndProperty: 'LC-01 L-1',
-                        percentages: '%Erakina 40,00% | %Komunidad 30,00%',
+                        percentages: '40,00% | 30,00%',
                         colorClass: 'text-red-500',
                     },
                 ];
