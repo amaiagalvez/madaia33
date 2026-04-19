@@ -23,6 +23,7 @@ use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Support\VotingEligibilityService;
+use Illuminate\Validation\ValidationException;
 use App\Actions\Votings\CastVotingBallotAction;
 
 class DevSeeder extends Seeder
@@ -497,6 +498,10 @@ class DevSeeder extends Seeder
             ->orderBy('id')
             ->get()
             ->each(function (Voting $voting) use ($castVotingBallotAction, $eligibilityService, $delegatedUser, $propertyOwner): void {
+                $alreadyVotedOwnerIds = VotingBallot::query()
+                    ->where('voting_id', $voting->id)
+                    ->pluck('owner_id');
+
                 $eligibleOwners = $eligibilityService->eligibleOwners($voting)->values();
 
                 if ($eligibleOwners->isEmpty() || $voting->options->isEmpty()) {
@@ -507,13 +512,22 @@ class DevSeeder extends Seeder
                     ? $eligibleOwners->firstWhere('id', $propertyOwner->id)
                     : $eligibleOwners->first();
 
-                if ($selfVotingOwner instanceof Owner && $selfVotingOwner->user !== null) {
-                    $castVotingBallotAction->execute(
+                if (
+                    $selfVotingOwner instanceof Owner
+                    && $selfVotingOwner->user !== null
+                    && ! $alreadyVotedOwnerIds->contains($selfVotingOwner->id)
+                ) {
+                    $ballotCreated = $this->castBallotIfMissing(
+                        $castVotingBallotAction,
                         $voting,
                         $selfVotingOwner,
-                        $voting->options->first()->id,
+                        (int) $voting->options->first()->id,
                         $selfVotingOwner->user,
                     );
+
+                    if ($ballotCreated) {
+                        $alreadyVotedOwnerIds->push($selfVotingOwner->id);
+                    }
                 }
 
                 $delegatedOwner = $eligibleOwners->first(
@@ -524,33 +538,80 @@ class DevSeeder extends Seeder
                     return;
                 }
 
+                if ($alreadyVotedOwnerIds->contains($delegatedOwner->id)) {
+                    return;
+                }
+
                 $delegatedOption = $voting->options->skip(1)->first() ?? $voting->options->first();
 
-                $castVotingBallotAction->execute(
+                $ballotCreated = $this->castBallotIfMissing(
+                    $castVotingBallotAction,
                     $voting,
                     $delegatedOwner,
-                    $delegatedOption->id,
+                    (int) $delegatedOption->id,
                     $delegatedUser,
                 );
+
+                if ($ballotCreated) {
+                    $alreadyVotedOwnerIds->push($delegatedOwner->id);
+                }
 
                 $votedIds = collect([$selfVotingOwner?->id, $delegatedOwner->id])->filter()->values();
 
                 $eligibleOwners
                     ->reject(fn (Owner $owner): bool => $votedIds->contains($owner->id))
                     ->take(4)
-                    ->each(function (Owner $owner) use ($castVotingBallotAction, $voting): void {
-                        if ($owner->user === null) {
+                    ->each(function (Owner $owner) use ($alreadyVotedOwnerIds, $castVotingBallotAction, $voting): void {
+                        if ($owner->user === null || $alreadyVotedOwnerIds->contains($owner->id)) {
                             return;
                         }
 
-                        $castVotingBallotAction->execute(
+                        $ballotCreated = $this->castBallotIfMissing(
+                            $castVotingBallotAction,
                             $voting,
                             $owner,
-                            $voting->options->random()->id,
+                            (int) $voting->options->random()->id,
                             $owner->user,
                         );
+
+                        if ($ballotCreated) {
+                            $alreadyVotedOwnerIds->push($owner->id);
+                        }
                     });
             });
+    }
+
+    private function castBallotIfMissing(
+        CastVotingBallotAction $castVotingBallotAction,
+        Voting $voting,
+        Owner $owner,
+        int $optionId,
+        User $authenticatedUser,
+    ): bool {
+        $alreadyVoted = VotingBallot::query()
+            ->where('voting_id', $voting->id)
+            ->where('owner_id', $owner->id)
+            ->exists();
+
+        if ($alreadyVoted) {
+            return false;
+        }
+
+        try {
+            $castVotingBallotAction->execute($voting, $owner, $optionId, $authenticatedUser);
+
+            return true;
+        } catch (ValidationException $exception) {
+            $voteMessages = $exception->errors()['vote'] ?? [];
+
+            foreach ($voteMessages as $message) {
+                if (str_contains((string) $message, 'already_voted')) {
+                    return false;
+                }
+            }
+
+            throw $exception;
+        }
     }
 
     private function seedPastVotingBallots(): void
