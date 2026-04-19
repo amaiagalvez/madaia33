@@ -126,6 +126,31 @@ it('shows ballot history when the related voting is soft deleted', function () {
         ->assertSee('Artxibatutako bozketa');
 });
 
+it('shows owner ballot history when vote was cast by another user', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $delegateUser = User::factory()->create();
+
+    $voting = Voting::factory()->create([
+        'name_eu' => 'Boto ordezkatua profilean',
+        'name_es' => 'Voto delegado en perfil',
+    ]);
+
+    VotingBallot::factory()->create([
+        'owner_id' => $owner->id,
+        'cast_by_user_id' => $delegateUser->id,
+        'voting_id' => $voting->id,
+        'voted_at' => now()->subMinutes(30),
+    ]);
+
+    test()->actingAs($owner->user)
+        ->get(route('profile.eu', ['tab' => 'votings']))
+        ->assertOk()
+        ->assertSee('Boto ordezkatua profilean');
+});
+
 it('shows only messages sent by logged user in messages tab', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();

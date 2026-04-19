@@ -61,7 +61,7 @@ class ProfileController extends Controller
             'receivedMessages' => collect($this->receivedMessages($owner)),
             'requiresTermsAcceptance' => $requiresTermsAcceptance,
             'termsHtml' => $this->profileTermsHtml(),
-            'userBallots' => $this->userBallots($user?->id),
+            'userBallots' => $this->userBallots($user?->id, $owner?->id),
             'userMessages' => collect($this->userMessages($user?->id)),
         ]);
     }
@@ -314,14 +314,23 @@ class ProfileController extends Controller
     /**
      * @return Collection<int, array{id: int, voting_name: string, voted_at: Carbon}>
      */
-    private function userBallots(?int $userId): Collection
+    private function userBallots(?int $userId, ?int $ownerId): Collection
     {
-        if ($userId === null) {
+        if ($userId === null && $ownerId === null) {
             return collect();
         }
 
         return VotingBallot::query()
-            ->where('cast_by_user_id', $userId)
+            ->where(static function ($query) use ($userId, $ownerId): void {
+                if ($ownerId !== null) {
+                    $query->where('owner_id', $ownerId);
+                }
+
+                if ($userId !== null) {
+                    $method = $ownerId !== null ? 'orWhere' : 'where';
+                    $query->{$method}('cast_by_user_id', $userId);
+                }
+            })
             ->with([
                 'voting' => static function ($query): void {
                     $query
