@@ -198,6 +198,48 @@ test('authenticated owner sees votings explanation and pdf actions on local http
     });
 });
 
+test('front votings renders html question content instead of escaped tags', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $portal = Location::factory()->portal()->create(['code' => '77-H']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+        'question_eu' => '<div>Hau <strong>galdera</strong> da</div>',
+        'question_es' => '<div>Esta <strong>pregunta</strong> existe</div>',
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+        'label_eu' => 'Bai',
+        'label_es' => 'Si',
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner, $voting) {
+        $browser->loginAs($owner->user)
+            ->visit('/eu/bozketak')
+            ->waitFor('[data-voting-question="' . $voting->id . '"]', 10)
+            ->assertSeeIn('[data-voting-question="' . $voting->id . '"]', 'Hau galdera da')
+            ->assertSourceMissing('&lt;div&gt;Hau &lt;strong&gt;galdera&lt;/strong&gt; da&lt;/div&gt;')
+            ->assertScript(
+                'return document.querySelector("[data-voting-question=\"' . $voting->id . '\"] strong") !== null;',
+                true,
+            );
+    });
+});
+
 test('superadmin can open votings front in read only mode', function () {
     $superadmin = User::query()->find(1) ?? User::factory()->create([
         'id' => 1,

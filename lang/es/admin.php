@@ -334,6 +334,10 @@ return [
         'empty' => 'No hay usuarias registradas.',
         'delete_title' => 'Eliminar usuaria',
         'delete_confirmation' => 'Esta acción eliminará a la usuaria (soft delete).',
+        'reset_password_action' => 'Restablecer contraseña',
+        'reset_password_title' => 'Restablecer contraseña de la usuaria',
+        'reset_password_confirmation' => 'Esta acción establecerá la contraseña en 123456789. ¿Quieres continuar?',
+        'password_reset_success' => 'La contraseña se ha restablecido.',
         'delete_blocked_has_votes' => 'No se puede eliminar la usuaria porque su propietaria ya ha votado en alguna votación.',
         'delete_blocked_has_assignments' => 'No se puede eliminar la usuaria porque su propietaria tiene propiedades asignadas (activas o históricas).',
         'roles_labels' => [

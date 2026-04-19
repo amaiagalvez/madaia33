@@ -31,13 +31,13 @@
         data-votings-content>
         <div class="mb-6 flex flex-wrap items-center justify-end gap-2" data-votings-pdf-actions>
             <a href="{{ route(\App\SupportedLocales::routeName('votings.pdf.delegated')) }}"
-                class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
+                class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
                 data-front-download-delegated-pdf>
                 {{ __('votings.front.download_delegated_pdf') }}
             </a>
 
             <a href="{{ route(\App\SupportedLocales::routeName('votings.pdf.in_person')) }}"
-                class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
+                class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
                 data-front-download-in-person-pdf>
                 {{ __('votings.front.download_in_person_pdf') }}
             </a>
@@ -56,13 +56,13 @@
         @if ($canManageDelegatedVoting && !$isDelegated && !$isInPersonVoting)
             <div class="mb-6 flex items-center justify-end gap-2" data-votings-delegated-action>
                 <button type="button" wire:click="openInPersonVoteModal"
-                    class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
+                    class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
                     data-open-front-in-person-modal>
                     {{ __('votings.front.in_person_vote_button') }}
                 </button>
 
                 <button type="button" wire:click="openDelegatedVoteModal"
-                    class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
+                    class="cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 text-stone-600 bg-[#edd2c7]/45 hover:text-[#793d3d]"
                     data-open-front-delegated-modal>
                     {{ __('votings.front.delegated_vote_button') }}
                 </button>
@@ -112,7 +112,7 @@
                         </label>
                         <input id="delegateDniInput" type="text" wire:model.live="delegateDni"
                             placeholder="{{ __('votings.front.delegate_dni_placeholder') }}"
-                            class="block w-full max-w-xs rounded-md border border-amber-300 bg-white px-3 py-1.5 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
+                            class="block w-full max-w-xs rounded-md border border-amber-300 bg-white px-3 py-1.5 text-sm text-stone-900 shadow-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
                             data-delegate-dni-input>
                         @error('delegateDni')
                             <p class="text-xs text-red-600">{{ $message }}</p>
@@ -145,7 +145,10 @@
                     <h2 class="text-xl font-bold tracking-tight text-gray-900">
                         {{ $voting->name }}
                     </h2>
-                    <p class="mt-2 text-sm text-gray-600">{{ $voting->question }}</p>
+                    <div class="prose prose-sm mt-2 max-w-none text-gray-600"
+                        data-voting-question="{{ $voting->id }}">
+                        {!! $voting->question !!}
+                    </div>
 
                     @if (in_array($voting->id, $votedVotingIds, true))
                         <div
@@ -165,7 +168,7 @@
                                     <input type="radio"
                                         wire:model="selectedOptions.{{ $voting->id }}"
                                         value="{{ $option->id }}"
-                                        class="h-4 w-4 border-gray-300 text-[#d9755b] focus:ring-[#d9755b]">
+                                        class="h-4 w-4 border-gray-300 text-brand-600 focus:ring-brand-600">
                                     <span>{{ $option->label }}</span>
                                 </label>
                             @endforeach
@@ -191,8 +194,8 @@
 
     <template x-teleport="body">
         <div x-show="$wire.showDelegatedModal">
-            <div class="fixed inset-0 z-[100] bg-black/50" aria-hidden="true"></div>
-            <div class="fixed inset-0 z-[110] grid place-items-center p-4">
+            <div class="fixed inset-0 z-100 bg-black/50" aria-hidden="true"></div>
+            <div class="fixed inset-0 z-110 grid place-items-center p-4">
                 <div class="w-full max-w-6xl space-y-4 rounded-xl bg-white p-6 shadow-2xl"
                     data-front-delegated-modal>
                     <div class="flex items-start justify-between gap-3">
@@ -210,7 +213,7 @@
                         <input id="delegatedSearch" type="text"
                             wire:model.live.debounce.300ms="delegatedSearch"
                             placeholder="{{ __('votings.front.delegated_search_placeholder') }}"
-                            class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                            class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600">
                     </div>
 
                     <div class="max-h-[70vh] overflow-auto rounded-lg border border-gray-200">
@@ -284,8 +287,8 @@
 
     <template x-teleport="body">
         <div x-show="$wire.showInPersonModal">
-            <div class="fixed inset-0 z-[100] bg-black/50" aria-hidden="true"></div>
-            <div class="fixed inset-0 z-[110] grid place-items-center p-4">
+            <div class="fixed inset-0 z-100 bg-black/50" aria-hidden="true"></div>
+            <div class="fixed inset-0 z-110 grid place-items-center p-4">
                 <div class="w-full max-w-6xl space-y-4 rounded-xl bg-white p-6 shadow-2xl"
                     data-front-in-person-modal>
                     <div class="flex items-start justify-between gap-3">
@@ -303,7 +306,7 @@
                         <input id="inPersonSearch" type="text"
                             wire:model.live.debounce.300ms="inPersonSearch"
                             placeholder="{{ __('votings.front.in_person_search_placeholder') }}"
-                            class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]">
+                            class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600">
                     </div>
 
                     <div class="max-h-[70vh] overflow-auto rounded-lg border border-gray-200">

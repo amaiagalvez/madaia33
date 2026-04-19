@@ -9,6 +9,7 @@ use App\Models\Location;
 use App\Models\VotingBallot;
 use App\Livewire\Admin\Users;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
     foreach (Role::names() as $roleName) {
@@ -310,4 +311,24 @@ it('prevents deleting a user when related owner has assignment history even if i
         ->assertSee(__('admin.users.delete_blocked_has_assignments'));
 
     expect(User::query()->whereKey($targetUser->id)->exists())->toBeTrue();
+});
+
+it('resets user password to default value after confirmation modal flow', function () {
+    $manager = adminUser();
+
+    $targetUser = User::factory()->create([
+        'email' => 'reset-password-user@example.com',
+        'password' => 'old-secret-pass',
+    ]);
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('confirmResetPassword', $targetUser->id)
+        ->assertSet('confirmingResetPasswordUserId', $targetUser->id)
+        ->assertSet('showResetPasswordModal', true)
+        ->call('resetUserPassword')
+        ->assertSet('confirmingResetPasswordUserId', null)
+        ->assertSet('showResetPasswordModal', false);
+
+    expect(Hash::check('123456789', $targetUser->fresh()->password))->toBeTrue();
 });

@@ -334,6 +334,10 @@ return [
         'empty' => 'Ez dago erabiltzaile erregistrorik.',
         'delete_title' => 'Erabiltzailea ezabatu',
         'delete_confirmation' => 'Ekintza honek erabiltzailea ezabatuko du (soft delete).',
+        'reset_password_action' => 'Pasahitza berrezarri',
+        'reset_password_title' => 'Erabiltzailearen pasahitza berrezarri',
+        'reset_password_confirmation' => 'Ekintza honek pasahitza 123456789 baliora ezarriko du. Jarraitu nahi duzu?',
+        'password_reset_success' => 'Pasahitza berrezarri da.',
         'delete_blocked_has_votes' => 'Ezin da erabiltzailea ezabatu, haren jabeak dagoeneko bozkatu duelako bozketaren batean.',
         'delete_blocked_has_assignments' => 'Ezin da erabiltzailea ezabatu, haren jabeak jabetza esleituak dituelako (aktiboak edo historikoak).',
         'roles_labels' => [
