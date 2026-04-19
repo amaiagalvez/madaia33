@@ -2,23 +2,45 @@
 
 namespace App\Actions\Campaigns;
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Queue;
 use Throwable;
-use Symfony\Component\Process\Process;
 
 class RunQueueWorkStopWhenEmptyAction
 {
+    private const MAX_JOBS_PER_REQUEST = 1000;
+    private const MAX_SECONDS_PER_REQUEST = 300;
+
     public function execute(): bool
     {
         try {
-            $process = new Process(
-                [PHP_BINARY, 'artisan', 'queue:work', '--stop-when-empty'],
-                base_path(),
-            );
+            $connection = (string) config('queue.default', 'database');
+            $queue = (string) config("queue.connections.{$connection}.queue", 'default');
+            $startedAt = microtime(true);
+            $processedJobs = 0;
 
-            $process->setTimeout(300);
-            $process->run();
+            while (Queue::connection($connection)->size($queue) > 0) {
+                $exitCode = Artisan::call('queue:work', [
+                    '--once' => true,
+                    '--queue' => $queue,
+                ]);
 
-            return $process->isSuccessful();
+                if ($exitCode !== 0) {
+                    return false;
+                }
+
+                $processedJobs++;
+
+                if ($processedJobs >= self::MAX_JOBS_PER_REQUEST) {
+                    return false;
+                }
+
+                if ((microtime(true) - $startedAt) >= self::MAX_SECONDS_PER_REQUEST) {
+                    return false;
+                }
+            }
+
+            return true;
         } catch (Throwable $throwable) {
             report($throwable);
 
