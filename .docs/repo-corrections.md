@@ -300,3 +300,5 @@
 - When a controller flow is refactored from `Artisan::call(...)` to an injected action class, Feature tests must mock/bind that action (`app()->instance(...)`) instead of asserting Artisan facade calls; otherwise Mockery InvalidCountException reports expected calls as 0.
 - For queue processing triggered from HTTP/admin actions, avoid daemon-mode `queue:work --stop-when-empty` in environments without PCNTL; use iterative `queue:work --once` with queue-size checks and safety limits (jobs/time) to prevent `undefined function pcntl_signal()` failures.
 - En tablas Blade largas, un parche parcial puede dejar etiquetas `<td>`/`<th>` duplicadas y romper HTML silenciosamente; tras mover columnas, revisar cierre de celdas y ejecutar un test focalizado del listado afectado.
+
+- Cuando el usuario corrige el alcance (por ejemplo, "no cambiar el orden"), aplica un ajuste mínimo: revierte solo las asunciones introducidas por la corrección anterior y conserva el objetivo funcional principal con un test de regresión focalizado.

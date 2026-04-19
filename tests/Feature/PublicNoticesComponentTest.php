@@ -81,12 +81,27 @@ test('livewire public notices filter with general notices', function () {
 });
 
 test('livewire public notices orders by published_at descending', function () {
-    $notice1 = Notice::factory()->public()->create(['published_at' => now()->subDays(2)]);
-    $notice2 = Notice::factory()->public()->create(['published_at' => now()->subDay(1)]);
-    $notice3 = Notice::factory()->public()->create(['published_at' => now()]);
+    $oldest = Notice::factory()->public()->create(['published_at' => now()->subDays(2)]);
+    $middle = Notice::factory()->public()->create(['published_at' => now()->subDay()]);
+    $newest = Notice::factory()->public()->create(['published_at' => now()]);
 
     Livewire::test(PublicNotices::class)
-        ->assertViewHas('notices', fn ($notices) => $notices->count() === 3);
+        ->assertViewHas('notices', function ($notices) use ($newest, $middle, $oldest) {
+            $ids = $notices->pluck('id')->values()->all();
+
+            return $ids === [$newest->id, $middle->id, $oldest->id];
+        });
+});
+
+test('livewire public notices includes notices with future published_at', function () {
+    $futureNotice = Notice::factory()->public()->create([
+        'title_eu' => 'Etorkizuneko iragarkia',
+        'title_es' => 'Anuncio futuro',
+        'published_at' => now()->addDays(7),
+    ]);
+
+    Livewire::test(PublicNotices::class)
+        ->assertSee($futureNotice->title);
 });
 
 test('livewire public notices handles empty state', function () {

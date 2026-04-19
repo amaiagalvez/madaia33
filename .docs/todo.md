@@ -63,3 +63,5 @@ añadir una regla al agente amalur para que lo mantenga actualizado
 
 //123456789
 $2y$12$uaKH0btUF6aJXzp.FXKSBOzqtSJER5FjViLkHfklpmcj2x/sJxqj2
+
+-- crear contraseña y mandarla en el email de ongietorri

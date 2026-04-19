@@ -12,54 +12,65 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
     $title = 'Dusk Test Iragarkia ' . now()->timestamp;
     $adminNoticesPath = '/admin/iragarkiak';
+    $createPublishedAt = '2026-04-10';
+    $createPublishedAtDisplay = '10/04/2026';
+    $updatedPublishedAt = '2026-04-12';
+    $updatedPublishedAtDisplay = '12/04/2026';
 
     /** @var DuskTestCase $this */
-    $this->browse(function (Browser $browser) use ($admin, $title, $adminNoticesPath) {
+    $this->browse(function (Browser $browser) use ($admin, $title, $adminNoticesPath, $createPublishedAt, $createPublishedAtDisplay, $updatedPublishedAt, $updatedPublishedAtDisplay) {
         // Login and go to notices admin
         $browser->loginAs($admin)
             ->visit($adminNoticesPath)
             ->waitForText('Sortu berria');
 
-        // Create notice (draft, not public)
+        // Create notice with explicit published date
         $browser->press('Sortu berria')
             ->waitFor('#titleEu')
             ->type('#titleEu', $title)
             ->type('#contentEu', 'Dusk test edukia.')
+            ->waitFor('#publishedAt')
+            ->type('#publishedAt', $createPublishedAt);
+
+        $browser->script(<<<'JS'
+            const publishButton = Array.from(document.querySelectorAll('[data-admin-field="boolean-toggle"] button'))
+                .find((button) => button.textContent.includes('Bai'));
+            if (publishButton) {
+                publishButton.click();
+            }
+        JS);
+
+        $browser
             ->press('Sortu berria')
             ->waitForText($title)
-            ->assertSee($title);
+            ->assertSee($title)
+            ->assertSee($createPublishedAtDisplay);
 
-        // Publish notice from row action
-        $browser->pause(500);
-
-        $browser->script("
+        // Edit notice and update published date
+        $browser->script(" 
             const rows = document.querySelectorAll('tbody tr');
             for (const row of rows) {
                 if (row.textContent.includes('{$title}')) {
-                    const btn = row.querySelector('button[title=\"Argitaratu\"]');
+                    const btn = row.querySelector('button[title=\"Editatu\"]');
                     if (btn) btn.click();
                     break;
                 }
             }
         ");
 
-        $browser->waitForText('Baieztatu', 5);
-
-        $browser->script(<<<'JS'
-            const confirmButton = Array.from(document.querySelectorAll('dialog[open] button'))
-                .find((button) => button.textContent.includes('Baieztatu'));
-            if (confirmButton) {
-                confirmButton.click();
-            }
-        JS);
-
-        $browser->waitForTextIn('tbody', $title, 5);
+        $browser->waitFor('#publishedAt', 5)
+            ->assertInputValue('#publishedAt', $createPublishedAt)
+            ->clear('#publishedAt')
+            ->type('#publishedAt', $updatedPublishedAt)
+            ->press('Gorde')
+            ->waitForTextIn('tbody', $title, 5)
+            ->assertSee($updatedPublishedAtDisplay);
 
         // Verify visible in public
         $browser->visit('/eu/iragarkiak')
             ->assertSee($title);
 
-        // Unpublish
+        // Unpublish notice from row action
         $browser->visit($adminNoticesPath)
             ->waitForText($title)
             ->pause(500);

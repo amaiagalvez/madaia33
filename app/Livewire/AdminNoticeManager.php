@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Notice;
 use Livewire\Component;
 use App\Models\Location;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use App\Models\NoticeLocation;
@@ -32,6 +33,10 @@ class AdminNoticeManager extends Component
     public string $contentEs = '';
 
     public bool $isPublic = false;
+
+    public string $publishedAt = '';
+
+    public string $originalPublishedAt = '';
 
     /** @var string[] */
     public array $selectedLocations = [];
@@ -81,6 +86,7 @@ class AdminNoticeManager extends Component
             'contentEu' => 'required|string',
             'contentEs' => 'nullable|string',
             'isPublic' => 'boolean',
+            'publishedAt' => 'nullable|date',
             'selectedLocations' => $selectedLocationsRule,
             'selectedLocations.*' => $selectedLocationRules,
         ];
@@ -106,6 +112,8 @@ class AdminNoticeManager extends Component
         $this->contentEu = $notice->content_eu ?? '';
         $this->contentEs = $notice->content_es ?? '';
         $this->isPublic = $notice->is_public;
+        $this->publishedAt = $notice->published_at?->format('Y-m-d') ?? '';
+        $this->originalPublishedAt = $notice->published_at?->toDateTimeString() ?? '';
         $this->selectedLocations = $notice->locations
             ->map(fn (NoticeLocation $location): ?string => $location->location_code)
             ->filter()
@@ -199,6 +207,23 @@ class AdminNoticeManager extends Component
 
     private function resolvePublishedAt(?Notice $existingNotice = null): mixed
     {
+        $selectedPublishedAt = $this->publishedAt !== ''
+            ? Carbon::parse($this->publishedAt)->startOfDay()
+            : null;
+
+        if (
+            $existingNotice !== null
+            && $selectedPublishedAt !== null
+            && $this->originalPublishedAt !== ''
+            && Carbon::parse($this->originalPublishedAt)->toDateString() === $selectedPublishedAt->toDateString()
+        ) {
+            return $existingNotice->published_at;
+        }
+
+        if ($selectedPublishedAt !== null) {
+            return $selectedPublishedAt;
+        }
+
         if ($existingNotice !== null) {
             if (! $this->isPublic) {
                 return $existingNotice->published_at;
@@ -309,6 +334,8 @@ class AdminNoticeManager extends Component
         $this->contentEu = '';
         $this->contentEs = '';
         $this->isPublic = false;
+        $this->publishedAt = '';
+        $this->originalPublishedAt = '';
         $this->selectedLocations = [];
         $this->resetValidation();
     }

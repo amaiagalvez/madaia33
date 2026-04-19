@@ -10,7 +10,7 @@ return [
     'filter_hint' => 'Aukeratu kokapena eta aurkitu dagokizun informazioa azkarrago.',
     'empty' => 'Une honetan ez dago iragarkirik.',
     'no_translation' => 'Iragarki hau ez dago euskaraz itzulita.',
-    'published_at' => 'Argitaratze-data',
+    'published_at' => 'Data',
     'portal' => 'Portala',
     'local' => 'Lokala',
     'garage' => 'Garaje-solairua',
