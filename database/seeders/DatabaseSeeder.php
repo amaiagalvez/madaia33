@@ -14,12 +14,14 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             DirectMessagesCampaignSeeder::class,
             CampaignTemplateSeeder::class,
-            LocationSeeder::class,
-            PropertySeeder::class,
         ]);
 
         if (app()->isLocal()) {
-            $this->call(DevSeeder::class);
+            $this->call([
+                LocationSeeder::class,
+                PropertySeeder::class,
+                DevSeeder::class,
+            ]);
         }
     }
 }

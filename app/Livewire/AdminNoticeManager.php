@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Notice;
@@ -32,6 +33,10 @@ class AdminNoticeManager extends Component
     public string $contentEs = '';
 
     public bool $isPublic = false;
+
+    public string $publishedAt = '';
+
+    public string $originalPublishedAt = '';
 
     /** @var string[] */
     public array $selectedLocations = [];
@@ -81,6 +86,7 @@ class AdminNoticeManager extends Component
             'contentEu' => 'required|string',
             'contentEs' => 'nullable|string',
             'isPublic' => 'boolean',
+            'publishedAt' => 'nullable|date',
             'selectedLocations' => $selectedLocationsRule,
             'selectedLocations.*' => $selectedLocationRules,
         ];
@@ -106,6 +112,8 @@ class AdminNoticeManager extends Component
         $this->contentEu = $notice->content_eu ?? '';
         $this->contentEs = $notice->content_es ?? '';
         $this->isPublic = $notice->is_public;
+        $this->publishedAt = $notice->published_at?->format('Y-m-d') ?? '';
+        $this->originalPublishedAt = $notice->published_at?->toDateTimeString() ?? '';
         $this->selectedLocations = $notice->locations
             ->map(fn (NoticeLocation $location): ?string => $location->location_code)
             ->filter()
@@ -199,15 +207,48 @@ class AdminNoticeManager extends Component
 
     private function resolvePublishedAt(?Notice $existingNotice = null): mixed
     {
-        if ($existingNotice !== null) {
-            if (! $this->isPublic) {
-                return $existingNotice->published_at;
-            }
+        $selectedPublishedAt = $this->selectedPublishedAt();
 
-            return $existingNotice->published_at ?: now();
+        if ($this->shouldKeepOriginalPublishedAt($existingNotice, $selectedPublishedAt)) {
+            return $existingNotice?->published_at;
         }
 
-        return $this->isPublic ? now() : null;
+        if ($selectedPublishedAt !== null) {
+            return $selectedPublishedAt;
+        }
+
+        return $this->fallbackPublishedAt($existingNotice);
+    }
+
+    private function selectedPublishedAt(): ?Carbon
+    {
+        if ($this->publishedAt === '') {
+            return null;
+        }
+
+        return Carbon::parse($this->publishedAt)->startOfDay();
+    }
+
+    private function shouldKeepOriginalPublishedAt(?Notice $existingNotice, ?Carbon $selectedPublishedAt): bool
+    {
+        if ($existingNotice === null || $selectedPublishedAt === null || $this->originalPublishedAt === '') {
+            return false;
+        }
+
+        return Carbon::parse($this->originalPublishedAt)->toDateString() === $selectedPublishedAt->toDateString();
+    }
+
+    private function fallbackPublishedAt(?Notice $existingNotice): mixed
+    {
+        if ($existingNotice === null) {
+            return $this->isPublic ? now() : null;
+        }
+
+        if (! $this->isPublic) {
+            return $existingNotice->published_at;
+        }
+
+        return $existingNotice->published_at ?: now();
     }
 
     public function publishNotice(int $id): void
@@ -309,6 +350,8 @@ class AdminNoticeManager extends Component
         $this->contentEu = '';
         $this->contentEs = '';
         $this->isPublic = false;
+        $this->publishedAt = '';
+        $this->originalPublishedAt = '';
         $this->selectedLocations = [];
         $this->resetValidation();
     }

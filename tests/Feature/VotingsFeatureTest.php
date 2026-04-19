@@ -126,6 +126,42 @@ it('shows votings explanation card text from settings in front votings', functio
         ->assertSee('Bozketen azalpen pertsonalizatua');
 });
 
+it('renders voting question html on front votings cards without escaping tags', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $portal = Location::factory()->portal()->create(['code' => '33-HQ']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+        'question_eu' => '<div>Hau <strong>galdera</strong> da</div>',
+        'question_es' => '<div>Esta <strong>pregunta</strong> existe</div>',
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    test()->actingAs($owner->user)
+        ->get(route('votings.eu'))
+        ->assertSuccessful()
+        ->assertSeeHtml('data-voting-question="' . $voting->id . '"')
+        ->assertSee('Hau')
+        ->assertSee('galdera')
+        ->assertSee('da')
+        ->assertDontSee('&lt;div&gt;Hau &lt;strong&gt;galdera&lt;/strong&gt; da&lt;/div&gt;');
+});
+
 it('shows votings explanation text for the active locale in front votings', function () {
     app()->setLocale('es');
 

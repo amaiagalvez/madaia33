@@ -57,6 +57,26 @@ it('creating notice appears in admin list', function () {
     expect(Notice::where('title_eu', 'Iragarki berria')->exists())->toBeTrue();
 });
 
+it('stores explicit published_at when creating a public notice', function () {
+    $user = adminUser();
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->set('titleEu', 'Iragarki datarekin')
+        ->set('titleEs', 'Aviso con fecha')
+        ->set('contentEu', 'Edukia')
+        ->set('contentEs', 'Contenido')
+        ->set('isPublic', true)
+        ->set('publishedAt', '2026-04-10')
+        ->call('saveNotice')
+        ->assertSee(__('general.messages.saved'));
+
+    $notice = Notice::where('title_eu', 'Iragarki datarekin')->firstOrFail();
+
+    expect($notice->published_at?->toDateString())->toBe('2026-04-10')
+        ->and($notice->is_public)->toBeTrue();
+});
+
 it('publishing notice makes it visible in public area', function () {
     $user = adminUser();
     $notice = Notice::factory()->private()->create();
@@ -292,6 +312,26 @@ it('edits an existing notice and replaces locations on save', function () {
         ->and($notice->content_es)->toBeNull()
         ->and($notice->published_at?->toDateTimeString())->toBe($originalPublishedAt?->toDateTimeString())
         ->and($notice->locations->pluck('location_code')->values()->toArray())->toBe(['P-1']);
+});
+
+it('updates explicit published_at when editing a public notice', function () {
+    $user = adminUser();
+
+    $notice = Notice::factory()->public()->create([
+        'title_eu' => 'Data editatzeko',
+        'published_at' => now()->subDay(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('editNotice', $notice->id)
+        ->set('titleEu', 'Data editatzeko')
+        ->set('contentEu', $notice->content_eu)
+        ->set('isPublic', true)
+        ->set('publishedAt', '2026-04-12')
+        ->call('saveNotice');
+
+    expect($notice->fresh()->published_at?->toDateString())->toBe('2026-04-12');
 });
 
 it('creates UUID slug when title does not produce valid slug', function () {

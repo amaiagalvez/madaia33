@@ -5,16 +5,19 @@ namespace App\Livewire\Admin;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
+use App\Models\Setting;
 use Livewire\Component;
 use App\Models\Location;
 use App\SupportedLocales;
-use Illuminate\Support\Str;
 use App\Models\VotingBallot;
 use Livewire\WithPagination;
+use App\Mail\UserWelcomeMail;
 use Illuminate\Validation\Rule;
 use App\Models\UserLoginSession;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class Users extends Component
 {
@@ -43,6 +46,10 @@ class Users extends Component
     public array $selectedManagedLocations = [];
 
     public ?int $confirmingDeleteUserId = null;
+
+    public ?int $confirmingResetPasswordUserId = null;
+
+    public bool $showResetPasswordModal = false;
 
     public string $search = '';
 
@@ -119,16 +126,25 @@ class Users extends Component
 
         abort_if($user->id === 1, 403);
 
-        if ($this->editingUserId === null) {
+        $isNewUser = $this->editingUserId === null;
+
+        if ($isNewUser) {
+            $accessCode = User::generateUniqueCode();
+
             $user->name = $validated['name'];
             $user->email = $validated['email'];
-            $user->password = Str::password(20);
+            $user->code = $accessCode;
+            $user->password = Hash::make($accessCode);
         }
 
         $user->is_active = (bool) $validated['isActive'];
 
         $user->save();
         $user->syncOwnerIdentity();
+
+        if ($isNewUser) {
+            $this->sendWelcomeMail($user);
+        }
 
         $this->syncUserRolesAndLocations($user);
 
@@ -148,6 +164,41 @@ class Users extends Component
     public function cancelDelete(): void
     {
         $this->confirmingDeleteUserId = null;
+    }
+
+    public function confirmResetPassword(int $userId): void
+    {
+        abort_unless($this->currentUser()?->canManageUsers(), 403);
+        abort_if($userId === 1, 403);
+
+        $this->confirmingResetPasswordUserId = $userId;
+        $this->showResetPasswordModal = true;
+    }
+
+    public function cancelResetPassword(): void
+    {
+        $this->confirmingResetPasswordUserId = null;
+        $this->showResetPasswordModal = false;
+    }
+
+    public function resetUserPassword(): void
+    {
+        abort_unless($this->currentUser()?->canManageUsers(), 403);
+
+        if ($this->confirmingResetPasswordUserId === null) {
+            return;
+        }
+
+        abort_if($this->confirmingResetPasswordUserId === 1, 403);
+
+        $user = User::query()->findOrFail($this->confirmingResetPasswordUserId);
+        $user->password = '123456789';
+        $user->code = null;
+        $user->save();
+
+        $this->cancelResetPassword();
+
+        session()->flash('message', __('admin.users.password_reset_success'));
     }
 
     public function deleteUser(): void
@@ -359,6 +410,38 @@ class Users extends Component
                 ->values()
                 ->all(),
         ]);
+    }
+
+    private function sendWelcomeMail(User $user): void
+    {
+        if (! $user->email) {
+            return;
+        }
+
+        $locale = SupportedLocales::normalize($user->language ?? SupportedLocales::DEFAULT);
+
+        $settings = Setting::stringValues(['from_address', 'from_name']);
+
+        $subject = __('admin.users.welcome_email.welcome_subject', locale: $locale);
+
+        $bodyTemplate = __('admin.users.welcome_email.welcome_body', locale: $locale);
+        $changePasswordButtonLabel = __('profile.overview.change_password', locale: $locale);
+
+        $bodyHtml = str_replace(
+            ['##izena##', '##kodea##', '##aldatu_pasahitza##'],
+            [$user->name, (string) ($user->code ?? ''), $changePasswordButtonLabel],
+            $bodyTemplate,
+        );
+
+        Mail::to($user->email)->send(
+            new UserWelcomeMail(
+                fromAddress: $settings['from_address'] ?? null,
+                fromName: $settings['from_name'] ?? null,
+                subjectLine: $subject,
+                bodyHtml: $bodyHtml,
+                recipientLocale: $locale,
+            ),
+        );
     }
 
     private function currentUser(): ?User

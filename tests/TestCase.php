@@ -11,6 +11,16 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        $appKey = (string) config('app.key');
+
+        if ($appKey === '') {
+            $appKey = 'base64:' . base64_encode(random_bytes(32));
+            config()->set('app.key', $appKey);
+            putenv('APP_KEY=' . $appKey);
+            $_ENV['APP_KEY'] = $appKey;
+            $_SERVER['APP_KEY'] = $appKey;
+        }
+
         app()->useStoragePath(sys_get_temp_dir() . '/madaia33-storage-tests-' . getmypid());
 
         config()->set('mail.from.address', 'noreply@example.test');

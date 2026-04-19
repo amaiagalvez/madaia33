@@ -57,6 +57,17 @@
                     {{ __('admin.log_viewer') }}
                 </a>
 
+                <a href="{{ route('admin.artisan.database_copy') }}"
+                    class="inline-flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-800 shadow-sm transition hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2"
+                    data-admin-download-database-copy>
+                    <svg class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 16.5V4.5m0 12 4.5-4.5M12 16.5l-4.5-4.5M3.75 19.5h16.5" />
+                    </svg>
+                    {{ __('admin.database_copy.download_button') }}
+                </a>
+
                 @if (session('status'))
                     <p class="mt-3 text-sm font-medium text-green-700">
                         {{ session('status') }}
@@ -65,18 +76,15 @@
             </div>
         @endif
 
-        {{-- Stats --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-6">
-            <x-admin.stat-card :label="__('admin.stats.published_notices')" :value="$publishedNoticesCount" />
-            <x-admin.stat-card :label="__('admin.stats.total_notices')" :value="$totalNoticesCount" />
-            <x-admin.stat-card :label="__('admin.stats.images')" :value="$imagesCount" />
-            <x-admin.stat-card :label="__('admin.stats.unread_messages')" :value="$unreadMessagesCount" />
-            <x-admin.stat-card :label="__('admin.stats.users')" :value="$usersCount" />
-            <x-admin.stat-card :label="__('admin.stats.owners')" :value="$ownersCount" />
-            <x-admin.stat-card :label="__('admin.stats.invalid_contacts_owners')" :value="$invalidContactsOwnersCount"
-                data-admin-stat-invalid-contacts />
-            <x-admin.stat-card :label="__('admin.stats.locations')" :value="$locationsCount" />
-            <x-admin.stat-card :label="__('admin.stats.votings')" :value="$votingsCount" />
-        </div>
+        @if (auth()->user()?->isSuperadmin())
+            {{-- Stats --}}
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+                <x-admin.stat-card :label="__('admin.stats.unread_messages')" :value="$unreadMessagesCount" />
+                <x-admin.stat-card :label="__('admin.stats.users')" :value="$usersCount" />
+                <x-admin.stat-card :label="__('admin.stats.owners')" :value="$ownersCount" />
+                <x-admin.stat-card :label="__('admin.stats.invalid_contacts_owners')" :value="$invalidContactsOwnersCount"
+                    data-admin-stat-invalid-contacts />
+            </div>
+        @endif
     </div>
 </x-layouts::admin.main>

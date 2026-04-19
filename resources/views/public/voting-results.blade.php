@@ -26,9 +26,10 @@
             <h2 class="text-xl font-semibold text-stone-900" data-voting-results-title>
                 {{ $voting->name }}
             </h2>
-            <p class="text-sm text-stone-700" data-voting-results-question>
-                {{ $voting->question }}
-            </p>
+            <div class="prose prose-sm max-w-none text-sm text-stone-700"
+                data-voting-results-question>
+                {!! $voting->question !!}
+            </div>
         </div>
 
         @php

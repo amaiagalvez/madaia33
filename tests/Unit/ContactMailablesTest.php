@@ -146,9 +146,7 @@ it('renders tracking pixel URL in direct-message mail views', function () {
         fromName: CONTACT_MAIL_FROM_NAME,
         subjectLine: 'Ongietorri',
         bodyHtml: '<p>Edukia</p>',
-        resetUrl: 'https://example.test/reset',
         trackingPixelUrl: $trackingPixelUrl,
-        trackedResetUrl: 'https://example.test/track/click/token?url=https%3A%2F%2Fexample.test%2Freset',
     );
 
     expect($contactConfirmation->render())->toContain($trackingPixelUrl)

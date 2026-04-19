@@ -8,7 +8,12 @@ use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\VotingBallot;
 use App\Livewire\Admin\Users;
+use App\Mail\UserWelcomeMail;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 beforeEach(function () {
     foreach (Role::names() as $roleName) {
@@ -310,4 +315,88 @@ it('prevents deleting a user when related owner has assignment history even if i
         ->assertSee(__('admin.users.delete_blocked_has_assignments'));
 
     expect(User::query()->whereKey($targetUser->id)->exists())->toBeTrue();
+});
+
+it('resets user password to default value after confirmation modal flow', function () {
+    $manager = adminUser();
+
+    $targetUser = User::factory()->create([
+        'code' => '123456789',
+        'email' => 'reset-password-user@example.com',
+        'password' => 'old-secret-pass',
+    ]);
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('confirmResetPassword', $targetUser->id)
+        ->assertSet('confirmingResetPasswordUserId', $targetUser->id)
+        ->assertSet('showResetPasswordModal', true)
+        ->call('resetUserPassword')
+        ->assertSet('confirmingResetPasswordUserId', null)
+        ->assertSet('showResetPasswordModal', false);
+
+    $fresh = $targetUser->fresh();
+    expect(Hash::check('123456789', $fresh->password))->toBeTrue()
+        ->and($fresh->code)->toBeNull();
+});
+
+it('sends welcome email with access code when creating a user from admin panel', function () {
+    Mail::fake();
+
+    $manager = adminUser();
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('createUser')
+        ->set('name', 'Email Welcome User')
+        ->set('email', 'email-welcome-user@example.com')
+        ->set('isActive', true)
+        ->set('selectedRoles', [])
+        ->set('selectedManagedLocations', [])
+        ->call('saveUser')
+        ->assertHasNoErrors();
+
+    $createdUser = User::query()->where('email', 'email-welcome-user@example.com')->firstOrFail();
+
+    Mail::assertSent(UserWelcomeMail::class, function (UserWelcomeMail $mail) use ($createdUser): bool {
+        return $mail->hasTo('email-welcome-user@example.com')
+            && is_string($createdUser->code)
+            && str_contains($mail->bodyHtml, (string) $createdUser->code)
+            && ! str_contains($mail->bodyHtml, route('security.edit'))
+            && ! str_contains($mail->bodyHtml, '##aldatu_pasahitza##')
+            && str_contains($mail->bodyHtml, __('profile.overview.change_password', locale: $createdUser->language));
+    });
+});
+
+it('allows login with the access code sent when user is created from admin panel', function () {
+    $manager = adminUser();
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('createUser')
+        ->set('name', 'Code Login User')
+        ->set('email', 'code-login-user@example.com')
+        ->set('isActive', true)
+        ->set('selectedRoles', [])
+        ->set('selectedManagedLocations', [])
+        ->call('saveUser')
+        ->assertHasNoErrors();
+
+    $createdUser = User::query()->where('email', 'code-login-user@example.com')->firstOrFail();
+
+    expect($createdUser->code)->toMatch('/^\d{9}$/')
+        ->and(Hash::check((string) $createdUser->code, (string) $createdUser->password))->toBeTrue();
+
+    Auth::logout();
+
+    test()->assertGuest();
+
+    test()->withoutMiddleware(PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => $createdUser->email,
+            'password' => (string) $createdUser->code,
+        ])
+        ->assertSessionHasNoErrors();
+
+    test()->assertAuthenticatedAs($createdUser);
 });

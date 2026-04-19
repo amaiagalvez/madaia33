@@ -497,7 +497,7 @@ class Owners extends Component
     public function render(): View
     {
         return view('livewire.admin.owners.index', [
-            'owners' => $this->buildOwnersQuery()->orderBy('coprop1_name')->paginate(20),
+            'owners' => $this->buildOwnersQuery()->orderBy('id')->paginate(20),
             ...$this->loadViewData(),
             'expandedAssignments' => $this->loadExpandedAssignments(),
         ]);

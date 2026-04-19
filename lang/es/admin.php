@@ -123,6 +123,17 @@ return [
         'status_finished' => 'Cola procesada hasta vaciarse.',
         'status_failed' => 'No se pudo ejecutar la cola.',
     ],
+    'database_copy' => [
+        'download_button' => 'Descargar copia de BD',
+        'errors' => [
+            'connection_not_found' => 'No se pudo encontrar la conexión de base de datos.',
+            'unsupported_driver' => 'Este tipo de base de datos no admite descarga de copia.',
+            'sqlite_in_memory' => 'No se puede descargar una copia cuando SQLite está en memoria.',
+            'sqlite_file_missing' => 'No se encontró el archivo de base de datos SQLite.',
+            'database_name_missing' => 'Falta el nombre de la base de datos en la configuración.',
+            'dump_failed' => 'No se pudo generar la copia de la base de datos.',
+        ],
+    ],
     'legal' => [
         'privacy_policy' => 'Política de privacidad',
         'legal_notice' => 'Aviso legal',
@@ -249,6 +260,11 @@ return [
             'active' => 'Propietarias activas',
             'inactive' => 'Propietarias inactivas',
             'all' => 'Todas',
+            'status_pdf' => 'Estado',
+            'portal_pdf' => 'Portal',
+            'garage_pdf' => 'Garaje',
+            'storage_pdf' => 'Trastero',
+            'local_pdf' => 'Local',
             'all_portals' => 'Todos los portales',
             'all_locals' => 'Todos los locales',
             'all_garages' => 'Todos los garajes',
@@ -273,6 +289,13 @@ return [
         'welcome_not_sent_missing_email' => 'No se ha enviado el mensaje de bienvenida porque la propietaria no tiene email.',
         'edit_owner' => 'Editar propietaria',
         'edit_submit' => 'Guardar cambios',
+        'download_pdf' => 'Descargar PDF',
+        'pdf' => [
+            'title' => 'Listado de propietarias',
+            'filename' => 'listado-propietarias',
+            'generated_at' => 'Fecha de generación',
+            'applied_filters' => 'Filtros aplicados',
+        ],
         'audit' => [
             'title' => 'Historial de cambios',
             'empty' => 'Todavia no hay cambios registrados para esta propietaria.',
@@ -303,7 +326,8 @@ return [
         ],
         'email' => [
             'default_subject' => 'Madaia 33 - Confirmación de propiedad',
-            'default_body' => '<p>Hola ##izena##,</p><p>Se te han asignado las siguientes propiedades:</p>##info##',
+            'default_body' => '<p>Hola ##izena##,</p><p>Tu codigo de acceso es: <strong>##kodea##</strong></p><p>Se te han asignado las siguientes propiedades:</p>##info##',
+            'password_placeholder' => '***** (tu contraseña)',
             'no_properties' => 'No hay propiedades asignadas.',
             'reset_action' => 'Configurar contraseña',
         ],
@@ -334,6 +358,10 @@ return [
         'empty' => 'No hay usuarias registradas.',
         'delete_title' => 'Eliminar usuaria',
         'delete_confirmation' => 'Esta acción eliminará a la usuaria (soft delete).',
+        'reset_password_action' => 'Restablecer contraseña',
+        'reset_password_title' => 'Restablecer contraseña de la usuaria',
+        'reset_password_confirmation' => 'Esta acción establecerá la contraseña en 123456789. ¿Quieres continuar?',
+        'password_reset_success' => 'La contraseña se ha restablecido.',
         'delete_blocked_has_votes' => 'No se puede eliminar la usuaria porque su propietaria ya ha votado en alguna votación.',
         'delete_blocked_has_assignments' => 'No se puede eliminar la usuaria porque su propietaria tiene propiedades asignadas (activas o históricas).',
         'roles_labels' => [
@@ -344,6 +372,10 @@ return [
             'voto_delegado' => 'Voto delegado',
         ],
         'delegated_vote_terms_accepted' => 'Condiciones',
+        'welcome_email' => [
+            'welcome_subject' => 'Bienvenida/a - Tu código de acceso',
+            'welcome_body' => '<p>Hola ##izena##,</p><p>Has sido registrada en el sistema. Entra en <a href="https://madaia33.eus">madaia33.eus</a>. Tu código de acceso es: <strong>##kodea##</strong></p><p>Después de entrar, por seguridad, cambia tu contraseña desde tu perfil pulsando el botón "##aldatu_pasahitza##".</p>',
+        ],
     ],
     'votings' => [
         'menu' => 'Votaciones',

@@ -174,7 +174,9 @@ test('password reset notification keeps the visitor locale and localized reset l
 test('password can be reset with valid token', function () {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'code' => '123456789',
+    ]);
 
     test()->withoutMiddleware(PreventRequestForgery::class)
         ->post(route('password.email'), ['email' => $user->email]);
@@ -191,6 +193,8 @@ test('password can be reset with valid token', function () {
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('login', absolute: false));
+
+        expect($user->fresh()->code)->toBeNull();
 
         return true;
     });
