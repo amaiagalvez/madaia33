@@ -16,6 +16,7 @@
 ==> comprobar public/build carpeta (production)
 
 # Code
+- [ ] PDF voto delegado y voto presencial,
 - [ ] crear un aviso para las votaciones activas
 - [ ] spec kiro pendientes (obra)
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué

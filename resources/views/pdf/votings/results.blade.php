@@ -184,9 +184,9 @@
 
     @forelse ($votings as $voting)
         <section class="voting-block">
-            <p class="question-eu">{{ $voting['question_eu'] }}</p>
+            <p class="question-eu">{!! $voting['question_eu'] !!}</p>
             @if ($voting['question_es'] !== '')
-                <p class="question-es">{{ $voting['question_es'] }}</p>
+                <p class="question-es">{!! $voting['question_es'] !!}</p>
             @endif
 
             <table class="meta">

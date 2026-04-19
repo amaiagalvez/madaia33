@@ -313,3 +313,4 @@
 - If Docker app containers lack `mysqldump`/`mariadb-dump`, provide a DB-backed SQL streaming fallback for admin backups so the feature works without extra OS packages; keep CLI dump as the preferred fast path when available.
 - For download endpoints that return physical files (like sqlite backups), set an explicit `Content-Type` in the response and assert it in Feature tests; temp-file MIME guessing can return `text/plain` and break deterministic header expectations.
 - In Livewire table tests, avoid asserting removed/static labels (e.g., `%Erakina`, `%Komunidad`) when the UI now renders only formatted values; assert stable data values/selectors instead to prevent false failures from presentation copy refactors.
+- If CI executes Feature/Livewire tests without APP_KEY, set a deterministic fallback app key in `tests/TestCase::setUp()` (and sync to env/server vars) to prevent `MissingAppKeyException` during view rendering.
