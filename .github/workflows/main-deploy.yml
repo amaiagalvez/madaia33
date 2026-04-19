@@ -292,7 +292,22 @@ jobs:
             fi
 
             if [[ "$HAS_UPLOADS" == "true" ]]; then
-              printf "%s\n" "mirror -R --verbose .deploy-sync/upload '$FTP_SERVER_DIR';" >> "$command_file"
+              while IFS= read -r staged_file; do
+                local relative_path
+                local relative_dir
+                local remote_target_dir
+
+                relative_path="${staged_file#.deploy-sync/upload/}"
+                relative_dir="$(dirname "$relative_path")"
+                remote_target_dir="$FTP_SERVER_DIR"
+
+                if [[ "$relative_dir" != "." ]]; then
+                  remote_target_dir="${FTP_SERVER_DIR}${relative_dir}"
+                  printf "mkdir -p '%s';\n" "$remote_target_dir" >> "$command_file"
+                fi
+
+                printf "put -O '%s' '%s';\n" "$remote_target_dir" "$staged_file" >> "$command_file"
+              done < <(find .deploy-sync/upload -type f | sort)
             fi
 
             if [[ "$SYNC_BUILD_ASSETS" == "true" ]]; then
@@ -322,6 +337,7 @@ jobs:
               printf "%s\n" "set net:max-retries 1"
               printf "%s\n" "set net:reconnect-interval-base 5"
               printf "%s\n" "set net:reconnect-interval-max 10"
+              printf "%s\n" "set xfer:clobber on"
               printf "%s\n" "set ssl:verify-certificate no"
               printf "%s\n" "set ftp:ssl-allow $ssl_allow"
               printf "%s\n" "set ftp:ssl-force $ssl_force"
