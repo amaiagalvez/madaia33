@@ -249,6 +249,11 @@ return [
             'active' => 'Propietarias activas',
             'inactive' => 'Propietarias inactivas',
             'all' => 'Todas',
+            'status_pdf' => 'Estado',
+            'portal_pdf' => 'Portal',
+            'garage_pdf' => 'Garaje',
+            'storage_pdf' => 'Trastero',
+            'local_pdf' => 'Local',
             'all_portals' => 'Todos los portales',
             'all_locals' => 'Todos los locales',
             'all_garages' => 'Todos los garajes',
@@ -273,6 +278,13 @@ return [
         'welcome_not_sent_missing_email' => 'No se ha enviado el mensaje de bienvenida porque la propietaria no tiene email.',
         'edit_owner' => 'Editar propietaria',
         'edit_submit' => 'Guardar cambios',
+        'download_pdf' => 'Descargar PDF',
+        'pdf' => [
+            'title' => 'Listado de propietarias',
+            'filename' => 'listado-propietarias',
+            'generated_at' => 'Fecha de generación',
+            'applied_filters' => 'Filtros aplicados',
+        ],
         'audit' => [
             'title' => 'Historial de cambios',
             'empty' => 'Todavia no hay cambios registrados para esta propietaria.',
@@ -350,9 +362,8 @@ return [
         ],
         'delegated_vote_terms_accepted' => 'Condiciones',
         'welcome_email' => [
-            'welcome_subject' => 'Bienvenida - Tu código de acceso',
-            'welcome_body' => '<p>Hola ##izena##,</p><p>Has sido registrada en el sistema. Tu código de acceso es: <strong>##kodea##</strong></p><p>Te recomendamos acceder a tu perfil y cambiar tu contraseña usando el botón <strong>"Cambiar Contraseña"</strong>.</p><p>##aldatu_pasahitza##</p>',
-            'change_password_button' => 'Cambiar Contraseña',
+            'welcome_subject' => 'Bienvenida/a - Tu código de acceso',
+            'welcome_body' => '<p>Hola ##izena##,</p><p>Has sido registrada en el sistema. Entra en <a href="https://madaia33.eus">madaia33.eus</a>. Tu código de acceso es: <strong>##kodea##</strong></p><p>Después de entrar, por seguridad, te recomendamos cambiar tu contraseña desde tu perfil.</p>',
         ],
     ],
     'votings' => [

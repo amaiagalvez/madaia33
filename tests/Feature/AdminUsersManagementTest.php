@@ -10,6 +10,7 @@ use App\Mail\UserWelcomeMail;
 use App\Models\VotingBallot;
 use App\Livewire\Admin\Users;
 use App\Models\PropertyAssignment;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 
@@ -360,7 +361,42 @@ it('sends welcome email with access code when creating a user from admin panel',
         return $mail->hasTo('email-welcome-user@example.com')
             && is_string($createdUser->code)
             && str_contains($mail->bodyHtml, (string) $createdUser->code)
-            && str_contains($mail->bodyHtml, route('security.edit'))
-            && str_contains($mail->bodyHtml, 'Pasahitza aldatu');
+            && ! str_contains($mail->bodyHtml, route('security.edit'))
+            && ! str_contains($mail->bodyHtml, '##aldatu_pasahitza##')
+            && ! str_contains($mail->bodyHtml, 'Pasahitza aldatu')
+            && ! str_contains($mail->bodyHtml, 'Cambiar Contraseña');
     });
+});
+
+it('allows login with the access code sent when user is created from admin panel', function () {
+    $manager = adminUser();
+
+    Livewire::actingAs($manager)
+        ->test(Users::class)
+        ->call('createUser')
+        ->set('name', 'Code Login User')
+        ->set('email', 'code-login-user@example.com')
+        ->set('isActive', true)
+        ->set('selectedRoles', [])
+        ->set('selectedManagedLocations', [])
+        ->call('saveUser')
+        ->assertHasNoErrors();
+
+    $createdUser = User::query()->where('email', 'code-login-user@example.com')->firstOrFail();
+
+    expect($createdUser->code)->toMatch('/^\d{9}$/')
+        ->and(Hash::check((string) $createdUser->code, (string) $createdUser->password))->toBeTrue();
+
+    Auth::logout();
+
+    test()->assertGuest();
+
+    test()->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class)
+        ->post(route('login.store'), [
+            'email' => $createdUser->email,
+            'password' => (string) $createdUser->code,
+        ])
+        ->assertSessionHasNoErrors();
+
+    test()->assertAuthenticatedAs($createdUser);
 });

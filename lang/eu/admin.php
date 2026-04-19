@@ -250,6 +250,11 @@ return [
             'active' => 'Jabe aktiboak',
             'inactive' => 'Jabe inaktiboak',
             'all' => 'Guztiak',
+            'status_pdf' => 'Egoera',
+            'portal_pdf' => 'Ataria',
+            'garage_pdf' => 'Garajea',
+            'storage_pdf' => 'Trastelekua',
+            'local_pdf' => 'Lokala',
             'all_portals' => 'Atari guztiak',
             'all_locals' => 'Lokal guztiak',
             'all_garages' => 'Garaje guztiak',
@@ -274,6 +279,13 @@ return [
         'welcome_not_sent_missing_email' => 'Ongi etorriko mezua ez da bidali, jabeak ez duelako emailik.',
         'edit_owner' => 'Editatu jabea',
         'edit_submit' => 'Gorde aldaketak',
+        'download_pdf' => 'Deskargatu PDFa',
+        'pdf' => [
+            'title' => 'Jabeen zerrenda',
+            'filename' => 'jabeak-zerrenda',
+            'generated_at' => 'Sortze data',
+            'applied_filters' => 'Aplikatutako iragazkiak',
+        ],
         'audit' => [
             'title' => 'Aldaketen historia',
             'empty' => 'Oraindik ez dago jabe honentzat erregistratutako aldaketarik.',
@@ -351,8 +363,7 @@ return [
         'delegated_vote_terms_accepted' => 'Baldintzak',
         'welcome_email' => [
             'welcome_subject' => 'Ongi etorri - Zure sarbide-kodea',
-            'welcome_body' => '<p>Kaixo ##izena##,</p><p>Sistemara erregistratu zara. Zure sarbide-kodea hau da: <strong>##kodea##</strong></p><p>Gomendatzen dizugu zure profilan sartu eta pasahitza aldatzea <strong>"Pasahitza aldatu"</strong> botoia erabiliz.</p><p>##aldatu_pasahitza##</p>',
-            'change_password_button' => 'Pasahitza aldatu',
+            'welcome_body' => '<p>Kaixo ##izena##,</p><p>Sisteman erregistratuta. Sartu hemen: <a href="https://madaia33.eus">madaia33.eus</a>. Zure sarbide-kodea hau da: <strong>##kodea##</strong></p><p>Sarbidea egin ondoren, zure profiletik pasahitza alda dezakezu.</p>',
         ],
     ],
     'votings' => [

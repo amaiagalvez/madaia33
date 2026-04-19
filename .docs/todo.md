@@ -12,16 +12,18 @@
 - [ ] dusk-test
 
 # Code
--- probar queue goian
--- comprobar public/build carpeta
-al crear un usuario desde el panel admin/erabiltzaileak, mandarle un mensaje avisandole de que se le ha dado de alta y cual es su código para entrar. Decirle que cambie la contraseña desde su perfil pinchando en el botón "Cambiar Contraseña". (frogatzeko)
--- crear un aviso para las votaciones activas
--- jabeak zerrenda en el panel en las columnas atariak, localak, garajeak eta trastelekuak mostrar los porcentajes de cada propiedad asignada (community_pct | location_pct) si la asignación de la propiedad está validada mostrarlo en verde, sino en rojo
+==> probar queue (production)
+==> comprobar public/build carpeta (production)
 
-- spec kiro pendientes (obra)
+al crear un usuario desde el panel admin/erabiltzaileak, mandarle un mensaje avisandole de que se le ha dado de alta y cual es su código para entrar. Decirle que cambie la contraseña desde su perfil pinchando en el botón "Cambiar Contraseña". (frogatzeko)
+no entra, al crear un usuario desde el panel el password tiene que ser el código que se le asigna en el campo code.
+
+- [ ] crear un aviso para las votaciones activas
+- [ ] spec kiro pendientes (obra)
 - [ ] repasar estatistikak home
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
+- Botón para descargar copia de la base de datos a local
 - Deialdiak sartzeko formularioa + pdf + emailez bidali + iragarkia sortu
 - [ ] Añadir espacio Obra (info, formulario, doocumentacion)
 - [ ] https://whatsapp.com/channel/0029VbCTbySGOj9pCe3Pnd47 Botoi bat iragarkiak honea bidaltzeko

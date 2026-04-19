@@ -9,7 +9,6 @@ use App\Models\Setting;
 use Livewire\Component;
 use App\Models\Location;
 use App\SupportedLocales;
-use Illuminate\Support\Str;
 use App\Models\VotingBallot;
 use Livewire\WithPagination;
 use App\Mail\UserWelcomeMail;
@@ -129,9 +128,12 @@ class Users extends Component
         $isNewUser = $this->editingUserId === null;
 
         if ($isNewUser) {
+            $accessCode = User::generateUniqueCode();
+
             $user->name = $validated['name'];
             $user->email = $validated['email'];
-            $user->password = Str::password(20);
+            $user->code = $accessCode;
+            $user->password = $accessCode;
         }
 
         $user->is_active = (bool) $validated['isActive'];
@@ -421,15 +423,11 @@ class Users extends Component
 
         $subject = __('admin.users.welcome_email.welcome_subject', locale: $locale);
 
-        $changePasswordUrl = route('security.edit');
-        $buttonLabel = __('admin.users.welcome_email.change_password_button', locale: $locale);
-        $buttonHtml = '<a href="' . $changePasswordUrl . '" style="display:inline-block;padding:10px 20px;background-color:#793d3d;color:#ffffff;text-decoration:none;border-radius:4px;font-weight:bold;">' . $buttonLabel . '</a>';
-
         $bodyTemplate = __('admin.users.welcome_email.welcome_body', locale: $locale);
 
         $bodyHtml = str_replace(
             ['##izena##', '##kodea##', '##aldatu_pasahitza##'],
-            [$user->name, (string) ($user->code ?? ''), $buttonHtml],
+            [$user->name, (string) ($user->code ?? ''), ''],
             $bodyTemplate,
         );
 
