@@ -13,7 +13,7 @@ return [
         'sessions' => 'Sesiones',
         'received' => 'Mensajes recibidos',
         'messages' => 'Mensajes enviados',
-        'owner' => 'Ficha de propietaria',
+        'owner' => 'Mis Datos',
     ],
     'overview' => [
         'title' => 'Resumen',

@@ -13,7 +13,7 @@ return [
         'sessions' => 'Saioak',
         'received' => 'Jasotako mezuak',
         'messages' => 'Bidalitako mezuak',
-        'owner' => 'Jabearen fitxa',
+        'owner' => 'Nire Datuak',
     ],
     'overview' => [
         'title' => 'Laburpena',

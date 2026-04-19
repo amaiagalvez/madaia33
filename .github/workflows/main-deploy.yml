@@ -252,10 +252,15 @@ jobs:
             echo "::warning::No FTP port responded during preflight. Continuing with deploy attempts (FTPS/FTP fallback)."
           fi
 
-      - name: Install lftp
+      - name: Verify lftp is available
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lftp
+          if ! command -v lftp >/dev/null 2>&1; then
+            echo "lftp is not installed on this self-hosted runner."
+            echo "Install it once on the runner host and re-run the workflow."
+            exit 1
+          fi
+
+          lftp --version | head -n 1
 
       - name: Deploy files via FTPS
         timeout-minutes: 30
@@ -308,21 +313,12 @@ jobs:
             if [[ "$HAS_UPLOADS" == "true" ]]; then
               while IFS= read -r staged_file; do
                 local relative_path
-                local relative_dir
-                local remote_target_dir
+                local remote_output_path
 
                 relative_path="${staged_file#.deploy-sync/upload/}"
-                relative_dir="$(dirname "$relative_path")"
-                remote_target_dir="$FTP_SERVER_DIR"
+                remote_output_path="${FTP_SERVER_DIR}${relative_path}"
 
-                if [[ "$relative_dir" != "." ]]; then
-                  remote_target_dir="${FTP_SERVER_DIR}${relative_dir}"
-                  printf "%s\n" "set cmd:fail-exit false" >> "$command_file"
-                  printf "mkdir -p '%s';\n" "$remote_target_dir" >> "$command_file"
-                  printf "%s\n" "set cmd:fail-exit true" >> "$command_file"
-                fi
-
-                printf "put -O '%s' '%s';\n" "$remote_target_dir" "$staged_file" >> "$command_file"
+                printf "put -o '%s' '%s';\n" "$remote_output_path" "$staged_file" >> "$command_file"
               done < <(find .deploy-sync/upload -type f | sort)
             fi
 
