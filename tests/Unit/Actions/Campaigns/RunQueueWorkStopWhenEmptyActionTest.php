@@ -1,6 +1,5 @@
 <?php
 
-use Mockery;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Artisan;
 use App\Actions\Campaigns\RunQueueWorkStopWhenEmptyAction;

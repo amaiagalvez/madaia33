@@ -1,6 +1,5 @@
 <?php
 
-use Mockery;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Owner;
