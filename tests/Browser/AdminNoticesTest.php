@@ -18,7 +18,7 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
     $updatedPublishedAtDisplay = '12/04/2026';
 
     /** @var DuskTestCase $this */
-    $this->browse(function (Browser $browser) use ($admin, $title, $adminNoticesPath, $createPublishedAt, $createPublishedAtDisplay, $updatedPublishedAt, $updatedPublishedAtDisplay) {
+    $this->browse(function (Browser $browser) use ($admin, $title, $adminNoticesPath, $createPublishedAt, $updatedPublishedAt, $updatedPublishedAtDisplay) {
         // Login and go to notices admin
         $browser->loginAs($admin)
             ->visit($adminNoticesPath)

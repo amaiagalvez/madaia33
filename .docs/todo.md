@@ -17,6 +17,7 @@
 
 # Code
 - [ ] PDF voto delegado y voto presencial,
+- [ ] Los formularios del panel se tapan con el menu de arriba (Bozketak)
 - [ ] crear un aviso para las votaciones activas
 - [ ] spec kiro pendientes (obra)
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
