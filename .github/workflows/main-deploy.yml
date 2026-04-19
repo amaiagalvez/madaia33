@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -41,6 +41,115 @@ jobs:
 
       - name: Build frontend assets
         run: npm run build
+
+      - name: Prepare deploy payload
+        id: deploy_payload
+        env:
+          EVENT_BEFORE: ${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          upload_dir=".deploy-sync/upload"
+          delete_list=".deploy-sync/delete.txt"
+          changes_file=".deploy-sync/changes.tsv"
+
+          rm -rf .deploy-sync
+          mkdir -p "$upload_dir"
+          : > "$delete_list"
+          : > "$changes_file"
+
+          force_full_sync=false
+          sync_build_assets=false
+
+          is_excluded_path() {
+            case "$1" in
+              .git|.git/*|.gitattributes|.gitignore|.github/*|.docs/*|.kiro/*|.specify/*|.vscode/*|node_modules/*|tests/*|vendor/*|dc-data/*|.env|storage/*|composer.phar)
+                return 0
+                ;;
+              *)
+                return 1
+                ;;
+            esac
+          }
+
+          should_sync_build_assets() {
+            case "$1" in
+              resources/*|package.json|package-lock.json|vite.config.js)
+                return 0
+                ;;
+              *)
+                return 1
+                ;;
+            esac
+          }
+
+          stage_file_for_upload() {
+            local path="$1"
+            local target_dir
+
+            target_dir="$upload_dir/$(dirname "$path")"
+            mkdir -p "$target_dir"
+            cp "$path" "$upload_dir/$path"
+          }
+
+          if [[ "$EVENT_NAME" != "push" || -z "$EVENT_BEFORE" || "$EVENT_BEFORE" =~ ^0+$ ]]; then
+            force_full_sync=true
+            echo "Workflow triggered without a reliable push base. Falling back to full sync."
+          else
+            git diff --name-status --find-renames "$EVENT_BEFORE" "$EVENT_SHA" > "$changes_file"
+
+            while IFS=$'\t' read -r status first_path second_path; do
+              [[ -n "$status" ]] || continue
+
+              case "$status" in
+                D)
+                  if ! is_excluded_path "$first_path"; then
+                    printf '%s\n' "$first_path" >> "$delete_list"
+                  fi
+                  continue
+                  ;;
+                R* )
+                  if ! is_excluded_path "$first_path"; then
+                    printf '%s\n' "$first_path" >> "$delete_list"
+                  fi
+                  current_path="$second_path"
+                  ;;
+                *)
+                  current_path="$first_path"
+                  ;;
+              esac
+
+              if is_excluded_path "$current_path"; then
+                continue
+              fi
+
+              if [[ -f "$current_path" ]]; then
+                stage_file_for_upload "$current_path"
+              fi
+
+              if should_sync_build_assets "$current_path"; then
+                sync_build_assets=true
+              fi
+            done < "$changes_file"
+          fi
+
+          has_uploads=false
+          has_deletions=false
+
+          if find "$upload_dir" -type f -print -quit | grep -q .; then
+            has_uploads=true
+          fi
+
+          if [[ -s "$delete_list" ]]; then
+            has_deletions=true
+          fi
+
+          echo "force_full_sync=$force_full_sync" >> "$GITHUB_OUTPUT"
+          echo "sync_build_assets=$sync_build_assets" >> "$GITHUB_OUTPUT"
+          echo "has_uploads=$has_uploads" >> "$GITHUB_OUTPUT"
+          echo "has_deletions=$has_deletions" >> "$GITHUB_OUTPUT"
 
       - name: Normalize FTP server directory
         id: ftp_dir
@@ -142,51 +251,107 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_PORT: ${{ steps.ftp_host.outputs.port }}
           FTP_SERVER_DIR: ${{ steps.ftp_dir.outputs.server_dir }}
+          FORCE_FULL_SYNC: ${{ steps.deploy_payload.outputs.force_full_sync }}
+          SYNC_BUILD_ASSETS: ${{ steps.deploy_payload.outputs.sync_build_assets }}
+          HAS_UPLOADS: ${{ steps.deploy_payload.outputs.has_uploads }}
+          HAS_DELETIONS: ${{ steps.deploy_payload.outputs.has_deletions }}
         run: |
-          set +e
+          set -euo pipefail
 
           fallback_port="21"
 
-          lftp -c "
-            set cmd:fail-exit true;
-            set dns:order inet;
-            set net:timeout 20;
-            set net:max-retries 1;
-            set net:reconnect-interval-base 5;
-            set net:reconnect-interval-max 10;
-            set ssl:verify-certificate no;
-            set ftp:ssl-force true;
-            set ftp:ssl-protect-data true;
-            set ftp:passive-mode true;
-            set ftp:prefer-epsv false;
-            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftps://$FTP_SERVER';
-            echo 'Connected with FTPS';
-              mirror -R --delete --verbose \
-              --exclude-glob '.git' \
-              --exclude-glob '.git/**' \
-              --exclude-glob '.gitattributes' \
-              --exclude-glob '.gitignore' \
-              --exclude-glob '.github/**' \
-              --exclude-glob '.docs/**' \
-              --exclude-glob '.kiro/**' \
-              --exclude-glob '.specify/**' \
-              --exclude-glob '.vscode/**' \
-              --exclude-glob 'node_modules/**' \
-              --exclude-glob 'tests/**' \
-              --exclude-glob 'vendor/**' \
-              --exclude-glob 'dc-data/**' \
-              --exclude-glob '.env' \
-              --exclude-glob 'storage/logs/*' \
-              --exclude-glob 'storage/framework/cache/*' \
-              --exclude-glob 'storage/framework/sessions/*' \
-              --exclude-glob 'storage/framework/views/*' \
-              --exclude 'storage/**' \
-              --exclude 'composer.phar' \
-              . '$FTP_SERVER_DIR';
-            bye
-          "
+          full_sync_command="mirror -R --delete --verbose \
+            --exclude-glob '.git' \
+            --exclude-glob '.git/**' \
+            --exclude-glob '.gitattributes' \
+            --exclude-glob '.gitignore' \
+            --exclude-glob '.github/**' \
+            --exclude-glob '.docs/**' \
+            --exclude-glob '.kiro/**' \
+            --exclude-glob '.specify/**' \
+            --exclude-glob '.vscode/**' \
+            --exclude-glob 'node_modules/**' \
+            --exclude-glob 'tests/**' \
+            --exclude-glob 'vendor/**' \
+            --exclude-glob 'dc-data/**' \
+            --exclude-glob '.env' \
+            --exclude-glob 'storage/logs/*' \
+            --exclude-glob 'storage/framework/cache/*' \
+            --exclude-glob 'storage/framework/sessions/*' \
+            --exclude-glob 'storage/framework/views/*' \
+            --exclude 'storage/**' \
+            --exclude 'composer.phar' \
+            . '$FTP_SERVER_DIR';"
 
+          append_deploy_commands() {
+            local command_file="$1"
+
+            if [[ "$FORCE_FULL_SYNC" == "true" ]]; then
+              echo "$full_sync_command" >> "$command_file"
+              return
+            fi
+
+            if [[ "$HAS_UPLOADS" == "true" ]]; then
+              printf "%s\n" "mirror -R --verbose .deploy-sync/upload '$FTP_SERVER_DIR';" >> "$command_file"
+            fi
+
+            if [[ "$SYNC_BUILD_ASSETS" == "true" ]]; then
+              printf "%s\n" "mirror -R --delete --verbose public/build '${FTP_SERVER_DIR}public/build';" >> "$command_file"
+            fi
+
+            if [[ "$HAS_DELETIONS" == "true" ]]; then
+              while IFS= read -r deleted_path; do
+                [[ -n "$deleted_path" ]] || continue
+                printf "rm -f '%s%s';\n" "$FTP_SERVER_DIR" "$deleted_path" >> "$command_file"
+              done < .deploy-sync/delete.txt
+            fi
+          }
+
+          build_lftp_script() {
+            local command_file="$1"
+            local protocol="$2"
+            local port="$3"
+            local ssl_allow="$4"
+            local ssl_force="$5"
+            local ssl_protect_data="$6"
+
+            {
+              printf "%s\n" "set cmd:fail-exit true"
+              printf "%s\n" "set dns:order inet"
+              printf "%s\n" "set net:timeout 20"
+              printf "%s\n" "set net:max-retries 1"
+              printf "%s\n" "set net:reconnect-interval-base 5"
+              printf "%s\n" "set net:reconnect-interval-max 10"
+              printf "%s\n" "set ssl:verify-certificate no"
+              printf "%s\n" "set ftp:ssl-allow $ssl_allow"
+              printf "%s\n" "set ftp:ssl-force $ssl_force"
+              printf "%s\n" "set ftp:ssl-protect-data $ssl_protect_data"
+              printf "%s\n" "set ftp:passive-mode true"
+              printf "%s\n" "set ftp:prefer-epsv false"
+              printf "%s\n" "open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$port' '$protocol://$FTP_SERVER'"
+              printf "%s\n" "echo 'Connected with $protocol'"
+            } > "$command_file"
+
+            append_deploy_commands "$command_file"
+            echo "bye" >> "$command_file"
+          }
+
+          if [[ "$FORCE_FULL_SYNC" != "true" && "$HAS_UPLOADS" != "true" && "$SYNC_BUILD_ASSETS" != "true" && "$HAS_DELETIONS" != "true" ]]; then
+            echo "No deployable file changes detected in this push. Skipping FTP sync."
+            exit 0
+          fi
+
+          ftps_script="$(mktemp)"
+          ftp_script="$(mktemp)"
+          trap 'rm -f "$ftps_script" "$ftp_script"' EXIT
+
+          build_lftp_script "$ftps_script" "ftps" "$FTP_PORT" "true" "true" "true"
+          build_lftp_script "$ftp_script" "ftp" "$fallback_port" "false" "false" "false"
+
+          set +e
+          lftp -f "$ftps_script"
           ftps_exit_code=$?
+          set -e
 
           if [[ $ftps_exit_code -eq 0 ]]; then
             echo "Deploy completed using FTPS."
@@ -196,41 +361,4 @@ jobs:
           echo "FTPS failed (exit code: $ftps_exit_code). Trying FTP fallback..."
           echo "Using FTP fallback port: $fallback_port"
 
-          lftp -c "
-            set cmd:fail-exit true;
-            set dns:order inet;
-            set net:timeout 20;
-            set net:max-retries 1;
-            set net:reconnect-interval-base 5;
-            set net:reconnect-interval-max 10;
-            set ftp:ssl-allow false;
-            set ftp:ssl-force false;
-            set ftp:ssl-protect-data false;
-            set ftp:passive-mode true;
-            set ftp:prefer-epsv false;
-            open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$fallback_port' 'ftp://$FTP_SERVER';
-            echo 'Connected with FTP fallback';
-            mirror -R --delete --verbose \
-              --exclude-glob '.git' \
-              --exclude-glob '.git/**' \
-              --exclude-glob '.gitattributes' \
-              --exclude-glob '.gitignore' \
-              --exclude-glob '.github/**' \
-              --exclude-glob '.docs/**' \
-              --exclude-glob '.kiro/**' \
-              --exclude-glob '.specify/**' \
-              --exclude-glob '.vscode/**' \
-              --exclude-glob 'node_modules/**' \
-              --exclude-glob 'tests/**' \
-              --exclude-glob 'vendor/**' \
-              --exclude-glob 'dc-data/**' \
-              --exclude-glob '.env' \
-              --exclude-glob 'storage/logs/*' \
-              --exclude-glob 'storage/framework/cache/*' \
-              --exclude-glob 'storage/framework/sessions/*' \
-              --exclude-glob 'storage/framework/views/*' \
-              --exclude 'storage/**' \
-              --exclude 'composer.phar' \
-              . '$FTP_SERVER_DIR';
-            bye
-          "
+          lftp -f "$ftp_script"
