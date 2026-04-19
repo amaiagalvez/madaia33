@@ -35,7 +35,7 @@ jobs:
           --optimize-autoloader
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: "22"
 
@@ -164,7 +164,7 @@ jobs:
             set ftp:prefer-epsv false;
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$FTP_PORT' 'ftps://$FTP_SERVER';
             echo 'Connected with FTPS';
-            mirror -R --delete --verbose --ignore-time \              
+            mirror -R --delete --verbose \              
               --include-glob 'public/build/**' \
               --include-glob 'public/build/manifest.json' \
               --exclude-glob '.git*' \
@@ -212,7 +212,7 @@ jobs:
             set ftp:prefer-epsv false;
             open -u '$FTP_USERNAME','$FTP_PASSWORD' -p '$fallback_port' 'ftp://$FTP_SERVER';
             echo 'Connected with FTP fallback';
-            mirror -R --delete --verbose --ignore-time \
+            mirror -R --delete --verbose \
               --include-glob 'public/build/**' \
               --include-glob 'public/build/manifest.json' \
               --exclude-glob '.git*' \
