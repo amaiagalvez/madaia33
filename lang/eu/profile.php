@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Nire profila',
-    'seo_description' => 'Erabiltzailearen profila: bozketak, saioak eta jabetzen balidazioa.',
+    'seo_description' => 'Erabiltzailearen profila: bozketak, saioak eta zure datuen balidazioa.',
     'kicker' => 'Erabiltzaile-gunea',
     'heading' => 'Nire profila',
     'summary' => 'Hemen zure jarduera, saioak eta zure datuen egoera ikus ditzakezu.',
