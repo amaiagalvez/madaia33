@@ -73,10 +73,15 @@
         "quality:phpmd": [
             "php -d error_reporting='E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED' vendor/bin/phpmd app text phpmd.xml"
         ],
+        "quality:queries": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --compact tests/Feature/Performance"
+        ],
         "quality": [
             "@lint:check",
             "@analyse",
-            "@quality:phpmd"
+            "@quality:phpmd",
+            "@quality:queries"
         ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
