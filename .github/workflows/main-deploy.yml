@@ -303,7 +303,9 @@ jobs:
 
                 if [[ "$relative_dir" != "." ]]; then
                   remote_target_dir="${FTP_SERVER_DIR}${relative_dir}"
+                  printf "%s\n" "set cmd:fail-exit false" >> "$command_file"
                   printf "mkdir -p '%s';\n" "$remote_target_dir" >> "$command_file"
+                  printf "%s\n" "set cmd:fail-exit true" >> "$command_file"
                 fi
 
                 printf "put -O '%s' '%s';\n" "$remote_target_dir" "$staged_file" >> "$command_file"
