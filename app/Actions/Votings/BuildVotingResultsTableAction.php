@@ -114,7 +114,7 @@ class BuildVotingResultsTableAction
                 $owner->loadMissing('activeAssignments.property.location');
 
                 return [
-                    'owner_name' => $canSeeOwnerNames ? $owner->coprop1_name : '—',
+                    'owner_name' => $canSeeOwnerNames ? $owner->fullName1 : '—',
                     'properties' => $this->ownerPropertiesLabel($owner),
                     'owner_percentage' => (float) $this->eligibilityService->percentageForOwnerAtVotingDate($voting, $owner),
                     'selected_option_id' => $voting->is_anonymous

@@ -325,9 +325,10 @@ test('delegated-vote user sees delegated button on public votings and can open m
 
     $owner = Owner::factory()->create([
         'coprop1_name' => 'Dusk Delegatua',
+        'coprop1_surname' => 'Abizen Osoa',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => '88-Z']);
+    $portal = Location::factory()->portal()->create(['name' => '88-Z']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -359,6 +360,7 @@ test('delegated-vote user sees delegated button on public votings and can open m
             ->assertPresent('[data-open-front-delegated-modal]')
             ->click('[data-open-front-delegated-modal]')
             ->waitFor('[data-front-delegated-modal]')
+            ->assertSee('Dusk Delegatua Abizen Osoa')
             ->assertPresent('[data-front-vote-as-owner]');
     });
 });
@@ -374,9 +376,10 @@ test('delegated-vote user sees in-person button on public votings and can open m
 
     $owner = Owner::factory()->create([
         'coprop1_name' => 'Dusk Presentziala',
+        'coprop1_surname' => 'Abizen Osoa',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => '88-Y']);
+    $portal = Location::factory()->portal()->create(['name' => '88-Y']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -408,6 +411,7 @@ test('delegated-vote user sees in-person button on public votings and can open m
             ->assertPresent('[data-open-front-in-person-modal]')
             ->click('[data-open-front-in-person-modal]')
             ->waitFor('[data-front-in-person-modal]')
+            ->assertSee('Dusk Presentziala Abizen Osoa')
             ->assertPresent('[data-front-in-person-vote-as-owner]');
     });
 });

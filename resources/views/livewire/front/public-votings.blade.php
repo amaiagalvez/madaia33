@@ -99,7 +99,7 @@
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <p>
-                            {{ __('votings.front.delegated_mode', ['owner' => $activeOwner->coprop1_name]) }}
+                            {{ __('votings.front.delegated_mode', ['owner' => $activeOwner->fullName1]) }}
                         </p>
                         <button type="button" wire:click="clearDelegatedMode"
                             class="inline-flex items-center rounded-md border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100">
@@ -127,7 +127,7 @@
                 data-votings-in-person-banner>
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <p>
-                        {{ __('votings.front.in_person_mode', ['owner' => $activeOwner->coprop1_name]) }}
+                        {{ __('votings.front.in_person_mode', ['owner' => $activeOwner->fullName1]) }}
                     </p>
                     <button type="button" wire:click="clearDelegatedMode"
                         class="inline-flex items-center rounded-md border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100">

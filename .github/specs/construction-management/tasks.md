@@ -570,13 +570,14 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [x] actualiza el skill de database-schema-mermaid
 - [x] en el front de bozketak añadir en cada bozketa la fecha incio y fin a la derecha
 - [x] repasa el home del front, la página iragakiak, la de bozketak, la de obras y el profila. Las fechas en euskera son año mes y dia y en castellano dia mes y año. Corrígelas.
-- [ ] busca en todo el código dónde se utiliza coprop1_name o coprop2_name y preguntame si quiero cambiarlo por fullName1/fullName2 o no.
+- [x] busca en todo el código dónde se utiliza coprop1_name o coprop2_name y preguntame si quiero cambiarlo por fullName1/fullName2 o no.
 - [x] en la pagina de la obra del front, si el usuario no ha leido el aviso, ponerle delante del nombre del aviso un icono cono un sobre cerrado en rojo y lo ha liedo u
 
-- [ ] En el mermaid del SKILL falta añadir la parte de constructions
+- [ ] En el mermaid del SKILL database-schema-mermaid falta añadir la parte de constructions
 - [ ] Falta la traducción del rol de constructor
 - [ ] En el listado de Iragarkiak del panel en el modal "Iragarki honen irekiera-egoera" Cuando este leido mostrar un check verde y si no una x roja en vez del texto en la columna Egoera. Quitar el botón de abjo del modal, ya tiene la X de arriba para cerrar.
 - [ ] obra necesita title y slug en eu y es, modificar le formulario, notice_tags necesita slug_eu y slug_es. Cuando se cree la obra tener en cuenta los idiomas al crear el notice_tag. En el front de una obra en concreto da error al cambiar de idioma, se tiene que quedar en la misma página pero en el idioma elegido.
+- [ ] cuando se vota delegado o presencial, si el owner por el que se está votando tiene email, mandarle también un email de confirmación, como el que se manada cuando el owner vota directamente.
 
 ## Implementation Plan - Zuzenketak 5
 
@@ -585,7 +586,7 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [x] Obrako iragarkien frontend zerrenda arindu: lehenetsita data + titulua bakarrik erakutsi, xehetasuna (edukia + dokumentuak) desplegable bihurtu, eta irekitze-ekintzak owner mailan trazatu.
 - [x] Admin `iragarkiak` zerrendan, obra bati lotutako iragarkietan bars ikonodun ekintza gehitu irekitze-egoera (zein owner-ek ireki duen/ez duen) kontsultatzeko.
 - [x] Front `bozketak` txarteletan hasiera/amaiera datak eskuinean erakutsi eta data-formatu lokala bateratu home/notices/bozketak/obrak/profila pantailetan.
-- [ ] `coprop1_name` / `coprop2_name` erabileren inbentario osoa osatu eta erabiltzaileari baieztapena eskatu izen-aldaketa (`fullName1` / `fullName2`) egin aurretik.
+- [x] `coprop1_name` / `coprop2_name` erabileren inbentario osoa osatu eta erabiltzaileari baieztapena eskatu izen-aldaketa (`fullName1` / `fullName2`) egin aurretik.
 
 ### Technical Decisions
 
@@ -603,7 +604,7 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [x] 4. Admin `iragarkiak`: obra-tag lotura duten errenkadetan bars botoia gehitu eta modal/panelean owner ireki/ez-ireki zerrenda erakutsi.
 - [x] 5. Front `bozketak`: txartel bakoitzean hasiera/amaiera datak eskuineko blokera gehitu, responsive portaera zainduta.
 - [x] 6. Data-formatu bateratzea: home, iragarkiak, bozketak, obrak eta profila pantailetan helper berria edo osagai bateratua aplikatu.
-- [ ] 7. `coprop1_name`/`coprop2_name` erabileren txostena prestatu eta erabiltzaileari galdetu izen-aldaketa exekutatu nahi duen ala ez (baieztapenik gabe ez aldatu).
+- [x] 7. `coprop1_name`/`coprop2_name` erabileren txostena prestatu eta erabiltzaileari galdetu izen-aldaketa exekutatu nahi duen ala ez (baieztapenik gabe ez aldatu).
 - [x] 8. `database-schema-mermaid` skill ERD eguneratu eta sintaxia balidatu.
 - [x] 9. Balidazioa: test Unit/Feature/Dusk fokalizatuak + pint + quality gate.
 
@@ -615,7 +616,7 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [x] Data-formatu helburuak: [resources/views/components/front/notice-card.blade.php](resources/views/components/front/notice-card.blade.php), [resources/views/public/constructions/index.blade.php](resources/views/public/constructions/index.blade.php), [resources/views/public/constructions/show.blade.php](resources/views/public/constructions/show.blade.php), [resources/views/public/profile.blade.php](resources/views/public/profile.blade.php), eta lotutako helper/controller puntuak.
 - [x] Tracking datu-egitura berria: `database/migrations/**`, `app/Models/**`, eta beharrezko route/controller edo Livewire endpoint-a.
 - [x] Mermaid ERD skilla: [.github/skills/database-schema-mermaid/SKILL.md](.github/skills/database-schema-mermaid/SKILL.md).
-- [ ] `coprop*` inbentarioa (jada bildua) eta erabaki-puntua: app/resources/tests/database/lang multzoan dauden erabilerak.
+- [x] `coprop*` inbentarioa (jada bildua) eta erabaki-puntua: app/resources/tests/database/lang multzoan dauden erabilerak.
 
 ### Validation
 

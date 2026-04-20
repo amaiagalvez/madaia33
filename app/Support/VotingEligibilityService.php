@@ -259,11 +259,11 @@ class VotingEligibilityService
     private function delegationSearchIndex(Owner $owner, Collection $portalCodes, Collection $localCodes, Collection $garageCodes): string
     {
         $searchTerms = [
-            $owner->coprop1_name,
+            $owner->fullName1,
             $owner->coprop1_dni,
             $owner->coprop1_email,
             $owner->coprop1_phone,
-            $owner->coprop2_name,
+            $owner->fullName2,
             $owner->coprop2_dni,
             $owner->coprop2_email,
             $owner->coprop2_phone,

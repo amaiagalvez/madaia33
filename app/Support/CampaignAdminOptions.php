@@ -52,7 +52,7 @@ class CampaignAdminOptions
 
         return $query
             ->get()
-            ->map(static fn (CampaignTemplate $template): array => [
+            ->map(static fn(CampaignTemplate $template): array => [
                 'value' => (string) $template->id,
                 'label' => $template->name,
             ])
@@ -97,7 +97,7 @@ class CampaignAdminOptions
                 $query->whereIn('id', $managedLocationIds);
             })
             ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
-            ->orderBy('code')
+            ->orderBy('name')
             ->get();
 
         foreach ($locations as $location) {
@@ -105,7 +105,7 @@ class CampaignAdminOptions
 
             $options[] = [
                 'value' => $value,
-                'label' => $this->locationLabel((string) $location->type) . ' ' . (string) $location->code,
+                'label' => $this->locationLabel((string) $location->type) . ' ' . (string) $location->name,
             ];
         }
 
@@ -119,7 +119,7 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->filter(static fn (mixed $value): bool => is_string($value) && $value !== '')
+            ->filter(static fn(mixed $value): bool => is_string($value) && $value !== '')
             ->values()
             ->all();
     }
@@ -131,8 +131,8 @@ class CampaignAdminOptions
     {
         return collect($this->recipientFilterOptions())
             ->pluck('value')
-            ->map(static fn (mixed $value): int => (int) $value)
-            ->filter(static fn (int $value): bool => $value > 0)
+            ->map(static fn(mixed $value): int => (int) $value)
+            ->filter(static fn(int $value): bool => $value > 0)
             ->values()
             ->all();
     }
@@ -160,8 +160,8 @@ class CampaignAdminOptions
 
         if (str_contains($value, ':')) {
             $legacyLabels = collect(explode(',', $value))
-                ->map(static fn (string $token): string => trim($token))
-                ->filter(static fn (string $token): bool => $token !== '' && str_contains($token, ':'))
+                ->map(static fn(string $token): string => trim($token))
+                ->filter(static fn(string $token): bool => $token !== '' && str_contains($token, ':'))
                 ->map(function (string $token): string {
                     [$type, $code] = explode(':', $token, 2);
 
@@ -181,14 +181,14 @@ class CampaignAdminOptions
         }
 
         $location = Location::query()
-            ->select(['id', 'type', 'code'])
+            ->select(['id', 'type', 'name'])
             ->find((int) $value);
 
         if (! $location instanceof Location) {
             return __('campaigns.admin.filters.all');
         }
 
-        return $this->locationLabel((string) $location->type) . ' ' . (string) $location->code;
+        return $this->locationLabel((string) $location->type) . ' ' . (string) $location->name;
     }
 
     public function previewText(?string $textEu, ?string $textEs): string

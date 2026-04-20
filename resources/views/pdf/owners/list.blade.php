@@ -153,8 +153,8 @@
                     $assignmentGroups = [$portals, $garages, $storages, $locals];
                 @endphp
                 <tr>
-                    <td>{{ trim(($owner->coprop1_name ?? '') . ' ' . ($owner->coprop1_surname ?? '')) }}
-                       <br> [{{ $owner->language }}]
+                    <td>{{ $owner->fullName1 ?: '-' }}
+                        <br> [{{ $owner->language }}]
                     </td>
                     <td>
                         @if (($owner->coprop1_email ?? '') !== '' || ($owner->coprop1_phone ?? '') !== '')
@@ -176,7 +176,7 @@
                             -
                         @endif
                     </td>
-                    <td>{{ trim(($owner->coprop2_name ?? '') . ' ' . ($owner->coprop2_surname ?? '')) ?: '-' }}
+                    <td>{{ $owner->fullName2 ?: '-' }}
                     </td>
                     <td>
                         @if (($owner->coprop2_email ?? '') !== '' || ($owner->coprop2_phone ?? '') !== '')

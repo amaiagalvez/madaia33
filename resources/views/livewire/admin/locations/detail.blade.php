@@ -61,7 +61,7 @@
             @if ($currentChief !== null)
                 <p class="mt-3 text-sm text-stone-700"
                     data-chief-owner-current="{{ $currentChief->id }}">
-                    {{ __('admin.locations.chief_owner_current', ['name' => $currentChief->coprop1_name]) }}
+                    {{ __('admin.locations.chief_owner_current', ['name' => $currentChief->fullName1]) }}
                 </p>
             @endif
         </div>

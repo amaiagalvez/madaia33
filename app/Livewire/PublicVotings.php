@@ -166,8 +166,8 @@ class PublicVotings extends Component
             ->map(static function (array $row): array {
                 return [
                     'owner_id' => $row['owner']->id,
-                    'owner_name' => $row['owner']->coprop1_name,
-                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
+                    'owner_name' => $row['owner']->fullName1,
+                    'owner_secondary_name' => $row['owner']->fullName2,
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
                     'local_codes' => $row['local_codes'],
@@ -205,7 +205,7 @@ class PublicVotings extends Component
         abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn (array $row): int => $row['owner']->id)
+            ->map(static fn(array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -228,8 +228,8 @@ class PublicVotings extends Component
             ->map(static function (array $row): array {
                 return [
                     'owner_id' => $row['owner']->id,
-                    'owner_name' => $row['owner']->coprop1_name,
-                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
+                    'owner_name' => $row['owner']->fullName1,
+                    'owner_secondary_name' => $row['owner']->fullName2,
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
                     'local_codes' => $row['local_codes'],
@@ -267,7 +267,7 @@ class PublicVotings extends Component
         abort_unless($this->canManageDelegatedVotingForCurrentUser(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn (array $row): int => $row['owner']->id)
+            ->map(static fn(array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -480,7 +480,7 @@ class PublicVotings extends Component
             ->where('owner_id', $this->activeOwner->id)
             ->whereIn('voting_id', $votings->pluck('id'))
             ->pluck('voting_id')
-            ->map(static fn ($votingId): int => (int) $votingId)
+            ->map(static fn($votingId): int => (int) $votingId)
             ->all();
 
         return view('livewire.front.public-votings', [
@@ -609,7 +609,7 @@ class PublicVotings extends Component
 
         $this->filteredDelegatedRows = array_values(array_filter(
             $this->delegatedRows,
-            static fn (array $row): bool => str_contains($row['search_index'], $search)
+            static fn(array $row): bool => str_contains($row['search_index'], $search)
         ));
     }
 
@@ -625,7 +625,7 @@ class PublicVotings extends Component
 
         $this->filteredInPersonRows = array_values(array_filter(
             $this->inPersonRows,
-            static fn (array $row): bool => str_contains($row['search_index'], $search)
+            static fn(array $row): bool => str_contains($row['search_index'], $search)
         ));
     }
 }
