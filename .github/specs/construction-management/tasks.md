@@ -452,4 +452,122 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 
 
 ### Zuzenketak 2
-- [ ] Obrak, al botón activo ponerle confirmación (como en la columna publikatuta de iragarkiak )
+- [x] Obrak, al botón activo ponerle confirmación (como en la columna publikatuta de iragarkiak )
+
+## Implementation Plan - Zuzenketak 2
+
+### Goal
+
+- [x] Gehitu baieztapen-modala `Obrak` kudeaketan aktibo/inaktibo botoiari, `Iragarkiak` ataleko `publikatuta` zutabeko UX berdinarekin, nahi gabeko egoera-aldaketak saihesteko.
+
+### Technical Decisions
+
+- [x] Erabili lehendik dagoen `confirmPublish` eredua (`AdminNoticeManager`) erreferentzia gisa: `confirming*Id` + `action` + `show*Modal` propietateak eta `confirm/do/cancel` metodoen triada.
+- [x] Mantendu egungo taulako botoi osagaia (`x-admin.action-link-confirm`) eta lotu klik-ekintza zuzena `toggleActive(...)`-tik `confirmToggleActive(...)`-ra.
+- [x] Ez aldatu rol-baimenen logika; baieztapena UI/UX geruza bat izango da soilik (`canManageConstructions()` bera mantenduz).
+
+### Execution Steps
+
+- [x] 1. Gehitu `AdminConstructionManager`-en egoera-propietate berriak (`confirmingActiveId`, `activeAction`, `showActiveModal`) eta metodoak (`confirmToggleActive`, `doToggleActive`, `cancelToggleActive`).
+- [x] 2. Eguneratu `construction-manager.blade.php` aktibo botoiaren `wire:click` ekintza baieztapen-fluxura eramateko.
+- [x] 3. Gehitu baieztapen-modala Bladean (`activate/deactivate` testu dinamikoekin), `Iragarkiak`-eko modalaren egitura bisuala erreferentzia hartuta.
+- [x] 4. Eguneratu test fokalizatuak: gutxienez Feature test bat baieztapenik gabe ez dela toggle egiten eta `doToggleActive`-rekin bai.
+
+### Work Items
+
+- [x] Livewire klasea: [app/Livewire/AdminConstructionManager.php](app/Livewire/AdminConstructionManager.php)
+- [x] Livewire bista: [resources/views/livewire/admin/construction-manager.blade.php](resources/views/livewire/admin/construction-manager.blade.php)
+- [x] Erreferentzia eredua: [app/Livewire/AdminNoticeManager.php](app/Livewire/AdminNoticeManager.php), [resources/views/livewire/admin/notice-manager.blade.php](resources/views/livewire/admin/notice-manager.blade.php)
+- [x] Testak: [tests/Feature/AdminConstructionManagerTest.php](tests/Feature/AdminConstructionManagerTest.php)
+
+### Validation
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminConstructionManagerTest.php`
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
+
+
+### Zuzenketak 3
+- [x] Obraren frontetik bidalitako mezuetan subject-a bereizi: owner-rentzat `APP IZENA (settings) - OBRAREN IZENA mezua`; admin-entzat aurretik `[KONTSULA. OBRAREN IZENA]` gehituta.
+
+## Implementation Plan - Zuzenketak 3
+
+### Goal
+
+- [x] Doitu obra-kontsulten email subject formatua rol-hartzailearen arabera, erabiltzaileari (owner) eta administrazioari testu koherente eta bereizia bidaliz.
+
+### Technical Decisions
+
+- [x] App izena `front_site_name` ezarpenetik ebatzi `App\Support\EmailSiteName::resolve()` erabiliz (fallback seguruarekin), kode bikoizketa saihesteko.
+- [x] `PublicConstructionInquiryForm`-en bi subject eraiki: `owner` subject oinarria eta `admin` subjecta (`[KONTSULA. <obra>] ` + owner subject).
+- [x] `ContactMessage.subject` eremuan owner subjecta gorde eta `SendAuthenticatedContactMessageAction`-era bi subjectak pasa (`userMailSubject`, `adminMailSubject`) gaur egungo arkitekturari jarraituz.
+
+### Execution Steps
+
+- [x] 1. Gehitu/eguneratu subject builder metodoak `PublicConstructionInquiryForm`-en app izena + obra izena + `mezua` formatuarekin.
+- [x] 2. Eguneratu `submit()` metodoa `ContactMessage` sortzerakoan owner subjecta gordetzeko eta admin subject prefijatua bidaltzeko.
+- [x] 3. Eguneratu test fokalizatua `tests/Feature/PublicConstructionInquiryFormTest.php` subject berriak egiaztatzeko.
+- [x] 4. Exekutatu formateoa eta test fokalizatua Docker barruan.
+
+### Work Items
+
+- [x] Livewire logika: [app/Livewire/PublicConstructionInquiryForm.php](app/Livewire/PublicConstructionInquiryForm.php)
+- [x] Site name helper: [app/Support/EmailSiteName.php](app/Support/EmailSiteName.php)
+- [x] Testak: [tests/Feature/PublicConstructionInquiryFormTest.php](tests/Feature/PublicConstructionInquiryFormTest.php)
+
+### Validation
+
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/PublicConstructionInquiryFormTest.php`
+
+### Zuzenketak 4
+- [ ] `locations.code` kendu, `properties.code` gehitu, `admin/finkak/{id}`-n hasierako taula berria gehitu kodearekin, owner sortze-formetik eta `admin/jabeak` + jabeen PDFtik `ZBKIA` kendu, jabetza-zutabeetan propietate-kodea aurretik erakutsi, eta `admin/jabeak` zerrenda `Atariak` zutabearen arabera gorantz ordenatu hutsak amaieran utzita.
+
+## Implementation Plan - Zuzenketak 4
+
+### Goal
+
+- [ ] Kokaleku-kodearen iturburu nagusia `properties.code` bihurtu, administrazio UI/PDFetan `ZBKIA` kentzea koherente egin, jabetza-kodea ikusgai utzi jabeen eta finken fluxuetan, eta `admin/jabeak` zerrenda `Atariak` zutabearen arabera gorantz ordenatu baliorik gabeko errenkadak amaieran utzita.
+
+### Technical Decisions
+
+- [ ] Egin schema-migrazio esplizituak: `locations.code` kentzeko forward-fix bat eta `properties.code` gehitzeko beste bat, datu-migrazioarekin batera (`locations.code` -> `properties.code`) behar denean.
+- [ ] `admin/finkak/{location}` detail-ean bi geruza bereizi: goiko summary taula kokaleku-datuetarako eta azpiko jabetzen taula `code`, `name`, ehunekoak eta egoerarekin.
+- [ ] Owner sortze-fluxuan `ownerId`/`ZBKIA` kendu UI + balidazio + ekintza mailan; ondorioz, `owners.id` eskuz ez ezartzea izango da lehenetsia, baldin eta `owners.id = user_id` migrazio zabalagoa aparteko fasera eramaten bada.
+- [ ] Jabeen zerrendan eta PDFan `admin.owners.columns.num` zutabea kendu, `Ko-jabea1` izen osoaren ondoan hizkuntza erakutsi, eta `Ataariak/Garajeak/Trastelekuak/Lokalak` zutabeetan formatua `[property.code] property.name` bihurtu.
+- [ ] `admin/jabeak` zerrendaren ordenazio lehenetsia `Atariak` zutabearen balio agregatuaren arabera egin, gorantz, eta baliorik ez duten jabeak amaieran utzi; horretarako query-mailako ordenazioa behar da, ez Bladeko post-prozesamendua.
+
+### Execution Steps
+
+- [ ] 1. Aztertu eta eguneratu eskema: `properties.code` gehitu, `locations.code` erreferentzia guztiak mapatu, eta datu-trantsizio segurua definitu.
+- [ ] 2. Eguneratu `Location`, `Property`, `LocationDetail`, jabeen Livewire osagaia eta lotutako Bladeak propietate-kode berria erabiltzeko.
+- [ ] 3. Kendu `ZBKIA` owner sortze-formetik, admin jabe-zerrendatik eta jabeen PDFtik; gehitu hizkuntza `Ko-jabea1` izenaren ondoan.
+- [ ] 4. Eguneratu `admin/finkak/{id}` detail view-a: hasierako summary taula berria kokalekuaren datuekin eta jabetzen taulan `code` zutabea lehen tokian.
+- [ ] 5. Eguneratu propietate-zerrenden formatua jabeen taulan/PDFan eta behar diren beste presentazio-puntuetan `[code] name` modura.
+- [ ] 6. Ezarri `admin/jabeak` query ordenazioa `Atariak` zutabearen arabera gorantz, `NULL`/hutsik dauden balioak amaieran geratzeko moduan.
+- [ ] 7. Balidazioa: Feature test fokalizatuak, PDF testak, behar diren Location/Owners/ordenazio testak, eta ondoren quality gatea.
+
+### Work Items
+
+- [ ] Modeloak eta migrazioak: [app/Models/Location.php](app/Models/Location.php), [app/Models/Property.php](app/Models/Property.php), [database/migrations/2026_04_09_100002_create_locations_table.php](database/migrations/2026_04_09_100002_create_locations_table.php), [database/migrations/2026_04_09_100003_create_properties_table.php](database/migrations/2026_04_09_100003_create_properties_table.php)
+- [ ] Finken detaila: [resources/views/admin/locations/show.blade.php](resources/views/admin/locations/show.blade.php), [app/Livewire/Admin/LocationDetail.php](app/Livewire/Admin/LocationDetail.php), [resources/views/livewire/admin/locations/detail.blade.php](resources/views/livewire/admin/locations/detail.blade.php)
+- [ ] Jabeen admin UI eta ordenazioa: [app/Livewire/Admin/Owners.php](app/Livewire/Admin/Owners.php), [app/Concerns/InteractsWithAdminOwners.php](app/Concerns/InteractsWithAdminOwners.php), [app/Support/AdminOwnersFilters.php](app/Support/AdminOwnersFilters.php), [app/Validations/OwnerFormValidation.php](app/Validations/OwnerFormValidation.php), [app/Actions/Owners/CreateOwnerAction.php](app/Actions/Owners/CreateOwnerAction.php), [resources/views/livewire/admin/owners/index.blade.php](resources/views/livewire/admin/owners/index.blade.php)
+- [ ] Jabeen PDFa: [resources/views/pdf/owners/list.blade.php](resources/views/pdf/owners/list.blade.php) eta controller/query lotua
+- [ ] Erreferentzia osagarriak: [app/Services/Messaging/MessageVariableResolver.php](app/Services/Messaging/MessageVariableResolver.php), [app/Livewire/Admin/Concerns/HandlesVotingOwnerModals.php](app/Livewire/Admin/Concerns/HandlesVotingOwnerModals.php), eta `location.code` erabiltzen duten gainerako puntuak
+- [ ] Testak: [tests/Feature/AdminOwnersAndLocationsTest.php](tests/Feature/AdminOwnersAndLocationsTest.php), [tests/Feature/AdminOwnersPdfDownloadTest.php](tests/Feature/AdminOwnersPdfDownloadTest.php), eta behar diren jabetza/finka/ordenazio test berriak
+
+### Validation
+
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersAndLocationsTest.php`
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersPdfDownloadTest.php`
+- [ ] Gehitu/eguneratu finken detailerako test fokalizatua (`LocationDetail` / route show)
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
+
+
+### Zuzenketak 5
+- [ ] puede que haya muchos avisos con muchos documentos en el front de una obra, muestra solo la fecha y el título, ordenados de forma descendente. Con una flecha en cada una que al clickar despliegue su contenido al volver a clikcar lo esconda.Trackear esos click de abrir para saber qué owner las han abierto y cuales no. En el listado de admin/iragakiak, en los que el anuncio esté unido a una obra, añadir un botón con el icono de bars que muestre que owner han abierto dicho anuncio
+- [ ] actualiza el skill de database-schema-mermaid
+- [ ] en el front de bozketak añadir en cada bozketa la fecha incio y fin a la derecha
+- [ ] repasa el home del front, la página iragakiak, la de bozketak, la de obras y el profila. Las fechas en euskera son año mes y dia y en castellano dia mes y año. Corrígelas.
+- [ ] busca en todo el código dónde se utiliza coprop1_name o coprop2_name y preguntame si quiero cambiarlo por fullName1/fullName2 o no.

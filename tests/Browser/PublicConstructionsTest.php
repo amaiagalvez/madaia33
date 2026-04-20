@@ -39,6 +39,11 @@ test('authenticated user can browse public constructions and open a detail page'
             ->assertMissing('[data-construction-inquiry-form-inline]')
             ->click('[data-construction-contact-trigger]')
             ->waitFor('[data-construction-inquiry-modal]')
-            ->assertSee(__('constructions.inquiry.title'));
+            ->assertSee(__('constructions.inquiry.title'))
+            ->type('#construction-inquiry-message', 'Obrari buruzko kontsulta bat bidaltzen dut Dusk testetik.')
+            ->click('[data-construction-inquiry-submit]')
+            ->waitFor('[data-construction-inquiry-success]')
+            ->assertScript('return getComputedStyle(document.querySelector("[data-construction-inquiry-modal]")).display === "none";')
+            ->assertSee(__('constructions.inquiry.success'));
     });
 });

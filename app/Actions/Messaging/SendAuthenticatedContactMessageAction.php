@@ -18,70 +18,70 @@ use App\Actions\Campaigns\RecordDirectMessageRecipientAction;
 
 class SendAuthenticatedContactMessageAction
 {
-  private const EMAIL_SETTING_KEYS = [
-    'admin_email',
-    'from_address',
-    'from_name',
-    'smtp_host',
-    'smtp_port',
-    'smtp_username',
-    'smtp_password',
-    'smtp_encryption',
-  ];
+    private const EMAIL_SETTING_KEYS = [
+        'admin_email',
+        'from_address',
+        'from_name',
+        'smtp_host',
+        'smtp_port',
+        'smtp_username',
+        'smtp_password',
+        'smtp_encryption',
+    ];
 
-  public function execute(
-    User $user,
-    ContactMessage $contactMessage,
-    string $messageBody,
-    string $userMailSubject,
-    ?string $adminMailSubject = null,
-  ): bool {
-    try {
-      $settings = array_replace(array_fill_keys(self::EMAIL_SETTING_KEYS, ''), Setting::stringValues(self::EMAIL_SETTING_KEYS));
+    public function execute(
+        User $user,
+        ContactMessage $contactMessage,
+        string $messageBody,
+        string $userMailSubject,
+        ?string $adminMailSubject = null,
+    ): bool {
+        try {
+            $settings = array_replace(array_fill_keys(self::EMAIL_SETTING_KEYS, ''), Setting::stringValues(self::EMAIL_SETTING_KEYS));
 
-      app(ConfiguredMailSettings::class)->apply($settings);
+            app(ConfiguredMailSettings::class)->apply($settings);
 
-      $adminEmail = $settings['admin_email'] ?: (string) config('mail.from.address');
-      $fromAddress = $settings['from_address'] ?: (string) config('mail.from.address');
-      $fromName = ($settings['from_name'] ?? '') !== '' ? $settings['from_name'] : (string) config('mail.from.name');
-      $trackingPixelUrl = null;
+            $adminEmail = $settings['admin_email'] ?: (string) config('mail.from.address');
+            $fromAddress = $settings['from_address'] ?: (string) config('mail.from.address');
+            $fromName = $settings['from_name'] !== '' ? $settings['from_name'] : (string) config('mail.from.name');
+            $trackingPixelUrl = null;
 
-      if ($user->owner instanceof Owner) {
-        $recipient = app(RecordDirectMessageRecipientAction::class)->execute(
-          owner: $user->owner,
-          contact: (string) $user->email,
-          subject: ContactConfirmationSubject::forAudit($userMailSubject),
-          body: $messageBody,
-          sentByUserId: $user->id,
-        );
+            if ($user->owner instanceof Owner) {
+                $recipient = app(RecordDirectMessageRecipientAction::class)->execute(
+                    owner: $user->owner,
+                    contact: (string) $user->email,
+                    subject: ContactConfirmationSubject::forAudit($userMailSubject),
+                    body: $messageBody,
+                    sentByUserId: $user->id,
+                );
 
-        $trackingPixelUrl = app(CampaignTrackingUrlBuilder::class)->openPixelUrl($recipient->tracking_token);
-      }
+                $trackingPixelUrl = app(CampaignTrackingUrlBuilder::class)->openPixelUrl($recipient->tracking_token);
+            }
 
-      Mail::to($user->email)->send(new ContactConfirmation(
-        new ContactMailData(
-          visitorName: $user->name,
-          messageSubject: $userMailSubject,
-          messageBody: $messageBody,
-        ),
-        $fromAddress,
-        $fromName,
-        $trackingPixelUrl,
-      ));
+            Mail::to($user->email)->send(new ContactConfirmation(
+                new ContactMailData(
+                    visitorName: $user->name,
+                    messageSubject: $userMailSubject,
+                    messageBody: $messageBody,
+                ),
+                $fromAddress,
+                $fromName,
+                $trackingPixelUrl,
+            ));
 
-      $adminContactMessage = $contactMessage->replicate();
-      $adminContactMessage->subject = $adminMailSubject ?? $userMailSubject;
+            $adminContactMessage = $contactMessage->replicate();
+            $adminContactMessage->subject = $adminMailSubject ?? $userMailSubject;
 
-      Mail::to($adminEmail)->send(new ContactNotification($adminContactMessage, null, $fromAddress, $fromName));
+            Mail::to($adminEmail)->send(new ContactNotification($adminContactMessage, null, $fromAddress, $fromName));
 
-      return false;
-    } catch (\Throwable $e) {
-      Log::error('SendAuthenticatedContactMessageAction: email send failed', [
-        'message_id' => $contactMessage->id,
-        'error' => $e->getMessage(),
-      ]);
+            return false;
+        } catch (\Throwable $e) {
+            Log::error('SendAuthenticatedContactMessageAction: email send failed', [
+                'message_id' => $contactMessage->id,
+                'error' => $e->getMessage(),
+            ]);
 
-      return true;
+            return true;
+        }
     }
-  }
 }

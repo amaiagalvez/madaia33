@@ -175,6 +175,8 @@ return [
         'empty' => 'Ez dago obrarik.',
         'delete_title' => 'Obra ezabatu',
         'confirm_delete' => 'Ziur zaude obra hau ezabatu nahi duzula?',
+        'confirm_activate' => 'Ziur zaude obra hau aktibatu nahi duzula?',
+        'confirm_deactivate' => 'Ziur zaude obra hau desaktibatu nahi duzula?',
         'fields' => [
             'title' => 'Izenburua',
             'description' => 'Deskribapena',

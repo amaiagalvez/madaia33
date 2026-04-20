@@ -29,6 +29,8 @@ it('stores a construction contact message with the construction tag and sends th
     Mail::fake();
     app()->setLocale('eu');
 
+    createSetting('front_site_name', 'Madaia 33');
+
     $user = User::factory()->create([
         'name' => 'Ane',
         'email' => 'ane@example.com',
@@ -46,14 +48,21 @@ it('stores a construction contact message with the construction tag and sends th
         ->assertSet('statusType', 'success');
 
     $message = ContactMessage::query()->firstOrFail();
+    $ownerSubject = 'Madaia 33 - ' . $construction->title . ' mezua';
+    $adminSubject = '[KONTSULA. ' . $construction->title . '] ' . $ownerSubject;
 
     expect($message->user_id)->toBe($user->id)
         ->and($message->notice_tag_id)->toBe($construction->tag->id)
         ->and($message->name)->toBe('Ane')
         ->and($message->email)->toBe('ane@example.com')
-        ->and($message->subject)->toBe('[' . __('constructions.inquiry.message_subject_prefix') . '. ' . $construction->title . ']')
+        ->and($message->subject)->toBe($ownerSubject)
         ->and($message->message)->toContain('Obra honen hasiera eguna baieztatu nahi dut.');
 
-    Mail::assertSent(ContactConfirmation::class, 1);
-    Mail::assertSent(ContactNotification::class, 1);
+    Mail::assertSent(ContactConfirmation::class, function (ContactConfirmation $mail) use ($ownerSubject): bool {
+        return $mail->messageSubject === $ownerSubject;
+    });
+
+    Mail::assertSent(ContactNotification::class, function (ContactNotification $mail) use ($adminSubject): bool {
+        return $mail->messageSubject === $adminSubject;
+    });
 });

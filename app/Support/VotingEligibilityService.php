@@ -238,11 +238,11 @@ class VotingEligibilityService
 
     private function propertyLabelWithCommunityPct(PropertyAssignment $assignment): string
     {
-        $code = (string) $assignment->property->location->code;
+        $locationName = (string) $assignment->property->location->name;
         $name = (string) $assignment->property->name;
         $communityPct = $assignment->property->community_pct;
 
-        $label = trim($code . ' ' . $name);
+        $label = trim(sprintf('[%s] %s %s', $assignment->property->displayCode(), $locationName, $name));
 
         if ($communityPct === null) {
             return $label;

@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Rules\NoScriptTags;
 use App\Models\Construction;
 use App\Models\ContactMessage;
+use App\Support\EmailSiteName;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Actions\Messaging\SendAuthenticatedContactMessageAction;
@@ -31,7 +32,7 @@ class PublicConstructionInquiryForm extends Component
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, array<int, NoScriptTags|string>>
      */
     protected function rules(): array
     {
@@ -66,14 +67,15 @@ class PublicConstructionInquiryForm extends Component
 
         abort_unless($construction->tag !== null, 404);
 
-        $subject = $this->buildSubject($construction);
+        $ownerSubject = $this->buildOwnerSubject($construction);
+        $adminSubject = $this->buildAdminSubject($construction, $ownerSubject);
 
         $contactMessage = ContactMessage::query()->create([
             'user_id' => Auth::id(),
             'notice_tag_id' => $construction->tag->id,
             'name' => $user->name,
             'email' => $user->email,
-            'subject' => $subject,
+            'subject' => $ownerSubject,
             'message' => $this->message,
         ]);
 
@@ -81,18 +83,27 @@ class PublicConstructionInquiryForm extends Component
             user: $user,
             contactMessage: $contactMessage,
             messageBody: $this->message,
-            userMailSubject: $subject,
-            adminMailSubject: $subject,
+            userMailSubject: $ownerSubject,
+            adminMailSubject: $adminSubject,
         );
 
         $this->reset(['message']);
         $this->statusType = $emailFailed ? 'error' : 'success';
         $this->statusMessage = $emailFailed ? __('contact.email_error') : __('constructions.inquiry.success');
+
+        if (! $emailFailed) {
+            $this->dispatch('construction-inquiry-submitted', statusType: $this->statusType, statusMessage: $this->statusMessage);
+        }
     }
 
-    private function buildSubject(Construction $construction): string
+    private function buildOwnerSubject(Construction $construction): string
     {
-        return '[' . __('constructions.inquiry.message_subject_prefix') . '. ' . $construction->title . ']';
+        return EmailSiteName::resolve() . ' - ' . $construction->title . ' mezua';
+    }
+
+    private function buildAdminSubject(Construction $construction, string $ownerSubject): string
+    {
+        return '[KONTSULA. ' . $construction->title . '] ' . $ownerSubject;
     }
 
     public function render(): View

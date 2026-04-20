@@ -118,14 +118,6 @@
                 <flux:heading size="lg" class="mb-4">{{ __('admin.owners.create') }}
                 </flux:heading>
 
-                <div class="mb-4">
-                    <flux:field>
-                        <flux:label>{{ __('admin.owners.form.id') }}</flux:label>
-                        <flux:input wire:model="ownerId" type="text" inputmode="numeric" />
-                        <flux:error name="ownerId" />
-                    </flux:field>
-                </div>
-
                 <div class="grid gap-4 lg:grid-cols-2">
                     <div class="rounded-lg border border-zinc-200 p-4">
                         <flux:heading size="sm" class="mb-3 text-zinc-800">
@@ -248,9 +240,10 @@
                                         </flux:select.option>
                                         @foreach ($assignableProperties as $property)
                                             <flux:select.option :value="$property->id">
-                                                {{ $property->location->code }} -
+                                                {{ $property->location->name }} -
                                                 {{ __('admin.locations.types.' . $property->location->type) }}
-                                                - {{ $property->name }}
+                                                - [{{ $property->displayCode() }}]
+                                                {{ $property->name }}
                                             </flux:select.option>
                                         @endforeach
                                     </flux:select>
@@ -333,38 +326,35 @@
         </div>
     </div>
 
-    <x-admin.panel-table table-class="min-w-full divide-y divide-gray-200 text-sm"
+    <x-admin.panel-table table-class="min-w-full table-fixed divide-y divide-gray-200 text-sm"
         class="overflow-x-auto" data-owner-table>
         <thead class="bg-gray-50">
             <tr>
-                <x-admin.table-header-cell class="text-center">
-                    {{ __('admin.owners.columns.num') }}
-                </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="w-[24%]">
                     {{ __('admin.owners.columns.coprop1') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="w-[24%]">
                     {{ __('admin.owners.columns.coprop2') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="w-[8%]">
                     {{ __('admin.owners.columns.portals') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="w-[8%]">
                     {{ __('admin.owners.columns.garages') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="w-[8%]">
                     {{ __('admin.owners.columns.storages') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="w-[8%]">
                     {{ __('admin.owners.columns.locals') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="w-[6%]">
                     {{ __('admin.owners.columns.welcome') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell>
+                <x-admin.table-header-cell class="w-[6%]">
                     {{ __('admin.owners.columns.terms_accepted') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell class="relative">
+                <x-admin.table-header-cell class="relative w-[8%]">
                     <span class="sr-only">{{ __('general.buttons.edit') }}</span>
                 </x-admin.table-header-cell>
             </tr>
@@ -372,16 +362,11 @@
         <tbody class="divide-y divide-gray-200 bg-white">
             @forelse($owners as $owner)
                 <tr wire:key="owner-{{ $owner->id }}" data-owner-id="{{ $owner->id }}">
-                    <td class="px-2 py-2 text-center text-sm text-gray-500 whitespace-nowrap"
-                        data-owner-id-cell>
-                        <span class="font-mono text-xs">{{ $owner->id }}</span>
-                        <span class="ml-1 text-xs leading-5 text-gray-500" data-owner-language>
-                            [{{ $owner->language }}]
-                        </span>
-                    </td>
-                    <td class="px-2 py-2 text-sm text-gray-900" data-owner-coprop1>
-
-                        <div class="font-medium"> {{ $owner->full_name1 }}</div>
+                    <td class="hidden" data-owner-id-cell></td>
+                    <td class="px-2 py-2 text-sm text-gray-900 align-top" data-owner-coprop1>
+                        <div class="font-medium">{{ $owner->full_name1 }} <span
+                                class="ml-1 text-xs leading-5 text-gray-500">[{{ $owner->language }}]</span>
+                        </div>
                         <div class="mt-1 text-xs leading-5 {{ $owner->coprop1_email_invalid ? 'text-red-600 font-medium line-through decoration-2' : 'text-gray-500' }}"
                             data-owner-coprop1-email>
                             {{ $owner->coprop1_email }}
@@ -396,7 +381,7 @@
                             @endif
                         </div>
                     </td>
-                    <td class="px-2 py-2 text-sm text-gray-500">
+                    <td class="px-2 py-2 text-sm text-gray-500 align-top">
                         <div class="font-medium text-gray-900">{{ $owner->full_name2 }}
                         </div>
 
@@ -431,13 +416,14 @@
                         ];
                     @endphp
                     @foreach ($assignmentGroups as $assignmentType => $assignments)
-                        <td class="px-2 py-2 text-sm text-gray-500"
+                        <td class="px-1 py-2 text-xs text-gray-500 align-top"
                             data-owner-assignment-type="{{ $assignmentType }}">
                             @forelse ($assignments as $a)
                                 <span data-owner-assignment-line
                                     class="{{ $a->admin_validated && $a->owner_validated ? 'text-green-600' : 'text-red-500' }}">
+                                    [{{ $a->property->displayCode() }}]
                                     <span class="font-semibold">
-                                        {{ $a->property->location->code }}
+                                        {{ $a->property->location->name }}
                                         {{ $a->property->name }}
                                     </span>
                                     <br>
@@ -492,7 +478,7 @@
 
                 @if ($expandedOwnerId === $owner->id)
                     <tr wire:key="owner-inline-panel-{{ $owner->id }}" class="bg-gray-50">
-                        <td colspan="10" class="px-6 py-4">
+                        <td colspan="9" class="px-6 py-4">
                             <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4"
                                 data-owner-inline-panel="{{ $owner->id }}">
                                 @if ($rowErrorMessage !== '')
@@ -541,7 +527,8 @@
                     class="hover:bg-gray-50/60">
                     <td class="px-3 py-3 text-sm text-gray-600">
                         <div class="font-medium text-gray-900">
-                            {{ $assignment->property->location->code }}
+                            [{{ $assignment->property->displayCode() }}]
+                            {{ $assignment->property->location->name }}
                         </div>
                         <div>
                             {{ $assignment->property->name }}
@@ -615,9 +602,9 @@
                     </option>
                     @foreach ($assignableProperties as $property)
                         <option value="{{ $property->id }}">
-                            {{ $property->location->code }} -
+                            {{ $property->location->name }} -
                             {{ __('admin.locations.types.' . $property->location->type) }}
-                            - {{ $property->name }}
+                            - [{{ $property->displayCode() }}] {{ $property->name }}
                         </option>
                     @endforeach
                 </select>
@@ -646,7 +633,7 @@
 @endif
 @empty
 <tr>
-    <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500">
+    <td colspan="9" class="px-6 py-8 text-center text-sm text-gray-500">
         {{ __('admin.owners.no_records') }}
     </td>
 </tr>

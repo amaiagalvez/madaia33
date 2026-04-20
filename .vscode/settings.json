@@ -72,7 +72,11 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "printf": true
+        "printf": true,
+        "/^set -e\ncd /home/amaia/Dokumentuak/madaia33\nperl -0777 -i -pe \"s/\\(Location::factory\\\\\\(\\\\\\)\\(\\?:->\\\\w\\+\\\\\\(\\\\\\)\\)\\?->create\\\\\\(\\\\\\[\\\\s\\*\\(\\?:'type'\\\\s\\*=>\\\\s\\*'\\[\\^'\\]\\*',\\\\s\\*\\)\\?\\)'code'\\\\s\\*=>\\\\s\\*'\\[\\^'\\]\\*',\\\\s\\*/\\$1/g\" tests/Feature/AdminOwnersAndLocationsTest\\.php\nrg -n \"Location::factory\\\\\\(\\\\\\)\\.\\*code\\|->set\\\\\\('newCode'\\|->set\\\\\\('editCode'\\|editCode\\|newCode\\|->where\\\\\\('code',\\\\s\\*'L-\\|->assertSee\\\\\\('P-INVALID'\" tests/Feature/AdminOwnersAndLocationsTest\\.php$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     },
     "chat.promptFilesRecommendations": {
         "speckit.constitution": true,

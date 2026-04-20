@@ -16,6 +16,7 @@ class Property extends Model
 
     protected $fillable = [
         'location_id',
+        'code',
         'name',
         'community_pct',
         'location_pct',
@@ -56,5 +57,15 @@ class Property extends Model
     public function isAssigned(): bool
     {
         return $this->activeAssignments()->exists();
+    }
+
+    public function displayCode(): string
+    {
+        return trim((string) ($this->code ?: $this->name));
+    }
+
+    public function displayLabel(): string
+    {
+        return '[' . $this->displayCode() . '] ' . $this->name;
     }
 }

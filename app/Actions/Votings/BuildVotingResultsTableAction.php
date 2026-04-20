@@ -74,7 +74,7 @@ class BuildVotingResultsTableAction
         return $ballots
             ->mapWithKeys(static function (VotingBallot $ballot): array {
                 $selection = $ballot->selections
-                    ->sortBy(static fn (VotingSelection $item): int => $item->id)
+                    ->sortBy(static fn(VotingSelection $item): int => $item->id)
                     ->first();
 
                 return [
@@ -174,7 +174,12 @@ class BuildVotingResultsTableAction
     {
         return $owner->activeAssignments
             ->map(function (PropertyAssignment $assignment): string {
-                $propertyLabel = trim($assignment->property->location->code . ' ' . $assignment->property->name);
+                $propertyLabel = trim(sprintf(
+                    '[%s] %s %s',
+                    $assignment->property->displayCode(),
+                    $assignment->property->location->name,
+                    $assignment->property->name
+                ));
                 $pct = (float) ($assignment->property->community_pct ?? 0);
 
                 return sprintf('%s (%s%%)', $propertyLabel, number_format($pct, 2, ',', '.'));

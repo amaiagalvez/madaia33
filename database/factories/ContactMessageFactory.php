@@ -31,7 +31,7 @@ class ContactMessageFactory extends Factory
 
     public function read(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'is_read' => true,
             'read_at' => now(),
         ]);
@@ -39,7 +39,7 @@ class ContactMessageFactory extends Factory
 
     public function unread(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'is_read' => false,
             'read_at' => null,
         ]);

@@ -35,6 +35,12 @@ class AdminConstructionManager extends Component
 
     public ?int $confirmingDeleteId = null;
 
+    public ?int $confirmingActiveId = null;
+
+    public string $activeAction = '';
+
+    public bool $showActiveModal = false;
+
     public function mount(): void
     {
         abort_unless($this->currentUser()?->canManageConstructions(), 403);
@@ -116,6 +122,36 @@ class AdminConstructionManager extends Component
         $construction->update([
             'is_active' => ! $construction->is_active,
         ]);
+    }
+
+    public function confirmToggleActive(int $constructionId): void
+    {
+        abort_unless($this->currentUser()?->canManageConstructions(), 403);
+
+        $construction = Construction::query()->findOrFail($constructionId);
+
+        $this->confirmingActiveId = $constructionId;
+        $this->activeAction = $construction->is_active ? 'deactivate' : 'activate';
+        $this->showActiveModal = true;
+    }
+
+    public function doToggleActive(): void
+    {
+        abort_unless($this->currentUser()?->canManageConstructions(), 403);
+
+        if ($this->confirmingActiveId === null) {
+            return;
+        }
+
+        $this->toggleActive($this->confirmingActiveId);
+        $this->cancelToggleActive();
+    }
+
+    public function cancelToggleActive(): void
+    {
+        $this->confirmingActiveId = null;
+        $this->activeAction = '';
+        $this->showActiveModal = false;
     }
 
     public function confirmDelete(int $constructionId): void

@@ -73,6 +73,34 @@ it('construction manager cannot delete constructions', function () {
         ->assertForbidden();
 });
 
+it('requires confirmation before toggling construction active state', function () {
+    $user = User::factory()->create();
+    $user->assignRole(Role::SUPER_ADMIN);
+
+    $construction = Construction::factory()->create([
+        'is_active' => true,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-construction-manager')
+        ->call('confirmToggleActive', $construction->id)
+        ->assertSet('confirmingActiveId', $construction->id)
+        ->assertSet('activeAction', 'deactivate')
+        ->assertSet('showActiveModal', true);
+
+    expect($construction->fresh()?->is_active)->toBeTrue();
+
+    Livewire::actingAs($user)
+        ->test('admin-construction-manager')
+        ->call('confirmToggleActive', $construction->id)
+        ->call('doToggleActive')
+        ->assertSet('confirmingActiveId', null)
+        ->assertSet('activeAction', '')
+        ->assertSet('showActiveModal', false);
+
+    expect($construction->fresh()?->is_active)->toBeFalse();
+});
+
 it('validates ends_at after starts_at', function () {
     $user = User::factory()->create();
     $user->assignRole(Role::SUPER_ADMIN);

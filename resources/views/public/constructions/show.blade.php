@@ -4,7 +4,14 @@
     @endpush
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-page="construction-show"
-        x-data="{ inquiryOpen: false }" @keydown.escape.window="inquiryOpen = false">
+        x-data="{ inquiryOpen: false, inquiryStatusType: null, inquiryStatusMessage: '' }" @keydown.escape.window="inquiryOpen = false"
+        @construction-inquiry-submitted.window="
+            if ($event.detail?.statusType === 'success') {
+                inquiryOpen = false;
+                inquiryStatusType = 'success';
+                inquiryStatusMessage = $event.detail?.statusMessage ?? '';
+            }
+        ">
         <h1 class="sr-only">{{ $construction->title }}</h1>
 
         <header data-construction-header-card
@@ -38,6 +45,12 @@
                         </svg>
                         {{ __('constructions.inquiry.send') }}
                     </button>
+
+                    <div x-cloak x-show="inquiryStatusType === 'success'"
+                        class="mt-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700"
+                        role="alert" aria-live="polite" data-construction-inquiry-success>
+                        <span x-text="inquiryStatusMessage"></span>
+                    </div>
                 </div>
             </div>
         </header>

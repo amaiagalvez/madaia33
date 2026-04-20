@@ -22,6 +22,8 @@ class LocationDetail extends Component
 
     public string $chiefPropertyId = '';
 
+    public string $newPropertyCode = '';
+
     public string $newPropertyName = '';
 
     public string $newCommunityPct = '';
@@ -31,6 +33,8 @@ class LocationDetail extends Component
     public bool $showAddForm = false;
 
     public ?int $editingPropertyId = null;
+
+    public string $editCode = '';
 
     public string $editName = '';
 
@@ -49,7 +53,9 @@ class LocationDetail extends Component
     protected function rules(): array
     {
         return [
+            'newPropertyCode' => 'required|string|max:20',
             'newPropertyName' => 'required|string|max:20',
+            'editCode' => 'required|string|max:20',
             'editName' => 'required|string|max:20',
             'editCommunityPct' => 'required|numeric|min:0|max:100',
             'editLocationPct' => 'required|numeric|min:0|max:100',
@@ -69,10 +75,12 @@ class LocationDetail extends Component
         $this->newLocationPct = $this->normalizeDecimalInput($this->newLocationPct);
 
         $this->validate([
+            'newPropertyCode' => 'required|string|max:20',
             'newPropertyName' => 'required|string|max:20',
             'newCommunityPct' => 'required|numeric|min:0|max:100',
             'newLocationPct' => 'required|numeric|min:0|max:100',
         ], [], [
+            'newPropertyCode' => __('admin.locations.code'),
             'newPropertyName' => __('admin.locations.property_name'),
             'newCommunityPct' => __('admin.locations.community_pct'),
             'newLocationPct' => __('admin.locations.location_pct'),
@@ -80,11 +88,13 @@ class LocationDetail extends Component
 
         Property::create([
             'location_id' => $this->location->id,
+            'code' => $this->newPropertyCode,
             'name' => $this->newPropertyName,
             'community_pct' => $this->newCommunityPct,
             'location_pct' => $this->newLocationPct,
         ]);
 
+        $this->newPropertyCode = '';
         $this->newPropertyName = '';
         $this->newCommunityPct = '';
         $this->newLocationPct = '';
@@ -98,6 +108,7 @@ class LocationDetail extends Component
         $property = Property::findOrFail($propertyId);
 
         $this->editingPropertyId = $propertyId;
+        $this->editCode = (string) $property->displayCode();
         $this->editName = $property->name;
         $this->editCommunityPct = (string) ($property->community_pct ?? '');
         $this->editLocationPct = (string) ($property->location_pct ?? '');
@@ -111,6 +122,7 @@ class LocationDetail extends Component
         $this->editLocationPct = $this->normalizeDecimalInput($this->editLocationPct);
 
         $this->validate([
+            'editCode' => 'required|string|max:20',
             'editName' => 'required|string|max:20',
             'editCommunityPct' => 'required|numeric|min:0|max:100',
             'editLocationPct' => 'required|numeric|min:0|max:100',
@@ -118,6 +130,7 @@ class LocationDetail extends Component
 
         $property = Property::findOrFail($this->editingPropertyId);
         $property->update([
+            'code' => $this->editCode,
             'name' => $this->editName,
             'community_pct' => $this->editCommunityPct,
             'location_pct' => $this->editLocationPct,
@@ -136,10 +149,12 @@ class LocationDetail extends Component
         abort_unless($this->canManagePropertyCrud(), 403);
 
         $this->showAddForm = true;
+        $this->newPropertyCode = '';
         $this->newPropertyName = '';
         $this->newCommunityPct = '';
         $this->newLocationPct = '';
         $this->resetValidation([
+            'newPropertyCode',
             'newPropertyName',
             'newCommunityPct',
             'newLocationPct',
@@ -149,10 +164,12 @@ class LocationDetail extends Component
     public function cancelAddForm(): void
     {
         $this->showAddForm = false;
+        $this->newPropertyCode = '';
         $this->newPropertyName = '';
         $this->newCommunityPct = '';
         $this->newLocationPct = '';
         $this->resetValidation([
+            'newPropertyCode',
             'newPropertyName',
             'newCommunityPct',
             'newLocationPct',
@@ -224,6 +241,7 @@ class LocationDetail extends Component
         $properties = $this->location->properties()
             ->with(['activeAssignments'])
             ->withCount(['activeAssignments'])
+            ->orderBy('code', 'asc')
             ->orderBy('name', 'asc')
             ->get();
 

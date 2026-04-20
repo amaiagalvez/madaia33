@@ -122,7 +122,7 @@ class OwnersPdfController extends Controller
         /** @var Collection<int, Location> $locations */
         $locations = Location::query()
             ->whereIn('id', $selectedLocationIds->all())
-            ->get(['id', 'code', 'type'])
+            ->get(['id', 'name', 'type'])
             ->keyBy('id');
 
         $labels = [];
@@ -140,7 +140,7 @@ class OwnersPdfController extends Controller
                 continue;
             }
 
-            $labels[] = __('admin.owners.filters.' . $type . '_pdf') . ': ' . $location->code;
+            $labels[] = __('admin.owners.filters.' . $type . '_pdf') . ': ' . $location->name;
         }
 
         return $labels;

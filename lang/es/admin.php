@@ -175,6 +175,8 @@ return [
         'empty' => 'No hay obras.',
         'delete_title' => 'Eliminar obra',
         'confirm_delete' => '¿Seguro que quieres eliminar esta obra?',
+        'confirm_activate' => '¿Seguro que quieres activar esta obra?',
+        'confirm_deactivate' => '¿Seguro que quieres desactivar esta obra?',
         'fields' => [
             'title' => 'Titulo',
             'description' => 'Descripcion',

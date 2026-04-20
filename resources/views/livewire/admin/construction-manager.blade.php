@@ -79,7 +79,7 @@
                         {{ $construction->ends_at?->format('Y-m-d') ?? '—' }}</td>
                     <td class="px-6 py-4 text-sm">
                         <x-admin.action-link-confirm
-                            wire:click="toggleActive({{ $construction->id }})"
+                            wire:click="confirmToggleActive({{ $construction->id }})"
                             title="{{ $construction->is_active ? __('admin.constructions.actions.deactivate') : __('admin.constructions.actions.activate') }}"
                             :state="$construction->is_active ? 'success' : 'danger'">
                             @if ($construction->is_active)
@@ -133,6 +133,52 @@
                     <button type="button" wire:click="deleteConstruction"
                         class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
                         {{ __('general.buttons.delete') }}
+                    </button>
+                </div>
+            </div>
+        </dialog>
+    @endif
+
+    @if ($showActiveModal)
+        <dialog open
+            class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4"
+            aria-labelledby="construction-active-modal-title">
+            <div class="mx-4 w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+                <div class="flex items-start gap-3">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full {{ $activeAction === 'activate' ? 'bg-green-100' : 'bg-amber-100' }}">
+                        @if ($activeAction === 'activate')
+                            <svg class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        @else
+                            <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        @endif
+                    </div>
+                    <div>
+                        <h3 id="construction-active-modal-title"
+                            class="text-base font-semibold text-gray-900">
+                            {{ $activeAction === 'activate' ? __('admin.constructions.actions.activate') : __('admin.constructions.actions.deactivate') }}
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            {{ $activeAction === 'activate' ? __('admin.constructions.confirm_activate') : __('admin.constructions.confirm_deactivate') }}
+                        </p>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" wire:click="cancelToggleActive"
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                        {{ __('general.buttons.cancel') }}
+                    </button>
+                    <button type="button" wire:click="doToggleActive"
+                        class="rounded-md px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 {{ $activeAction === 'activate' ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' : 'bg-amber-500 hover:bg-amber-600 focus:ring-amber-400' }}">
+                        {{ __('general.buttons.confirm') }}
                     </button>
                 </div>
             </div>

@@ -41,7 +41,6 @@ trait InteractsWithAdminOwners
     private function ownerCreationAttributes(): array
     {
         return [
-            'ownerId' => __('admin.owners.form.id'),
             'coprop1Name' => __('admin.owners.form.coprop1_name'),
             'coprop1Surname' => __('admin.owners.form.coprop1_surname'),
             'coprop1Dni' => __('admin.owners.form.coprop1_dni'),
@@ -64,7 +63,6 @@ trait InteractsWithAdminOwners
     private function resetCreateOwnerFormState(): void
     {
         $this->reset([
-            'ownerId',
             'coprop1Name',
             'coprop1Surname',
             'coprop1Dni',
@@ -96,6 +94,31 @@ trait InteractsWithAdminOwners
             'assignments.property.location',
         ]);
 
+        $query->addSelect([
+            'portal_location_sort' => PropertyAssignment::query()
+                ->select('locations.name')
+                ->join('properties', 'properties.id', '=', 'property_assignments.property_id')
+                ->join('locations', 'locations.id', '=', 'properties.location_id')
+                ->whereColumn('property_assignments.owner_id', 'owners.id')
+                ->where('locations.type', 'portal')
+                ->whereNull('property_assignments.end_date')
+                ->orderBy('locations.name')
+                ->orderBy('properties.code')
+                ->orderBy('properties.name')
+                ->limit(1),
+            'portal_property_sort' => PropertyAssignment::query()
+                ->selectRaw('COALESCE(properties.code, properties.name)')
+                ->join('properties', 'properties.id', '=', 'property_assignments.property_id')
+                ->join('locations', 'locations.id', '=', 'properties.location_id')
+                ->whereColumn('property_assignments.owner_id', 'owners.id')
+                ->where('locations.type', 'portal')
+                ->whereNull('property_assignments.end_date')
+                ->orderBy('locations.name')
+                ->orderBy('properties.code')
+                ->orderBy('properties.name')
+                ->limit(1),
+        ]);
+
         AdminOwnersFilters::apply($query, [
             'status' => $this->filterStatus,
             'portal' => $this->filterPortal,
@@ -106,7 +129,11 @@ trait InteractsWithAdminOwners
             'ownershipView' => $this->ownershipView,
         ]);
 
-        return $query;
+        return $query
+            ->orderByRaw('portal_location_sort IS NULL ASC')
+            ->orderBy('portal_location_sort')
+            ->orderBy('portal_property_sort')
+            ->orderBy('owners.id');
     }
 
     /**
@@ -115,14 +142,15 @@ trait InteractsWithAdminOwners
     private function loadViewData(): array
     {
         return [
-            'portals' => Location::portals()->orderBy('code')->get(),
-            'locals' => Location::locals()->orderBy('code')->get(),
-            'garages' => Location::garages()->orderBy('code')->get(),
-            'storages' => Location::storage()->orderBy('code')->get(),
+            'portals' => Location::portals()->orderBy('name')->get(),
+            'locals' => Location::locals()->orderBy('name')->get(),
+            'garages' => Location::garages()->orderBy('name')->get(),
+            'storages' => Location::storage()->orderBy('name')->get(),
             'assignableProperties' => Property::query()
                 ->with('location')
                 ->whereDoesntHave('activeAssignments')
                 ->orderBy('location_id')
+                ->orderBy('code')
                 ->orderBy('name')
                 ->get(),
         ];

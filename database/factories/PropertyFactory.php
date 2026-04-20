@@ -16,9 +16,12 @@ class PropertyFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->bothify('?#');
+
         return [
             'location_id' => Location::factory(),
-            'name' => fake()->bothify('?#'),
+            'code' => fn (array $attributes): string => (string) ($attributes['name'] ?? $name),
+            'name' => $name,
             'community_pct' => fake()->randomFloat(4, 0.1, 5.0),
             'location_pct' => fake()->randomFloat(4, 0.1, 10.0),
         ];
