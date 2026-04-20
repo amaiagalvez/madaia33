@@ -21,6 +21,7 @@ class ContactMessageFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->safeEmail(),
             'user_id' => null,
+            'notice_tag_id' => null,
             'subject' => fake()->sentence(4),
             'message' => fake()->paragraph(),
             'is_read' => false,
@@ -30,7 +31,7 @@ class ContactMessageFactory extends Factory
 
     public function read(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn() => [
             'is_read' => true,
             'read_at' => now(),
         ]);
@@ -38,7 +39,7 @@ class ContactMessageFactory extends Factory
 
     public function unread(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn() => [
             'is_read' => false,
             'read_at' => null,
         ]);

@@ -22,6 +22,7 @@ return [
     'inquiry' => [
         'title' => 'Enviar consulta',
         'subtitle' => 'La persona responsable recibirá el mensaje y la respuesta llegará a tu correo.',
+        'message_subject_prefix' => 'CONSULTA',
         'name' => 'Nombre completo',
         'email' => 'Correo electrónico',
         'subject' => 'Asunto',
@@ -32,7 +33,6 @@ return [
             'name_required' => 'El nombre es obligatorio.',
             'email_required' => 'El correo electrónico es obligatorio.',
             'email_invalid' => 'El formato del correo electrónico no es válido.',
-            'subject_required' => 'El asunto es obligatorio.',
             'message_required' => 'El mensaje es obligatorio.',
         ],
     ],

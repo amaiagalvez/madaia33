@@ -22,6 +22,7 @@ return [
     'inquiry' => [
         'title' => 'Bidali kontsulta',
         'subtitle' => 'Arduradunari mezu zuzena bidaliko zaio eta zure helbidean jasoko duzu erantzuna.',
+        'message_subject_prefix' => 'KONTSULA',
         'name' => 'Izen-abizenak',
         'email' => 'Helbide elektronikoa',
         'subject' => 'Gaia',
@@ -32,7 +33,6 @@ return [
             'name_required' => 'Izena beharrezkoa da.',
             'email_required' => 'Helbide elektronikoa beharrezkoa da.',
             'email_invalid' => 'Helbide elektronikoaren formatua ez da zuzena.',
-            'subject_required' => 'Gaia beharrezkoa da.',
             'message_required' => 'Mezua beharrezkoa da.',
         ],
     ],

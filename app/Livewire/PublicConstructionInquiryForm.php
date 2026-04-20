@@ -4,18 +4,16 @@ namespace App\Livewire;
 
 use App\Models\User;
 use Livewire\Component;
+use App\Rules\NoScriptTags;
 use App\Models\Construction;
-use App\Models\ConstructionInquiry;
+use App\Models\ContactMessage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ConstructionInquiryNotificationMail;
+use App\Actions\Messaging\SendAuthenticatedContactMessageAction;
 
 class PublicConstructionInquiryForm extends Component
 {
     public int $constructionId;
-
-    public string $subject = '';
 
     public string $message = '';
 
@@ -38,8 +36,7 @@ class PublicConstructionInquiryForm extends Component
     protected function rules(): array
     {
         return [
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:5000',
+            'message' => ['required', 'string', 'max:5000', new NoScriptTags],
         ];
     }
 
@@ -49,8 +46,8 @@ class PublicConstructionInquiryForm extends Component
     protected function messages(): array
     {
         return [
-            'subject.required' => __('constructions.inquiry.validation.subject_required'),
             'message.required' => __('constructions.inquiry.validation.message_required'),
+            'message.max' => __('validation.max.string', ['attribute' => __('constructions.inquiry.message'), 'max' => 5000]),
         ];
     }
 
@@ -64,27 +61,38 @@ class PublicConstructionInquiryForm extends Component
 
         $construction = Construction::query()
             ->active()
-            ->with('managers:id,email')
+            ->with('tag:id,slug')
             ->findOrFail($this->constructionId);
 
-        $inquiry = ConstructionInquiry::query()->create([
-            'construction_id' => $construction->id,
+        abort_unless($construction->tag !== null, 404);
+
+        $subject = $this->buildSubject($construction);
+
+        $contactMessage = ContactMessage::query()->create([
             'user_id' => Auth::id(),
+            'notice_tag_id' => $construction->tag->id,
             'name' => $user->name,
             'email' => $user->email,
-            'subject' => $this->subject,
+            'subject' => $subject,
             'message' => $this->message,
         ]);
 
-        $construction->managers
-            ->filter(fn ($manager): bool => filled($manager->email))
-            ->each(function ($manager) use ($inquiry, $construction): void {
-                Mail::to($manager->email)->send(new ConstructionInquiryNotificationMail($inquiry, $construction));
-            });
+        $emailFailed = app(SendAuthenticatedContactMessageAction::class)->execute(
+            user: $user,
+            contactMessage: $contactMessage,
+            messageBody: $this->message,
+            userMailSubject: $subject,
+            adminMailSubject: $subject,
+        );
 
-        $this->reset(['subject', 'message']);
-        $this->statusType = 'success';
-        $this->statusMessage = __('constructions.inquiry.success');
+        $this->reset(['message']);
+        $this->statusType = $emailFailed ? 'error' : 'success';
+        $this->statusMessage = $emailFailed ? __('contact.email_error') : __('constructions.inquiry.success');
+    }
+
+    private function buildSubject(Construction $construction): string
+    {
+        return '[' . __('constructions.inquiry.message_subject_prefix') . '. ' . $construction->title . ']';
     }
 
     public function render(): View

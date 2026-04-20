@@ -355,36 +355,36 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [x] 16. Ejecutar checkpoint final 16 con `composer quality` y cierre.
 
 ### Work Items
- [x] Al crear una obra se crea una etiqueta, el slug de esa etiqueta tiene que ser único, pero simple, el nombre que se le ha dado a la obra y si está repetido no dejar crear la obra, si se edita la obra, modificar el nombre de la etiqueta y el slug.
- [x] Si hay una obra en activo, añadir en el menú del front una entrada a esa obra
- [x] en el front de una obra activa, quitar la parte de las fechas, quitar la parte del formulario y moverlo a un modal, como en la parte superior del perfil de usario, un encabezado con el nombre de la obra y el botóon de Mezua bidali que saca el modal, no hace falta nombre ni email en el formulario, cogelos del usuario logueado, ya que para ver todo esto hay que estar logueado.
- [x] Si hay una obra en activo, en el front añadir otro bloque junto a bozketak y profila, cada uno de los tres debe ocupar un tercio de la pantalla, si solo hay dos, cada uno la mitad, y si solo se muestra uno, completo.
+    [x] Al crear una obra se crea una etiqueta, el slug de esa etiqueta tiene que ser único, pero simple, el nombre que se le ha dado a la obra y si está repetido no dejar crear la obra, si se edita la obra, modificar el nombre de la etiqueta y el slug.
+    [x] Si hay una obra en activo, añadir en el menú del front una entrada a esa obra
+    [x] en el front de una obra activa, quitar la parte de las fechas, quitar la parte del formulario y moverlo a un modal, como en la parte superior del perfil de usario, un encabezado con el nombre de la obra y el botóon de Mezua bidali que saca el modal, no hace falta nombre ni email en el formulario, cogelos del usuario logueado, ya que para ver todo esto hay que estar logueado.
+    [x] Si hay una obra en activo, en el front añadir otro bloque junto a bozketak y profila, cada uno de los tres debe ocupar un tercio de la pantalla, si solo hay dos, cada uno la mitad, y si solo se muestra uno, completo.
 - [ ] Documentos y descargas: `app/Http/Controllers/NoticeDocumentController.php`, rutas en `routes/web.php`.
- [x] Asegurar que el flujo de obras activas sea coherente en backend y frontend: slug de etiqueta simple y único, navegación visible cuando aplica, cabecera + modal de contacto en detalle de obra y distribución responsive correcta de bloques públicos.
+    [x] Asegurar que el flujo de obras activas sea coherente en backend y frontend: slug de etiqueta simple y único, navegación visible cuando aplica, cabecera + modal de contacto en detalle de obra y distribución responsive correcta de bloques públicos.
 - [ ] Testing progresivo: `tests/Unit/**`, `tests/Feature/**`, `tests/Browser/**` (si se tocan flujos sensibles en Blade).
- [x] Mantener el patrón de creación automática de etiqueta en el observer de obras, pero aplicar slug simple derivado del título y unicidad estricta al crear/editar.
- [x] Resolver la entrada de menú del front mostrando todas las obras activas (no solo una), reutilizando el layout/componente de navegación existente y sin duplicar menús.
- [x] En la vista pública de obra activa, copiar el mismo header usado en perfil (estructura visual y CTA), y usar el botón Mezua bidali para abrir modal.
- [x] Aplicar el layout de bloques (obras/bozketak/profila) únicamente en home, con reglas 1-2-3 columnas según elementos visibles.
+    [x] Mantener el patrón de creación automática de etiqueta en el observer de obras, pero aplicar slug simple derivado del título y unicidad estricta al crear/editar.
+    [x] Resolver la entrada de menú del front mostrando todas las obras activas (no solo una), reutilizando el layout/componente de navegación existente y sin duplicar menús.
+    [x] En la vista pública de obra activa, copiar el mismo header usado en perfil (estructura visual y CTA), y usar el botón Mezua bidali para abrir modal.
+    [x] Aplicar el layout de bloques (obras/bozketak/profila) únicamente en home, con reglas 1-2-3 columnas según elementos visibles.
 - [ ] Formato obligatorio tras cambios PHP: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`.
- [x] 1. Slug de etiqueta en obras: actualizar observer + validación de creación/edición para impedir colisiones y sincronizar nombre/slug de etiqueta al editar título de obra.
- [x] 2. Menú front condicional: añadir entradas para todas las obras activas cuando existan.
- [x] 3. Vista pública de obra activa: quitar bloque de fechas, sustituir cabecera por la del perfil, mover formulario a modal con botón Mezua bidali y usar datos del usuario autenticado sin inputs manuales de nombre/email.
- [x] 4. Bloques front (obras/bozketak/profila): aplicar distribución dinámica 1/2/3 columnas solo en home según número de bloques activos.
- [x] 5. Validación integral: tests Unit/Feature/Browser afectados + quality gate completa.
+    [x] 1. Slug de etiqueta en obras: actualizar observer + validación de creación/edición para impedir colisiones y sincronizar nombre/slug de etiqueta al editar título de obra.
+    [x] 2. Menú front condicional: añadir entradas para todas las obras activas cuando existan.
+    [x] 3. Vista pública de obra activa: quitar bloque de fechas, sustituir cabecera por la del perfil, mover formulario a modal con botón Mezua bidali y usar datos del usuario autenticado sin inputs manuales de nombre/email.
+    [x] 4. Bloques front (obras/bozketak/profila): aplicar distribución dinámica 1/2/3 columnas solo en home según número de bloques activos.
+    [x] 5. Validación integral: tests Unit/Feature/Browser afectados + quality gate completa.
 
- [x] Backend obras/etiquetas: [app/Observers/ConstructionObserver.php](app/Observers/ConstructionObserver.php), [app/Livewire/AdminConstructionManager.php](app/Livewire/AdminConstructionManager.php) (si aplica), modelos/validaciones relacionadas.
- [x] Navegación front: layout/componente activo de menú público en [resources/views](resources/views).
- [x] Detalle obra front: [resources/views/public/constructions/show.blade.php](resources/views/public/constructions/show.blade.php), [app/Livewire/PublicConstructionInquiryForm.php](app/Livewire/PublicConstructionInquiryForm.php).
- [x] Bloques front portada/zona objetivo: vistas públicas donde conviven obras, bozketak y profila.
- [x] Tests: Unit/Feature en [tests/Unit](tests/Unit), [tests/Feature](tests/Feature) y Dusk focalizado en [tests/Browser](tests/Browser).
+    [x] Backend obras/etiquetas: [app/Observers/ConstructionObserver.php](app/Observers/ConstructionObserver.php), [app/Livewire/AdminConstructionManager.php](app/Livewire/AdminConstructionManager.php) (si aplica), modelos/validaciones relacionadas.
+    [x] Navegación front: layout/componente activo de menú público en [resources/views](resources/views).
+    [x] Detalle obra front: [resources/views/public/constructions/show.blade.php](resources/views/public/constructions/show.blade.php), [app/Livewire/PublicConstructionInquiryForm.php](app/Livewire/PublicConstructionInquiryForm.php).
+    [x] Bloques front portada/zona objetivo: vistas públicas donde conviven obras, bozketak y profila.
+    [x] Tests: Unit/Feature en [tests/Unit](tests/Unit), [tests/Feature](tests/Feature) y Dusk focalizado en [tests/Browser](tests/Browser).
 
- [x] Test de regresión para slug único y sincronización de etiqueta al editar obra.
- [x] Test de navegación front para visibilidad condicional de entrada de obra activa.
- [x] Dusk focalizado para modal Mezua bidali y layout 1/2/3 bloques.
- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`.
- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact <tests-afectados>`.
- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
+    [x] Test de regresión para slug único y sincronización de etiqueta al editar obra.
+    [x] Test de navegación front para visibilidad condicional de entrada de obra activa.
+    [x] Dusk focalizado para modal Mezua bidali y layout 1/2/3 bloques.
+    [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`.
+    [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact <tests-afectados>`.
+    [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
 - [x] 1. Añadir/actualizar test Dusk focalizado para bloquear regresiones visuales y de interacción del bloque de documentos en avisos.
 - [x] 2. Refactorizar el bloque de documentos en [resources/views/livewire/admin/notice-manager.blade.php](resources/views/livewire/admin/notice-manager.blade.php) para igualarlo al patrón de bidalketak (contenedor, listas de pendientes/subidos, acciones).
 - [x] 3. Ajustar textos/keys de traducción solo si el nuevo diseño lo requiere.
@@ -405,16 +405,12 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 
 
 
-### Zuzenketak (frogatzeko)
+### Zuzenketak
 
 - [x] Al crear una obra se crea una etiqueta, el slug de esa etiqueta tiene que ser único, pero simple, el nombre que se le ha dado a la obra y si está repetido no dejar crear la obra, si se edita la obra, modificar el nombre de la etiqueta y el slug.
-- [ ] Si hay una obra en activo, añadir en el menú del front una entrada a esa obra
-- [ ] en el front de una obra activa, quitar la parte de las fechas, quitar la parte del formulario y moverlo a un modal, como en la parte superior del perfil de usario, un encabezado con el nombre de la obra y el botóon de Mezua bidali que saca el modal, no hace falta nombre ni email en el formulario, cogelos del usuario logueado, ya que para ver todo esto hay que estar logueado.
-- [ ] Si hay una obra en activo, en el front añadir otro bloque junto a bozketak y profila, cada uno de los tres debe ocupar un tercio de la pantalla, si solo hay dos, cada uno la mitad, y si solo se muestra uno, completo.
-
-- [ ] Obrak, al botón activo ponerle confirmación (como en la columna publikatuta de iragarkiak )
-- [ ] Formulario obrak, se repite el encabezado, Bidali Kontuslta y el subitulo aparecen dos veces.
-- [ ] Formulario obrak, al rellenar un formulario, enviar un mensaje de confirmación al owner (como se hace en el formulario del perfil)
+- [x] Si hay una obra en activo, añadir en el menú del front una entrada a esa obra
+- [x] en el front de una obra activa, quitar la parte de las fechas, quitar la parte del formulario y moverlo a un modal, como en la parte superior del perfil de usario, un encabezado con el nombre de la obra y el botóon de Mezua bidali que saca el modal, no hace falta nombre ni email en el formulario, cogelos del usuario logueado, ya que para ver todo esto hay que estar logueado.
+- [x] Si hay una obra en activo, en el front añadir otro bloque junto a bozketak y profila, cada uno de los tres debe ocupar un tercio de la pantalla, si solo hay dos, cada uno la mitad, y si solo se muestra uno, completo.
 
 ## Implementation Plan - Zuzenketak
 
@@ -453,3 +449,7 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`.
 - [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact <tests-afectados>`.
 - [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
+
+
+### Zuzenketak 2
+- [ ] Obrak, al botón activo ponerle confirmación (como en la columna publikatuta de iragarkiak )
