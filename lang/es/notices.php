@@ -51,5 +51,12 @@ return [
         'global_only' => 'Este rol solo puede crear avisos para toda la comunidad.',
         'delete_title' => 'Eliminar aviso',
         'confirm_delete' => '¿Estás seguro de que quieres eliminar este aviso?',
+        'show_readers' => 'Mostrar estado de lectura',
+        'readers_title' => 'Estado de apertura de este aviso',
+        'readers_empty' => 'No hay propietarias para mostrar este estado.',
+        'readers_opened_at' => 'Abierto el',
+        'readers_status' => 'Estado',
+        'readers_opened' => 'Abierto',
+        'readers_unopened' => 'Sin abrir',
     ],
 ];

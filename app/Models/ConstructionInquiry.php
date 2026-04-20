@@ -2,12 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Database\Factories\ConstructionInquiryFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property int $construction_id
+ * @property int|null $user_id
+ * @property string $name
+ * @property string $email
+ * @property string $subject
+ * @property string $message
+ * @property string|null $reply
+ * @property bool $is_read
+ * @property Carbon|null $replied_at
+ * @property Carbon|null $read_at
+ */
 class ConstructionInquiry extends Model
 {
     /** @use HasFactory<ConstructionInquiryFactory> */

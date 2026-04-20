@@ -5,14 +5,17 @@ namespace App\Livewire;
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
 use App\Models\Notice;
 use Livewire\Component;
+use App\Models\NoticeRead;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use App\Models\NoticeLocation;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Support\LocalizedDateFormatter;
 use App\Concerns\HandlesNoticeDocuments;
 use App\Concerns\ManagesNoticeLocations;
 use App\Concerns\BuildsLocaleFieldConfigs;
@@ -67,6 +70,13 @@ class AdminNoticeManager extends Component
 
     public bool $showPublishModal = false;
 
+    public bool $showReadersModal = false;
+
+    public ?int $readersNoticeId = null;
+
+    /** @var array<int, array{owner_name: string, opened_at: string, has_opened: bool}> */
+    public array $noticeReaders = [];
+
     public string $sortColumn = 'published_at';
 
     public string $sortDir = 'desc';
@@ -87,7 +97,7 @@ class AdminNoticeManager extends Component
 
         abort_unless($user?->canManageNotices(), 403);
 
-        $selectedLocationRules = ['string'];
+        $selectedLocationRules = ['string', 'exists:locations,id'];
 
         if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
             $selectedLocationRules[] = Rule::in($this->allowedLocationCodes());
@@ -126,7 +136,7 @@ class AdminNoticeManager extends Component
     {
         abort_unless($this->currentUser()?->canManageNotices(), 403);
 
-        $notice = Notice::with(['locations.location', 'documents' => fn ($query) => $query->withCount('downloads')])->findOrFail($id);
+        $notice = Notice::with(['locations.location', 'documents' => fn($query) => $query->withCount('downloads')])->findOrFail($id);
 
         $this->editingId = $notice->id;
         $this->titleEu = $notice->title_eu ?? '';
@@ -138,7 +148,7 @@ class AdminNoticeManager extends Component
         $this->publishedAt = $notice->published_at?->format('Y-m-d') ?? '';
         $this->originalPublishedAt = $notice->published_at?->toDateTimeString() ?? '';
         $this->selectedLocations = $notice->locations
-            ->map(fn (NoticeLocation $location): ?string => $location->location_code)
+            ->map(fn(NoticeLocation $location): string => (string) $location->location_id)
             ->filter()
             ->values()
             ->all();
@@ -155,7 +165,7 @@ class AdminNoticeManager extends Component
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn (string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
                 ->values()
                 ->all();
         }
@@ -180,7 +190,7 @@ class AdminNoticeManager extends Component
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn (string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
                 ->values()
                 ->all();
         }
@@ -192,7 +202,7 @@ class AdminNoticeManager extends Component
 
         $this->syncLocations($notice);
         $this->storeAttachments($notice);
-        $this->setStoredDocumentsFromNotice($notice->load(['documents' => fn ($query) => $query->withCount('downloads')]));
+        $this->setStoredDocumentsFromNotice($notice->load(['documents' => fn($query) => $query->withCount('downloads')]));
 
         $this->resetForm();
         $this->showForm = false;
@@ -361,6 +371,51 @@ class AdminNoticeManager extends Component
     {
         $this->resetForm();
         $this->showForm = false;
+    }
+
+    public function showReaders(int $id): void
+    {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
+        $notice = Notice::query()
+            ->with('tag.construction')
+            ->findOrFail($id);
+
+        abort_unless($notice->tag?->construction !== null, 404);
+
+        $this->readersNoticeId = $id;
+
+        $readsByOwnerId = NoticeRead::query()
+            ->where('notice_id', $notice->id)
+            ->get(['owner_id', 'opened_at'])
+            ->keyBy('owner_id');
+
+        $this->noticeReaders = Owner::query()
+            ->whereHas('activeAssignments')
+            ->orderBy('coprop1_name')
+            ->orderBy('coprop1_surname')
+            ->get(['id', 'coprop1_name', 'coprop1_surname'])
+            ->map(static function (Owner $owner) use ($readsByOwnerId): array {
+                /** @var NoticeRead|null $read */
+                $read = $readsByOwnerId->get($owner->id);
+
+                return [
+                    'owner_name' => $owner->fullName1 !== '' ? $owner->fullName1 : '—',
+                    'opened_at' => LocalizedDateFormatter::shortDateTime($read?->opened_at),
+                    'has_opened' => $read !== null,
+                ];
+            })
+            ->values()
+            ->all();
+
+        $this->showReadersModal = true;
+    }
+
+    public function closeReadersModal(): void
+    {
+        $this->showReadersModal = false;
+        $this->readersNoticeId = null;
+        $this->noticeReaders = [];
     }
 
     public function sortBy(string $column): void

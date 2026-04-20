@@ -35,13 +35,19 @@ trait ManagesNoticeLocations
 
     private function resolveSelectionToForeignKey(string $selected): ?int
     {
+        $locationId = (int) $selected;
+
+        if ($locationId <= 0) {
+            return null;
+        }
+
         return Location::query()
-            ->where('code', $selected)
+            ->whereKey($locationId)
             ->value('id');
     }
 
     /**
-     * @return array<int, array{code: string, type: string, label: string}>
+     * @return array<int, array{id: string, type: string, label: string}>
      */
     private function allLocationOptions(): array
     {
@@ -59,14 +65,14 @@ trait ManagesNoticeLocations
 
         $locations = $query
             ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 WHEN type = 'garage' THEN 3 ELSE 4 END")
-            ->orderBy('code')
+            ->orderBy('name')
             ->get();
 
         return $locations
-            ->map(fn (Location $location): array => [
-                'code' => $location->code,
+            ->map(fn(Location $location): array => [
+                'id' => (string) $location->id,
                 'type' => $location->type,
-                'label' => $this->locationLabel($location) . $location->code,
+                'label' => trim($this->locationLabel($location) . $location->name),
             ])
             ->all();
     }
@@ -87,7 +93,7 @@ trait ManagesNoticeLocations
     private function allowedLocationCodes(): array
     {
         return collect($this->allLocationOptions())
-            ->map(static fn (array $location): string => $location['code'])
+            ->map(static fn(array $location): string => $location['id'])
             ->values()
             ->all();
     }

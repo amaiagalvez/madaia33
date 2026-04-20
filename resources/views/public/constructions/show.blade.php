@@ -62,44 +62,104 @@
             </div>
 
             @forelse ($notices as $notice)
-                <article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <h3 class="text-lg font-semibold text-stone-900">{{ $notice->title }}
-                        </h3>
-                        @if ($notice->published_at)
+                <article class="rounded-2xl border border-gray-200 bg-white shadow-sm"
+                    x-data="{
+                        open: false,
+                        hasBeenRead: {{ $notice->is_read_by_current_owner ? 'true' : 'false' }},
+                        trackUrl: '{{ route(\App\SupportedLocales::routeName('notices.read'), $notice->id) }}',
+                        async toggle() {
+                            this.open = !this.open;
+                            if (this.open && !this.hasBeenRead) {
+                                const response = await fetch(this.trackUrl, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ?? '',
+                                        'Accept': 'application/json',
+                                    },
+                                }).catch(() => null);
+                    
+                                if (response?.ok) {
+                                    this.hasBeenRead = true;
+                                }
+                            }
+                        },
+                    }" data-construction-notice="{{ $notice->id }}">
+                    {{-- Cabecera siempre visible: título + fecha + flecha --}}
+                    <button type="button"
+                        class="flex w-full items-center justify-between gap-4 px-6 py-4 text-left"
+                        @click="toggle()" :aria-expanded="open"
+                        data-construction-notice-toggle="{{ $notice->id }}">
+                        <div class="flex min-w-0 flex-1 flex-wrap items-center gap-3">
                             <span
-                                class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
-                                {{ $notice->published_at->translatedFormat('d/m/Y') }}
+                                class="inline-flex items-center gap-2 font-semibold text-stone-900">
+                                <span x-show="!hasBeenRead"
+                                    class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-red-600"
+                                    data-construction-notice-unread="{{ $notice->id }}">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21.75 7.5v9A2.25 2.25 0 0 1 19.5 18.75h-15A2.25 2.25 0 0 1 2.25 16.5v-9m19.5 0A2.25 2.25 0 0 0 19.5 5.25h-15A2.25 2.25 0 0 0 2.25 7.5m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 9.659A2.25 2.25 0 0 1 2.25 7.743V7.5" />
+                                    </svg>
+                                </span>
+                                <span x-show="hasBeenRead"
+                                    class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"
+                                    data-construction-notice-read="{{ $notice->id }}">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21.75 9V7.5A2.25 2.25 0 0 0 19.5 5.25h-15A2.25 2.25 0 0 0 2.25 7.5V9m19.5 0v7.5A2.25 2.25 0 0 1 19.5 18.75h-15A2.25 2.25 0 0 1 2.25 16.5V9m19.5 0-8.69 5.434a2.25 2.25 0 0 1-2.12 0L2.25 9" />
+                                    </svg>
+                                </span>
+                                <span>{{ $notice->title }}</span>
                             </span>
+                            @if ($notice->published_at)
+                                <span
+                                    class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700"
+                                    data-construction-notice-date="{{ $notice->id }}">
+                                    {{ \App\Support\LocalizedDateFormatter::date($notice->published_at) }}
+                                </span>
+                            @endif
+                        </div>
+                        <svg class="h-5 w-5 shrink-0 text-gray-400 transition-transform duration-200"
+                            :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+
+                    {{-- Contenido expandible --}}
+                    <div x-show="open" x-collapse class="border-t border-gray-100 px-6 pb-6 pt-4"
+                        data-construction-notice-content="{{ $notice->id }}">
+                        <div class="prose prose-stone max-w-none text-sm leading-7">
+                            {!! nl2br(e($notice->content)) !!}
+                        </div>
+
+                        @if ($notice->documents->isNotEmpty())
+                            <div class="mt-5 rounded-2xl border border-gray-200 bg-stone-50 p-4">
+                                <h4 class="text-sm font-semibold text-stone-900">
+                                    {{ __('constructions.front.documents_title') }}</h4>
+                                <ul class="mt-3 space-y-2">
+                                    @foreach ($notice->documents as $document)
+                                        <li>
+                                            <a href="{{ route('notice-documents.download', $document->token) }}"
+                                                class="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#edd2c7] bg-white px-3 py-2 text-sm font-medium text-[#793d3d] transition-colors hover:border-brand-600 hover:text-brand-hover"
+                                                data-document-download="{{ $document->id }}">
+                                                <svg class="h-4 w-4 shrink-0" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5"
+                                                    stroke="currentColor" aria-hidden="true">
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M12 16.5V3.75m0 12.75 4.5-4.5m-4.5 4.5-4.5-4.5M3.75 20.25h16.5" />
+                                                </svg>
+                                                {{ $document->filename }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
                     </div>
-                    <div class="prose prose-stone mt-4 max-w-none text-sm leading-7">
-                        {!! nl2br(e($notice->content)) !!}
-                    </div>
-
-                    @if ($notice->documents->isNotEmpty())
-                        <div class="mt-5 rounded-2xl border border-gray-200 bg-stone-50 p-4">
-                            <h4 class="text-sm font-semibold text-stone-900">
-                                {{ __('constructions.front.documents_title') }}</h4>
-                            <ul class="mt-3 space-y-2">
-                                @foreach ($notice->documents as $document)
-                                    <li>
-                                        <a href="{{ route('notice-documents.download', $document->token) }}"
-                                            class="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#edd2c7] bg-white px-3 py-2 text-sm font-medium text-[#793d3d] transition-colors hover:border-brand-600 hover:text-brand-hover"
-                                            data-document-download="{{ $document->id }}">
-                                            <svg class="h-4 w-4 shrink-0" fill="none"
-                                                viewBox="0 0 24 24" stroke-width="1.5"
-                                                stroke="currentColor" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M12 16.5V3.75m0 12.75 4.5-4.5m-4.5 4.5-4.5-4.5M3.75 20.25h16.5" />
-                                            </svg>
-                                            {{ $document->filename }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
                 </article>
             @empty
                 <div class="rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center">

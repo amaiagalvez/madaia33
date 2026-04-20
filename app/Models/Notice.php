@@ -85,4 +85,12 @@ class Notice extends Model
     {
         return $this->resolveLocalizedAttribute('content');
     }
+
+    /**
+     * @return HasMany<NoticeRead, $this>
+     */
+    public function reads(): HasMany
+    {
+        return $this->hasMany(NoticeRead::class);
+    }
 }

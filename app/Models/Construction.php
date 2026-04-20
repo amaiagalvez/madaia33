@@ -63,7 +63,7 @@ class Construction extends Model
      */
     public function tag(): HasOne
     {
-        return $this->hasOne(NoticeTag::class, 'slug', 'tag_slug');
+        return $this->hasOne(NoticeTag::class, 'slug', 'slug');
     }
 
     /**
@@ -81,10 +81,5 @@ class Construction extends Model
                     ->orWhereNull('ends_at');
             })
             ->where('is_active', true);
-    }
-
-    public function getTagSlugAttribute(): string
-    {
-        return $this->slug;
     }
 }

@@ -38,6 +38,7 @@ flowchart LR
     VOTINGS_G["Votings\nvotings, ballots, selections, totals"]:::votings
     CAMPAIGNS_G["Campaigns\ncampaigns, recipients, documents, templates"]:::campaigns
     CONTENT["Content & settings\nnotices, images, contact messages, settings"]:::content
+    TRACKING["Tracking\nnotice_reads, notice_document_downloads"]:::content
 
     AUTH -->|identity and permissions| OWNERSHIP
     AUTH -->|acting users| VOTINGS_G
@@ -46,6 +47,8 @@ flowchart LR
     OWNERSHIP -->|owners and locations| VOTINGS_G
     OWNERSHIP -->|owners and locations| CAMPAIGNS_G
     OWNERSHIP -->|location-scoped notices| CONTENT
+    OWNERSHIP -->|owner read state| TRACKING
+    CONTENT -->|notice audit trail| TRACKING
 
     classDef auth      fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
     classDef ownership fill:#dcfce7,stroke:#22c55e,color:#14532d
@@ -408,6 +411,29 @@ erDiagram
         datetime deleted_at
     }
 
+    NOTICE_READS {
+        bigint id
+        bigint notice_id
+        bigint owner_id
+        bigint user_id
+        string ip_address
+        timestamp opened_at
+        datetime deleted_at
+    }
+
+    OWNERS {
+        bigint id
+        bigint user_id
+        string coprop1_name
+        datetime deleted_at
+    }
+
+    USERS {
+        bigint id
+        string name
+        datetime deleted_at
+    }
+
     IMAGES {
         bigint id
         string filename
@@ -435,7 +461,10 @@ erDiagram
     }
 
     NOTICES ||--o{ NOTICE_LOCATIONS : has_many
+    NOTICES ||--o{ NOTICE_READS : tracks
     LOCATIONS ||--o{ NOTICE_LOCATIONS : has_many
+    OWNERS ||--o{ NOTICE_READS : opens
+    USERS ||--o{ NOTICE_READS : records
 ```
 
 ### 4) Framework tables

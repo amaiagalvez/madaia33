@@ -51,13 +51,14 @@
                                 <dt class="font-medium text-stone-700">
                                     {{ __('constructions.front.from') }}</dt>
                                 <dd class="mt-1 text-stone-900">
-                                    {{ $construction->starts_at->translatedFormat('d/m/Y') }}</dd>
+                                    {{ \App\Support\LocalizedDateFormatter::date($construction->starts_at) }}
+                                </dd>
                             </div>
                             <div class="rounded-xl border border-gray-200 bg-stone-50 px-4 py-3">
                                 <dt class="font-medium text-stone-700">
                                     {{ __('constructions.front.to') }}</dt>
                                 <dd class="mt-1 text-stone-900">
-                                    {{ $construction->ends_at?->translatedFormat('d/m/Y') ?? '...' }}
+                                    {{ $construction->ends_at ? \App\Support\LocalizedDateFormatter::date($construction->ends_at) : '...' }}
                                 </dd>
                             </div>
                         </dl>

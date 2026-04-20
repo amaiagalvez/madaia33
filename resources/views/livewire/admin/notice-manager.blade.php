@@ -108,7 +108,7 @@
                     </flux:field>
 
                     <x-admin.form-multi-checkbox-pills :legend="__('notices.admin.locations')" :options="$allLocations"
-                        model="selectedLocations" value-key="code" label-key="label"
+                        model="selectedLocations" value-key="id" label-key="label"
                         :empty-message="__('notices.admin.global_only')" />
 
                     <x-admin.form-file-input id="noticeAttachments" model="attachments" multiple
@@ -283,6 +283,19 @@
                     </td>
                     <td class="px-6 py-4 text-right text-sm font-medium">
                         <x-admin.table-row-actions>
+                            @if ($notice->tag?->construction !== null)
+                                <button type="button"
+                                    wire:click="showReaders({{ $notice->id }})"
+                                    class="inline-flex items-center justify-center rounded-full p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
+                                    title="{{ __('notices.admin.show_readers') }}"
+                                    data-notice-readers-btn="{{ $notice->id }}">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                                    </svg>
+                                </button>
+                            @endif
                             <x-admin.icon-button-edit
                                 wire:click="editNotice({{ $notice->id }})" />
                             <x-admin.icon-button-delete
@@ -386,6 +399,85 @@
                     <button type="button" wire:click="doPublish"
                         class="rounded-md px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 {{ $publishAction === 'publish' ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' : 'bg-amber-500 hover:bg-amber-600 focus:ring-amber-400' }}">
                         {{ __('general.buttons.confirm') }}
+                    </button>
+                </div>
+            </div>
+        </dialog>
+    @endif
+
+    {{-- Readers modal --}}
+    @if ($showReadersModal)
+        <dialog open
+            class="fixed inset-0 z-50 m-0 grid h-full w-full place-items-center bg-transparent p-4"
+            aria-labelledby="readers-modal-title" data-notice-readers-modal>
+            <div class="fixed inset-0 bg-black/40" wire:click="closeReadersModal"
+                aria-hidden="true"></div>
+            <div
+                class="relative mx-4 w-full max-w-lg space-y-4 rounded-xl bg-white p-6 shadow-2xl">
+                <div class="flex items-start justify-between gap-3">
+                    <h3 id="readers-modal-title" class="text-base font-semibold text-gray-900">
+                        {{ __('notices.admin.readers_title') }}
+                    </h3>
+                    <button type="button" wire:click="closeReadersModal"
+                        class="rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                        aria-label="{{ __('general.close') }}">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                @if (count($noticeReaders) === 0)
+                    <p class="text-sm text-gray-500" data-notice-readers-empty>
+                        {{ __('notices.admin.readers_empty') }}
+                    </p>
+                @else
+                    <div class="max-h-80 overflow-y-auto" data-notice-readers-list>
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-600">
+                                        {{ __('notices.admin.readers_status') }}
+                                    </th>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-600">
+                                        {{ __('admin.owners.title') }}
+                                    </th>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-600">
+                                        {{ __('notices.admin.readers_opened_at') }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 bg-white">
+                                @foreach ($noticeReaders as $reader)
+                                    <tr>
+                                        <td class="px-4 py-2">
+                                            <span @class([
+                                                'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                                                'bg-emerald-100 text-emerald-700' => $reader['has_opened'],
+                                                'bg-red-100 text-red-700' => !$reader['has_opened'],
+                                            ])
+                                                data-notice-reader-status>
+                                                {{ $reader['has_opened'] ? __('notices.admin.readers_opened') : __('notices.admin.readers_unopened') }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-2 text-gray-900">
+                                            {{ $reader['owner_name'] }}</td>
+                                        <td class="px-4 py-2 text-gray-500">
+                                            {{ $reader['has_opened'] ? $reader['opened_at'] : '—' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+
+                <div class="flex justify-end">
+                    <button type="button" wire:click="closeReadersModal"
+                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                        {{ __('general.buttons.close') }}
                     </button>
                 </div>
             </div>

@@ -65,7 +65,7 @@ class PublicHomeController extends Controller
     {
         return Notice::public()
             ->whereNull('notice_tag_id')
-            ->with('locations')
+            ->with('locations.location')
             ->latest()
             ->limit(12)
             ->get();

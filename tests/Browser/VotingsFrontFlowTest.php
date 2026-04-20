@@ -198,6 +198,46 @@ test('authenticated owner sees votings explanation and pdf actions on local http
     });
 });
 
+test('front votings shows localized date range block for each voting', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $portal = Location::factory()->portal()->create([
+        'name' => 'Portal 91-A',
+    ]);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->create([
+        'is_published' => true,
+        'starts_at' => '2026-04-20',
+        'ends_at' => '2026-04-30',
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+        'label_eu' => 'Bai',
+        'label_es' => 'Si',
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner, $voting) {
+        $browser->loginAs($owner->user)
+            ->visit('/es/votaciones')
+            ->waitFor('[data-voting-date-range="' . $voting->id . '"]', 5)
+            ->assertSeeIn('[data-voting-date-range="' . $voting->id . '"]', '20/04/2026')
+            ->assertSeeIn('[data-voting-date-range="' . $voting->id . '"]', '30/04/2026');
+    });
+});
+
 test('front votings renders html question content instead of escaped tags', function () {
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),

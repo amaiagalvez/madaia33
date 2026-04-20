@@ -5,14 +5,17 @@
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
 use App\Models\Notice;
 use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
 use App\Models\NoticeTag;
+use App\Models\NoticeRead;
 use App\Models\Construction;
 use App\Models\NoticeDocument;
 use Illuminate\Http\UploadedFile;
+use App\Models\PropertyAssignment;
 use App\Models\NoticeDocumentDownload;
 use Illuminate\Support\Facades\Storage;
 
@@ -675,4 +678,46 @@ it('searches notices by title and content in admin list', function () {
         ->set('search', 'parekatua')
         ->assertSee($titleMatch->title_eu)
         ->assertDontSee($nonMatch->title_eu);
+});
+
+it('shows opened and unopened owners for construction notices', function () {
+    $user = adminUser();
+
+    $construction = Construction::factory()->create([
+        'slug' => 'patio-irekierak',
+    ]);
+
+    $notice = Notice::factory()->create([
+        'title_eu' => 'Obrako irakurketa kontrola',
+        'notice_tag_id' => $construction->tag->id,
+    ]);
+
+    $openedOwner = Owner::factory()->create([
+        'coprop1_name' => 'Ane Irekia',
+        'coprop1_surname' => 'Jabea',
+    ]);
+    $unopenedOwner = Owner::factory()->create([
+        'coprop1_name' => 'Beñat Itxia',
+        'coprop1_surname' => 'Jabea',
+    ]);
+
+    PropertyAssignment::factory()->create(['owner_id' => $openedOwner->id]);
+    PropertyAssignment::factory()->create(['owner_id' => $unopenedOwner->id]);
+
+    NoticeRead::query()->create([
+        'notice_id' => $notice->id,
+        'owner_id' => $openedOwner->id,
+        'user_id' => $openedOwner->user_id,
+        'ip_address' => '127.0.0.1',
+        'opened_at' => now()->subMinute(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('showReaders', $notice->id)
+        ->assertSet('showReadersModal', true)
+        ->assertSee('Ane Irekia Jabea')
+        ->assertSee('Beñat Itxia Jabea')
+        ->assertSee(__('notices.admin.readers_opened'))
+        ->assertSee(__('notices.admin.readers_unopened'));
 });

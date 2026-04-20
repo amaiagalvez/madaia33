@@ -51,5 +51,12 @@ return [
         'global_only' => 'Rol honek komunitate osorako iragarkiak soilik sor ditzake.',
         'delete_title' => 'Iragarkia ezabatu',
         'confirm_delete' => 'Ziur zaude iragarki hau ezabatu nahi duzula?',
+        'show_readers' => 'Irekiera-egoera erakutsi',
+        'readers_title' => 'Iragarki honen irekiera-egoera',
+        'readers_empty' => 'Ez dago jaberik egoera hau erakusteko.',
+        'readers_opened_at' => 'Irekita noiz',
+        'readers_status' => 'Egoera',
+        'readers_opened' => 'Irekita',
+        'readers_unopened' => 'Irakurri gabe',
     ],
 ];

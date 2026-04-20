@@ -52,7 +52,7 @@ trait ManagesAdminNoticeFilters
 
         $allowedTagIds = $this->availableNoticeTags()
             ->pluck('id')
-            ->map(static fn (int $id): string => (string) $id)
+            ->map(static fn(int $id): string => (string) $id)
             ->all();
 
         if (! in_array($filter, $allowedTagIds, true)) {
@@ -97,8 +97,8 @@ trait ManagesAdminNoticeFilters
     {
         $query = Notice::with([
             'locations.location',
-            'tag',
-            'documents' => fn ($documentQuery) => $documentQuery->withCount('downloads'),
+            'tag.construction',
+            'documents' => fn($documentQuery) => $documentQuery->withCount('downloads'),
         ]);
 
         $this->applySearchFilter($query);

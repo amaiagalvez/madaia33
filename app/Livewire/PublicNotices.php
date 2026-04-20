@@ -54,7 +54,7 @@ class PublicNotices extends Component
                 $query->where(function ($q) {
                     // Include notices with the selected location
                     $q->whereHas('locations', function ($locationQuery): void {
-                        $locationQuery->whereHas('location', fn ($query) => $query->where('code', $this->locationFilter));
+                        $locationQuery->whereHas('location', fn ($query) => $query->where('id', $this->locationFilter));
                     });
                     // Also include general notices (no locations)
                     $q->orWhereDoesntHave('locations');
@@ -65,21 +65,21 @@ class PublicNotices extends Component
     }
 
     /**
-     * @return array<int, array{code: string, label: string}>
+     * @return array<int, array{id: int, label: string}>
      */
     private function availableFilterLocations(): array
     {
         return Location::query()
             ->whereIn('type', ['portal', 'local', 'garage'])
             ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 WHEN type = 'garage' THEN 3 ELSE 4 END")
-            ->orderBy('code')
-            ->get(['type', 'code'])
+            ->orderBy('name')
+            ->get(['id', 'type', 'name'])
             ->map(fn (Location $location): array => [
-                'code' => $location->code,
+                'id' => $location->id,
                 'label' => match ($location->type) {
-                    'portal' => __('notices.portal') . ' ' . $location->code,
-                    'local' => __('notices.local') . ' ' . $location->code,
-                    default => __('notices.garage') . ' ' . $location->code,
+                    'portal' => __('notices.portal') . ' ' . $location->name,
+                    'local' => __('notices.local') . ' ' . $location->name,
+                    default => __('notices.garage') . ' ' . $location->name,
                 },
             ])
             ->all();

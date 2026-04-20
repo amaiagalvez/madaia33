@@ -50,6 +50,7 @@ crear una nueva ruta con las instrucciones para usar la aplicación, añade text
 añadir una regla al agente amalur para que lo mantenga actualizado
 - [ ] Cómo se envian los mensajes programados?
 - [ ] crear dusk-test para todas las pantallas
+- [ ] El usuario que tiene el rol constructor no puede ver el front de votaciones, ni las obras en el front, ni su perfil
 
 6-C Julián Corcuera       629884577 osonikolas@gmail.com
 6-B Jose Meléndez         630856088 jose.melendez.amado@gmail.com

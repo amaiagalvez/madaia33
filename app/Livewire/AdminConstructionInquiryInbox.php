@@ -101,7 +101,7 @@ class AdminConstructionInquiryInbox extends Component
             'replied_at' => now(),
         ]);
 
-        Mail::to($inquiry->email)->send(new ConstructionInquiryReplyMail($inquiry->fresh(['construction'])));
+        Mail::to((string) $inquiry->email)->send(new ConstructionInquiryReplyMail($inquiry->fresh(['construction'])));
 
         $this->cancelReply();
     }

@@ -13,14 +13,13 @@
                     {{ __('notices.filter.all') }}
                 </button>
                 @foreach ($filterLocations as $location)
-                    <button type="button" wire:click="setLocationFilter('{{ $location['code'] }}')"
-                        data-notices-filter-btn="{{ $location['code'] }}"
-                        @class([
+                    <button type="button" wire:click="setLocationFilter('{{ $location['id'] }}')"
+                        data-notices-filter-btn="{{ $location['id'] }}" @class([
                             'rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors',
                             'border-[#793d3d] bg-[#793d3d] text-white' =>
-                                $locationFilter === $location['code'],
+                                $locationFilter === (string) $location['id'],
                             'border-gray-300 bg-white text-gray-700 hover:border-[#793d3d] hover:text-[#793d3d]' =>
-                                $locationFilter !== $location['code'],
+                                $locationFilter !== (string) $location['id'],
                         ])>
                         {{ $location['label'] }}
                     </button>

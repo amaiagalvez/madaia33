@@ -156,7 +156,7 @@
                                                 class="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                 {{ __('profile.votings.voted_at') }}</p>
                                             <p class="mt-1 text-sm text-gray-700">
-                                                {{ $ballot['voted_at']?->format('Y-m-d H:i:s') ?? '—' }}
+                                                {{ \App\Support\LocalizedDateFormatter::dateTime($ballot['voted_at']) }}
                                             </p>
                                         </article>
                                     @endforeach
@@ -181,7 +181,7 @@
                                                     <td class="px-4 py-3 text-sm text-gray-800">
                                                         {{ $ballot['voting_name'] }}</td>
                                                     <td class="px-4 py-3 text-sm text-gray-600">
-                                                        {{ $ballot['voted_at']?->format('Y-m-d H:i:s') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::dateTime($ballot['voted_at']) }}
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -229,7 +229,7 @@
                                                         class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                         {{ __('profile.votings.starts_at') }}</p>
                                                     <p class="mt-1 text-sm text-gray-700">
-                                                        {{ $voting['starts_at']?->format('Y-m-d') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::date($voting['starts_at']) }}
                                                     </p>
                                                 </div>
                                                 <div>
@@ -237,7 +237,7 @@
                                                         class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                         {{ __('profile.votings.ends_at') }}</p>
                                                     <p class="mt-1 text-sm text-gray-700">
-                                                        {{ $voting['ends_at']?->format('Y-m-d') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::date($voting['ends_at']) }}
                                                     </p>
                                                 </div>
                                             </div>
@@ -267,10 +267,10 @@
                                                     <td class="px-4 py-3 text-sm text-gray-800">
                                                         {{ $voting['voting_name'] }}</td>
                                                     <td class="px-4 py-3 text-sm text-gray-600">
-                                                        {{ $voting['starts_at']?->format('Y-m-d') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::date($voting['starts_at']) }}
                                                     </td>
                                                     <td class="px-4 py-3 text-sm text-gray-600">
-                                                        {{ $voting['ends_at']?->format('Y-m-d') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::date($voting['ends_at']) }}
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -311,7 +311,7 @@
                                                         class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                         {{ __('profile.votings.starts_at') }}</p>
                                                     <p class="mt-1 text-sm text-gray-700">
-                                                        {{ $voting['starts_at']?->format('Y-m-d') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::date($voting['starts_at']) }}
                                                     </p>
                                                 </div>
                                                 <div>
@@ -319,7 +319,7 @@
                                                         class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                         {{ __('profile.votings.ends_at') }}</p>
                                                     <p class="mt-1 text-sm text-gray-700">
-                                                        {{ $voting['ends_at']?->format('Y-m-d') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::date($voting['ends_at']) }}
                                                     </p>
                                                 </div>
                                             </div>
@@ -350,10 +350,10 @@
                                                     <td class="px-4 py-3 text-sm text-gray-800">
                                                         {{ $voting['voting_name'] }}</td>
                                                     <td class="px-4 py-3 text-sm text-gray-600">
-                                                        {{ $voting['starts_at']?->format('Y-m-d') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::date($voting['starts_at']) }}
                                                     </td>
                                                     <td class="px-4 py-3 text-sm text-gray-600">
-                                                        {{ $voting['ends_at']?->format('Y-m-d') ?? '—' }}
+                                                        {{ \App\Support\LocalizedDateFormatter::date($voting['ends_at']) }}
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -390,7 +390,7 @@
                                                 class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                 {{ __('profile.sessions.logged_in_at') }}</dt>
                                             <dd class="mt-1 text-sm text-gray-800">
-                                                {{ $session['logged_in_at']?->format('Y-m-d H:i:s') ?? '—' }}
+                                                {{ \App\Support\LocalizedDateFormatter::dateTime($session['logged_in_at']) }}
                                             </dd>
                                         </div>
                                         <div>
@@ -398,7 +398,7 @@
                                                 class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                 {{ __('profile.sessions.logged_out_at') }}</dt>
                                             <dd class="mt-1 text-sm text-gray-800">
-                                                {{ $session['logged_out_at']?->format('Y-m-d H:i:s') ?? __('profile.sessions.active') }}
+                                                {{ $session['logged_out_at'] ? \App\Support\LocalizedDateFormatter::dateTime($session['logged_out_at']) : __('profile.sessions.active') }}
                                             </dd>
                                         </div>
                                         <div>
@@ -444,10 +444,10 @@
                                     @foreach ($loginSessions as $session)
                                         <tr>
                                             <td class="px-4 py-3 text-sm text-gray-700">
-                                                {{ $session['logged_in_at']?->format('Y-m-d H:i:s') ?? '—' }}
+                                                {{ \App\Support\LocalizedDateFormatter::dateTime($session['logged_in_at']) }}
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
-                                                {{ $session['logged_out_at']?->format('Y-m-d H:i:s') ?? __('profile.sessions.active') }}
+                                                {{ $session['logged_out_at'] ? \App\Support\LocalizedDateFormatter::dateTime($session['logged_out_at']) : __('profile.sessions.active') }}
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $session['duration'] ?? __('profile.sessions.in_progress') }}
@@ -531,7 +531,7 @@
                                                 class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                 {{ __('profile.received.sent_at') }}</p>
                                             <p class="mt-1 text-sm text-gray-700">
-                                                {{ $receivedMessage['sent_at']->format('Y-m-d H:i:s') }}
+                                                {{ \App\Support\LocalizedDateFormatter::dateTime($receivedMessage['sent_at']) }}
                                             </p>
                                         </div>
                                         <div>
@@ -610,7 +610,7 @@
                                                 @endif
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
-                                                {{ $receivedMessage['sent_at']->format('Y-m-d H:i:s') }}
+                                                {{ \App\Support\LocalizedDateFormatter::dateTime($receivedMessage['sent_at']) }}
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $receivedMessage['status_label'] }}
@@ -692,7 +692,7 @@
                                                 class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                 {{ __('profile.messages.sent_at') }}</p>
                                             <p class="mt-1 text-sm text-gray-700">
-                                                {{ $userMessage['created_at']->format('Y-m-d H:i:s') }}
+                                                {{ \App\Support\LocalizedDateFormatter::dateTime($userMessage['created_at']) }}
                                             </p>
                                         </div>
                                         <div>
@@ -772,7 +772,7 @@
                                                 @endif
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
-                                                {{ $userMessage['created_at']->format('Y-m-d H:i:s') }}
+                                                {{ \App\Support\LocalizedDateFormatter::dateTime($userMessage['created_at']) }}
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-700">
                                                 {{ $userMessage['is_read'] ? __('profile.messages.read') : __('profile.messages.pending') }}
@@ -931,7 +931,7 @@
                                                 <span
                                                     class="block text-sm font-semibold text-gray-900">{{ $assignment->property ? ($assignment->property->location?->code ? $assignment->property->location->code . '  ' : '') . $assignment->property->name : __('profile.owner.unknown_property') }}</span>
                                                 <span
-                                                    class="mt-1 block text-sm text-gray-900">{{ __('profile.owner.assignment_dates', ['start' => $assignment->start_date?->format('Y-m-d') ?? '—']) }}</span>
+                                                    class="mt-1 block text-sm text-gray-900">{{ __('profile.owner.assignment_dates', ['start' => \App\Support\LocalizedDateFormatter::date($assignment->start_date)]) }}</span>
                                                 <span class="mt-1 block text-sm text-gray-900"
                                                     data-profile-owner-property-percentages>
                                                     {{ __('profile.owner.community_pct') }}:

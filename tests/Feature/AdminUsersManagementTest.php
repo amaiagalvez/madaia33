@@ -72,16 +72,16 @@ it('shows assigned managed locations in users list', function () {
     ]);
     $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
 
-    $portal = Location::factory()->portal()->create(['code' => 'L-PORTAL-01']);
-    $garage = Location::factory()->garage()->create(['code' => 'L-GARAGE-01']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal Norte']);
+    $garage = Location::factory()->garage()->create(['name' => 'Garaje Principal']);
     $communityAdmin->managedLocations()->sync([$portal->id, $garage->id]);
 
     test()->actingAs($manager)
         ->get(route('admin.users.index'))
         ->assertOk()
         ->assertSee('Community Locations User')
-        ->assertSee('L-PORTAL-01')
-        ->assertSee('L-GARAGE-01');
+        ->assertSee('Portal Norte')
+        ->assertSee('Garaje Principal');
 });
 
 it('filters users list by selected role', function () {

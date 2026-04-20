@@ -142,9 +142,20 @@
                 <article class="section-shell overflow-hidden p-5 sm:p-6"
                     wire:key="public-voting-card-{{ $voting->id }}"
                     data-voting-card="{{ $voting->id }}">
-                    <h2 class="text-xl font-bold tracking-tight text-gray-900">
-                        {{ $voting->name }}
-                    </h2>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <h2 class="text-xl font-bold tracking-tight text-gray-900">
+                            {{ $voting->name }}
+                        </h2>
+                        <div class="shrink-0 rounded-xl border border-[#edd2c7] bg-[#edd2c7]/25 px-3 py-2 text-right text-xs font-medium text-[#793d3d]"
+                            data-voting-date-range="{{ $voting->id }}">
+                            <p>{{ __('profile.votings.starts_at') }}:
+                                {{ \App\Support\LocalizedDateFormatter::date($voting->starts_at) }}
+                            </p>
+                            <p>{{ __('profile.votings.ends_at') }}:
+                                {{ \App\Support\LocalizedDateFormatter::date($voting->ends_at) }}
+                            </p>
+                        </div>
+                    </div>
                     <div class="prose prose-sm mt-2 max-w-none text-gray-600"
                         data-voting-question="{{ $voting->id }}">
                         {!! $voting->question !!}

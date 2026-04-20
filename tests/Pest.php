@@ -61,12 +61,11 @@ function createSetting(string $key, mixed $value): Setting
 
 function attachNoticeToLocationCode(Notice $notice, string $code): NoticeLocation
 {
-    $locationId = Location::query()->where('code', $code)->value('id');
+    $locationId = Location::query()->where('name', 'Location ' . $code)->value('id');
 
     if ($locationId === null) {
         $locationId = Location::factory()->create([
             'type' => str_starts_with($code, 'P-') ? 'garage' : 'portal',
-            'code' => $code,
             'name' => 'Location ' . $code,
         ])->id;
     }

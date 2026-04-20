@@ -189,7 +189,7 @@
                                 <span
                                     class="inline-flex items-center rounded-full bg-[#edd2c7]/45 px-2 py-0.5 text-xs font-medium text-[#793d3d]">
                                     {{ __('admin.locations.types.' . $managedLocation->type) }}
-                                    {{ $managedLocation->code }}
+                                    {{ $managedLocation->name }}
                                 </span>
                             @empty
                                 <span class="text-stone-400">—</span>

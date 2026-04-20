@@ -146,6 +146,18 @@ test('home page latest notices are ordered by latest', function (string $locale)
     expect($newerPos < $olderPos)->toBeTrue();
 })->with('supported_locales');
 
+test('home page renders notice dates using locale specific ordering', function (string $locale) {
+    Notice::factory()->public()->create([
+        'title_eu' => 'Hasierako data duen iragarkia',
+        'title_es' => 'Aviso con fecha en inicio',
+        'published_at' => '2026-04-20 00:00:00',
+    ]);
+
+    test()->get(route(SupportedLocales::routeName('home', $locale)))
+        ->assertSuccessful()
+        ->assertSee($locale === SupportedLocales::BASQUE ? '2026/04/20' : '20/04/2026');
+})->with('supported_locales');
+
 test('home page separates general notices from notices with location', function (string $locale) {
     $generalNotice = Notice::factory()->public()->create([
         'title_eu' => 'Iragarki Orokorra',

@@ -81,7 +81,7 @@ it('paginates notices at 10 per page ordered by published_at desc', function () 
 it('filters notices by portal while also showing general scope notices', function () {
     // Notice for portal 33-A only
     $portalA = Notice::factory()->public()->create();
-    attachNoticeToLocationCode($portalA, '33-A');
+    $portalALocation = attachNoticeToLocationCode($portalA, '33-A');
 
     // Notice for portal 33-B only
     $portalB = Notice::factory()->public()->create();
@@ -91,7 +91,7 @@ it('filters notices by portal while also showing general scope notices', functio
     $general = Notice::factory()->public()->create();
 
     $component = Livewire::test('public-notices')
-        ->set('locationFilter', '33-A');
+        ->set('locationFilter', (string) $portalALocation->location_id);
 
     $ids = $component->notices->pluck('id');
 
@@ -149,14 +149,26 @@ it('does not show missing-translation indicator when notice has translation for 
     $component->assertDontSee(__('notices.no_translation'));
 });
 
-it('shows location tags next to the notice', function () {
+it('shows location names next to the notice', function () {
     $notice = Notice::factory()->public()->create(['title_eu' => 'Aviso con portal']);
     attachNoticeToLocationCode($notice, '33-C');
 
     $component = Livewire::test('public-notices');
 
-    $component->assertSee('C');
+    $component->assertSee('Location 33-C');
 });
+
+it('renders notice dates using locale specific ordering', function (string $locale) {
+    Notice::factory()->public()->create([
+        'title_eu' => 'Data duen iragarkia',
+        'title_es' => 'Aviso con fecha',
+        'published_at' => '2026-04-10 00:00:00',
+    ]);
+
+    test()->get(route(SupportedLocales::routeName('notices', $locale)))
+        ->assertOk()
+        ->assertSee($locale === SupportedLocales::BASQUE ? '2026/04/10' : '10/04/2026');
+})->with('supported_locales');
 
 it('resets pagination when changing location filter', function () {
     Notice::factory()->count(15)->public()->create();
