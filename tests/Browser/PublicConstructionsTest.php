@@ -30,6 +30,7 @@ test('authenticated user can browse public constructions and open a detail page'
 
         $browser->loginAs($user)
             ->visit(route('constructions.eu'))
+            ->dismissCookieConsentBanner()
             ->assertSee(__('constructions.front.title'))
             ->click('[data-construction-link="' . $construction->slug . '"]')
             ->waitFor('[data-page="construction-show"]')
@@ -44,7 +45,7 @@ test('authenticated user can browse public constructions and open a detail page'
             ->type('#construction-inquiry-message', 'Obrari buruzko kontsulta bat bidaltzen dut Dusk testetik.')
             ->click('[data-construction-inquiry-submit]')
             ->waitFor('[data-construction-inquiry-success]')
-            ->assertScript('return getComputedStyle(document.querySelector("[data-construction-inquiry-modal]")).display === "none";')
+            ->waitUntil('return getComputedStyle(document.querySelector("[data-construction-inquiry-modal]")).display === "none";', 5)
             ->assertSee(__('constructions.inquiry.success'));
     });
 });

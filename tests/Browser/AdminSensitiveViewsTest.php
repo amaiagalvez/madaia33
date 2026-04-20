@@ -310,25 +310,25 @@ test('admin owners list shows assignment percentages with validation colors by p
                 const checks = [
                     {
                         selector: '[data-owner-assignment-type="portal"]',
-                        locationAndProperty: '[P-1] P-1',
+                        locationAndProperty: '[P-1] PT-01 P-1',
                         percentages: '20,75% | 10,50%',
                         colorClass: 'text-green-600',
                     },
                     {
                         selector: '[data-owner-assignment-type="garage"]',
-                        locationAndProperty: '[G-1] G-1',
+                        locationAndProperty: '[G-1] GR-01 G-1',
                         percentages: '6,50% | 5,25%',
                         colorClass: 'text-green-600',
                     },
                     {
                         selector: '[data-owner-assignment-type="storage"]',
-                        locationAndProperty: '[S-1] S-1',
+                        locationAndProperty: '[S-1] ST-01 S-1',
                         percentages: '2,00% | 1,00%',
                         colorClass: 'text-red-500',
                     },
                     {
                         selector: '[data-owner-assignment-type="local"]',
-                        locationAndProperty: '[L-1] L-1',
+                        locationAndProperty: '[L-1] LC-01 L-1',
                         percentages: '40,00% | 30,00%',
                         colorClass: 'text-red-500',
                     },
