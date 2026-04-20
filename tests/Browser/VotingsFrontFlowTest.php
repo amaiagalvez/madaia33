@@ -16,7 +16,7 @@ test('open voting callout redirects guest to private login and then to votings p
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '66-A']);
+    $portal = Location::factory()->portal()->create(['name' => '66-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -78,7 +78,7 @@ test('eligible owner can vote from front and ballot is stored as auditable recor
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '77-A']);
+    $portal = Location::factory()->portal()->create(['name' => '77-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -124,7 +124,7 @@ test('owner without accepted terms sees blocking modal in front votings until ac
     $owner = Owner::factory()->create([
         'accepted_terms_at' => null,
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '77-T']);
+    $portal = Location::factory()->portal()->create(['name' => '77-T']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -164,7 +164,7 @@ test('authenticated owner sees votings explanation and pdf actions on local http
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '77-U']);
+    $portal = Location::factory()->portal()->create(['name' => '77-U']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -242,7 +242,7 @@ test('front votings renders html question content instead of escaped tags', func
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '77-H']);
+    $portal = Location::factory()->portal()->create(['name' => '77-H']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([

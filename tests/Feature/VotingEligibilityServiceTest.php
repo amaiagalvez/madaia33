@@ -10,7 +10,7 @@ use App\Support\VotingEligibilityService;
 
 describe('VotingEligibilityService::ownerCanVote()', function () {
     it('returns true when owner has an active assignment in an allowed portal', function () {
-        $portal = Location::factory()->portal()->create(['code' => '33-A']);
+        $portal = Location::factory()->portal()->create(['name' => '33-A']);
         $property = Property::factory()->create(['location_id' => $portal->id]);
         $owner = Owner::factory()->create();
 
@@ -29,8 +29,8 @@ describe('VotingEligibilityService::ownerCanVote()', function () {
     });
 
     it('returns false when owner belongs to a different portal', function () {
-        $allowedPortal = Location::factory()->portal()->create(['code' => '33-A']);
-        $otherPortal = Location::factory()->portal()->create(['code' => '33-B']);
+        $allowedPortal = Location::factory()->portal()->create(['name' => '33-A']);
+        $otherPortal = Location::factory()->portal()->create(['name' => '33-B']);
         $property = Property::factory()->create(['location_id' => $otherPortal->id]);
         $owner = Owner::factory()->create();
 
@@ -49,7 +49,7 @@ describe('VotingEligibilityService::ownerCanVote()', function () {
     });
 
     it('returns true for any owner when voting has no location restrictions', function () {
-        $portal = Location::factory()->portal()->create(['code' => '44-A']);
+        $portal = Location::factory()->portal()->create(['name' => '44-A']);
         $property = Property::factory()->create(['location_id' => $portal->id]);
         $owner = Owner::factory()->create();
 
@@ -79,7 +79,7 @@ describe('VotingEligibilityService::ownerCanVote()', function () {
 
 describe('VotingEligibilityService::percentageForOwner()', function () {
     it('returns the sum of community_pct for eligible assignments', function () {
-        $portal = Location::factory()->portal()->create(['code' => '55-A']);
+        $portal = Location::factory()->portal()->create(['name' => '55-A']);
         $property1 = Property::factory()->create(['location_id' => $portal->id, 'community_pct' => '3.50']);
         $property2 = Property::factory()->create(['location_id' => $portal->id, 'community_pct' => '1.25']);
         $owner = Owner::factory()->create();
@@ -123,7 +123,7 @@ describe('VotingEligibilityService::ownersWithPendingDelegations()', function ()
     });
 
     it('returns owner entries with pending voting count when eligible and has not voted', function () {
-        $portal = Location::factory()->portal()->create(['code' => '66-A']);
+        $portal = Location::factory()->portal()->create(['name' => '66-A']);
         $property = Property::factory()->create(['location_id' => $portal->id]);
         $owner = Owner::factory()->create();
 
@@ -145,7 +145,7 @@ describe('VotingEligibilityService::ownersWithPendingDelegations()', function ()
     });
 
     it('excludes owner who already voted', function () {
-        $portal = Location::factory()->portal()->create(['code' => '77-A']);
+        $portal = Location::factory()->portal()->create(['name' => '77-A']);
         $property = Property::factory()->create(['location_id' => $portal->id]);
         $owner = Owner::factory()->create();
 

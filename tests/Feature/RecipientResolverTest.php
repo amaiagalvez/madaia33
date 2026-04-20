@@ -23,7 +23,7 @@ it('resolves all recipients with valid email contacts', function () {
         'coprop2_email_invalid' => false,
     ]);
 
-    $location = Location::factory()->portal()->create(['code' => 'P-01']);
+    $location = Location::factory()->portal()->create(['name' => 'P-01']);
 
     $propertyOne = Property::factory()->create(['location_id' => $location->id]);
     $propertyTwo = Property::factory()->create(['location_id' => $location->id]);
@@ -57,8 +57,8 @@ it('resolves all recipients with valid email contacts', function () {
 });
 
 it('filters recipients by portal code', function () {
-    $portalIncluded = Location::factory()->portal()->create(['code' => 'P-02']);
-    $portalExcluded = Location::factory()->portal()->create(['code' => 'P-03']);
+    $portalIncluded = Location::factory()->portal()->create(['name' => 'P-02']);
+    $portalExcluded = Location::factory()->portal()->create(['name' => 'P-03']);
 
     $ownerIncluded = Owner::factory()->create([
         'coprop1_email' => 'included@example.test',
@@ -104,8 +104,8 @@ it('filters recipients by portal code', function () {
 });
 
 it('filters recipients by garage code', function () {
-    $garageIncluded = Location::factory()->garage()->create(['code' => 'G-10']);
-    $garageExcluded = Location::factory()->garage()->create(['code' => 'G-11']);
+    $garageIncluded = Location::factory()->garage()->create(['name' => 'G-10']);
+    $garageExcluded = Location::factory()->garage()->create(['name' => 'G-11']);
 
     $ownerIncluded = Owner::factory()->create([
         'coprop1_email' => 'garage-included@example.test',
@@ -151,9 +151,9 @@ it('filters recipients by garage code', function () {
 });
 
 it('filters recipients by multiple locations', function () {
-    $portalIncluded = Location::factory()->portal()->create(['code' => 'P-20']);
-    $garageIncluded = Location::factory()->garage()->create(['code' => 'G-20']);
-    $portalExcluded = Location::factory()->portal()->create(['code' => 'P-21']);
+    $portalIncluded = Location::factory()->portal()->create(['name' => 'P-20']);
+    $garageIncluded = Location::factory()->garage()->create(['name' => 'G-20']);
+    $portalExcluded = Location::factory()->portal()->create(['name' => 'P-21']);
 
     $ownerPortal = Owner::factory()->create([
         'coprop1_email' => 'portal-multi@example.test',
@@ -211,7 +211,7 @@ it('filters recipients by multiple locations', function () {
 });
 
 it('generates zero one or two recipients depending on available contacts', function () {
-    $location = Location::factory()->portal()->create(['code' => 'P-04']);
+    $location = Location::factory()->portal()->create(['name' => 'P-04']);
 
     $ownerZero = Owner::factory()->create([
         'coprop1_email' => 'zero@example.test',
@@ -259,7 +259,7 @@ it('generates zero one or two recipients depending on available contacts', funct
 });
 
 it('only resolves whatsapp recipients for owners with whatsapp enabled', function () {
-    $location = Location::factory()->portal()->create(['code' => 'P-09']);
+    $location = Location::factory()->portal()->create(['name' => 'P-09']);
 
     $ownerWithWhatsapp = Owner::factory()->create([
         'coprop1_phone' => '600100100',
@@ -299,7 +299,7 @@ it('only resolves whatsapp recipients for owners with whatsapp enabled', functio
 });
 
 it('resolves manual recipients only for coprop1 without email and without digital channels', function () {
-    $location = Location::factory()->portal()->create(['code' => 'P-10']);
+    $location = Location::factory()->portal()->create(['name' => 'P-10']);
 
     $ownerWithoutPhoneAndEmail = Owner::factory()->create([
         'coprop1_email' => 'manual-no-phone@example.test',

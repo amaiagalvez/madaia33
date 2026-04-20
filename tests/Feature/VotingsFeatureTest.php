@@ -33,7 +33,7 @@ it('shows terms blocking modal in front votings when owner has not accepted term
     $owner = Owner::factory()->create([
         'accepted_terms_at' => null,
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '33-T']);
+    $portal = Location::factory()->portal()->create(['name' => '33-T']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -98,7 +98,7 @@ it('shows votings explanation card text from settings in front votings', functio
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '33-E']);
+    $portal = Location::factory()->portal()->create(['name' => '33-E']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -130,7 +130,7 @@ it('renders voting question html on front votings cards without escaping tags', 
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '33-HQ']);
+    $portal = Location::factory()->portal()->create(['name' => '33-HQ']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -168,7 +168,7 @@ it('shows votings explanation text for the active locale in front votings', func
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '33-ES']);
+    $portal = Location::factory()->portal()->create(['name' => '33-ES']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -204,7 +204,7 @@ it('shows votings explanation text from session locale key on front route', func
     ]);
     $owner->user->forceFill(['language' => 'eu'])->save();
 
-    $portal = Location::factory()->portal()->create(['code' => '33-SES']);
+    $portal = Location::factory()->portal()->create(['name' => '33-SES']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -280,7 +280,7 @@ it('allows an eligible owner to vote once and stores auditable rows', function (
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '33-A']);
+    $portal = Location::factory()->portal()->create(['name' => '33-A']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'community_pct' => 1.5000]);
 
     PropertyAssignment::factory()->create([
@@ -358,7 +358,7 @@ it('shows already voted notice and hides voting options when owner already voted
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '33-AV']);
+    $portal = Location::factory()->portal()->create(['name' => '33-AV']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -396,7 +396,7 @@ it('does not store option selections for anonymous votings', function () {
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '33-B']);
+    $portal = Location::factory()->portal()->create(['name' => '33-B']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'community_pct' => 2.2500]);
 
     PropertyAssignment::factory()->create([
@@ -445,7 +445,7 @@ it('stores delegated voter user id when voting on behalf of another owner', func
     $adminUser->assignRole(Role::DELEGATED_VOTE);
     $adminUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-C']);
+    $portal = Location::factory()->portal()->create(['name' => '33-C']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -521,7 +521,7 @@ it('allows superadmin to cast vote in delegated mode', function () {
     $superadmin->assignRole(Role::SUPER_ADMIN);
 
     $delegatedOwner = Owner::factory()->create();
-    $portal = Location::factory()->portal()->create(['code' => '33-D']);
+    $portal = Location::factory()->portal()->create(['name' => '33-D']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -577,7 +577,7 @@ it('requires delegate dni when voting in delegated mode', function () {
     $adminUser->assignRole(Role::DELEGATED_VOTE);
     $adminUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-F']);
+    $portal = Location::factory()->portal()->create(['name' => '33-F']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -619,7 +619,7 @@ it('allows delegated-vote users to select delegated owner from public votings sc
         'coprop1_name' => 'Aukeratzeko Jabea',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-E']);
+    $portal = Location::factory()->portal()->create(['name' => '33-E']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -659,7 +659,7 @@ it('stores in person vote without dni when voting on behalf of another owner', f
     $adminUser->assignRole(Role::DELEGATED_VOTE);
     $adminUser->update(['delegated_vote_terms_accepted_at' => now()]);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-G']);
+    $portal = Location::factory()->portal()->create(['name' => '33-G']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -712,7 +712,7 @@ it('allows superadmin to cast in-person vote', function () {
     $superadmin->assignRole(Role::SUPER_ADMIN);
 
     $inPersonOwner = Owner::factory()->create();
-    $portal = Location::factory()->portal()->create(['code' => '33-H']);
+    $portal = Location::factory()->portal()->create(['name' => '33-H']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -760,7 +760,7 @@ it('allows delegated-vote users to select in-person owner from public votings sc
         'coprop1_name' => 'Presentziala Jabea',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-I']);
+    $portal = Location::factory()->portal()->create(['name' => '33-I']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -801,7 +801,7 @@ it('hides delegated action buttons when delegated mode is active', function () {
         'coprop1_name' => 'Delegazio Moduko Jabea',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-J']);
+    $portal = Location::factory()->portal()->create(['name' => '33-J']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -849,7 +849,7 @@ it('allows privileged roles to cast direct vote when they also have property own
         ]);
     }
 
-    $portal = Location::factory()->portal()->create(['code' => '33-ROL-' . strtoupper(substr($extraRole, 0, 2))]);
+    $portal = Location::factory()->portal()->create(['name' => '33-ROL-' . strtoupper(substr($extraRole, 0, 2))]);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -896,7 +896,7 @@ it('blocks direct vote when privileged roles are missing property owner role', f
     $user = $owner->user()->firstOrFail();
     $user->assignRole($role);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-NO-PO-' . strtoupper(substr($role, 0, 2))]);
+    $portal = Location::factory()->portal()->create(['name' => '33-NO-PO-' . strtoupper(substr($role, 0, 2))]);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([

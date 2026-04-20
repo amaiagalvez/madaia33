@@ -22,7 +22,7 @@ it('sends a confirmation email after a successful vote', function () {
     Mail::fake();
 
     $owner = Owner::factory()->create();
-    $portal = Location::factory()->portal()->create(['code' => '44-A']);
+    $portal = Location::factory()->portal()->create(['name' => '44-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -67,8 +67,8 @@ it('rejects vote attempts when owner does not belong to the allowed locations', 
 
     $owner = Owner::factory()->create();
 
-    $portalAllowed = Location::factory()->portal()->create(['code' => '55-A']);
-    $portalOther = Location::factory()->portal()->create(['code' => '55-B']);
+    $portalAllowed = Location::factory()->portal()->create(['name' => '55-A']);
+    $portalOther = Location::factory()->portal()->create(['name' => '55-B']);
 
     $ownerProperty = Property::factory()->create(['location_id' => $portalOther->id]);
     PropertyAssignment::factory()->create([
@@ -109,7 +109,7 @@ it('ignores delegated session impersonation for owner users', function () {
     ]);
     $ownerB = Owner::factory()->create();
 
-    $portal = Location::factory()->portal()->create(['code' => '57-A']);
+    $portal = Location::factory()->portal()->create(['name' => '57-A']);
     $propertyA = Property::factory()->create(['location_id' => $portal->id]);
     $propertyB = Property::factory()->create(['location_id' => $portal->id]);
 

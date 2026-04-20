@@ -7,25 +7,21 @@ use Database\Seeders\PropertySeeder;
 it('seeds portal, local and garage properties with expected names', function () {
     $portal = Location::factory()->create([
         'type' => 'portal',
-        'code' => '33-A',
         'name' => 'Portal 33-A',
     ]);
 
     $local = Location::factory()->create([
         'type' => 'local',
-        'code' => 'L-1',
         'name' => 'Local L-1',
     ]);
 
     $garage = Location::factory()->create([
         'type' => 'garage',
-        'code' => 'P-1',
         'name' => 'Garaje P-1',
     ]);
 
     $storage = Location::factory()->create([
         'type' => 'storage',
-        'code' => 'A',
         'name' => 'Trastero A',
     ]);
 
@@ -46,7 +42,6 @@ it('seeds portal, local and garage properties with expected names', function () 
 it('is idempotent when run multiple times', function () {
     $portal = Location::factory()->create([
         'type' => 'portal',
-        'code' => '33-B',
         'name' => 'Portal 33-B',
     ]);
 
@@ -59,7 +54,6 @@ it('is idempotent when run multiple times', function () {
 it('does not modify existing property data when records already exist', function () {
     $portal = Location::factory()->create([
         'type' => 'portal',
-        'code' => '33-C',
         'name' => 'Portal 33-C',
     ]);
 

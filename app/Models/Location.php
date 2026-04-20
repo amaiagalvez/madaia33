@@ -20,6 +20,11 @@ class Location extends Model
         'name',
     ];
 
+    protected static function newFactory(): LocationFactory
+    {
+        return LocationFactory::new();
+    }
+
     /**
      * @return HasMany<Property, $this>
      */

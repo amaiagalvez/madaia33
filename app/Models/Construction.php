@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Database\Factories\ConstructionFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -48,14 +47,6 @@ class Construction extends Model
     public function managers(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
-    }
-
-    /**
-     * @return HasMany<ConstructionInquiry, $this>
-     */
-    public function inquiries(): HasMany
-    {
-        return $this->hasMany(ConstructionInquiry::class);
     }
 
     /**

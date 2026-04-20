@@ -929,7 +929,7 @@
                                             @endif
                                             <span class="block">
                                                 <span
-                                                    class="block text-sm font-semibold text-gray-900">{{ $assignment->property ? ($assignment->property->location?->code ? $assignment->property->location->code . '  ' : '') . $assignment->property->name : __('profile.owner.unknown_property') }}</span>
+                                                    class="block text-sm font-semibold text-gray-900">{{ $assignment->property ? ($assignment->property->location?->name ? $assignment->property->location->name . '  ' : '') . $assignment->property->name : __('profile.owner.unknown_property') }}</span>
                                                 <span
                                                     class="mt-1 block text-sm text-gray-900">{{ __('profile.owner.assignment_dates', ['start' => \App\Support\LocalizedDateFormatter::date($assignment->start_date)]) }}</span>
                                                 <span class="mt-1 block text-sm text-gray-900"

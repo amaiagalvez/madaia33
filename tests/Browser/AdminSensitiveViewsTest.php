@@ -232,10 +232,10 @@ test('admin owners list shows assignment percentages with validation colors by p
         'coprop1_name' => 'Dusk Percentages Owner',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'PT-01']);
-    $local = Location::factory()->local()->create(['code' => 'LC-01']);
-    $garage = Location::factory()->garage()->create(['code' => 'GR-01']);
-    $storage = Location::factory()->storage()->create(['code' => 'ST-01']);
+    $portal = Location::factory()->portal()->create(['name' => 'PT-01']);
+    $local = Location::factory()->local()->create(['name' => 'LC-01']);
+    $garage = Location::factory()->garage()->create(['name' => 'GR-01']);
+    $storage = Location::factory()->storage()->create(['name' => 'ST-01']);
 
     $portalProperty = Property::factory()->create([
         'location_id' => $portal->id,

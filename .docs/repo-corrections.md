@@ -326,3 +326,4 @@
 - For download endpoints that return physical files (like sqlite backups), set an explicit `Content-Type` in the response and assert it in Feature tests; temp-file MIME guessing can return `text/plain` and break deterministic header expectations.
 - In Livewire table tests, avoid asserting removed/static labels (e.g., `%Erakina`, `%Komunidad`) when the UI now renders only formatted values; assert stable data values/selectors instead to prevent false failures from presentation copy refactors.
 - If CI executes Feature/Livewire tests without APP_KEY, set a deterministic fallback app key in `tests/TestCase::setUp()` (and sync to env/server vars) to prevent `MissingAppKeyException` during view rendering.
+- Si se elimina una columna de dominio (`locations.code`), no usar accessors temporales como parche; migra de forma real todos los usos a `name` (tests, Blade y servicios) y ajusta los assertions de contenido derivado (por ejemplo mails) al nuevo formato.

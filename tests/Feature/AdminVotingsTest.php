@@ -109,8 +109,8 @@ it('shows only managed-location votings for community admin users', function () 
     $communityAdmin = User::factory()->create();
     $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
 
-    $managedLocation = Location::factory()->portal()->create(['code' => 'CM-1']);
-    $otherLocation = Location::factory()->portal()->create(['code' => 'CM-2']);
+    $managedLocation = Location::factory()->portal()->create(['name' => 'CM-1']);
+    $otherLocation = Location::factory()->portal()->create(['name' => 'CM-2']);
     $communityAdmin->managedLocations()->sync([$managedLocation->id]);
 
     $managedVoting = Voting::factory()->create([
@@ -140,7 +140,7 @@ it('hides owner names in census and voters modals for non super admin users', fu
     $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
 
     $owner = Owner::factory()->create(['coprop1_name' => 'Propietaria Oculta']);
-    $location = Location::factory()->portal()->create(['code' => 'HID-1']);
+    $location = Location::factory()->portal()->create(['name' => 'HID-1']);
     $property = Property::factory()->create(['location_id' => $location->id]);
 
     $communityAdmin->managedLocations()->sync([$location->id]);
@@ -189,7 +189,7 @@ it('shows active votings with census and votes in admin component', function () 
     $admin->assignRole(Role::SUPER_ADMIN);
 
     $owner = Owner::factory()->create();
-    $portal = Location::factory()->portal()->create(['code' => '88-A']);
+    $portal = Location::factory()->portal()->create(['name' => '88-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -244,7 +244,7 @@ it('shows delegated voter name in voters modal for audit visibility', function (
     $admin->assignRole(Role::SUPER_ADMIN);
 
     $owner = Owner::factory()->create(['coprop1_name' => 'Jabe Delegatua']);
-    $portal = Location::factory()->portal()->create(['code' => '99-A']);
+    $portal = Location::factory()->portal()->create(['name' => '99-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -296,7 +296,7 @@ it('shows casting user name in voters modal for in-person ballots', function () 
     $admin->assignRole(Role::SUPER_ADMIN);
 
     $owner = Owner::factory()->create(['coprop1_name' => 'Jabe Presentziala']);
-    $portal = Location::factory()->portal()->create(['code' => 'PRES-01']);
+    $portal = Location::factory()->portal()->create(['name' => 'PRES-01']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -346,7 +346,7 @@ it('keeps historical eligible owners in census modal and only voters in voters m
     $admin = User::factory()->create();
     $admin->assignRole(Role::SUPER_ADMIN);
 
-    $portal = Location::factory()->portal()->create(['code' => '77-H']);
+    $portal = Location::factory()->portal()->create(['name' => '77-H']);
     $propertyA = Property::factory()->create(['location_id' => $portal->id, 'name' => 'P-1']);
     $propertyB = Property::factory()->create(['location_id' => $portal->id, 'name' => 'P-2']);
 
@@ -435,8 +435,8 @@ it('filters delegated vote modal by owner and location search terms', function (
         'coprop2_name' => 'Bea Koop2',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'P-301']);
-    $garage = Location::factory()->garage()->create(['code' => 'G-88']);
+    $portal = Location::factory()->portal()->create(['name' => 'P-301']);
+    $garage = Location::factory()->garage()->create(['name' => 'G-88']);
 
     $portalProperty = Property::factory()->create(['location_id' => $portal->id]);
     $garageProperty = Property::factory()->create(['location_id' => $garage->id]);
@@ -499,7 +499,7 @@ it('starts delegated vote and redirects to public votings route', function () {
         'coprop1_name' => 'Delegazio Jabea',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'P-777']);
+    $portal = Location::factory()->portal()->create(['name' => 'P-777']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -533,7 +533,7 @@ it('allows editing an existing voting from admin component', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::SUPER_ADMIN);
 
-    $portal = Location::factory()->portal()->create(['code' => 'P-501']);
+    $portal = Location::factory()->portal()->create(['name' => 'P-501']);
 
     $voting = Voting::factory()->current()->create([
         'name_eu' => 'Hasierako izena',
@@ -666,7 +666,7 @@ it('hides owner names in census and voters modals for general admin users', func
     $generalAdmin->assignRole(Role::GENERAL_ADMIN);
 
     $owner = Owner::factory()->create(['coprop1_name' => 'Propietaria General Oculta']);
-    $location = Location::factory()->portal()->create(['code' => 'GA-999']);
+    $location = Location::factory()->portal()->create(['name' => 'GA-999']);
     $property = Property::factory()->create(['location_id' => $location->id]);
 
     PropertyAssignment::factory()->create([
@@ -710,7 +710,7 @@ it('allows community admin to create edit and delete managed location votings', 
     $communityAdmin = User::factory()->create();
     $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
 
-    $managedLocation = Location::factory()->portal()->create(['code' => 'CA-CRUD']);
+    $managedLocation = Location::factory()->portal()->create(['name' => 'CA-CRUD']);
     $communityAdmin->managedLocations()->sync([$managedLocation->id]);
 
     Livewire::actingAs($communityAdmin)

@@ -172,6 +172,8 @@ it('renders notice dates using locale specific ordering', function (string $loca
 
 it('resets pagination when changing location filter', function () {
     Notice::factory()->count(15)->public()->create();
+    $filteredNotice = Notice::factory()->public()->create();
+    $portalLocation = attachNoticeToLocationCode($filteredNotice, '33-A');
 
     $component = Livewire::test('public-notices');
 
@@ -180,6 +182,6 @@ it('resets pagination when changing location filter', function () {
     expect($component->notices->currentPage())->toBe(2);
 
     // Change filter — should reset to page 1
-    $component->set('locationFilter', '33-A');
+    $component->set('locationFilter', (string) $portalLocation->location_id);
     expect($component->notices->currentPage())->toBe(1);
 });

@@ -314,7 +314,13 @@ class CreateOwnerAction
             return null;
         }
 
-        $label = $property->displayLabel();
+        $locationName = trim((string) ($property->location->name ?? ''));
+        $propertyName = trim((string) ($property->name ?? ''));
+        $label = trim($locationName . ' ' . $propertyName);
+
+        if ($label === '') {
+            $label = $property->displayLabel();
+        }
 
         return '<li>' . e($label) . '</li>';
     }

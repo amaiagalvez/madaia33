@@ -269,14 +269,14 @@
                             ? $campaign->locations->filter(fn($location) => $location->location !== null)->map(
                                     fn($location) => __('campaigns.admin.filters.' . $location->location->type) .
                                         ' ' .
-                                        $location->location->code,
+                                        $location->location->name,
                                 )->implode(', ')
                             : __('campaigns.admin.filters.all') }}">
                         @if ($campaign->locations->isNotEmpty())
                             {{ $campaign->locations->filter(fn($location) => $location->location !== null)->map(
                                     fn($location) => __('campaigns.admin.filters.' . $location->location->type) .
                                         ' ' .
-                                        $location->location->code,
+                                        $location->location->name,
                                 )->implode(', ') }}
                         @else
                             {{ __('campaigns.admin.filters.all') }}

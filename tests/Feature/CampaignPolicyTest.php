@@ -31,7 +31,7 @@ it('denies admin_general for location-specific campaigns', function () {
     Role::query()->firstOrCreate(['name' => Role::GENERAL_ADMIN]);
     $user->assignRole(Role::GENERAL_ADMIN);
 
-    $location = Location::factory()->portal()->create(['code' => 'P-33']);
+    $location = Location::factory()->portal()->create(['name' => 'P-33']);
 
     $campaign = Campaign::factory()->create([
         'status' => 'draft',
@@ -68,8 +68,8 @@ it('denies admin_comunidad for unmanaged location filters', function () {
     Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
     $user->assignRole(Role::COMMUNITY_ADMIN);
 
-    $managedLocation = Location::factory()->portal()->create(['code' => 'P-50']);
-    $unmanagedLocation = Location::factory()->portal()->create(['code' => 'P-51']);
+    $managedLocation = Location::factory()->portal()->create(['name' => 'P-50']);
+    $unmanagedLocation = Location::factory()->portal()->create(['name' => 'P-51']);
 
     $user->managedLocations()->attach($managedLocation->id);
 
@@ -92,8 +92,8 @@ it('denies admin_comunidad when a multi-location filter contains unmanaged locat
     Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
     $user->assignRole(Role::COMMUNITY_ADMIN);
 
-    $managedPortal = Location::factory()->portal()->create(['code' => 'P-70']);
-    $unmanagedGarage = Location::factory()->garage()->create(['code' => 'G-71']);
+    $managedPortal = Location::factory()->portal()->create(['name' => 'P-70']);
+    $unmanagedGarage = Location::factory()->garage()->create(['name' => 'G-71']);
 
     $user->managedLocations()->attach($managedPortal->id);
 

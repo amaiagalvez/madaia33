@@ -110,9 +110,6 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/obras', fn () => view('admin.constructions'))
         ->middleware('role:superadmin,admin_general,construction_manager')
         ->name('constructions');
-    Route::get('/consultas-obras', fn () => view('admin.construction-inquiries'))
-        ->middleware('role:superadmin,admin_general,construction_manager')
-        ->name('construction-inquiries');
     Route::get('/erabiltzaileak', fn () => view('admin.users.index'))
         ->middleware('role:superadmin')
         ->name('users.index');

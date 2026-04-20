@@ -282,7 +282,7 @@ it('opens add-property form and saves property for the currently opened location
 it('requires and persists percentages for storage locations too', function () {
     $user = adminUser();
 
-    $storageLocation = Location::factory()->create(['name' => 'Trastero A']);
+    $storageLocation = Location::factory()->storage()->create(['name' => 'Trastero A']);
 
     Livewire::actingAs($user)
         ->test(LocationDetail::class, ['location' => $storageLocation])
@@ -342,8 +342,8 @@ it('filters owners by active portal assignment', function () {
 it('filters owners by active local assignment', function () {
     $user = adminUser();
 
-    $localA = Location::factory()->create(['name' => 'Local L-1']);
-    $localB = Location::factory()->create(['name' => 'Local L-2']);
+    $localA = Location::factory()->local()->create(['name' => 'Local L-1']);
+    $localB = Location::factory()->local()->create(['name' => 'Local L-2']);
 
     $propertyA = Property::factory()->create(['location_id' => $localA->id, 'name' => '1A']);
     $propertyB = Property::factory()->create(['location_id' => $localB->id, 'name' => '2B']);
@@ -552,7 +552,7 @@ it('renders new admin pages for locations and owners', function () {
 it('renders a type-aware breadcrumb link on location detail page', function () {
     $user = adminUser();
 
-    $garage = Location::factory()->create(['name' => 'Garaje P-2']);
+    $garage = Location::factory()->garage()->create(['name' => 'Garaje P-2']);
 
     test()->actingAs($user)
         ->get(route('admin.locations.show', $garage))
