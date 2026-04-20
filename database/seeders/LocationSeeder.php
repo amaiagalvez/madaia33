@@ -16,19 +16,19 @@ class LocationSeeder extends Seeder
 
         $locations = array_merge(
             array_map(
-                static fn(string $name): array => ['type' => 'portal', 'name' => 'Portal ' . $name],
+                static fn (string $name): array => ['type' => 'portal', 'name' => 'Portal ' . $name],
                 $portalNames,
             ),
             array_map(
-                static fn(string $name): array => ['type' => 'local', 'name' => 'Local ' . $name],
+                static fn (string $name): array => ['type' => 'local', 'name' => 'Local ' . $name],
                 $localNames,
             ),
             array_map(
-                static fn(string $name): array => ['type' => 'garage', 'name' => 'Garaje ' . $name],
+                static fn (string $name): array => ['type' => 'garage', 'name' => 'Garaje ' . $name],
                 $garageNames,
             ),
             array_map(
-                static fn(string $name): array => ['type' => 'storage', 'name' => 'Trastero ' . $name],
+                static fn (string $name): array => ['type' => 'storage', 'name' => 'Trastero ' . $name],
                 $storageNames,
             ),
         );

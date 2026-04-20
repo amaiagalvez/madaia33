@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Collection;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\View\View;
 use App\Http\Composers\VotingsNavigationComposer;
 
 it('sets default navigation values when route does not qualify for front navigation', function () {

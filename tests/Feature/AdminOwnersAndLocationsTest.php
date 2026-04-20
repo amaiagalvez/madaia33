@@ -311,8 +311,8 @@ it('requires and persists percentages for storage locations too', function () {
 it('filters owners by active portal assignment', function () {
     $user = adminUser();
 
-    $portalA = Location::factory()->create(['name' => 'Portal 33-A']);
-    $portalB = Location::factory()->create(['name' => 'Portal 33-B']);
+    $portalA = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
+    $portalB = Location::factory()->portal()->create(['name' => 'Portal 33-B']);
 
     $propertyA = Property::factory()->create(['location_id' => $portalA->id, 'name' => '1A']);
     $propertyB = Property::factory()->create(['location_id' => $portalB->id, 'name' => '2B']);
@@ -1192,7 +1192,7 @@ it('prevents reopening a closed assignment when the property already has another
 it('displays aggregated community and location percentages in locations listing', function () {
     $user = adminUser();
 
-    $portal = Location::factory()->create(['name' => 'Portal 33-A']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
 
     // Create properties with known percentages
     Property::factory()->create([
@@ -1218,8 +1218,8 @@ it('displays aggregated community and location percentages in locations listing'
 it('shows chief property column value and fallback in locations listing', function () {
     $user = adminUser();
 
-    $locationWithChief = Location::factory()->create(['name' => 'Portal 33-A']);
-    $locationWithoutChief = Location::factory()->create(['name' => 'Portal 33-B']);
+    $locationWithChief = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
+    $locationWithoutChief = Location::factory()->portal()->create(['name' => 'Portal 33-B']);
 
     $chiefProperty = Property::factory()->create([
         'location_id' => $locationWithChief->id,
@@ -1312,7 +1312,7 @@ it('does not show warning in locations listing when all community percentages su
 it('shows invalid location percentage total in listing when not equal to 100%', function () {
     $user = adminUser();
 
-    $portalInvalid = Location::factory()->create(['name' => 'Portal Invalid']);
+    $portalInvalid = Location::factory()->portal()->create(['name' => 'Portal Invalid']);
 
     Property::factory()->create([
         'location_id' => $portalInvalid->id,
