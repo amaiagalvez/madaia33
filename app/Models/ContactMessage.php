@@ -18,6 +18,7 @@ class ContactMessage extends Model
         'name',
         'email',
         'user_id',
+        'notice_tag_id',
         'subject',
         'message',
         'is_read',
@@ -26,6 +27,7 @@ class ContactMessage extends Model
 
     protected $casts = [
         'user_id' => 'integer',
+        'notice_tag_id' => 'integer',
         'is_read' => 'boolean',
         'read_at' => 'datetime',
     ];
@@ -41,6 +43,14 @@ class ContactMessage extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<NoticeTag, $this>
+     */
+    public function noticeTag(): BelongsTo
+    {
+        return $this->belongsTo(NoticeTag::class, 'notice_tag_id');
     }
 
     /**

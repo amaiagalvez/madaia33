@@ -68,7 +68,7 @@ it('shows votings menu link when authenticated and open votings exist even with 
     $owner1 = Owner::factory()->create();
     $owner2 = Owner::factory()->create();
 
-    $portal = Location::factory()->portal()->create(['code' => '33-A']);
+    $portal = Location::factory()->portal()->create(['name' => '33-A']);
     $property1 = Property::factory()->create(['location_id' => $portal->id]);
     $property2 = Property::factory()->create(['location_id' => $portal->id]);
 

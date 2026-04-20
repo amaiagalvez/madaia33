@@ -13,7 +13,7 @@ test('authenticated public votings response does not disable bfcache with no-sto
         'accepted_terms_at' => now(),
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => '99-A']);
+    $portal = Location::factory()->portal()->create(['name' => '99-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([

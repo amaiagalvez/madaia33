@@ -23,7 +23,7 @@ return [
     'history_image_alt' => 'Komunitatearen historiaren irudi adierazgarria',
     'history_photos_title' => 'Komunitateko argazki zaharrak dituzu?',
     'history_photos_summary' => 'Partekatu nahi badituzu, idatzi :email helbidera eta memoria kolektiboan txertatuko ditugu.',
-    'votings_badge' => 'Bozketak irekita',
+    'votings_badge' => 'Bozketa irekiak',
     'votings_title' => 'Komunitateko bozketa aktiboak dituzu zain',
     'votings_summary' => 'Sartu bozketa gunera eta eman zure botoa epea amaitu aurretik.',
     'votings_cta' => 'Bozketetara joan',
@@ -31,6 +31,9 @@ return [
     'profile_title' => 'Nahi duzunean kontsulta dezakezu zure profila',
     'profile_summary' => 'Sartu profilera eta berrikusi zure datuak, saioak, mezuak eta bozketen laburpena.',
     'profile_cta' => 'Profila ikusi',
+    'constructions_badge' => 'Obrak',
+    'constructions_title' => 'Obrari buruzko informazio guztia',
+    'constructions_summary' => 'Sartu eta ikusi obren xehetasunak, iragarkiak eta kontakturako formularioa zure zalantzak bidaltzeko.',
     'promises' => [
         'informed_title' => 'Eguneratuta egoteko',
         'informed_body' => 'Iragarki berriak eta informazio erabilgarria lehen planoan ikusten dira.',

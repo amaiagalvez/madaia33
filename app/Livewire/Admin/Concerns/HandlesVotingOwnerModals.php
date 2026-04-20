@@ -41,11 +41,16 @@ trait HandlesVotingOwnerModals
 
         $this->ownersModalRows = $owners
             ->map(fn (Owner $owner): array => [
-                'name' => $this->canSeeOwnerNamesInVotingModals() ? $owner->coprop1_name : '—',
+                'name' => $this->canSeeOwnerNamesInVotingModals() ? $owner->fullName1 : '—',
                 'has_voted' => isset($votedOwnerIds[$owner->id]),
                 'vote' => $votesByOwner[$owner->id] ?? '',
                 'properties' => $owner->activeAssignments
-                    ->map(fn (PropertyAssignment $assignment): string => trim($assignment->property->location->code . ' ' . $assignment->property->name))
+                    ->map(fn (PropertyAssignment $assignment): string => trim(sprintf(
+                        '[%s] %s %s',
+                        $assignment->property->displayCode(),
+                        $assignment->property->location->name,
+                        $assignment->property->name
+                    )))
                     ->filter()
                     ->join(', '),
                 'percentage' => $this->eligibilityService->percentageForOwnerAtVotingDate($voting, $owner),
@@ -144,7 +149,7 @@ trait HandlesVotingOwnerModals
         $castByUser = $ballot?->castByUser;
 
         return [
-            'name' => $this->canSeeOwnerNamesInVotingModals() ? $owner->coprop1_name : '—',
+            'name' => $this->canSeeOwnerNamesInVotingModals() ? $owner->fullName1 : '—',
             'percentage' => $this->eligibilityService->percentageForOwnerAtVotingDate($voting, $owner),
             'vote' => $ballot instanceof VotingBallot ? $this->formatBallotOptionLabel($ballot) : '',
             'delegated_by' => $ballot instanceof VotingBallot
@@ -153,7 +158,12 @@ trait HandlesVotingOwnerModals
             'delegate_dni' => $ballot instanceof VotingBallot ? ($ballot->cast_delegate_dni ?? '—') : '—',
             'has_voted' => $ballot instanceof VotingBallot,
             'properties' => $owner->activeAssignments
-                ->map(fn (PropertyAssignment $assignment): string => trim($assignment->property->location->code . ' ' . $assignment->property->name))
+                ->map(fn (PropertyAssignment $assignment): string => trim(sprintf(
+                    '[%s] %s %s',
+                    $assignment->property->displayCode(),
+                    $assignment->property->location->name,
+                    $assignment->property->name
+                )))
                 ->filter()
                 ->join(', '),
         ];
@@ -212,8 +222,8 @@ trait HandlesVotingOwnerModals
             ->map(static function (array $row): array {
                 return [
                     'owner_id' => $row['owner']->id,
-                    'owner_name' => $row['owner']->coprop1_name,
-                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
+                    'owner_name' => $row['owner']->fullName1,
+                    'owner_secondary_name' => $row['owner']->fullName2,
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
                     'local_codes' => $row['local_codes'],

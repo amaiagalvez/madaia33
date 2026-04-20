@@ -12,7 +12,13 @@
 - [ ] dusk-test
 
 # Code
-- [ ] crear un aviso para las votaciones activas
+- [ ] obra necesita title y slug en eu y es, modificar le formulario, notice_tags necesita slug_eu y slug_es. Cuando se cree la obra tener en cuenta los idiomas al crear el notice_tag. En el front de una obra en concreto da error al cambiar de idioma, se tiene que quedar en la misma página pero en el idioma elegido.
+- [ ] cuando se vota delegado o presencial, si el owner por el que se está votando tiene email, mandarle también un email de confirmación, como el que se manada cuando el owner vota directamente.
+- [ ] en el front, cuando solo se muestren dos (por ejemplo bozketak y obrak) en la parte de obrak poner el boton como en bozketak, a la derecha.
+- [ ] crear un aviso para las votaciones activas: crear un cron que mire a qué votaciones activas les faltan 3 días para terminarse, que prepare una bidalketa solo para los owner que no hayan votado en alguna de las votaciones que haya encontrado (puede que los owner hayan votado unas si y otras no) y lo envie poniendo en marcha la queue existente. En el texto de la bidalketa que ponga algo así Aviso automático, faltan 3 días para que se terminen las siguientes votaciones y a continuación la lista de votaciones con un enlace a la url de votaciones del front, en el idioma que tenga configurado el owner.
+Añadir un botón en el listado de votaciones que haga lo mismo.
+- [ ] repetir lo anterior, pero buscando solo las votaciones que terminan el día actual (ojo! no repetir código)
+
 - [ ] spec kiro pendientes (obra)
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak
@@ -43,10 +49,11 @@
 - [ ] ante una auditoría, cómo le explico al auditor/a la calidad de las votaciones?
 - [ ] config recaptcha, analitics
 - [ ] manual de usuaria
-crar una miniweb en html con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación añadir una ruta al menú del panel tiene que estar en dos idiomas eu y es
+crear una nueva ruta con las instrucciones para usar la aplicación, añade texto y pantallazos para que los usuarios que se logueen tengan claro cómo usar la aplicación añadir una ruta al menú del panel tiene que estar en dos idiomas eu y es
 añadir una regla al agente amalur para que lo mantenga actualizado
 - [ ] Cómo se envian los mensajes programados?
 - [ ] crear dusk-test para todas las pantallas
+- [ ] El usuario que tiene el rol constructor no puede ver el front de votaciones, ni las obras en el front, ni su perfil
 
 6-C Julián Corcuera       629884577 osonikolas@gmail.com
 6-B Jose Meléndez         630856088 jose.melendez.amado@gmail.com

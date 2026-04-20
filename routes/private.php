@@ -107,6 +107,9 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/bozketak/pdf/emaitzak', [VotingPdfController::class, 'adminResults'])
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings.pdf.results');
+    Route::get('/obras', fn () => view('admin.constructions'))
+        ->middleware('role:superadmin,admin_general,construction_manager')
+        ->name('constructions');
     Route::get('/erabiltzaileak', fn () => view('admin.users.index'))
         ->middleware('role:superadmin')
         ->name('users.index');

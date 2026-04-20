@@ -5,20 +5,30 @@ namespace App\Livewire;
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
 use App\Models\Notice;
 use Livewire\Component;
-use App\Models\Location;
+use App\Models\NoticeRead;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use App\Models\NoticeLocation;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Support\LocalizedDateFormatter;
+use App\Concerns\HandlesNoticeDocuments;
+use App\Concerns\ManagesNoticeLocations;
 use App\Concerns\BuildsLocaleFieldConfigs;
+use App\Livewire\Concerns\ManagesAdminNoticeFilters;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class AdminNoticeManager extends Component
 {
     use BuildsLocaleFieldConfigs;
+    use HandlesNoticeDocuments;
+    use ManagesAdminNoticeFilters;
+    use ManagesNoticeLocations;
+    use WithFileUploads;
     use WithPagination;
 
     // Form state
@@ -34,12 +44,20 @@ class AdminNoticeManager extends Component
 
     public bool $isPublic = false;
 
+    public ?int $selectedTagId = null;
+
     public string $publishedAt = '';
 
     public string $originalPublishedAt = '';
 
     /** @var string[] */
     public array $selectedLocations = [];
+
+    /** @var array<int, mixed> */
+    public array $attachments = [];
+
+    /** @var array<int, array{id: int, filename: string, is_public: bool, downloads_count: int}> */
+    public array $storedDocuments = [];
 
     // Delete confirmation
     public ?int $confirmingDeleteId = null;
@@ -52,9 +70,20 @@ class AdminNoticeManager extends Component
 
     public bool $showPublishModal = false;
 
+    public bool $showReadersModal = false;
+
+    public ?int $readersNoticeId = null;
+
+    /** @var array<int, array{owner_name: string, opened_at: string, has_opened: bool}> */
+    public array $noticeReaders = [];
+
     public string $sortColumn = 'published_at';
 
     public string $sortDir = 'desc';
+
+    public string $search = '';
+
+    public string $tagFilter = 'all';
 
     // UI state
     public bool $showForm = false;
@@ -68,7 +97,7 @@ class AdminNoticeManager extends Component
 
         abort_unless($user?->canManageNotices(), 403);
 
-        $selectedLocationRules = ['string'];
+        $selectedLocationRules = ['string', 'exists:locations,id'];
 
         if ($user->hasRole(Role::COMMUNITY_ADMIN)) {
             $selectedLocationRules[] = Rule::in($this->allowedLocationCodes());
@@ -85,10 +114,13 @@ class AdminNoticeManager extends Component
             'titleEs' => 'nullable|string|max:255',
             'contentEu' => 'required|string',
             'contentEs' => 'nullable|string',
+            'selectedTagId' => ['nullable', 'integer', Rule::exists('notice_tags', 'id')],
             'isPublic' => 'boolean',
             'publishedAt' => 'nullable|date',
             'selectedLocations' => $selectedLocationsRule,
             'selectedLocations.*' => $selectedLocationRules,
+            'attachments' => ['array'],
+            'attachments.*' => ['file', 'mimes:pdf,docx,xlsx,jpg,jpeg,png', 'max:20480'],
         ];
     }
 
@@ -104,7 +136,7 @@ class AdminNoticeManager extends Component
     {
         abort_unless($this->currentUser()?->canManageNotices(), 403);
 
-        $notice = Notice::with(['locations.location'])->findOrFail($id);
+        $notice = Notice::with(['locations.location', 'documents' => fn ($query) => $query->withCount('downloads')])->findOrFail($id);
 
         $this->editingId = $notice->id;
         $this->titleEu = $notice->title_eu ?? '';
@@ -112,13 +144,16 @@ class AdminNoticeManager extends Component
         $this->contentEu = $notice->content_eu ?? '';
         $this->contentEs = $notice->content_es ?? '';
         $this->isPublic = $notice->is_public;
+        $this->selectedTagId = $notice->notice_tag_id;
         $this->publishedAt = $notice->published_at?->format('Y-m-d') ?? '';
         $this->originalPublishedAt = $notice->published_at?->toDateTimeString() ?? '';
         $this->selectedLocations = $notice->locations
-            ->map(fn (NoticeLocation $location): ?string => $location->location_code)
+            ->map(fn (NoticeLocation $location): string => (string) $location->location_id)
             ->filter()
             ->values()
             ->all();
+        $this->attachments = [];
+        $this->setStoredDocumentsFromNotice($notice);
 
         $user = $this->currentUser();
 
@@ -134,6 +169,8 @@ class AdminNoticeManager extends Component
                 ->values()
                 ->all();
         }
+
+        $this->normalizeSelectedTagForCurrentUser();
 
         $this->showForm = true;
         $this->dispatch('admin-notice-form-focus');
@@ -159,10 +196,13 @@ class AdminNoticeManager extends Component
         }
 
         $this->validate();
+        $this->authorizeSelectedTag();
 
         $notice = $this->upsertNotice();
 
         $this->syncLocations($notice);
+        $this->storeAttachments($notice);
+        $this->setStoredDocumentsFromNotice($notice->load(['documents' => fn ($query) => $query->withCount('downloads')]));
 
         $this->resetForm();
         $this->showForm = false;
@@ -200,6 +240,7 @@ class AdminNoticeManager extends Component
             'title_es' => $this->titleEs ?: null,
             'content_eu' => $this->contentEu,
             'content_es' => $this->contentEs ?: null,
+            'notice_tag_id' => $this->selectedTagId,
             'is_public' => $this->isPublic,
             'published_at' => $this->resolvePublishedAt($existingNotice),
         ];
@@ -318,7 +359,9 @@ class AdminNoticeManager extends Component
         abort_unless($this->currentUser()?->canManageNotices(), 403);
 
         if ($this->confirmingDeleteId) {
-            Notice::findOrFail($this->confirmingDeleteId)->delete();
+            $notice = Notice::query()->findOrFail($this->confirmingDeleteId);
+            $notice->documents()->delete();
+            $notice->delete();
             $this->confirmingDeleteId = null;
             $this->showDeleteModal = false;
         }
@@ -328,6 +371,51 @@ class AdminNoticeManager extends Component
     {
         $this->resetForm();
         $this->showForm = false;
+    }
+
+    public function showReaders(int $id): void
+    {
+        abort_unless($this->currentUser()?->canManageNotices(), 403);
+
+        $notice = Notice::query()
+            ->with('tag.construction')
+            ->findOrFail($id);
+
+        abort_unless($notice->tag?->construction !== null, 404);
+
+        $this->readersNoticeId = $id;
+
+        $readsByOwnerId = NoticeRead::query()
+            ->where('notice_id', $notice->id)
+            ->get(['owner_id', 'opened_at'])
+            ->keyBy('owner_id');
+
+        $this->noticeReaders = Owner::query()
+            ->whereHas('activeAssignments')
+            ->orderBy('coprop1_name')
+            ->orderBy('coprop1_surname')
+            ->get(['id', 'coprop1_name', 'coprop1_surname'])
+            ->map(static function (Owner $owner) use ($readsByOwnerId): array {
+                /** @var NoticeRead|null $read */
+                $read = $readsByOwnerId->get($owner->id);
+
+                return [
+                    'owner_name' => $owner->fullName1 !== '' ? $owner->fullName1 : '—',
+                    'opened_at' => LocalizedDateFormatter::shortDateTime($read?->opened_at),
+                    'has_opened' => $read !== null,
+                ];
+            })
+            ->values()
+            ->all();
+
+        $this->showReadersModal = true;
+    }
+
+    public function closeReadersModal(): void
+    {
+        $this->showReadersModal = false;
+        $this->readersNoticeId = null;
+        $this->noticeReaders = [];
     }
 
     public function sortBy(string $column): void
@@ -350,85 +438,41 @@ class AdminNoticeManager extends Component
         $this->contentEu = '';
         $this->contentEs = '';
         $this->isPublic = false;
+        $this->selectedTagId = null;
         $this->publishedAt = '';
         $this->originalPublishedAt = '';
         $this->selectedLocations = [];
+        $this->attachments = [];
+        $this->storedDocuments = [];
         $this->resetValidation();
     }
 
-    /**
-     * Sync the notice_locations pivot for the given notice.
-     */
-    private function syncLocations(Notice $notice): void
-    {
-        $notice->locations()->delete();
-
-        $rows = [];
-
-        foreach (array_values(array_unique($this->selectedLocations)) as $selected) {
-            $locationId = $this->resolveSelectionToForeignKey((string) $selected);
-
-            if ($locationId === null) {
-                continue;
-            }
-
-            $rows[] = [
-                'notice_id' => $notice->id,
-                'location_id' => $locationId,
-            ];
-        }
-
-        if ($rows !== []) {
-            NoticeLocation::insert($rows);
-        }
-    }
-
-    private function resolveSelectionToForeignKey(string $selected): ?int
-    {
-        return Location::query()
-            ->where('code', $selected)
-            ->value('id');
-    }
-
-    /**
-     * @return array<int, array{code: string, type: string, label: string}>
-     */
-    private function allLocationOptions(): array
+    private function authorizeSelectedTag(): void
     {
         $user = $this->currentUser();
 
-        $query = Location::query()->whereIn('type', ['portal', 'local', 'garage']);
-
-        if ($user?->hasRole(Role::GENERAL_ADMIN)) {
-            return [];
+        if ($user === null || ! $user->hasRole(Role::CONSTRUCTION_MANAGER) || $this->selectedTagId === null) {
+            return;
         }
 
-        if ($user?->hasRole(Role::COMMUNITY_ADMIN)) {
-            $query->whereIn('id', $user->managedLocations()->pluck('locations.id'));
-        }
+        $allowedTagIds = $this->availableNoticeTags()->pluck('id')->all();
 
-        $locations = $query
-            ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 WHEN type = 'garage' THEN 3 ELSE 4 END")
-            ->orderBy('code')
-            ->get();
-
-        return $locations
-            ->map(fn (Location $location): array => [
-                'code' => $location->code,
-                'type' => $location->type,
-                'label' => $this->locationLabel($location) . $location->code,
-            ])
-            ->all();
+        abort_unless(in_array($this->selectedTagId, $allowedTagIds, true), 403);
     }
 
-    private function locationLabel(Location $location): string
+    private function normalizeSelectedTagForCurrentUser(): void
     {
-        return match ($location->type) {
-            'portal' => __('admin.locations.types.portal') . ' ',
-            'local' => __('admin.locations.types.local') . ' ',
-            'garage' => __('admin.locations.types.garage') . ' ',
-            default => '',
-        };
+        $user = $this->currentUser();
+
+        if ($user === null || ! $user->hasRole(Role::CONSTRUCTION_MANAGER) || $this->selectedTagId === null) {
+            return;
+        }
+
+        $allowedTagIds = $this->availableNoticeTags()->pluck('id')->all();
+
+        if (! in_array($this->selectedTagId, $allowedTagIds, true)) {
+            $this->selectedTagId = null;
+        }
     }
 
     public function render(): View
@@ -437,45 +481,11 @@ class AdminNoticeManager extends Component
 
         abort_unless($user?->canManageNotices(), 403);
 
-        $allowedSortColumns = ['created_at', 'is_public', 'published_at'];
-        $sortColumn = in_array($this->sortColumn, $allowedSortColumns, true) ? $this->sortColumn : 'published_at';
-        $sortDir = in_array($this->sortDir, ['asc', 'desc'], true) ? $this->sortDir : 'desc';
-
-        $notices = Notice::with(['locations.location'])
-            ->when($user->hasRole(Role::GENERAL_ADMIN), static function ($query): void {
-                $query->whereDoesntHave('locations');
-            })
-            ->when($user->hasRole(Role::COMMUNITY_ADMIN), function ($query) use ($user): void {
-                $managedLocationIds = $user->managedLocations()->pluck('locations.id')->all();
-
-                if ($managedLocationIds === []) {
-                    $query->whereRaw('1 = 0');
-
-                    return;
-                }
-
-                $query->whereHas('locations', function ($locationsQuery) use ($managedLocationIds): void {
-                    $locationsQuery->whereIn('location_id', $managedLocationIds);
-                });
-            })
-            ->orderBy($sortColumn, $sortDir)
-            ->paginate(12);
-
         return view('livewire.admin.notice-manager', [
-            'notices' => $notices,
+            'notices' => $this->noticesQuery($user)->paginate(12),
             'allLocations' => $this->allLocationOptions(),
+            'noticeTags' => $this->availableNoticeTags(),
         ]);
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function allowedLocationCodes(): array
-    {
-        return collect($this->allLocationOptions())
-            ->map(static fn (array $location): string => $location['code'])
-            ->values()
-            ->all();
     }
 
     private function currentUser(): ?User

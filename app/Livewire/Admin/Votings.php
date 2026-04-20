@@ -589,11 +589,11 @@ class Votings extends Component
             'locations' => $this->availableLocationQueryForCurrentUser()
                 ->whereIn('type', ['portal', 'local', 'garage'])
                 ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 ELSE 3 END")
-                ->orderBy('code')
+                ->orderBy('name')
                 ->get()
                 ->map(static fn (Location $l): array => [
                     'id' => (string) $l->id,
-                    'label' => __('admin.locations.types.' . $l->type) . ' ' . $l->code,
+                    'label' => __('admin.locations.types.' . $l->type) . ' ' . $l->name,
                 ])
                 ->all(),
         ]);

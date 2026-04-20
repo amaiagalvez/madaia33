@@ -32,7 +32,7 @@ test('admin voting list shows per-row results button and opens voting results pa
         'coprop1_name' => 'Dusk Results Owner',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'R-11']);
+    $portal = Location::factory()->portal()->create(['name' => 'R-11']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '1A',
@@ -136,7 +136,7 @@ test('anonymous voting shows votes_count in GUZTIRA option totals row', function
         'coprop1_name' => 'Dusk Anonymous Owner',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'R-12']);
+    $portal = Location::factory()->portal()->create(['name' => 'R-12']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '2B',

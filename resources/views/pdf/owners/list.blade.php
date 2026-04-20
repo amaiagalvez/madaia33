@@ -61,11 +61,6 @@
             background: #f9fafb;
         }
 
-        .owner-id {
-            text-align: center;
-            white-space: nowrap;
-        }
-
         .line {
             margin-bottom: 3px;
             border-bottom: 1px dashed #e5e7eb;
@@ -117,7 +112,6 @@
     <table>
         <thead>
             <tr>
-                <th rowspan="2">{{ __('admin.owners.columns.num') }}</th>
                 <th colspan="2">KoJabea1</th>
                 <th colspan="2">KoJabea2</th>
                 <th rowspan="2">Atariak</th>
@@ -159,8 +153,8 @@
                     $assignmentGroups = [$portals, $garages, $storages, $locals];
                 @endphp
                 <tr>
-                    <td class="owner-id">{{ $owner->id }} <br> [{{ $owner->language }}]</td>
-                    <td>{{ trim(($owner->coprop1_name ?? '') . ' ' . ($owner->coprop1_surname ?? '')) }}
+                    <td>{{ $owner->fullName1 ?: '-' }}
+                        <br> [{{ $owner->language }}]
                     </td>
                     <td>
                         @if (($owner->coprop1_email ?? '') !== '' || ($owner->coprop1_phone ?? '') !== '')
@@ -182,7 +176,7 @@
                             -
                         @endif
                     </td>
-                    <td>{{ trim(($owner->coprop2_name ?? '') . ' ' . ($owner->coprop2_surname ?? '')) ?: '-' }}
+                    <td>{{ $owner->fullName2 ?: '-' }}
                     </td>
                     <td>
                         @if (($owner->coprop2_email ?? '') !== '' || ($owner->coprop2_phone ?? '') !== '')
@@ -210,7 +204,26 @@
                             @forelse ($assignmentGroup as $assignment)
                                 <div class="line">
                                     <strong>
-                                        {{ trim(($assignment->property->location->code ?? '') . ' ' . ($assignment->property->name ?? '')) }}
+                                        @php
+                                            $propertyCode =
+                                                (string) ($assignment->property->code ??
+                                                    ($assignment->property->name ?? ''));
+                                            $propertyName =
+                                                (string) ($assignment->property->name ?? '');
+                                            $locationName =
+                                                (string) ($assignment->property->location->name ??
+                                                    '');
+                                            $propertyLabel = trim(
+                                                sprintf(
+                                                    '[%s] %s %s',
+                                                    $propertyCode,
+                                                    $locationName,
+                                                    $propertyName,
+                                                ),
+                                                ' ',
+                                            );
+                                        @endphp
+                                        {{ $propertyLabel }}
                                     </strong>
                                     <br>
                                     <span class="nowrap">
@@ -227,7 +240,7 @@
                 </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="empty">{{ __('admin.owners.no_records') }}</td>
+                        <td colspan="8" class="empty">{{ __('admin.owners.no_records') }}</td>
                     </tr>
                 @endforelse
             </tbody>

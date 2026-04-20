@@ -192,7 +192,7 @@
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $voting->name }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
-                        {{ $voting->locations->map(fn($vl) => $vl->location?->code)->filter()->join(', ') }}
+                        {{ $voting->locations->map(fn($vl) => $vl->location?->name)->filter()->join(', ') }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600"
                         data-voting-date-range="{{ $voting->id }}">

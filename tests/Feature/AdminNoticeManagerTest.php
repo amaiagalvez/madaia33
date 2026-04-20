@@ -5,10 +5,19 @@
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Owner;
 use App\Models\Notice;
 use Livewire\Livewire;
 use App\Models\Location;
 use App\Models\Property;
+use App\Models\NoticeTag;
+use App\Models\NoticeRead;
+use App\Models\Construction;
+use App\Models\NoticeDocument;
+use Illuminate\Http\UploadedFile;
+use App\Models\PropertyAssignment;
+use App\Models\NoticeDocumentDownload;
+use Illuminate\Support\Facades\Storage;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Property 8: Notice publish toggle is reversible
@@ -177,8 +186,8 @@ it('editing notice dispatches focus event to form', function () {
 
 it('location association persists correctly', function () {
     $user = adminUser();
-    Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
-    Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
+    $portal = Location::factory()->create(['type' => 'portal', 'name' => '33-A']);
+    $garage = Location::factory()->create(['type' => 'garage', 'name' => 'P-1']);
 
     Livewire::actingAs($user)
         ->test('admin-notice-manager')
@@ -186,7 +195,7 @@ it('location association persists correctly', function () {
         ->set('titleEs', 'Aviso con ubicación')
         ->set('contentEu', 'Edukia')
         ->set('contentEs', 'Contenido')
-        ->set('selectedLocations', ['33-A', 'P-1'])
+        ->set('selectedLocations', [(string) $portal->id, (string) $garage->id])
         ->call('saveNotice');
 
     $notice = Notice::where('title_eu', 'Iragarki kokapenarekin')->firstOrFail();
@@ -247,8 +256,7 @@ it('shows only locations in form location selector', function () {
 
     $location = Location::factory()->create([
         'type' => 'portal',
-        'code' => '33-A',
-        'name' => 'Portal 33-A',
+        'name' => '33-A',
     ]);
 
     Property::factory()->create([
@@ -258,8 +266,7 @@ it('shows only locations in form location selector', function () {
 
     Location::factory()->create([
         'type' => 'storage',
-        'code' => 'TR-99',
-        'name' => 'Trastero TR-99',
+        'name' => 'TR-99',
     ]);
 
     Livewire::actingAs($user)
@@ -273,8 +280,8 @@ it('shows only locations in form location selector', function () {
 
 it('edits an existing notice and replaces locations on save', function () {
     $user = adminUser();
-    Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
-    Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
+    $portal = Location::factory()->create(['type' => 'portal', 'name' => '33-A']);
+    $garage = Location::factory()->create(['type' => 'garage', 'name' => 'P-1']);
 
     $notice = Notice::factory()->public()->create([
         'title_eu' => 'Original EU',
@@ -284,7 +291,7 @@ it('edits an existing notice and replaces locations on save', function () {
         'published_at' => now()->subDay(),
     ]);
 
-    attachNoticeToLocationCode($notice, '33-A');
+    $notice->locations()->create(['location_id' => $portal->id]);
 
     $originalPublishedAt = $notice->published_at;
 
@@ -294,13 +301,13 @@ it('edits an existing notice and replaces locations on save', function () {
         ->assertSet('editingId', $notice->id)
         ->assertSet('showForm', true)
         ->assertSet('titleEu', 'Original EU')
-        ->assertSet('selectedLocations', ['33-A'])
+        ->assertSet('selectedLocations', [(string) $portal->id])
         ->set('titleEu', 'Editado EU')
         ->set('titleEs', '')
         ->set('contentEu', 'Edukia eguneratua')
         ->set('contentEs', '')
         ->set('isPublic', true)
-        ->set('selectedLocations', ['P-1'])
+        ->set('selectedLocations', [(string) $garage->id])
         ->call('saveNotice')
         ->assertSet('showForm', false)
         ->assertSet('editingId', null);
@@ -437,8 +444,8 @@ it('shows only managed-location notices to community admin users', function () {
     $communityAdmin = User::factory()->create();
     $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
 
-    $managedLocation = Location::factory()->portal()->create(['code' => 'CA-1']);
-    $otherLocation = Location::factory()->portal()->create(['code' => 'CA-2']);
+    $managedLocation = Location::factory()->portal()->create(['name' => 'CA-1']);
+    $otherLocation = Location::factory()->portal()->create(['name' => 'CA-2']);
     $communityAdmin->managedLocations()->sync([$managedLocation->id]);
 
     $managedNotice = Notice::factory()->create([
@@ -460,4 +467,255 @@ it('shows only managed-location notices to community admin users', function () {
         ->assertSee('Iragarki Kudeatua')
         ->assertDontSee('Iragarki Kanpokoa')
         ->assertDontSee('Iragarki Orokor CA');
+});
+
+it('shows only assigned construction tags to construction manager', function () {
+    foreach (Role::names() as $roleName) {
+        Role::query()->firstOrCreate(['name' => $roleName]);
+    }
+
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::CONSTRUCTION_MANAGER);
+
+    $assignedConstruction = Construction::factory()->create([
+        'title' => 'Obra A',
+        'slug' => 'obra-a',
+    ]);
+    $otherConstruction = Construction::factory()->create([
+        'title' => 'Obra B',
+        'slug' => 'obra-b',
+    ]);
+
+    $manager->constructions()->sync([$assignedConstruction->id]);
+
+    $assignedTag = NoticeTag::query()->where('slug', $assignedConstruction->slug)->firstOrFail();
+    $otherTag = NoticeTag::query()->where('slug', $otherConstruction->slug)->firstOrFail();
+
+    Livewire::actingAs($manager)
+        ->test('admin-notice-manager')
+        ->call('createNotice')
+        ->assertSee($assignedTag->name)
+        ->assertDontSee($otherTag->name);
+});
+
+it('forbids construction manager from assigning unowned construction tag', function () {
+    foreach (Role::names() as $roleName) {
+        Role::query()->firstOrCreate(['name' => $roleName]);
+    }
+
+    $manager = User::factory()->create();
+    $manager->assignRole(Role::CONSTRUCTION_MANAGER);
+
+    $assignedConstruction = Construction::factory()->create([
+        'slug' => 'baimendua',
+    ]);
+    $otherConstruction = Construction::factory()->create([
+        'slug' => 'debekatua',
+    ]);
+
+    $manager->constructions()->sync([$assignedConstruction->id]);
+
+    $otherTag = NoticeTag::query()->where('slug', $otherConstruction->slug)->firstOrFail();
+
+    Livewire::actingAs($manager)
+        ->test('admin-notice-manager')
+        ->set('titleEu', 'Manager test')
+        ->set('contentEu', 'Edukia')
+        ->set('selectedTagId', $otherTag->id)
+        ->call('saveNotice')
+        ->assertForbidden();
+});
+
+it('validates unsupported document mime type on notice save', function () {
+    Storage::fake('public');
+
+    $user = adminUser();
+
+    $invalidAttachment = UploadedFile::fake()->create('script.exe', 20, 'application/octet-stream');
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->set('titleEu', 'Iragarki MIME')
+        ->set('contentEu', 'Edukia')
+        ->set('attachments', [$invalidAttachment])
+        ->call('saveNotice')
+        ->assertHasErrors(['attachments.0' => 'mimes']);
+});
+
+it('auto uploads documents when editing and can remove pending attachments in create mode', function () {
+    Storage::fake('public');
+
+    $user = adminUser();
+    $notice = Notice::factory()->create();
+
+    $editAttachment = UploadedFile::fake()->create('oharra.pdf', 20, 'application/pdf');
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('editNotice', $notice->id)
+        ->set('attachments', [$editAttachment])
+        ->assertSet('attachments', [])
+        ->assertSee('oharra.pdf');
+
+    expect(NoticeDocument::query()->where('notice_id', $notice->id)->count())->toBe(1);
+
+    $createAttachment = UploadedFile::fake()->create('zain.pdf', 20, 'application/pdf');
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('createNotice')
+        ->set('attachments', [$createAttachment])
+        ->assertSee('zain.pdf')
+        ->call('removePendingAttachment', 0)
+        ->assertSet('attachments', []);
+});
+
+it('shows notice downloads count in admin list', function () {
+    $user = adminUser();
+
+    $notice = Notice::factory()->create([
+        'title_eu' => 'Iragarki deskargak',
+    ]);
+
+    $document = NoticeDocument::factory()->create([
+        'notice_id' => $notice->id,
+    ]);
+
+    NoticeDocumentDownload::query()->create([
+        'notice_document_id' => $document->id,
+        'user_id' => $user->id,
+        'ip_address' => '127.0.0.1',
+        'downloaded_at' => now(),
+    ]);
+
+    NoticeDocumentDownload::query()->create([
+        'notice_document_id' => $document->id,
+        'user_id' => $user->id,
+        'ip_address' => '127.0.0.1',
+        'downloaded_at' => now(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->assertSeeHtml('data-notice-download-count="' . $notice->id . '"')
+        ->assertSee('2');
+});
+
+it('filters notices by untagged option in admin list', function () {
+    $user = adminUser();
+
+    $tag = NoticeTag::factory()->create();
+
+    $untagged = Notice::factory()->create([
+        'title_eu' => 'Iragarki etiketarik gabe',
+        'notice_tag_id' => null,
+    ]);
+
+    $tagged = Notice::factory()->create([
+        'title_eu' => 'Iragarki etiketaduna',
+        'notice_tag_id' => $tag->id,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('setTagFilter', 'untagged')
+        ->assertSee($untagged->title_eu)
+        ->assertDontSee($tagged->title_eu);
+});
+
+it('filters notices by selected tag in admin list', function () {
+    $user = adminUser();
+
+    $tagA = NoticeTag::factory()->create([
+        'name_eu' => 'A Etiketa',
+    ]);
+    $tagB = NoticeTag::factory()->create([
+        'name_eu' => 'B Etiketa',
+    ]);
+
+    $noticeA = Notice::factory()->create([
+        'title_eu' => 'A etiketako iragarkia',
+        'notice_tag_id' => $tagA->id,
+    ]);
+
+    $noticeB = Notice::factory()->create([
+        'title_eu' => 'B etiketako iragarkia',
+        'notice_tag_id' => $tagB->id,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('setTagFilter', (string) $tagA->id)
+        ->assertSee($noticeA->title_eu)
+        ->assertDontSee($noticeB->title_eu);
+});
+
+it('searches notices by title and content in admin list', function () {
+    $user = adminUser();
+
+    $titleMatch = Notice::factory()->create([
+        'title_eu' => 'Bilaketa titulua parekatua',
+        'content_eu' => 'Edukia arrunta',
+    ]);
+
+    $contentMatch = Notice::factory()->create([
+        'title_eu' => 'Beste izenburu bat',
+        'content_eu' => 'Hemen dago gako-hitza: terminoa',
+    ]);
+
+    $nonMatch = Notice::factory()->create([
+        'title_eu' => 'Ez dator bat',
+        'content_eu' => 'Bestelako testua',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->set('search', 'terminoa')
+        ->assertSee($contentMatch->title_eu)
+        ->assertDontSee($nonMatch->title_eu)
+        ->set('search', 'parekatua')
+        ->assertSee($titleMatch->title_eu)
+        ->assertDontSee($nonMatch->title_eu);
+});
+
+it('shows opened and unopened owners for construction notices', function () {
+    $user = adminUser();
+
+    $construction = Construction::factory()->create([
+        'slug' => 'patio-irekierak',
+    ]);
+
+    $notice = Notice::factory()->create([
+        'title_eu' => 'Obrako irakurketa kontrola',
+        'notice_tag_id' => $construction->tag->id,
+    ]);
+
+    $openedOwner = Owner::factory()->create([
+        'coprop1_name' => 'Ane Irekia',
+        'coprop1_surname' => 'Jabea',
+    ]);
+    $unopenedOwner = Owner::factory()->create([
+        'coprop1_name' => 'Beñat Itxia',
+        'coprop1_surname' => 'Jabea',
+    ]);
+
+    PropertyAssignment::factory()->create(['owner_id' => $openedOwner->id]);
+    PropertyAssignment::factory()->create(['owner_id' => $unopenedOwner->id]);
+
+    NoticeRead::query()->create([
+        'notice_id' => $notice->id,
+        'owner_id' => $openedOwner->id,
+        'user_id' => $openedOwner->user_id,
+        'ip_address' => '127.0.0.1',
+        'opened_at' => now()->subMinute(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('showReaders', $notice->id)
+        ->assertSet('showReadersModal', true)
+        ->assertSee('Ane Irekia Jabea')
+        ->assertSee('Beñat Itxia Jabea')
+        ->assertSeeHtml('data-notice-reader-opened-icon')
+        ->assertSeeHtml('data-notice-reader-unopened-icon');
 });

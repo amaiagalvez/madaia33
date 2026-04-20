@@ -21,7 +21,7 @@ test('livewire public notices displays 9 items per page', function () {
 test('livewire public notices filter selector is reactive', function () {
     $portal = 'A';
     $notice1 = Notice::factory()->public()->create();
-    attachNoticeToLocationCode($notice1, $portal);
+    $portalLocation = attachNoticeToLocationCode($notice1, $portal);
 
     $notice2 = Notice::factory()->public()->create();
     attachNoticeToLocationCode($notice2, 'B');
@@ -29,22 +29,23 @@ test('livewire public notices filter selector is reactive', function () {
     Livewire::test(PublicNotices::class)
         ->assertSee($notice1->title)
         ->assertSee($notice2->title)
-        ->set('locationFilter', $portal)
+        ->set('locationFilter', (string) $portalLocation->location_id)
         ->assertSee($notice1->title);
 });
 
 test('livewire public notices filter resets pagination', function () {
     $portal = 'A';
+    $portalLocationId = null;
     for ($i = 0; $i < 12; $i++) {
         $notice = Notice::factory()->public()->create(['published_at' => now()->subMinutes($i)]);
         if ($i < 6) {
-            attachNoticeToLocationCode($notice, $portal);
+            $portalLocationId ??= attachNoticeToLocationCode($notice, $portal)->location_id;
         }
     }
 
     $component = Livewire::test(PublicNotices::class)
         ->call('setPage', 2) // Go to page 2
-        ->set('locationFilter', $portal) // Filter
+        ->set('locationFilter', (string) $portalLocationId) // Filter
         ->assertViewHas('notices', function ($notices) {
             return $notices->currentPage() === 1; // Should reset to page 1
         });
@@ -69,13 +70,13 @@ test('livewire public notices filter with general notices', function () {
     $portal = 'A';
     // Notice with portal location
     $notice1 = Notice::factory()->public()->create();
-    attachNoticeToLocationCode($notice1, $portal);
+    $portalLocation = attachNoticeToLocationCode($notice1, $portal);
 
     // Notice with no locations (general)
     $notice2 = Notice::factory()->public()->create();
 
     Livewire::test(PublicNotices::class)
-        ->set('locationFilter', $portal)
+        ->set('locationFilter', (string) $portalLocation->location_id)
         ->assertSee($notice1->title)
         ->assertSee($notice2->title); // General notices should also appear
 });

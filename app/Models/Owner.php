@@ -150,6 +150,14 @@ class Owner extends Model
         return $this->hasMany(OwnerAuditLog::class);
     }
 
+    /**
+     * @return HasMany<NoticeRead, $this>
+     */
+    public function noticeReads(): HasMany
+    {
+        return $this->hasMany(NoticeRead::class);
+    }
+
     protected static function newFactory(): OwnerFactory
     {
         return OwnerFactory::new();

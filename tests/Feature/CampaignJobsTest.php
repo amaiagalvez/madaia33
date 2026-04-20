@@ -28,7 +28,7 @@ it('dispatch campaign job enqueues one send job per resolved recipient', functio
         'coprop2_email_invalid' => false,
     ]);
 
-    $location = Location::factory()->portal()->create(['code' => 'P-20']);
+    $location = Location::factory()->portal()->create(['name' => 'P-20']);
     $property = Property::factory()->create(['location_id' => $location->id]);
 
     PropertyAssignment::factory()->create([
@@ -116,7 +116,7 @@ it('dispatch campaign job creates whatsapp recipients without enqueueing send jo
         'coprop2_has_whatsapp' => true,
     ]);
 
-    $location = Location::factory()->portal()->create(['code' => 'P-21']);
+    $location = Location::factory()->portal()->create(['name' => 'P-21']);
     $property = Property::factory()->create(['location_id' => $location->id]);
 
     PropertyAssignment::factory()->create([
@@ -192,7 +192,7 @@ it('dispatch campaign job creates manual recipients without enqueueing send jobs
     Owner::query()->whereKey($ownerWithoutPhoneAndEmail->id)->update(['coprop1_email' => '']);
     Owner::query()->whereKey($ownerWithPhoneWithoutWhatsappAndEmail->id)->update(['coprop1_email' => '']);
 
-    $location = Location::factory()->portal()->create(['code' => 'P-22']);
+    $location = Location::factory()->portal()->create(['name' => 'P-22']);
 
     PropertyAssignment::factory()->create([
         'owner_id' => $ownerWithoutPhoneAndEmail->id,

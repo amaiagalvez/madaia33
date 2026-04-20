@@ -11,8 +11,8 @@ class MessageVariableResolver
         $owner->loadMissing('activeAssignments.property.location');
 
         $name = $slot === 'coprop2'
-            ? (string) ($owner->coprop2_name ?? '')
-            : (string) ($owner->coprop1_name ?? '');
+            ? ($owner->fullName2 !== '' ? $owner->fullName2 : $owner->fullName1)
+            : $owner->fullName1;
 
         $properties = $owner->activeAssignments
             ->map(fn ($assignment) => (string) ($assignment->property->name ?? ''))
@@ -21,7 +21,7 @@ class MessageVariableResolver
             ->implode(', ');
 
         $portals = $owner->activeAssignments
-            ->map(fn ($assignment) => (string) ($assignment->property->location->code ?? ''))
+            ->map(fn ($assignment) => (string) ($assignment->property->location->name ?? ''))
             ->filter()
             ->unique()
             ->values()

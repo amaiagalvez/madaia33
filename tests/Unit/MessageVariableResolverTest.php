@@ -10,10 +10,11 @@ use App\Services\Messaging\MessageVariableResolver;
 it('replaces supported variables with owner data', function () {
     $owner = new Owner([
         'coprop1_name' => 'Ane',
+        'coprop1_surname' => 'Etxeberria',
         'coprop2_name' => 'Miren',
     ]);
 
-    $location = new Location(['code' => 'P-1']);
+    $location = new Location(['name' => 'P-1']);
     $property = new Property(['name' => '1A']);
     $property->setRelation('location', $location);
 
@@ -26,17 +27,18 @@ it('replaces supported variables with owner data', function () {
 
     $result = $resolver->resolve('Kaixo **nombre**: **propiedad** (**portal**)', $owner, 'coprop1');
 
-    expect($result)->toBe('Kaixo Ane: 1A (P-1)');
+    expect($result)->toBe('Kaixo Ane Etxeberria: 1A (P-1)');
 });
 
 it('handles multiple active properties and unique portal codes', function () {
     $owner = new Owner([
         'coprop1_name' => 'Ane',
         'coprop2_name' => 'Miren',
+        'coprop2_surname' => 'Goikoetxea',
     ]);
 
-    $locationOne = new Location(['code' => 'P-1']);
-    $locationTwo = new Location(['code' => 'P-2']);
+    $locationOne = new Location(['name' => 'P-1']);
+    $locationTwo = new Location(['name' => 'P-2']);
 
     $propertyOne = new Property(['name' => '1A']);
     $propertyOne->setRelation('location', $locationOne);
@@ -64,14 +66,15 @@ it('handles multiple active properties and unique portal codes', function () {
 
     $resolver = new MessageVariableResolver;
 
-    $result = $resolver->resolve('**propiedad** | **portal**', $owner, 'coprop2');
+    $result = $resolver->resolve('**nombre** | **propiedad** | **portal**', $owner, 'coprop2');
 
-    expect($result)->toBe('1A, 2B, 3C | P-1, P-2');
+    expect($result)->toBe('Miren Goikoetxea | 1A, 2B, 3C | P-1, P-2');
 });
 
 it('replaces unknown markers with empty string', function () {
     $owner = new Owner([
         'coprop1_name' => 'Ane',
+        'coprop1_surname' => 'Agirre',
     ]);
 
     $owner->setRelation('activeAssignments', new Collection);
@@ -80,5 +83,5 @@ it('replaces unknown markers with empty string', function () {
 
     $result = $resolver->resolve('Hola **nombre** **desconocida**', $owner, 'coprop1');
 
-    expect($result)->toBe('Hola Ane ');
+    expect($result)->toBe('Hola Ane Agirre ');
 });

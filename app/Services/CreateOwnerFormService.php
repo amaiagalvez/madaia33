@@ -40,7 +40,6 @@ class CreateOwnerFormService
     public function prepareOwnerData(array $validated): array
     {
         return [
-            'owner_id' => $this->nullableInt($validated['ownerId'] ?? null),
             'coprop1_name' => $validated['coprop1Name'],
             'coprop1_surname' => $this->nullableString($validated['coprop1Surname'] ?? null),
             'coprop1_dni' => $this->nullableString($validated['coprop1Dni'] ?? null),
@@ -65,15 +64,6 @@ class CreateOwnerFormService
         }
 
         return (string) $value;
-    }
-
-    private function nullableInt(mixed $value): ?int
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        return (int) $value;
     }
 
     private function nullablePrimaryEmail(mixed $value): string

@@ -299,10 +299,10 @@ class AdminCampaignDetail extends Component
             return __('campaigns.admin.unknown_owner');
         }
 
-        $name = $owner->coprop1_name;
+        $name = $owner->fullName1;
 
         if ($recipient->slot === 'coprop2') {
-            $name = $owner->coprop2_name ?: $owner->coprop1_name;
+            $name = $owner->fullName2 !== '' ? $owner->fullName2 : $owner->fullName1;
         }
 
         return $name ?: __('campaigns.admin.unknown_owner');

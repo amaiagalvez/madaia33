@@ -87,7 +87,7 @@ class VotingPdfBuilder
             ->whereNull('deleted_at')
             ->with('location')
             ->get()
-            ->map(fn (VotingLocation $vl): string => trim((string) ($vl->location->name ?? $vl->location->code ?? '')))
+            ->map(fn (VotingLocation $vl): string => trim((string) ($vl->location->name ?? '')))
             ->filter(fn (string $name): bool => $name !== '')
             ->unique()
             ->sort()

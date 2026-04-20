@@ -59,7 +59,7 @@ describe('CreateOwnerAction', function () {
         createSetting('owners_welcome_subject_eu', 'Ongi etorri Madaia 33ra');
         createSetting('owners_welcome_text_eu', '<p>Kaixo ##izena##</p><p>Kodea: ##kodea##</p>##info##');
 
-        $portal = Location::factory()->portal()->create(['code' => '33-A']);
+        $portal = Location::factory()->portal()->create(['name' => '33-A']);
         $property = Property::factory()->create([
             'location_id' => $portal->id,
             'name' => '1A',

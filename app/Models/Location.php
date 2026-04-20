@@ -17,9 +17,13 @@ class Location extends Model
 
     protected $fillable = [
         'type',
-        'code',
         'name',
     ];
+
+    protected static function newFactory(): LocationFactory
+    {
+        return LocationFactory::new();
+    }
 
     /**
      * @return HasMany<Property, $this>

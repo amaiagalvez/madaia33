@@ -18,7 +18,7 @@ it('covers all owner-accessible front screens including votings results and prof
     ]);
 
     $portal = Location::factory()->portal()->create([
-        'code' => '99-Z',
+        'name' => '99-Z',
     ]);
 
     $property = Property::factory()->create([

@@ -84,14 +84,6 @@ class CreateOwnerAction
      */
     private function createOwner(User $user, array $data): Owner
     {
-        $ownerId = $data['owner_id'] ?? null;
-
-        if ($ownerId !== null && Owner::withTrashed()->whereKey((int) $ownerId)->exists()) {
-            throw ValidationException::withMessages([
-                'ownerId' => __('validation.unique', ['attribute' => __('admin.owners.form.id')]),
-            ]);
-        }
-
         $owner = new Owner([
             'user_id' => $user->id,
             'coprop1_name' => $data['coprop1_name'],
@@ -109,10 +101,6 @@ class CreateOwnerAction
             'coprop2_has_whatsapp' => (bool) ($data['coprop2_has_whatsapp'] ?? false),
             'coprop2_email' => $data['coprop2_email'] ?? null,
         ]);
-
-        if ($ownerId !== null) {
-            $owner->id = (int) $ownerId;
-        }
 
         $owner->save();
 
@@ -296,7 +284,7 @@ class CreateOwnerAction
             ->all();
 
         $properties = Property::query()
-            ->with('location:id,code,type')
+            ->with('location:id,name,type')
             ->whereIn('id', $propertyIds)
             ->get()
             ->keyBy('id');
@@ -326,7 +314,13 @@ class CreateOwnerAction
             return null;
         }
 
-        $label = $property->location->code . ' ' . $property->name;
+        $locationName = trim((string) ($property->location->name ?? ''));
+        $propertyName = trim((string) ($property->name ?? ''));
+        $label = trim($locationName . ' ' . $propertyName);
+
+        if ($label === '') {
+            $label = $property->displayLabel();
+        }
 
         return '<li>' . e($label) . '</li>';
     }

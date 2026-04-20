@@ -30,7 +30,7 @@ it('shows non-anonymous voting results with per-owner selected option percentage
         'coprop1_name' => 'Owner Results Visible',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'RES-1']);
+    $portal = Location::factory()->portal()->create(['name' => 'RES-1']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '2B',
@@ -135,7 +135,7 @@ it('shows anonymous voting results without per-owner option percentages and keep
         'coprop1_name' => 'Owner Hidden Vote',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'RES-2']);
+    $portal = Location::factory()->portal()->create(['name' => 'RES-2']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '3C',
@@ -220,7 +220,7 @@ it('highlights totals in red when votes_count or pct_total differ from calculate
         'coprop1_name' => 'Owner Mismatch Case',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'RES-3']);
+    $portal = Location::factory()->portal()->create(['name' => 'RES-3']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '4D',

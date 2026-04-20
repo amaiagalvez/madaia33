@@ -192,7 +192,7 @@ class CastVotingBallotAction
 
         try {
             $subject = __('votings.mail.subject');
-            $body = __('votings.mail.greeting', ['name' => $owner->coprop1_name]) . "\n"
+            $body = __('votings.mail.greeting', ['name' => $owner->fullName1]) . "\n"
                 . __('votings.mail.body', ['voting' => $voting->name]) . "\n"
                 . __('votings.mail.thanks');
 

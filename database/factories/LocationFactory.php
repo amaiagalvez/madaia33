@@ -17,7 +17,6 @@ class LocationFactory extends Factory
     {
         return [
             'type' => fake()->randomElement(['portal', 'local', 'garage', 'storage']),
-            'code' => fake()->unique()->bothify('##-?'),
             'name' => fake()->bothify('Location ##'),
         ];
     }

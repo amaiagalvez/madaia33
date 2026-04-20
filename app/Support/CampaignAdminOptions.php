@@ -97,7 +97,7 @@ class CampaignAdminOptions
                 $query->whereIn('id', $managedLocationIds);
             })
             ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'garage' THEN 2 ELSE 3 END")
-            ->orderBy('code')
+            ->orderBy('name')
             ->get();
 
         foreach ($locations as $location) {
@@ -105,7 +105,7 @@ class CampaignAdminOptions
 
             $options[] = [
                 'value' => $value,
-                'label' => $this->locationLabel((string) $location->type) . ' ' . (string) $location->code,
+                'label' => $this->locationLabel((string) $location->type) . ' ' . (string) $location->name,
             ];
         }
 
@@ -181,14 +181,14 @@ class CampaignAdminOptions
         }
 
         $location = Location::query()
-            ->select(['id', 'type', 'code'])
+            ->select(['id', 'type', 'name'])
             ->find((int) $value);
 
         if (! $location instanceof Location) {
             return __('campaigns.admin.filters.all');
         }
 
-        return $this->locationLabel((string) $location->type) . ' ' . (string) $location->code;
+        return $this->locationLabel((string) $location->type) . ' ' . (string) $location->name;
     }
 
     public function previewText(?string $textEu, ?string $textEs): string

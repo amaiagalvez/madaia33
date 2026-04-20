@@ -18,10 +18,10 @@ use App\Actions\Owners\CreateOwnerAction;
 it('renders admin locations list for selected type', function () {
     $user = adminUser();
 
-    Location::factory()->create(['type' => 'portal', 'code' => '99-A', 'name' => 'Portal 99-A']);
-    Location::factory()->create(['type' => 'portal', 'code' => '11-A', 'name' => 'Portal 11-A']);
-    Location::factory()->create(['type' => 'local', 'code' => 'L-1', 'name' => 'Local L-1']);
-    Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
+    Location::factory()->create(['type' => 'portal', 'name' => 'Portal 99-A']);
+    Location::factory()->create(['type' => 'portal', 'name' => 'Portal 11-A']);
+    Location::factory()->create(['type' => 'local', 'name' => 'Local L-1']);
+    Location::factory()->create(['type' => 'garage', 'name' => 'Garaje P-1']);
 
     Livewire::actingAs($user)
         ->test(Locations::class)
@@ -29,7 +29,7 @@ it('renders admin locations list for selected type', function () {
         ->assertSeeHtml('data-admin-filter-button="portal"')
         ->assertSeeHtml('data-admin-table-header')
         ->assertSeeHtml('data-admin-action="edit"')
-        ->assertSeeInOrder(['11-A', '99-A'])
+        ->assertSeeInOrder(['Portal 11-A', 'Portal 99-A'])
         ->assertDontSee('Local L-1')
         ->assertDontSee('Garaje P-1')
         ->call('setType', 'local')
@@ -42,19 +42,13 @@ it('renders admin locations list for selected type', function () {
 
 it('opens and saves location edit form from locations list without navigating', function () {
     $user = adminUser();
-    $location = Location::factory()->create([
-        'type' => 'portal',
-        'code' => '55-A',
-        'name' => 'Portal 55-A',
-    ]);
+    $location = Location::factory()->create(['name' => 'Portal 55-A']);
 
     Livewire::actingAs($user)
         ->test(Locations::class)
         ->call('openEditForm', $location->id)
         ->assertSet('showEditForm', true)
         ->assertSet('editingLocationId', $location->id)
-        ->assertSet('editCode', '55-A')
-        ->set('editCode', '55-B')
         ->set('editName', 'Portal 55-B')
         ->call('saveEditForm')
         ->assertSet('showEditForm', false)
@@ -62,8 +56,7 @@ it('opens and saves location edit form from locations list without navigating', 
 
     $location->refresh();
 
-    expect($location->code)->toBe('55-B')
-        ->and($location->name)->toBe('Portal 55-B');
+    expect($location->name)->toBe('Portal 55-B');
 });
 
 it('creates a new location from the locations list side panel', function () {
@@ -74,25 +67,19 @@ it('creates a new location from the locations list side panel', function () {
         ->set('type', 'local')
         ->call('createLocation')
         ->assertSet('showCreateForm', true)
-        ->set('newCode', 'L-99')
         ->set('newName', 'Local 99')
         ->call('saveCreateForm')
         ->assertSet('showCreateForm', false);
 
     expect(Location::query()
         ->where('type', 'local')
-        ->where('code', 'L-99')
         ->where('name', 'Local 99')
         ->exists())->toBeTrue();
 });
 
 it('opens delete confirmation and deletes location from locations list', function () {
     $user = adminUser();
-    $location = Location::factory()->create([
-        'type' => 'portal',
-        'code' => '66-A',
-        'name' => 'Portal 66-A',
-    ]);
+    $location = Location::factory()->create(['name' => 'Portal 66-A']);
 
     Livewire::actingAs($user)
         ->test(Locations::class)
@@ -109,11 +96,7 @@ it('opens delete confirmation and deletes location from locations list', functio
 it('does not delete location when it still has linked properties', function () {
     $user = adminUser();
 
-    $location = Location::factory()->create([
-        'type' => 'portal',
-        'code' => '77-A',
-        'name' => 'Portal 77-A',
-    ]);
+    $location = Location::factory()->create(['name' => 'Portal 77-A']);
 
     Property::factory()->create([
         'location_id' => $location->id,
@@ -132,9 +115,10 @@ it('does not delete location when it still has linked properties', function () {
 it('renders location detail with assignment badges', function () {
     $user = adminUser();
 
-    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    $location = Location::factory()->create(['name' => 'Portal 33-A']);
     $property = Property::factory()->create([
         'location_id' => $location->id,
+        'code' => '1A',
         'name' => '1A',
     ]);
 
@@ -156,6 +140,8 @@ it('renders location detail with assignment badges', function () {
     test()->actingAs($user)
         ->get(route('admin.locations.show', $location))
         ->assertOk()
+        ->assertSee('Portal 33-A')
+        ->assertSee('1A')
         ->assertDontSee('data-admin-validated=', false)
         ->assertDontSee('data-owner-validated=', false);
 });
@@ -164,7 +150,7 @@ it('toggles assignment validations one by one and blocks closed assignments', fu
     $user = adminUser();
 
     $owner = Owner::factory()->create();
-    $location = Location::factory()->portal()->create(['code' => '33-A']);
+    $location = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
 
     $activeProperty = Property::factory()->create([
         'location_id' => $location->id,
@@ -228,10 +214,11 @@ it('toggles assignment validations one by one and blocks closed assignments', fu
 it('accepts comma decimals for location percentages and stores them normalized with dot', function () {
     $user = adminUser();
 
-    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    $location = Location::factory()->create(['name' => 'Portal 33-A']);
 
     $component = Livewire::actingAs($user)
         ->test(LocationDetail::class, ['location' => $location])
+        ->set('newPropertyCode', '7C')
         ->set('newPropertyName', '7C')
         ->set('newCommunityPct', '1,2500')
         ->set('newLocationPct', '2,5000')
@@ -239,6 +226,7 @@ it('accepts comma decimals for location percentages and stores them normalized w
 
     $createdProperty = Property::query()
         ->where('location_id', $location->id)
+        ->where('code', '7C')
         ->where('name', '7C')
         ->first();
 
@@ -248,6 +236,7 @@ it('accepts comma decimals for location percentages and stores them normalized w
 
     $component
         ->call('startEditing', $createdProperty->id)
+        ->set('editCode', '7D')
         ->set('editName', '7D')
         ->set('editCommunityPct', '3,5000')
         ->set('editLocationPct', '4,7500')
@@ -255,7 +244,8 @@ it('accepts comma decimals for location percentages and stores them normalized w
 
     $refreshedProperty = $createdProperty->fresh();
 
-    expect($refreshedProperty->name)->toBe('7D')
+    expect($refreshedProperty->code)->toBe('7D')
+        ->and($refreshedProperty->name)->toBe('7D')
         ->and((float) $refreshedProperty->community_pct)->toBe(3.5)
         ->and((float) $refreshedProperty->location_pct)->toBe(4.75);
 });
@@ -263,22 +253,15 @@ it('accepts comma decimals for location percentages and stores them normalized w
 it('opens add-property form and saves property for the currently opened location', function () {
     $user = adminUser();
 
-    $openedLocation = Location::factory()->create([
-        'type' => 'portal',
-        'code' => '33-OPEN',
-        'name' => 'Portal Open',
-    ]);
-    $otherLocation = Location::factory()->create([
-        'type' => 'portal',
-        'code' => '33-OTHER',
-        'name' => 'Portal Other',
-    ]);
+    $openedLocation = Location::factory()->create(['name' => 'Portal Open']);
+    $otherLocation = Location::factory()->create(['name' => 'Portal Other']);
 
     Livewire::actingAs($user)
         ->test(LocationDetail::class, ['location' => $openedLocation])
         ->assertSet('showAddForm', false)
         ->call('openAddForm')
         ->assertSet('showAddForm', true)
+        ->set('newPropertyCode', 'OPEN-1')
         ->set('newPropertyName', 'OPEN-1')
         ->set('newCommunityPct', '10')
         ->set('newLocationPct', '20')
@@ -287,6 +270,7 @@ it('opens add-property form and saves property for the currently opened location
 
     expect(Property::query()
         ->where('location_id', $openedLocation->id)
+        ->where('code', 'OPEN-1')
         ->where('name', 'OPEN-1')
         ->exists())->toBeTrue()
         ->and(Property::query()
@@ -298,14 +282,11 @@ it('opens add-property form and saves property for the currently opened location
 it('requires and persists percentages for storage locations too', function () {
     $user = adminUser();
 
-    $storageLocation = Location::factory()->create([
-        'type' => 'storage',
-        'code' => 'TR-A',
-        'name' => 'Trastero A',
-    ]);
+    $storageLocation = Location::factory()->storage()->create(['name' => 'Trastero A']);
 
     Livewire::actingAs($user)
         ->test(LocationDetail::class, ['location' => $storageLocation])
+        ->set('newPropertyCode', 'S-1')
         ->set('newPropertyName', 'S-1')
         ->set('newCommunityPct', '')
         ->set('newLocationPct', '')
@@ -318,6 +299,7 @@ it('requires and persists percentages for storage locations too', function () {
 
     $createdStorageProperty = Property::query()
         ->where('location_id', $storageLocation->id)
+        ->where('code', 'S-1')
         ->where('name', 'S-1')
         ->first();
 
@@ -329,8 +311,8 @@ it('requires and persists percentages for storage locations too', function () {
 it('filters owners by active portal assignment', function () {
     $user = adminUser();
 
-    $portalA = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
-    $portalB = Location::factory()->create(['type' => 'portal', 'code' => '33-B', 'name' => 'Portal 33-B']);
+    $portalA = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
+    $portalB = Location::factory()->portal()->create(['name' => 'Portal 33-B']);
 
     $propertyA = Property::factory()->create(['location_id' => $portalA->id, 'name' => '1A']);
     $propertyB = Property::factory()->create(['location_id' => $portalB->id, 'name' => '2B']);
@@ -360,8 +342,8 @@ it('filters owners by active portal assignment', function () {
 it('filters owners by active local assignment', function () {
     $user = adminUser();
 
-    $localA = Location::factory()->create(['type' => 'local', 'code' => 'L-1', 'name' => 'Local L-1']);
-    $localB = Location::factory()->create(['type' => 'local', 'code' => 'L-2', 'name' => 'Local L-2']);
+    $localA = Location::factory()->local()->create(['name' => 'Local L-1']);
+    $localB = Location::factory()->local()->create(['name' => 'Local L-2']);
 
     $propertyA = Property::factory()->create(['location_id' => $localA->id, 'name' => '1A']);
     $propertyB = Property::factory()->create(['location_id' => $localB->id, 'name' => '2B']);
@@ -480,7 +462,7 @@ it('uses shared styling components in owners inline assignments panel', function
     $user = adminUser();
 
     $owner = Owner::factory()->create(['coprop1_name' => 'Inline Styled Owner']);
-    $portal = Location::factory()->portal()->create(['code' => '33-Z']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-Z']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '5A',
@@ -547,7 +529,7 @@ it('filters owners by text search across owner record fields', function () {
 it('renders new admin pages for locations and owners', function () {
     $user = adminUser();
 
-    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    $location = Location::factory()->create(['name' => 'Portal 33-A']);
     $owner = Owner::factory()->create();
 
     test()->actingAs($user)
@@ -570,7 +552,7 @@ it('renders new admin pages for locations and owners', function () {
 it('renders a type-aware breadcrumb link on location detail page', function () {
     $user = adminUser();
 
-    $garage = Location::factory()->garage()->create(['code' => 'P-2', 'name' => 'Garaje P-2']);
+    $garage = Location::factory()->garage()->create(['name' => 'Garaje P-2']);
 
     test()->actingAs($user)
         ->get(route('admin.locations.show', $garage))
@@ -582,8 +564,8 @@ it('creates a new owner from the admin owners list', function () {
     Mail::fake();
 
     $adminUser = adminUser();
-    $portal = Location::factory()->portal()->create(['code' => '33-A', 'name' => 'Portal 33-A']);
-    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1A']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'code' => '1A', 'name' => '1A']);
 
     Livewire::actingAs($adminUser)
         ->test(Owners::class)
@@ -619,7 +601,7 @@ it('creates a new owner without email and does not send welcome email', function
     Mail::fake();
 
     $adminUser = adminUser();
-    $portal = Location::factory()->portal()->create(['code' => '33-B', 'name' => 'Portal 33-B']);
+    $portal = Location::factory()->create(['name' => 'Portal 33-B']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1B']);
 
     Livewire::actingAs($adminUser)
@@ -646,7 +628,7 @@ it('resends the owner welcome email from the owners list', function () {
     Mail::fake();
 
     $adminUser = adminUser();
-    $portal = Location::factory()->portal()->create(['code' => '77-W', 'name' => 'Portal 77-W']);
+    $portal = Location::factory()->create(['name' => 'Portal 77-W']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '2B']);
 
     $owner = (new CreateOwnerAction)->execute([
@@ -682,7 +664,7 @@ it('does not resend owner welcome email when owner has no email', function () {
     Mail::fake();
 
     $adminUser = adminUser();
-    $portal = Location::factory()->portal()->create(['code' => '77-X', 'name' => 'Portal 77-X']);
+    $portal = Location::factory()->create(['name' => 'Portal 77-X']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '2C']);
 
     $owner = Owner::factory()->create([
@@ -705,58 +687,36 @@ it('does not resend owner welcome email when owner has no email', function () {
     Mail::assertNothingSent();
 });
 
-it('creates a new owner with a manual id from the admin owners list', function () {
+it('creates a new owner without exposing or setting a manual owner id', function () {
     Mail::fake();
 
     $adminUser = adminUser();
-    $portal = Location::factory()->portal()->create(['code' => '33-A', 'name' => 'Portal 33-A']);
-    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1A']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
+    $property = Property::factory()->create(['location_id' => $portal->id, 'code' => '1A', 'name' => '1A']);
 
     Livewire::actingAs($adminUser)
         ->test(Owners::class)
         ->set('filterStatus', 'all')
-        ->set('ownerId', '500')
-        ->set('coprop1Name', 'Manual Id Owner')
+        ->set('coprop1Name', 'Automatic Id Owner')
         ->set('coprop1Dni', '11223344B')
-        ->set('coprop1Email', 'manual-id@example.com')
+        ->set('coprop1Email', 'automatic-id@example.com')
         ->set('coprop1Phone', '600123124')
         ->set('newAssignments.0.property_id', (string) $property->id)
         ->set('newAssignments.0.start_date', '2026-01-01')
         ->call('createOwner')
         ->assertSet('showCreateForm', false);
 
-    $owner = Owner::query()->find(500);
+    $owner = Owner::query()->where('coprop1_email', 'automatic-id@example.com')->first();
 
     expect($owner)->not->toBeNull()
-        ->and($owner->coprop1_email)->toBe('manual-id@example.com');
-});
-
-it('shows validation error when manual owner id is repeated', function () {
-    Mail::fake();
-
-    $adminUser = adminUser();
-    $existingOwner = Owner::factory()->create();
-    $portal = Location::factory()->portal()->create(['code' => '33-A', 'name' => 'Portal 33-A']);
-    $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1A']);
-
-    Livewire::actingAs($adminUser)
-        ->test(Owners::class)
-        ->set('filterStatus', 'all')
-        ->set('ownerId', (string) $existingOwner->id)
-        ->set('coprop1Name', 'Repeated Id Owner')
-        ->set('coprop1Dni', '11223344C')
-        ->set('coprop1Email', 'repeated-id@example.com')
-        ->set('coprop1Phone', '600123125')
-        ->set('newAssignments.0.property_id', (string) $property->id)
-        ->set('newAssignments.0.start_date', '2026-01-01')
-        ->call('createOwner')
-        ->assertHasErrors(['ownerId' => 'unique']);
+        ->and($owner->id)->toBeGreaterThan(0)
+        ->and($owner->coprop1_email)->toBe('automatic-id@example.com');
 });
 
 it('shows owners without active properties when using without-properties filter', function () {
     $user = adminUser();
 
-    $portal = Location::factory()->portal()->create(['code' => '33-A', 'name' => 'Portal 33-A']);
+    $portal = Location::factory()->create(['name' => 'Portal 33-A']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '1A']);
 
     $activeOwner = Owner::factory()->create(['coprop1_name' => 'Jabe Aktiboa']);
@@ -789,7 +749,7 @@ it('shows owners without active properties when using without-properties filter'
 it('shows only properties without active owners in owner property selectors', function () {
     $user = adminUser();
 
-    $portal = Location::factory()->portal()->create(['code' => '33-S']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-S']);
 
     $availableProperty = Property::factory()->create([
         'location_id' => $portal->id,
@@ -846,7 +806,7 @@ it('sanitizes dni and phone fields when creating owner from admin list', functio
     Mail::fake();
 
     $adminUser = adminUser();
-    $portal = Location::factory()->portal()->create(['code' => '33-S', 'name' => 'Portal 33-S']);
+    $portal = Location::factory()->create(['name' => 'Portal 33-S']);
     $property = Property::factory()->create(['location_id' => $portal->id, 'name' => '3C']);
 
     Livewire::actingAs($adminUser)
@@ -929,7 +889,7 @@ it('updates has_whatsapp fields and shows invalid-contact warnings in admin owne
 it('renders owners list with inline expansion action instead of detail bars link', function () {
     $user = adminUser();
     $owner = Owner::factory()->create(['coprop1_name' => 'Inline Jabea']);
-    $portal = Location::factory()->portal()->create(['code' => '33-D']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-D']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '3B',
@@ -950,7 +910,7 @@ it('renders owners list with inline expansion action instead of detail bars link
 it('shows accepted terms indicator in owners list', function () {
     $user = adminUser();
 
-    $location = Location::factory()->portal()->create(['code' => '33-T']);
+    $location = Location::factory()->portal()->create(['name' => 'Portal 33-T']);
     $propertyAccepted = Property::factory()->create([
         'location_id' => $location->id,
         'name' => 'T-1',
@@ -994,10 +954,10 @@ it('shows assignment percentages in owner property-type columns with validation 
         'coprop1_name' => 'Owner Percentages',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'PT-02']);
-    $local = Location::factory()->local()->create(['code' => 'LC-02']);
-    $garage = Location::factory()->garage()->create(['code' => 'GR-02']);
-    $storage = Location::factory()->storage()->create(['code' => 'ST-02']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal PT-02']);
+    $local = Location::factory()->local()->create(['name' => 'Local LC-02']);
+    $garage = Location::factory()->garage()->create(['name' => 'Garage GR-02']);
+    $storage = Location::factory()->storage()->create(['name' => 'Storage ST-02']);
 
     $portalProperty = Property::factory()->create([
         'location_id' => $portal->id,
@@ -1063,19 +1023,19 @@ it('shows assignment percentages in owner property-type columns with validation 
         ->test(Owners::class)
         ->set('filterStatus', 'all')
         ->set('filterSearch', 'Owner Percentages')
-        ->assertSee('PT-02')
+        ->assertSee('[P-2]')
         ->assertSee('P-2')
         ->assertSee('21,75%')
         ->assertSee('11,50%')
-        ->assertSee('GR-02')
+        ->assertSee('[G-2]')
         ->assertSee('G-2')
         ->assertSee('7,50%')
         ->assertSee('6,25%')
-        ->assertSee('ST-02')
+        ->assertSee('[S-2]')
         ->assertSee('S-2')
         ->assertSee('3,00%')
         ->assertSee('2,00%')
-        ->assertSee('LC-02')
+        ->assertSee('[L-2]')
         ->assertSee('L-2')
         ->assertSee('41,00%')
         ->assertSee('31,00%')
@@ -1093,11 +1053,56 @@ it('shows assignment percentages in owner property-type columns with validation 
         ->assertSeeHtml('text-red-500');
 });
 
+it('orders owners by portal assignment ascending and keeps owners without portals last', function () {
+    $user = adminUser();
+
+    $portalA = Location::factory()->portal()->create(['name' => 'Portal A']);
+    $portalB = Location::factory()->portal()->create(['name' => 'Portal B']);
+    $garage = Location::factory()->garage()->create(['name' => 'Garage A']);
+
+    $portalPropertyA = Property::factory()->create(['location_id' => $portalA->id, 'code' => 'A-01', 'name' => 'Portal Property A']);
+    $portalPropertyB = Property::factory()->create(['location_id' => $portalB->id, 'code' => 'B-01', 'name' => 'Portal Property B']);
+    $garageProperty = Property::factory()->create(['location_id' => $garage->id, 'code' => 'G-01', 'name' => 'Garage Property']);
+
+    $ownerSecond = Owner::factory()->create(['coprop1_name' => 'Second Portal']);
+    $ownerFirst = Owner::factory()->create(['coprop1_name' => 'First Portal']);
+    $ownerWithoutPortal = Owner::factory()->create(['coprop1_name' => 'Without Portal']);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerSecond->id,
+        'property_id' => $portalPropertyB->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerFirst->id,
+        'property_id' => $portalPropertyA->id,
+        'end_date' => null,
+    ]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $ownerWithoutPortal->id,
+        'property_id' => $garageProperty->id,
+        'end_date' => null,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->assertViewHas('owners', function ($owners) use ($ownerFirst, $ownerSecond, $ownerWithoutPortal): bool {
+            return $owners->getCollection()->pluck('id')->all() === [
+                $ownerFirst->id,
+                $ownerSecond->id,
+                $ownerWithoutPortal->id,
+            ];
+        });
+});
+
 it('allows creating and editing owner assignments inline from owners list', function () {
     $user = adminUser();
 
     $owner = Owner::factory()->create(['coprop1_name' => 'Jabe Inline']);
-    $portal = Location::factory()->portal()->create(['code' => '33-C']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-C']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '2A',
@@ -1146,7 +1151,7 @@ it('allows creating and editing owner assignments inline from owners list', func
 it('prevents reopening a closed assignment when the property already has another active owner', function () {
     $user = adminUser();
 
-    $portal = Location::factory()->portal()->create(['code' => '33-R']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-R']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '4A',
@@ -1187,7 +1192,7 @@ it('prevents reopening a closed assignment when the property already has another
 it('displays aggregated community and location percentages in locations listing', function () {
     $user = adminUser();
 
-    $portal = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
 
     // Create properties with known percentages
     Property::factory()->create([
@@ -1213,8 +1218,8 @@ it('displays aggregated community and location percentages in locations listing'
 it('shows chief property column value and fallback in locations listing', function () {
     $user = adminUser();
 
-    $locationWithChief = Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
-    $locationWithoutChief = Location::factory()->create(['type' => 'portal', 'code' => '33-B', 'name' => 'Portal 33-B']);
+    $locationWithChief = Location::factory()->portal()->create(['name' => 'Portal 33-A']);
+    $locationWithoutChief = Location::factory()->portal()->create(['name' => 'Portal 33-B']);
 
     $chiefProperty = Property::factory()->create([
         'location_id' => $locationWithChief->id,
@@ -1256,7 +1261,7 @@ it('shows chief property column value and fallback in locations listing', functi
 it('shows red warning in locations listing when community percentages do not sum to 100%', function () {
     $user = adminUser();
 
-    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A']);
+    $location = Location::factory()->create(['type' => 'portal', 'name' => 'Portal 33-A']);
 
     // Properties that don't sum to 100%
     Property::factory()->create([
@@ -1282,7 +1287,7 @@ it('shows red warning in locations listing when community percentages do not sum
 it('does not show warning in locations listing when all community percentages sum to 100%', function () {
     $user = adminUser();
 
-    $location = Location::factory()->create(['type' => 'portal', 'code' => '33-A']);
+    $location = Location::factory()->create(['type' => 'portal', 'name' => 'Portal 33-A']);
 
     // Properties that sum exactly to 100%
     Property::factory()->create([
@@ -1307,11 +1312,7 @@ it('does not show warning in locations listing when all community percentages su
 it('shows invalid location percentage total in listing when not equal to 100%', function () {
     $user = adminUser();
 
-    $portalInvalid = Location::factory()->create([
-        'type' => 'portal',
-        'code' => 'P-INVALID',
-        'name' => 'Portal Invalid',
-    ]);
+    $portalInvalid = Location::factory()->portal()->create(['name' => 'Portal Invalid']);
 
     Property::factory()->create([
         'location_id' => $portalInvalid->id,
@@ -1322,15 +1323,15 @@ it('shows invalid location percentage total in listing when not equal to 100%', 
 
     Livewire::actingAs($user)
         ->test(Locations::class)
-        ->assertSee('P-INVALID')
+        ->assertSee('Portal Invalid')
         ->assertSee('60.00');
 });
 
 it('shows only properties with active owners in the same portal or garage as chief candidates', function () {
     $user = adminUser();
 
-    $portal = Location::factory()->portal()->create(['code' => '33-H']);
-    $otherPortal = Location::factory()->portal()->create(['code' => '33-Z']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-H']);
+    $otherPortal = Location::factory()->portal()->create(['name' => 'Portal 33-Z']);
 
     $portalPropertyA = Property::factory()->create([
         'location_id' => $portal->id,
@@ -1385,7 +1386,7 @@ it('transfers chief and COMMUNITY_ADMIN role from previous owner to new owner in
 
     Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-R']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-R']);
     $propertyA = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => 'R-1',
@@ -1433,8 +1434,8 @@ it('keeps COMMUNITY_ADMIN role for previous chief when she still manages another
 
     Role::query()->firstOrCreate(['name' => Role::COMMUNITY_ADMIN]);
 
-    $portal = Location::factory()->portal()->create(['code' => '33-K']);
-    $garage = Location::factory()->garage()->create(['code' => 'P-K']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-K']);
+    $garage = Location::factory()->garage()->create(['name' => 'Garage P-K']);
 
     $portalPropertyA = Property::factory()->create([
         'location_id' => $portal->id,
