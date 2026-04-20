@@ -40,12 +40,12 @@ trait HandlesVotingOwnerModals
         $this->ownersModalContext = 'census';
 
         $this->ownersModalRows = $owners
-            ->map(fn(Owner $owner): array => [
+            ->map(fn (Owner $owner): array => [
                 'name' => $this->canSeeOwnerNamesInVotingModals() ? $owner->coprop1_name : '—',
                 'has_voted' => isset($votedOwnerIds[$owner->id]),
                 'vote' => $votesByOwner[$owner->id] ?? '',
                 'properties' => $owner->activeAssignments
-                    ->map(fn(PropertyAssignment $assignment): string => trim(sprintf(
+                    ->map(fn (PropertyAssignment $assignment): string => trim(sprintf(
                         '[%s] %s %s',
                         $assignment->property->displayCode(),
                         $assignment->property->location->name,
@@ -116,7 +116,7 @@ trait HandlesVotingOwnerModals
     private function formatBallotOptionName(VotingBallot $ballot): string
     {
         return $ballot->selections
-            ->sortBy(static fn(VotingSelection $selection): int => $selection->option->position ?? PHP_INT_MAX)
+            ->sortBy(static fn (VotingSelection $selection): int => $selection->option->position ?? PHP_INT_MAX)
             ->map(static function (VotingSelection $selection): string {
                 $position = (int) $selection->option->position;
 
@@ -133,7 +133,7 @@ trait HandlesVotingOwnerModals
     private function formatBallotOptionLabel(VotingBallot $ballot): string
     {
         return $ballot->selections
-            ->sortBy(static fn(VotingSelection $selection): int => $selection->option->position ?? PHP_INT_MAX)
+            ->sortBy(static fn (VotingSelection $selection): int => $selection->option->position ?? PHP_INT_MAX)
             ->map(static function (VotingSelection $selection): string {
                 return trim((string) $selection->option->label);
             })
@@ -158,7 +158,7 @@ trait HandlesVotingOwnerModals
             'delegate_dni' => $ballot instanceof VotingBallot ? ($ballot->cast_delegate_dni ?? '—') : '—',
             'has_voted' => $ballot instanceof VotingBallot,
             'properties' => $owner->activeAssignments
-                ->map(fn(PropertyAssignment $assignment): string => trim(sprintf(
+                ->map(fn (PropertyAssignment $assignment): string => trim(sprintf(
                     '[%s] %s %s',
                     $assignment->property->displayCode(),
                     $assignment->property->location->name,
@@ -271,7 +271,7 @@ trait HandlesVotingOwnerModals
         abort_unless($this->canManageInPersonAndDelegatedSessions(), 403);
 
         $allowedOwnerIds = collect($this->eligibilityService->ownersWithPendingDelegations())
-            ->map(static fn(array $row): int => $row['owner']->id)
+            ->map(static fn (array $row): int => $row['owner']->id)
             ->all();
 
         abort_unless(in_array($ownerId, $allowedOwnerIds, true), 404);
@@ -304,7 +304,7 @@ trait HandlesVotingOwnerModals
 
         $filtered = array_values(array_filter(
             $rows,
-            static fn(array $row): bool => str_contains($row['search_index'], $search)
+            static fn (array $row): bool => str_contains($row['search_index'], $search)
         ));
 
         if ($type === 'delegated') {

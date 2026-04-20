@@ -74,7 +74,7 @@ class BuildVotingResultsTableAction
         return $ballots
             ->mapWithKeys(static function (VotingBallot $ballot): array {
                 $selection = $ballot->selections
-                    ->sortBy(static fn(VotingSelection $item): int => $item->id)
+                    ->sortBy(static fn (VotingSelection $item): int => $item->id)
                     ->first();
 
                 return [

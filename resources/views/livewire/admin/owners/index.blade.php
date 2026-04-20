@@ -330,10 +330,10 @@
         class="overflow-x-auto" data-owner-table>
         <thead class="bg-gray-50">
             <tr>
-                <x-admin.table-header-cell class="w-[24%]">
+                <x-admin.table-header-cell class="w-[25%]">
                     {{ __('admin.owners.columns.coprop1') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell class="w-[24%]">
+                <x-admin.table-header-cell class="w-[25%]">
                     {{ __('admin.owners.columns.coprop2') }}
                 </x-admin.table-header-cell>
                 <x-admin.table-header-cell class="w-[8%]">
@@ -354,7 +354,7 @@
                 <x-admin.table-header-cell class="w-[6%]">
                     {{ __('admin.owners.columns.terms_accepted') }}
                 </x-admin.table-header-cell>
-                <x-admin.table-header-cell class="relative w-[8%]">
+                <x-admin.table-header-cell class="relative w-[6%]">
                     <span class="sr-only">{{ __('general.buttons.edit') }}</span>
                 </x-admin.table-header-cell>
             </tr>

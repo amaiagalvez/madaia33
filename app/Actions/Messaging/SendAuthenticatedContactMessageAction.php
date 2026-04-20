@@ -37,42 +37,27 @@ class SendAuthenticatedContactMessageAction
         ?string $adminMailSubject = null,
     ): bool {
         try {
-            $settings = array_replace(array_fill_keys(self::EMAIL_SETTING_KEYS, ''), Setting::stringValues(self::EMAIL_SETTING_KEYS));
+            $mailConfig = $this->buildMailConfig();
+            $trackingPixelUrl = $this->resolveTrackingPixelUrl($user, $messageBody, $userMailSubject);
+            $contactMailData = new ContactMailData(
+                visitorName: $user->name,
+                messageSubject: $userMailSubject,
+                messageBody: $messageBody,
+            );
 
-            app(ConfiguredMailSettings::class)->apply($settings);
+            $this->sendUserConfirmation(
+                user: $user,
+                contactMailData: $contactMailData,
+                mailConfig: $mailConfig,
+                trackingPixelUrl: $trackingPixelUrl,
+            );
 
-            $adminEmail = $settings['admin_email'] ?: (string) config('mail.from.address');
-            $fromAddress = $settings['from_address'] ?: (string) config('mail.from.address');
-            $fromName = $settings['from_name'] !== '' ? $settings['from_name'] : (string) config('mail.from.name');
-            $trackingPixelUrl = null;
-
-            if ($user->owner instanceof Owner) {
-                $recipient = app(RecordDirectMessageRecipientAction::class)->execute(
-                    owner: $user->owner,
-                    contact: (string) $user->email,
-                    subject: ContactConfirmationSubject::forAudit($userMailSubject),
-                    body: $messageBody,
-                    sentByUserId: $user->id,
-                );
-
-                $trackingPixelUrl = app(CampaignTrackingUrlBuilder::class)->openPixelUrl($recipient->tracking_token);
-            }
-
-            Mail::to($user->email)->send(new ContactConfirmation(
-                new ContactMailData(
-                    visitorName: $user->name,
-                    messageSubject: $userMailSubject,
-                    messageBody: $messageBody,
-                ),
-                $fromAddress,
-                $fromName,
-                $trackingPixelUrl,
-            ));
-
-            $adminContactMessage = $contactMessage->replicate();
-            $adminContactMessage->subject = $adminMailSubject ?? $userMailSubject;
-
-            Mail::to($adminEmail)->send(new ContactNotification($adminContactMessage, null, $fromAddress, $fromName));
+            $this->sendAdminNotification(
+                contactMessage: $contactMessage,
+                userMailSubject: $userMailSubject,
+                adminMailSubject: $adminMailSubject,
+                mailConfig: $mailConfig,
+            );
 
             return false;
         } catch (\Throwable $e) {
@@ -83,5 +68,71 @@ class SendAuthenticatedContactMessageAction
 
             return true;
         }
+    }
+
+    /**
+     * @return array{adminEmail: string, fromAddress: string, fromName: string}
+     */
+    private function buildMailConfig(): array
+    {
+        $settings = array_replace(array_fill_keys(self::EMAIL_SETTING_KEYS, ''), Setting::stringValues(self::EMAIL_SETTING_KEYS));
+
+        app(ConfiguredMailSettings::class)->apply($settings);
+
+        return [
+            'adminEmail' => $settings['admin_email'] ?: (string) config('mail.from.address'),
+            'fromAddress' => $settings['from_address'] ?: (string) config('mail.from.address'),
+            'fromName' => $settings['from_name'] !== '' ? $settings['from_name'] : (string) config('mail.from.name'),
+        ];
+    }
+
+    private function resolveTrackingPixelUrl(User $user, string $messageBody, string $userMailSubject): ?string
+    {
+        if (! $user->owner instanceof Owner) {
+            return null;
+        }
+
+        $recipient = app(RecordDirectMessageRecipientAction::class)->execute(
+            owner: $user->owner,
+            contact: (string) $user->email,
+            subject: ContactConfirmationSubject::forAudit($userMailSubject),
+            body: $messageBody,
+            sentByUserId: $user->id,
+        );
+
+        return app(CampaignTrackingUrlBuilder::class)->openPixelUrl($recipient->tracking_token);
+    }
+
+    /**
+     * @param  array{adminEmail: string, fromAddress: string, fromName: string}  $mailConfig
+     */
+    private function sendUserConfirmation(
+        User $user,
+        ContactMailData $contactMailData,
+        array $mailConfig,
+        ?string $trackingPixelUrl,
+    ): void {
+        Mail::to($user->email)->send(new ContactConfirmation(
+            $contactMailData,
+            $mailConfig['fromAddress'],
+            $mailConfig['fromName'],
+            $trackingPixelUrl,
+        ));
+    }
+
+    /**
+     * @param  array{adminEmail: string, fromAddress: string, fromName: string}  $mailConfig
+     */
+    private function sendAdminNotification(
+        ContactMessage $contactMessage,
+        string $userMailSubject,
+        ?string $adminMailSubject,
+        array $mailConfig,
+    ): void {
+        $adminContactMessage = $contactMessage->replicate();
+        $adminContactMessage->subject = $adminMailSubject ?? $userMailSubject;
+
+        Mail::to($mailConfig['adminEmail'])
+            ->send(new ContactNotification($adminContactMessage, null, $mailConfig['fromAddress'], $mailConfig['fromName']));
     }
 }

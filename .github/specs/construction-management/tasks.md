@@ -521,7 +521,7 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/PublicConstructionInquiryFormTest.php`
 
 ### Zuzenketak 4
-- [ ] `locations.code` kendu, `properties.code` gehitu, `admin/finkak/{id}`-n hasierako taula berria gehitu kodearekin, owner sortze-formetik eta `admin/jabeak` + jabeen PDFtik `ZBKIA` kendu, jabetza-zutabeetan propietate-kodea aurretik erakutsi, eta `admin/jabeak` zerrenda `Atariak` zutabearen arabera gorantz ordenatu hutsak amaieran utzita.
+- [x] `locations.code` kendu, `properties.code` gehitu, `admin/finkak/{id}`-n hasierako taula berria gehitu kodearekin, owner sortze-formetik eta `admin/jabeak` + jabeen PDFtik `ZBKIA` kendu, jabetza-zutabeetan propietate-kodea aurretik erakutsi, eta `admin/jabeak` zerrenda `Atariak` zutabearen arabera gorantz ordenatu hutsak amaieran utzita.
 
 ## Implementation Plan - Zuzenketak 4
 
@@ -562,7 +562,7 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersAndLocationsTest.php`
 - [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact tests/Feature/AdminOwnersPdfDownloadTest.php`
 - [ ] Gehitu/eguneratu finken detailerako test fokalizatua (`LocationDetail` / route show)
-- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
 
 
 ### Zuzenketak 5
@@ -571,3 +571,51 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [ ] en el front de bozketak añadir en cada bozketa la fecha incio y fin a la derecha
 - [ ] repasa el home del front, la página iragakiak, la de bozketak, la de obras y el profila. Las fechas en euskera son año mes y dia y en castellano dia mes y año. Corrígelas.
 - [ ] busca en todo el código dónde se utiliza coprop1_name o coprop2_name y preguntame si quiero cambiarlo por fullName1/fullName2 o no.
+
+## Implementation Plan - Zuzenketak 5
+
+### Goal
+
+- [ ] Obrako iragarkien frontend zerrenda arindu: lehenetsita data + titulua bakarrik erakutsi, xehetasuna (edukia + dokumentuak) desplegable bihurtu, eta irekitze-ekintzak owner mailan trazatu.
+- [ ] Admin `iragarkiak` zerrendan, obra bati lotutako iragarkietan bars ikonodun ekintza gehitu irekitze-egoera (zein owner-ek ireki duen/ez duen) kontsultatzeko.
+- [ ] Front `bozketak` txarteletan hasiera/amaiera datak eskuinean erakutsi eta data-formatu lokala bateratu home/notices/bozketak/obrak/profila pantailetan.
+- [ ] `coprop1_name` / `coprop2_name` erabileren inbentario osoa osatu eta erabiltzaileari baieztapena eskatu izen-aldaketa (`fullName1` / `fullName2`) egin aurretik.
+
+### Technical Decisions
+
+- [ ] Obrako iragarkien irekiera-trackinga DB taula dedikatu batekin egin (`notice_id`, `owner_id`, `opened_at`, `ip_address`, `user_id`), gutxienez owner+notice bikote bakarra bermatuz (irekia/ez-irekia egoera kalkulatzeko).
+- [ ] Fronteko desplegable-interakzioa Alpine bidez egin (KISS): klik bakoitzean ireki/itxi, eta lehen irekitze baliodunean backend endpoint/Livewire action bidez tracking erregistroa sortu.
+- [ ] Admin zerrendarako lehendik dagoen osagai eredua berrerabili (`table-row-actions` bars ikonoa), obrarekin lotutako iragarkietan bakarrik aktibatuta.
+- [ ] Data-formatua helper bakarrean zentralizatu (locale-aware), bikoizketak saihesteko eta Blade guztietan irizpide bera aplikatzeko: EU = `Y/m/d`, ES = `d/m/Y` (eta datetime kasuetan baliokidearekin).
+- [ ] `database-schema-mermaid` skill fitxategian ERD eguneraketa egin aldaketa berean (taula berria + erlazioak).
+
+### Execution Steps
+
+- [ ] 1. Azpiegitura: notice-open tracking taula/migrazioa + modeloa + erlazioak (`Notice`, `Owner`, beharrezkoa bada `User`) eta indize/unikotasun arauak.
+- [ ] 2. Obraren frontend detaila: iragarkiak `date+title` laburpen zerrendan renderizatu, ordena beherakorra mantendu, eta item bakoitzean togglable edukia/dokumentuak gehitu.
+- [ ] 3. Tracking lotura: iragarki bat irekitzean owner-aren irekiera erregistratu (idempotentea) eta segurtasuna/baimenak egiaztatu (`auth` + owner ebazpena).
+- [ ] 4. Admin `iragarkiak`: obra-tag lotura duten errenkadetan bars botoia gehitu eta modal/panelean owner ireki/ez-ireki zerrenda erakutsi.
+- [ ] 5. Front `bozketak`: txartel bakoitzean hasiera/amaiera datak eskuineko blokera gehitu, responsive portaera zainduta.
+- [ ] 6. Data-formatu bateratzea: home, iragarkiak, bozketak, obrak eta profila pantailetan helper berria edo osagai bateratua aplikatu.
+- [ ] 7. `coprop1_name`/`coprop2_name` erabileren txostena prestatu eta erabiltzaileari galdetu izen-aldaketa exekutatu nahi duen ala ez (baieztapenik gabe ez aldatu).
+- [ ] 8. `database-schema-mermaid` skill ERD eguneratu eta sintaxia balidatu.
+- [ ] 9. Balidazioa: test Unit/Feature/Dusk fokalizatuak + pint + quality gate.
+
+### Work Items
+
+- [ ] Obrako frontend iragarkiak: [resources/views/public/constructions/show.blade.php](resources/views/public/constructions/show.blade.php), controller lotura [app/Http/Controllers/PublicConstructionController.php](app/Http/Controllers/PublicConstructionController.php).
+- [ ] Admin iragarkiak: [app/Livewire/AdminNoticeManager.php](app/Livewire/AdminNoticeManager.php), [resources/views/livewire/admin/notice-manager.blade.php](resources/views/livewire/admin/notice-manager.blade.php), eta osagai laguntzailea [resources/views/components/admin/table-row-actions.blade.php](resources/views/components/admin/table-row-actions.blade.php).
+- [ ] Bozketen frontend: [resources/views/livewire/front/public-votings.blade.php](resources/views/livewire/front/public-votings.blade.php).
+- [ ] Data-formatu helburuak: [resources/views/components/front/notice-card.blade.php](resources/views/components/front/notice-card.blade.php), [resources/views/public/constructions/index.blade.php](resources/views/public/constructions/index.blade.php), [resources/views/public/constructions/show.blade.php](resources/views/public/constructions/show.blade.php), [resources/views/public/profile.blade.php](resources/views/public/profile.blade.php), eta lotutako helper/controller puntuak.
+- [ ] Tracking datu-egitura berria: `database/migrations/**`, `app/Models/**`, eta beharrezko route/controller edo Livewire endpoint-a.
+- [ ] Mermaid ERD skilla: [.github/skills/database-schema-mermaid/SKILL.md](.github/skills/database-schema-mermaid/SKILL.md).
+- [ ] `coprop*` inbentarioa (jada bildua) eta erabaki-puntua: app/resources/tests/database/lang multzoan dauden erabilerak.
+
+### Validation
+
+- [ ] Unit/Feature test fokalak tracking eta admin zerrenda berriarentzat (ireki/ez-ireki kalkulua, baimenak, idempotentzia).
+- [ ] Dusk test fokalizatua obrako iragarki desplegablearen UXerako eta admin bars ekintzarako (Blade aldaketa sentikorra denez).
+- [ ] Dusk test fokalizatua bozketen txarteletako data-bloke berriarentzat eta frontend data-formatu lokaletarako smoke egiaztapenarekin.
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty`
+- [ ] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact <tests-afectados>`
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`
