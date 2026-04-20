@@ -9,7 +9,7 @@ return [
     'tabs_aria' => 'Profilaren fitxak',
     'tabs' => [
         'overview' => 'Laburpena',
-        'votings' => 'Nire bozketak',
+        'votings' => 'Bozketak',
         'sessions' => 'Saioak',
         'received' => 'Jasotako mezuak',
         'messages' => 'Bidalitako mezuak',

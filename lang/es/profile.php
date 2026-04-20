@@ -9,7 +9,7 @@ return [
     'tabs_aria' => 'Pestanas del perfil',
     'tabs' => [
         'overview' => 'Resumen',
-        'votings' => 'Mis votaciones',
+        'votings' => 'Votaciones',
         'sessions' => 'Sesiones',
         'received' => 'Mensajes recibidos',
         'messages' => 'Mensajes enviados',
