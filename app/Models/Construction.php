@@ -85,6 +85,6 @@ class Construction extends Model
 
     public function getTagSlugAttribute(): string
     {
-        return 'obra-' . $this->slug;
+        return $this->slug;
     }
 }

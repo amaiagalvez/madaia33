@@ -188,6 +188,10 @@ return [
             'activate' => 'Aktibatu',
             'deactivate' => 'Desaktibatu',
         ],
+        'validation' => [
+            'slug_invalid' => 'Obraren izenburutik slug baliodun bat sortu behar da.',
+            'slug_unique' => 'Izenburu horrekin dagoeneko beste obra bat badago.',
+        ],
     ],
     'construction_inquiries' => [
         'menu' => 'Obra-kontsultak',

@@ -188,6 +188,10 @@ return [
             'activate' => 'Activar',
             'deactivate' => 'Desactivar',
         ],
+        'validation' => [
+            'slug_invalid' => 'Debe generarse un slug válido a partir del titulo de la obra.',
+            'slug_unique' => 'Ya existe otra obra con ese titulo.',
+        ],
     ],
     'construction_inquiries' => [
         'menu' => 'Consultas de obras',

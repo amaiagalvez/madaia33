@@ -487,8 +487,8 @@ it('shows only assigned construction tags to construction manager', function () 
 
     $manager->constructions()->sync([$assignedConstruction->id]);
 
-    $assignedTag = NoticeTag::query()->where('slug', 'obra-' . $assignedConstruction->slug)->firstOrFail();
-    $otherTag = NoticeTag::query()->where('slug', 'obra-' . $otherConstruction->slug)->firstOrFail();
+    $assignedTag = NoticeTag::query()->where('slug', $assignedConstruction->slug)->firstOrFail();
+    $otherTag = NoticeTag::query()->where('slug', $otherConstruction->slug)->firstOrFail();
 
     Livewire::actingAs($manager)
         ->test('admin-notice-manager')
@@ -514,7 +514,7 @@ it('forbids construction manager from assigning unowned construction tag', funct
 
     $manager->constructions()->sync([$assignedConstruction->id]);
 
-    $otherTag = NoticeTag::query()->where('slug', 'obra-' . $otherConstruction->slug)->firstOrFail();
+    $otherTag = NoticeTag::query()->where('slug', $otherConstruction->slug)->firstOrFail();
 
     Livewire::actingAs($manager)
         ->test('admin-notice-manager')

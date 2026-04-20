@@ -31,6 +31,9 @@ return [
     'profile_title' => 'Consulta tu perfil siempre que lo necesites',
     'profile_summary' => 'Entra en tu perfil para revisar tus datos, sesiones, mensajes y resumen de votaciones.',
     'profile_cta' => 'Ver perfil',
+    'constructions_badge' => 'Obras activas',
+    'constructions_title' => 'Obras que estan en curso ahora',
+    'constructions_summary' => 'Selecciona una obra para revisar detalles, avisos vinculados y contacto directo.',
     'promises' => [
         'informed_title' => 'Mantenerse al día',
         'informed_body' => 'Los avisos recientes y la información útil aparecen en primer plano.',

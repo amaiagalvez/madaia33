@@ -110,10 +110,7 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerViewComposers(): void
     {
-        View::composer([
-            'layouts.front.main',
-            'layouts::front.main',
-        ], VotingsNavigationComposer::class);
+        View::composer('*', VotingsNavigationComposer::class);
 
         View::composer([
             'components.front.public-brand-link',

@@ -31,6 +31,9 @@ return [
     'profile_title' => 'Nahi duzunean kontsulta dezakezu zure profila',
     'profile_summary' => 'Sartu profilera eta berrikusi zure datuak, saioak, mezuak eta bozketen laburpena.',
     'profile_cta' => 'Profila ikusi',
+    'constructions_badge' => 'Obra aktiboak',
+    'constructions_title' => 'Une honetan martxan dauden obrak',
+    'constructions_summary' => 'Aukeratu obra bat eta ikusi xehetasunak, lotutako iragarkiak eta kontaktu zuzena.',
     'promises' => [
         'informed_title' => 'Eguneratuta egoteko',
         'informed_body' => 'Iragarki berriak eta informazio erabilgarria lehen planoan ikusten dira.',

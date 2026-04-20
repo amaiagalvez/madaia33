@@ -12,7 +12,10 @@
 - [ ] dusk-test
 
 # Code
-- [ ] crear un aviso para las votaciones activas
+- [ ] crear un aviso para las votaciones activas: crear un cron que mire a qué votaciones activas les faltan 3 días para terminarse, que prepare una bidalketa solo para los owner que no hayan votado en alguna de las votaciones que haya encontrado (puede que los owner hayan votado unas si y otras no) y lo envie poniendo en marcha la queue existente. En el texto de la bidalketa que ponga algo así Aviso automático, faltan 3 días para que se terminen las siguientes votaciones y a continuación la lista de votaciones con un enlace a la url de votaciones del front, en el idioma que tenga configurado el owner.
+Añadir un botón en el listado de votaciones que haga lo mismo.
+- [ ] repetir lo anterior, pero buscando solo las votaciones que terminan el día actual (ojo! no repetir código)
+
 - [ ] spec kiro pendientes (obra)
 - [ ] Estatutos de la comunidad y de cada portal o planta de garaje. Permisos, quien ve qué
 - Aktak

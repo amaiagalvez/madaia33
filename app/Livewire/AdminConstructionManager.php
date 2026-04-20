@@ -80,18 +80,15 @@ class AdminConstructionManager extends Component
         $validated = $this->validate($this->rules());
 
         $construction = $this->editingConstructionId !== null
-          ? Construction::query()->findOrFail($this->editingConstructionId)
-          : new Construction;
+            ? Construction::query()->findOrFail($this->editingConstructionId)
+            : new Construction;
 
         $construction->title = $validated['title'];
         $construction->description = $validated['description'] !== '' ? $validated['description'] : null;
         $construction->starts_at = $validated['startsAt'];
         $construction->ends_at = $validated['endsAt'] !== '' ? $validated['endsAt'] : null;
         $construction->is_active = (bool) $validated['isActive'];
-
-        if (blank($construction->slug)) {
-            $construction->slug = Str::slug($construction->title) . '-' . (string) Str::uuid();
-        }
+        $construction->slug = Str::slug($construction->title);
 
         $construction->save();
 
@@ -187,7 +184,30 @@ class AdminConstructionManager extends Component
     private function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $slug = Str::slug((string) $value);
+
+                    if ($slug === '') {
+                        $fail(__('admin.constructions.validation.slug_invalid'));
+
+                        return;
+                    }
+
+                    $query = Construction::query()->where('slug', $slug);
+
+                    if ($this->editingConstructionId !== null) {
+                        $query->whereKeyNot($this->editingConstructionId);
+                    }
+
+                    if ($query->exists()) {
+                        $fail(__('admin.constructions.validation.slug_unique'));
+                    }
+                },
+            ],
             'description' => ['nullable', 'string'],
             'startsAt' => ['required', 'date'],
             'endsAt' => ['nullable', 'date', 'after_or_equal:startsAt'],

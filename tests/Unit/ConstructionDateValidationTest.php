@@ -6,8 +6,8 @@ it('validates construction date pairs', function () {
     $start = fake()->dateTimeBetween('-10 days', '+10 days');
     $isInvalid = fake()->boolean();
     $end = $isInvalid
-      ? (clone $start)->modify('-1 day')
-      : (clone $start)->modify('+1 day');
+        ? (clone $start)->modify('-1 day')
+        : (clone $start)->modify('+1 day');
 
     $validator = Validator::make([
         'startsAt' => $start->format('Y-m-d'),

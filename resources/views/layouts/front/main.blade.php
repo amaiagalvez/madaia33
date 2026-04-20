@@ -56,7 +56,10 @@
     @php($isGalleryRoute = request()->routeIs('gallery.*'))
     @php($isContactRoute = request()->routeIs('contact.*'))
     @php($isVotingsRoute = request()->routeIs('votings.*'))
+    @php($isConstructionsRoute = request()->routeIs('constructions.*'))
     @php($isPrivateRoute = request()->routeIs('private.*'))
+    @php($activeConstructionsNav = $activeConstructionsNav ?? collect())
+    @php($currentConstructionSlug = (string) request()->route('slug', ''))
 
     <a href="#main-content"
         class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-gray-900 focus:shadow-md focus:ring-2 focus:ring-gray-500 focus:outline-none">
@@ -107,6 +110,15 @@
                             {{ __('general.nav.votings') }}
                         </a>
                     @endif
+                    @foreach ($activeConstructionsNav as $activeConstructionNav)
+                        @php($isCurrentConstruction = $isConstructionsRoute && $currentConstructionSlug === $activeConstructionNav->slug)
+                        <a href="{{ route(\App\SupportedLocales::routeName('constructions.show'), ['slug' => $activeConstructionNav->slug]) }}"
+                            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 {{ $isCurrentConstruction ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
+                            data-nav-construction-link="{{ $activeConstructionNav->slug }}"
+                            @if ($isCurrentConstruction) aria-current="page" @endif>
+                            {{ $activeConstructionNav->title }}
+                        </a>
+                    @endforeach
                     @if ($showPrivateLink)
                         <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
                             class="rounded-xl px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 {{ $isPrivateRoute ? 'bg-[#793d3d] text-white shadow-sm shadow-[#793d3d]/25' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}"
@@ -183,6 +195,15 @@
                         {{ __('general.nav.votings') }}
                     </a>
                 @endif
+                @foreach ($activeConstructionsNav as $activeConstructionNav)
+                    @php($isCurrentConstruction = $isConstructionsRoute && $currentConstructionSlug === $activeConstructionNav->slug)
+                    <a href="{{ route(\App\SupportedLocales::routeName('constructions.show'), ['slug' => $activeConstructionNav->slug]) }}"
+                        class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ $isCurrentConstruction ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
+                        data-nav-construction-link="{{ $activeConstructionNav->slug }}"
+                        @if ($isCurrentConstruction) aria-current="page" @endif>
+                        {{ $activeConstructionNav->title }}
+                    </a>
+                @endforeach
                 @if ($showPrivateLink)
                     <a href="{{ route(\App\SupportedLocales::routeName('private')) }}"
                         class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-[#edd2c7]/45 transition-colors min-h-11 {{ $isPrivateRoute ? 'bg-[#edd2c7] text-[#793d3d] font-semibold' : 'text-stone-700 hover:text-[#793d3d]' }}"
@@ -197,8 +218,8 @@
                         </p>
                         <a href="{{ route(\App\SupportedLocales::routeName('profile')) }}"
                             class="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 transition-colors hover:bg-[#edd2c7]/45 hover:text-[#793d3d]">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" aria-hidden="true">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                             </svg>

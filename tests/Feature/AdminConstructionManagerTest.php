@@ -3,6 +3,7 @@
 use App\Models\Role;
 use App\Models\User;
 use Livewire\Livewire;
+use App\Models\NoticeTag;
 use App\Models\Construction;
 
 beforeEach(function (): void {
@@ -119,4 +120,46 @@ it('admin constructions route allows construction manager role', function () {
     $response = $this->actingAs($user)->get(route('admin.constructions'));
 
     $response->assertOk();
+});
+
+it('prevents creating two constructions with the same simple slug', function () {
+    $user = User::factory()->create();
+    $user->assignRole(Role::SUPER_ADMIN);
+
+    Construction::factory()->create([
+        'title' => 'Obra Errepikatua',
+        'slug' => 'obra-errepikatua',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-construction-manager')
+        ->call('createConstruction')
+        ->set('title', 'Obra Errepikatua')
+        ->set('startsAt', now()->toDateString())
+        ->set('isActive', true)
+        ->call('saveConstruction')
+        ->assertHasErrors(['title']);
+});
+
+it('updates construction slug and notice tag after editing title', function () {
+    $user = User::factory()->create();
+    $user->assignRole(Role::SUPER_ADMIN);
+
+    $construction = Construction::factory()->create([
+        'title' => 'Aurreko izena',
+        'slug' => 'aurreko-izena',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-construction-manager')
+        ->call('editConstruction', $construction->id)
+        ->set('title', 'Izen berria')
+        ->call('saveConstruction')
+        ->assertHasNoErrors();
+
+    $updatedConstruction = $construction->fresh();
+
+    expect($updatedConstruction?->slug)->toBe('izen-berria')
+        ->and(NoticeTag::query()->where('slug', 'izen-berria')->exists())->toBeTrue()
+        ->and(NoticeTag::query()->where('slug', 'aurreko-izena')->exists())->toBeFalse();
 });

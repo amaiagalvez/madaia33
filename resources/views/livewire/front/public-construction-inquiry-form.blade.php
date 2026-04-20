@@ -14,33 +14,6 @@
     @endif
 
     <form wire:submit="submit" class="mt-6 space-y-4" novalidate>
-        <div>
-            <label for="construction-inquiry-name"
-                class="mb-1 block text-sm font-medium text-gray-700">
-                {{ __('constructions.inquiry.name') }}
-            </label>
-            <input id="construction-inquiry-name" type="text" wire:model="name"
-                class="block w-full min-h-11 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
-                @if ($errors->has('name')) aria-invalid="true" aria-describedby="construction-inquiry-name-error" @endif>
-            @error('name')
-                <p id="construction-inquiry-name-error" class="mt-1 text-sm text-red-600">
-                    {{ $message }}</p>
-            @enderror
-        </div>
-
-        <div>
-            <label for="construction-inquiry-email"
-                class="mb-1 block text-sm font-medium text-gray-700">
-                {{ __('constructions.inquiry.email') }}
-            </label>
-            <input id="construction-inquiry-email" type="email" wire:model="email"
-                class="block w-full min-h-11 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
-                @if ($errors->has('email')) aria-invalid="true" aria-describedby="construction-inquiry-email-error" @endif>
-            @error('email')
-                <p id="construction-inquiry-email-error" class="mt-1 text-sm text-red-600">
-                    {{ $message }}</p>
-            @enderror
-        </div>
 
         <div>
             <label for="construction-inquiry-subject"

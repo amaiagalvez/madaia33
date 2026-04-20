@@ -33,6 +33,12 @@ test('authenticated user can browse public constructions and open a detail page'
             ->click('[data-construction-link="' . $construction->slug . '"]')
             ->waitFor('[data-page="construction-show"]')
             ->assertSee($construction->title)
+            ->assertPresent('[data-construction-header-card]')
+            ->assertPresent('[data-construction-contact-trigger]')
+            ->assertMissing('[data-construction-timeline]')
+            ->assertMissing('[data-construction-inquiry-form-inline]')
+            ->click('[data-construction-contact-trigger]')
+            ->waitFor('[data-construction-inquiry-modal]')
             ->assertSee(__('constructions.inquiry.title'));
     });
 });

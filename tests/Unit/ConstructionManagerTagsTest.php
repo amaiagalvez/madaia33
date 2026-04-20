@@ -18,13 +18,13 @@ it('returns exactly assigned construction tags for manager', function () {
     $manager->constructions()->sync($assignedConstructions->pluck('id')->all());
 
     $expectedSlugs = $assignedConstructions
-        ->map(fn (Construction $construction): string => 'obra-' . $construction->slug)
+        ->map(fn (Construction $construction): string => $construction->slug)
         ->sort()
         ->values()
         ->all();
 
     $selectedSlugs = NoticeTag::query()
-        ->whereIn('slug', $manager->constructions()->pluck('constructions.slug')->map(fn (string $slug): string => 'obra-' . $slug)->all())
+        ->whereIn('slug', $manager->constructions()->pluck('constructions.slug')->all())
         ->pluck('slug')
         ->sort()
         ->values()

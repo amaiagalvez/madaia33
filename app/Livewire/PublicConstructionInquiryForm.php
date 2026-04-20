@@ -15,10 +15,6 @@ class PublicConstructionInquiryForm extends Component
 {
     public int $constructionId;
 
-    public string $name = '';
-
-    public string $email = '';
-
     public string $subject = '';
 
     public string $message = '';
@@ -33,9 +29,7 @@ class PublicConstructionInquiryForm extends Component
 
         /** @var User|null $user */
         $user = Auth::user();
-
-        $this->name = $user->name;
-        $this->email = $user->email;
+        abort_unless($user !== null, 403);
     }
 
     /**
@@ -44,8 +38,6 @@ class PublicConstructionInquiryForm extends Component
     protected function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:5000',
         ];
@@ -57,9 +49,6 @@ class PublicConstructionInquiryForm extends Component
     protected function messages(): array
     {
         return [
-            'name.required' => __('constructions.inquiry.validation.name_required'),
-            'email.required' => __('constructions.inquiry.validation.email_required'),
-            'email.email' => __('constructions.inquiry.validation.email_invalid'),
             'subject.required' => __('constructions.inquiry.validation.subject_required'),
             'message.required' => __('constructions.inquiry.validation.message_required'),
         ];
@@ -67,6 +56,10 @@ class PublicConstructionInquiryForm extends Component
 
     public function submit(): void
     {
+        /** @var User|null $user */
+        $user = Auth::user();
+        abort_unless($user !== null, 403);
+
         $this->validate();
 
         $construction = Construction::query()
@@ -77,8 +70,8 @@ class PublicConstructionInquiryForm extends Component
         $inquiry = ConstructionInquiry::query()->create([
             'construction_id' => $construction->id,
             'user_id' => Auth::id(),
-            'name' => $this->name,
-            'email' => $this->email,
+            'name' => $user->name,
+            'email' => $user->email,
             'subject' => $this->subject,
             'message' => $this->message,
         ]);

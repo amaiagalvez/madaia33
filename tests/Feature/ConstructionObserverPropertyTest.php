@@ -9,7 +9,7 @@ it('creates exactly one observer tag per construction', function () {
         'title' => $title,
     ]);
 
-    $slug = 'obra-' . $construction->slug;
+    $slug = $construction->slug;
 
     expect(NoticeTag::query()->where('slug', $slug)->count())->toBe(1)
         ->and(NoticeTag::query()->where('slug', $slug)->value('name_eu'))->toContain($construction->title);

@@ -52,7 +52,7 @@ trait ManagesAdminNoticeFilters
 
         $allowedTagIds = $this->availableNoticeTags()
             ->pluck('id')
-            ->map(static fn(int $id): string => (string) $id)
+            ->map(static fn (int $id): string => (string) $id)
             ->all();
 
         if (! in_array($filter, $allowedTagIds, true)) {
@@ -73,7 +73,6 @@ trait ManagesAdminNoticeFilters
         if ($user?->hasRole(Role::CONSTRUCTION_MANAGER)) {
             $slugs = $user->constructions()
                 ->pluck('constructions.slug')
-                ->map(static fn(string $slug): string => 'obra-' . $slug)
                 ->all();
 
             if ($slugs === []) {
@@ -99,7 +98,7 @@ trait ManagesAdminNoticeFilters
         $query = Notice::with([
             'locations.location',
             'tag',
-            'documents' => fn($documentQuery) => $documentQuery->withCount('downloads'),
+            'documents' => fn ($documentQuery) => $documentQuery->withCount('downloads'),
         ]);
 
         $this->applySearchFilter($query);
