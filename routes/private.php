@@ -38,43 +38,43 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
         ]);
     })->name('dashboard');
 
-    Route::get('/iragarkiak', fn() => view('admin.notices'))
+    Route::get('/iragarkiak', fn () => view('admin.notices'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('notices');
-    Route::get('/bidalketak', fn() => view('admin.campaigns'))
+    Route::get('/bidalketak', fn () => view('admin.campaigns'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns');
-    Route::get('/bidalketak/txantiloiak', fn() => view('admin.campaign-templates'))
+    Route::get('/bidalketak/txantiloiak', fn () => view('admin.campaign-templates'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns.templates');
-    Route::get('/bidalketak/kontaktu-okerrak', fn() => view('admin.invalid-contacts'))
+    Route::get('/bidalketak/kontaktu-okerrak', fn () => view('admin.invalid-contacts'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns.invalid-contacts');
-    Route::get('/bidalketak/{campaign}', fn(Campaign $campaign) => view('admin.campaign-detail', ['campaign' => $campaign]))
+    Route::get('/bidalketak/{campaign}', fn (Campaign $campaign) => view('admin.campaign-detail', ['campaign' => $campaign]))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns.show');
     Route::get('/bidalketak/{campaign}/whatsapp-csv', CampaignWhatsappCsvController::class)
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('campaigns.whatsapp-csv');
-    Route::get('/argazkiak', fn() => view('admin.images'))
+    Route::get('/argazkiak', fn () => view('admin.images'))
         ->middleware('role:superadmin')
         ->name('images');
-    Route::get('/mezuak', fn() => view('admin.messages'))
+    Route::get('/mezuak', fn () => view('admin.messages'))
         ->middleware('role:superadmin,admin_general')
         ->name('messages');
-    Route::get('/konfigurazioa', fn() => view('admin.settings'))
+    Route::get('/konfigurazioa', fn () => view('admin.settings'))
         ->middleware('role:superadmin')
         ->name('settings');
-    Route::get('/atariak', fn() => view('admin.locations.index', ['type' => 'portal']))
+    Route::get('/atariak', fn () => view('admin.locations.index', ['type' => 'portal']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.portals');
-    Route::get('/lokalak', fn() => view('admin.locations.index', ['type' => 'local']))
+    Route::get('/lokalak', fn () => view('admin.locations.index', ['type' => 'local']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.locals');
-    Route::get('/garajeak', fn() => view('admin.locations.index', ['type' => 'garage']))
+    Route::get('/garajeak', fn () => view('admin.locations.index', ['type' => 'garage']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.garages');
-    Route::get('/trasteroak', fn() => view('admin.locations.index', ['type' => 'storage']))
+    Route::get('/trasteroak', fn () => view('admin.locations.index', ['type' => 'storage']))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('locations.storages');
     Route::get('/finkak/{location}', function (Location $location) {
@@ -85,13 +85,13 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
 
         return view('admin.locations.show', ['location' => $location]);
     })->name('locations.show');
-    Route::get('/jabeak', fn() => view('admin.owners.index'))
+    Route::get('/jabeak', fn () => view('admin.owners.index'))
         ->middleware('role:superadmin')
         ->name('owners.index');
     Route::get('/jabeak/pdf', OwnersPdfController::class)
         ->middleware('role:superadmin')
         ->name('owners.pdf');
-    Route::get('/bozketak', fn() => view('admin.votings'))
+    Route::get('/bozketak', fn () => view('admin.votings'))
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings');
     Route::get('/bozketak/{voting}/emaitzak', [VotingResultsController::class, 'show'])
@@ -107,13 +107,13 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/bozketak/pdf/emaitzak', [VotingPdfController::class, 'adminResults'])
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings.pdf.results');
-    Route::get('/obras', fn() => view('admin.constructions'))
+    Route::get('/obras', fn () => view('admin.constructions'))
         ->middleware('role:superadmin,admin_general,construction_manager')
         ->name('constructions');
-    Route::get('/consultas-obras', fn() => view('admin.construction-inquiries'))
+    Route::get('/consultas-obras', fn () => view('admin.construction-inquiries'))
         ->middleware('role:superadmin,admin_general,construction_manager')
         ->name('construction-inquiries');
-    Route::get('/erabiltzaileak', fn() => view('admin.users.index'))
+    Route::get('/erabiltzaileak', fn () => view('admin.users.index'))
         ->middleware('role:superadmin')
         ->name('users.index');
 

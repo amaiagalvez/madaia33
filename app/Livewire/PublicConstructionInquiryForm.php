@@ -13,89 +13,89 @@ use App\Mail\ConstructionInquiryNotificationMail;
 
 class PublicConstructionInquiryForm extends Component
 {
-  public int $constructionId;
+    public int $constructionId;
 
-  public string $name = '';
+    public string $name = '';
 
-  public string $email = '';
+    public string $email = '';
 
-  public string $subject = '';
+    public string $subject = '';
 
-  public string $message = '';
+    public string $message = '';
 
-  public ?string $statusType = null;
+    public ?string $statusType = null;
 
-  public string $statusMessage = '';
+    public string $statusMessage = '';
 
-  public function mount(int $constructionId): void
-  {
-    $this->constructionId = $constructionId;
+    public function mount(int $constructionId): void
+    {
+        $this->constructionId = $constructionId;
 
-    /** @var User|null $user */
-    $user = Auth::user();
+        /** @var User|null $user */
+        $user = Auth::user();
 
-    $this->name = $user->name;
-    $this->email = $user->email;
-  }
+        $this->name = $user->name;
+        $this->email = $user->email;
+    }
 
-  /**
-   * @return array<string, string>
-   */
-  protected function rules(): array
-  {
-    return [
-      'name' => 'required|string|max:255',
-      'email' => 'required|email|max:255',
-      'subject' => 'required|string|max:255',
-      'message' => 'required|string|max:5000',
-    ];
-  }
+    /**
+     * @return array<string, string>
+     */
+    protected function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:5000',
+        ];
+    }
 
-  /**
-   * @return array<string, string>
-   */
-  protected function messages(): array
-  {
-    return [
-      'name.required' => __('constructions.inquiry.validation.name_required'),
-      'email.required' => __('constructions.inquiry.validation.email_required'),
-      'email.email' => __('constructions.inquiry.validation.email_invalid'),
-      'subject.required' => __('constructions.inquiry.validation.subject_required'),
-      'message.required' => __('constructions.inquiry.validation.message_required'),
-    ];
-  }
+    /**
+     * @return array<string, string>
+     */
+    protected function messages(): array
+    {
+        return [
+            'name.required' => __('constructions.inquiry.validation.name_required'),
+            'email.required' => __('constructions.inquiry.validation.email_required'),
+            'email.email' => __('constructions.inquiry.validation.email_invalid'),
+            'subject.required' => __('constructions.inquiry.validation.subject_required'),
+            'message.required' => __('constructions.inquiry.validation.message_required'),
+        ];
+    }
 
-  public function submit(): void
-  {
-    $this->validate();
+    public function submit(): void
+    {
+        $this->validate();
 
-    $construction = Construction::query()
-      ->active()
-      ->with('managers:id,email')
-      ->findOrFail($this->constructionId);
+        $construction = Construction::query()
+            ->active()
+            ->with('managers:id,email')
+            ->findOrFail($this->constructionId);
 
-    $inquiry = ConstructionInquiry::query()->create([
-      'construction_id' => $construction->id,
-      'user_id' => Auth::id(),
-      'name' => $this->name,
-      'email' => $this->email,
-      'subject' => $this->subject,
-      'message' => $this->message,
-    ]);
+        $inquiry = ConstructionInquiry::query()->create([
+            'construction_id' => $construction->id,
+            'user_id' => Auth::id(),
+            'name' => $this->name,
+            'email' => $this->email,
+            'subject' => $this->subject,
+            'message' => $this->message,
+        ]);
 
-    $construction->managers
-      ->filter(fn($manager): bool => filled($manager->email))
-      ->each(function ($manager) use ($inquiry, $construction): void {
-        Mail::to($manager->email)->send(new ConstructionInquiryNotificationMail($inquiry, $construction));
-      });
+        $construction->managers
+            ->filter(fn ($manager): bool => filled($manager->email))
+            ->each(function ($manager) use ($inquiry, $construction): void {
+                Mail::to($manager->email)->send(new ConstructionInquiryNotificationMail($inquiry, $construction));
+            });
 
-    $this->reset(['subject', 'message']);
-    $this->statusType = 'success';
-    $this->statusMessage = __('constructions.inquiry.success');
-  }
+        $this->reset(['subject', 'message']);
+        $this->statusType = 'success';
+        $this->statusMessage = __('constructions.inquiry.success');
+    }
 
-  public function render(): View
-  {
-    return view('livewire.front.public-construction-inquiry-form');
-  }
+    public function render(): View
+    {
+        return view('livewire.front.public-construction-inquiry-form');
+    }
 }

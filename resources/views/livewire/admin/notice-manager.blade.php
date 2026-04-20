@@ -59,6 +59,31 @@
         @endunless
     </div>
 
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <x-admin.filter-input id="notices-search" :label="__('notices.admin.search')" :placeholder="__('notices.admin.search')"
+            wire:model.live.debounce.300ms="search" data-notice-search />
+
+        <x-admin.filter-toggle-group data-notice-tag-filters>
+            <x-admin.filter-toggle-button wire:click="setTagFilter('all')"
+                data-notice-tag-filter="all" key="all" :active="$tagFilter === 'all'">
+                {{ __('general.buttons.all') }}
+            </x-admin.filter-toggle-button>
+
+            <x-admin.filter-toggle-button wire:click="setTagFilter('untagged')"
+                data-notice-tag-filter="untagged" key="untagged" :active="$tagFilter === 'untagged'">
+                {{ __('notices.admin.filter_without_tag') }}
+            </x-admin.filter-toggle-button>
+
+            @foreach ($noticeTags as $tag)
+                <x-admin.filter-toggle-button wire:click="setTagFilter('{{ $tag->id }}')"
+                    data-notice-tag-filter="{{ $tag->id }}" key="tag-{{ $tag->id }}"
+                    :active="$tagFilter === (string) $tag->id">
+                    {{ $tag->name }}
+                </x-admin.filter-toggle-button>
+            @endforeach
+        </x-admin.filter-toggle-group>
+    </div>
+
     {{-- Right panel form --}}
     @if ($showForm)
         <x-admin.side-panel-form section="notice-create-form" card-id="admin-notice-form-card"
@@ -86,46 +111,71 @@
                         model="selectedLocations" value-key="code" label-key="label"
                         :empty-message="__('notices.admin.global_only')" />
 
-                    <flux:field>
-                        <flux:label>{{ __('notices.admin.documents') }}</flux:label>
-                        <input type="file" wire:model="attachments" multiple
-                            data-notice-documents-input
-                            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700" />
-                        <flux:error name="attachments.*" />
-                        @if ($editingId)
-                            <div class="mt-2">
-                                <flux:button type="button" variant="primary"
-                                    wire:click="uploadDocument({{ $editingId }})">
-                                    {{ __('notices.admin.upload_documents') }}
-                                </flux:button>
-                            </div>
-                        @endif
-                    </flux:field>
+                    <x-admin.form-file-input id="noticeAttachments" model="attachments" multiple
+                        :label="__('notices.admin.documents')" accept=".pdf,.docx,.xlsx,.jpg,.jpeg,.png"
+                        :hint="$editingId
+                            ? __('notices.admin.documents_auto_upload_hint')
+                            : __('notices.admin.documents_pending_hint')" data-notice-documents-input data-auto-upload="true" />
 
-                    @if ($storedDocuments !== [])
-                        <div class="space-y-2" data-notice-documents-list>
-                            @foreach ($storedDocuments as $document)
-                                <div
-                                    class="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
-                                    <div class="text-sm text-gray-700">
-                                        <span>{{ $document['filename'] }}</span>
-                                        <span class="ml-2 text-xs text-gray-500">
-                                            {{ __('notices.admin.downloads_count') }}:
-                                            {{ $document['downloads_count'] }}
-                                        </span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <flux:button type="button" size="xs" variant="ghost"
-                                            wire:click="toggleDocumentPublic({{ $document['id'] }})">
-                                            {{ $document['is_public'] ? __('notices.admin.document_public') : __('notices.admin.document_private') }}
-                                        </flux:button>
-                                        <flux:button type="button" size="xs" variant="danger"
-                                            wire:click="removeDocument({{ $document['id'] }})">
-                                            {{ __('general.buttons.delete') }}
-                                        </flux:button>
-                                    </div>
+                    @error('attachments.*')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+
+                    @if ($storedDocuments !== [] || $attachments !== [])
+                        <div class="space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-4"
+                            data-notice-documents-panel>
+                            @if ($storedDocuments !== [])
+                                <div data-notice-documents-list>
+                                    <p class="text-sm font-semibold text-stone-900">
+                                        {{ __('notices.admin.uploaded_documents') }}
+                                    </p>
+                                    <ul class="mt-2 space-y-2">
+                                        @foreach ($storedDocuments as $document)
+                                            <li
+                                                class="flex items-center justify-between rounded-lg border border-stone-200 bg-white px-3 py-2">
+                                                <div class="min-w-0">
+                                                    <p class="truncate text-sm text-stone-700">
+                                                        {{ $document['filename'] }}</p>
+                                                    <p class="text-xs text-stone-500">
+                                                        {{ __('notices.admin.downloads_count') }}:
+                                                        {{ $document['downloads_count'] }}
+                                                    </p>
+                                                </div>
+                                                <div class="ml-3 flex items-center gap-2">
+                                                    <button type="button"
+                                                        class="inline-flex items-center rounded-full border border-stone-300 bg-white px-2.5 py-1 text-xs font-semibold text-stone-700 transition hover:bg-stone-100"
+                                                        wire:click="toggleDocumentPublic({{ $document['id'] }})">
+                                                        {{ $document['is_public'] ? __('notices.admin.document_public') : __('notices.admin.document_private') }}
+                                                    </button>
+                                                    <x-admin.icon-button-delete
+                                                        wire:click="removeDocument({{ $document['id'] }})"
+                                                        title="{{ __('general.buttons.delete') }}" />
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
                                 </div>
-                            @endforeach
+                            @endif
+
+                            @if ($attachments !== [])
+                                <div data-notice-pending-documents>
+                                    <p class="text-sm font-semibold text-stone-900">
+                                        {{ __('notices.admin.pending_documents') }}
+                                    </p>
+                                    <ul class="mt-2 space-y-2">
+                                        @foreach ($attachments as $index => $attachment)
+                                            <li
+                                                class="flex items-center justify-between rounded-lg border border-dashed border-brand-600/40 bg-white px-3 py-2">
+                                                <span
+                                                    class="text-sm text-stone-700">{{ $attachment->getClientOriginalName() }}</span>
+                                                <x-admin.icon-button-delete
+                                                    wire:click="removePendingAttachment({{ $index }})"
+                                                    title="{{ __('general.buttons.delete') }}" />
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                         </div>
                     @endif
 

@@ -48,6 +48,7 @@ class PublicNotices extends Component
     public function getNoticesProperty(): LengthAwarePaginator
     {
         return Notice::public()
+            ->whereNull('notice_tag_id')
             ->with(['locations.location'])
             ->when($this->locationFilter !== '', function ($query) {
                 $query->where(function ($q) {

@@ -541,6 +541,34 @@ it('validates unsupported document mime type on notice save', function () {
         ->assertHasErrors(['attachments.0' => 'mimes']);
 });
 
+it('auto uploads documents when editing and can remove pending attachments in create mode', function () {
+    Storage::fake('public');
+
+    $user = adminUser();
+    $notice = Notice::factory()->create();
+
+    $editAttachment = UploadedFile::fake()->create('oharra.pdf', 20, 'application/pdf');
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('editNotice', $notice->id)
+        ->set('attachments', [$editAttachment])
+        ->assertSet('attachments', [])
+        ->assertSee('oharra.pdf');
+
+    expect(NoticeDocument::query()->where('notice_id', $notice->id)->count())->toBe(1);
+
+    $createAttachment = UploadedFile::fake()->create('zain.pdf', 20, 'application/pdf');
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('createNotice')
+        ->set('attachments', [$createAttachment])
+        ->assertSee('zain.pdf')
+        ->call('removePendingAttachment', 0)
+        ->assertSet('attachments', []);
+});
+
 it('shows notice downloads count in admin list', function () {
     $user = adminUser();
 
@@ -570,4 +598,81 @@ it('shows notice downloads count in admin list', function () {
         ->test('admin-notice-manager')
         ->assertSeeHtml('data-notice-download-count="' . $notice->id . '"')
         ->assertSee('2');
+});
+
+it('filters notices by untagged option in admin list', function () {
+    $user = adminUser();
+
+    $tag = NoticeTag::factory()->create();
+
+    $untagged = Notice::factory()->create([
+        'title_eu' => 'Iragarki etiketarik gabe',
+        'notice_tag_id' => null,
+    ]);
+
+    $tagged = Notice::factory()->create([
+        'title_eu' => 'Iragarki etiketaduna',
+        'notice_tag_id' => $tag->id,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('setTagFilter', 'untagged')
+        ->assertSee($untagged->title_eu)
+        ->assertDontSee($tagged->title_eu);
+});
+
+it('filters notices by selected tag in admin list', function () {
+    $user = adminUser();
+
+    $tagA = NoticeTag::factory()->create([
+        'name_eu' => 'A Etiketa',
+    ]);
+    $tagB = NoticeTag::factory()->create([
+        'name_eu' => 'B Etiketa',
+    ]);
+
+    $noticeA = Notice::factory()->create([
+        'title_eu' => 'A etiketako iragarkia',
+        'notice_tag_id' => $tagA->id,
+    ]);
+
+    $noticeB = Notice::factory()->create([
+        'title_eu' => 'B etiketako iragarkia',
+        'notice_tag_id' => $tagB->id,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->call('setTagFilter', (string) $tagA->id)
+        ->assertSee($noticeA->title_eu)
+        ->assertDontSee($noticeB->title_eu);
+});
+
+it('searches notices by title and content in admin list', function () {
+    $user = adminUser();
+
+    $titleMatch = Notice::factory()->create([
+        'title_eu' => 'Bilaketa titulua parekatua',
+        'content_eu' => 'Edukia arrunta',
+    ]);
+
+    $contentMatch = Notice::factory()->create([
+        'title_eu' => 'Beste izenburu bat',
+        'content_eu' => 'Hemen dago gako-hitza: terminoa',
+    ]);
+
+    $nonMatch = Notice::factory()->create([
+        'title_eu' => 'Ez dator bat',
+        'content_eu' => 'Bestelako testua',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('admin-notice-manager')
+        ->set('search', 'terminoa')
+        ->assertSee($contentMatch->title_eu)
+        ->assertDontSee($nonMatch->title_eu)
+        ->set('search', 'parekatua')
+        ->assertSee($titleMatch->title_eu)
+        ->assertDontSee($nonMatch->title_eu);
 });

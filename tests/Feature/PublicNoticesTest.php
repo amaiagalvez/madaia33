@@ -5,6 +5,7 @@
 
 use App\Models\Notice;
 use Livewire\Livewire;
+use App\Models\NoticeTag;
 use App\SupportedLocales;
 use Illuminate\Support\Facades\App;
 
@@ -28,6 +29,31 @@ it('does not show private notices on the public notices route', function (string
     $response->assertOk();
     $response->assertSee($publicTitle);
     $response->assertDontSee($privateTitle);
+})->with('supported_locales');
+
+it('does not show tagged notices on the public notices route', function (string $locale) {
+    $tag = NoticeTag::factory()->create();
+
+    $untaggedTitle = $locale === SupportedLocales::SPANISH ? 'Aviso sin etiqueta ES' : 'Iragarki etiketarik gabe EU';
+    $taggedTitle = $locale === SupportedLocales::SPANISH ? 'Aviso etiquetado ES' : 'Iragarki etiketatua EU';
+
+    Notice::factory()->public()->create([
+        'title_eu' => 'Iragarki etiketarik gabe EU',
+        'title_es' => 'Aviso sin etiqueta ES',
+        'notice_tag_id' => null,
+    ]);
+
+    Notice::factory()->public()->create([
+        'title_eu' => 'Iragarki etiketatua EU',
+        'title_es' => 'Aviso etiquetado ES',
+        'notice_tag_id' => $tag->id,
+    ]);
+
+    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+
+    $response->assertOk();
+    $response->assertSee($untaggedTitle);
+    $response->assertDontSee($taggedTitle);
 })->with('supported_locales');
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -7,23 +7,23 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Notice;
 use Livewire\Component;
-use App\Models\NoticeTag;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use App\Models\NoticeLocation;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Concerns\HandlesNoticeDocuments;
 use App\Concerns\ManagesNoticeLocations;
 use App\Concerns\BuildsLocaleFieldConfigs;
+use App\Livewire\Concerns\ManagesAdminNoticeFilters;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class AdminNoticeManager extends Component
 {
     use BuildsLocaleFieldConfigs;
     use HandlesNoticeDocuments;
+    use ManagesAdminNoticeFilters;
     use ManagesNoticeLocations;
     use WithFileUploads;
     use WithPagination;
@@ -40,6 +40,8 @@ class AdminNoticeManager extends Component
     public string $contentEs = '';
 
     public bool $isPublic = false;
+
+    public ?int $selectedTagId = null;
 
     public string $publishedAt = '';
 
@@ -68,6 +70,10 @@ class AdminNoticeManager extends Component
     public string $sortColumn = 'published_at';
 
     public string $sortDir = 'desc';
+
+    public string $search = '';
+
+    public string $tagFilter = 'all';
 
     // UI state
     public bool $showForm = false;
@@ -128,6 +134,7 @@ class AdminNoticeManager extends Component
         $this->contentEu = $notice->content_eu ?? '';
         $this->contentEs = $notice->content_es ?? '';
         $this->isPublic = $notice->is_public;
+        $this->selectedTagId = $notice->notice_tag_id;
         $this->publishedAt = $notice->published_at?->format('Y-m-d') ?? '';
         $this->originalPublishedAt = $notice->published_at?->toDateTimeString() ?? '';
         $this->selectedLocations = $notice->locations
@@ -376,6 +383,7 @@ class AdminNoticeManager extends Component
         $this->contentEu = '';
         $this->contentEs = '';
         $this->isPublic = false;
+        $this->selectedTagId = null;
         $this->publishedAt = '';
         $this->originalPublishedAt = '';
         $this->selectedLocations = [];
@@ -412,70 +420,14 @@ class AdminNoticeManager extends Component
         }
     }
 
-    /**
-     * @return Collection<int, NoticeTag>
-     */
-    private function availableNoticeTags()
-    {
-        $user = $this->currentUser();
-
-        if ($user?->hasRole(Role::CONSTRUCTION_MANAGER)) {
-            $slugs = $user->constructions()
-                ->pluck('constructions.slug')
-                ->map(static fn (string $slug): string => 'obra-' . $slug)
-                ->all();
-
-            if ($slugs === []) {
-                return collect();
-            }
-
-            return NoticeTag::query()
-                ->whereIn('slug', $slugs)
-                ->orderBy('name_eu')
-                ->get();
-        }
-
-        return NoticeTag::query()
-            ->orderBy('name_eu')
-            ->get();
-    }
-
     public function render(): View
     {
         $user = $this->currentUser();
 
         abort_unless($user?->canManageNotices(), 403);
 
-        $allowedSortColumns = ['created_at', 'is_public', 'published_at'];
-        $sortColumn = in_array($this->sortColumn, $allowedSortColumns, true) ? $this->sortColumn : 'published_at';
-        $sortDir = in_array($this->sortDir, ['asc', 'desc'], true) ? $this->sortDir : 'desc';
-
-        $notices = Notice::with([
-            'locations.location',
-            'tag',
-            'documents' => fn ($query) => $query->withCount('downloads'),
-        ])
-            ->when($user->hasRole(Role::GENERAL_ADMIN), static function ($query): void {
-                $query->whereDoesntHave('locations');
-            })
-            ->when($user->hasRole(Role::COMMUNITY_ADMIN), function ($query) use ($user): void {
-                $managedLocationIds = $user->managedLocations()->pluck('locations.id')->all();
-
-                if ($managedLocationIds === []) {
-                    $query->whereRaw('1 = 0');
-
-                    return;
-                }
-
-                $query->whereHas('locations', function ($locationsQuery) use ($managedLocationIds): void {
-                    $locationsQuery->whereIn('location_id', $managedLocationIds);
-                });
-            })
-            ->orderBy($sortColumn, $sortDir)
-            ->paginate(12);
-
         return view('livewire.admin.notice-manager', [
-            'notices' => $notices,
+            'notices' => $this->noticesQuery($user)->paginate(12),
             'allLocations' => $this->allLocationOptions(),
             'noticeTags' => $this->availableNoticeTags(),
         ]);

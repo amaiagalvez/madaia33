@@ -26,6 +26,7 @@ class PublicHomeController extends Controller
         }
 
         $latestNotices = Notice::public()
+            ->whereNull('notice_tag_id')
             ->with('locations')
             ->latest()
             ->limit(12)

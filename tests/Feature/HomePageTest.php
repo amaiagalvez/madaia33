@@ -3,6 +3,7 @@
 use App\Models\Image;
 use App\Models\Notice;
 use App\Models\Setting;
+use App\Models\NoticeTag;
 use App\SupportedLocales;
 use Illuminate\Support\Facades\Storage;
 
@@ -107,6 +108,28 @@ test('home page respects public scope for notices', function (string $locale) {
     $response->assertSuccessful();
     $response->assertSee($publicNotice->title);
     $response->assertDontSee($privateNotice->title);
+})->with('supported_locales');
+
+test('home page does not show tagged notices in frontend lists', function (string $locale) {
+    $tag = NoticeTag::factory()->create();
+
+    $untaggedNotice = Notice::factory()->public()->create([
+        'title_eu' => 'Iragarki ikusgarria EU',
+        'title_es' => 'Aviso visible ES',
+        'notice_tag_id' => null,
+    ]);
+
+    $taggedNotice = Notice::factory()->public()->create([
+        'title_eu' => 'Iragarki etiketatua EU',
+        'title_es' => 'Aviso etiquetado ES',
+        'notice_tag_id' => $tag->id,
+    ]);
+
+    $response = test()->get(route(SupportedLocales::routeName('home', $locale)));
+
+    $response->assertSuccessful();
+    $response->assertSee($untaggedNotice->title);
+    $response->assertDontSee($taggedNotice->title);
 })->with('supported_locales');
 
 test('home page latest notices are ordered by latest', function (string $locale) {

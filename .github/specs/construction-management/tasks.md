@@ -370,3 +370,44 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [ ] Verificación mínima por bloque: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test --compact <tests-afectados>`.
 - [ ] Si hay cambios en `resources/views/**`, cubrir con Dusk focalizado antes de cerrar.
 - [ ] Puerta de calidad final obligatoria: `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
+
+## Implementation Plan - Avisos dokumentuak (Bidalketak estilora)
+
+### Goal
+
+- [x] Alinear el bloque de documentos del formulario de avisos con el patrón visual y de interacción usado en el formulario de bidalketak (campañas), manteniendo comportamiento funcional actual.
+
+### Technical Decisions
+
+- [x] Tomar como referencia el bloque de adjuntos en [resources/views/livewire/admin/campaign-manager.blade.php](resources/views/livewire/admin/campaign-manager.blade.php) y aplicar el mismo lenguaje visual en [resources/views/livewire/admin/notice-manager.blade.php](resources/views/livewire/admin/notice-manager.blade.php).
+- [x] Reutilizar componentes Blade existentes de admin para evitar HTML/CSS duplicado cuando sea posible.
+- [x] Mantener compatibilidad con Livewire 4 (`wire:model`/acciones actuales) sin tocar lógica de persistencia en [app/Livewire/AdminNoticeManager.php](app/Livewire/AdminNoticeManager.php) salvo ajustes mínimos estrictamente necesarios.
+
+### Execution Steps
+
+- [x] 1. Añadir/actualizar test Dusk focalizado para bloquear regresiones visuales y de interacción del bloque de documentos en avisos.
+- [x] 2. Refactorizar el bloque de documentos en [resources/views/livewire/admin/notice-manager.blade.php](resources/views/livewire/admin/notice-manager.blade.php) para igualarlo al patrón de bidalketak (contenedor, listas de pendientes/subidos, acciones).
+- [x] 3. Ajustar textos/keys de traducción solo si el nuevo diseño lo requiere.
+- [x] 4. Ejecutar validación mínima afectada (Feature + Dusk focalizado) y formateo necesario.
+
+### Work Items
+
+- [x] UI objetivo: [resources/views/livewire/admin/notice-manager.blade.php](resources/views/livewire/admin/notice-manager.blade.php).
+- [x] Patrón de referencia: [resources/views/livewire/admin/campaign-manager.blade.php](resources/views/livewire/admin/campaign-manager.blade.php).
+- [x] Tests: [tests/Browser/AdminNoticeTagAndDocumentsUiTest.php](tests/Browser/AdminNoticeTagAndDocumentsUiTest.php) y tests Feature de [tests/Feature/AdminNoticeManagerTest.php](tests/Feature/AdminNoticeManagerTest.php) si aplica.
+
+### Validation
+
+- [x] Dusk focalizado del flujo afectado antes y después del cambio.
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 vendor/bin/pint --dirty` (si hay cambios PHP).
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 php artisan test tests/Feature/AdminNoticeManagerTest.php --compact`.
+- [x] `docker compose run --rm --user ${DC_UID:-1000}:${DC_GID:-1000} madaia33 composer quality`.
+
+
+
+### Zuzenketak
+
+- [ ] Al crear una obra se crea una etiqueta, el slug de esa etiqueta tiene que ser único, pero simple, el nombre que se le ha dado a la obra y si está repetido no dejar crear la obra, si se edita la obra, modificar el nombre de la etiqueta y el slug.
+- [ ] Si hay una obra en activo, añadir en el menú del front una entrada a esa obra
+- [ ] en el front de una obra activa, quitar la parte de las fechas, quitar la parte del formulario y moverlo a un modal, como en la parte superior del perfil de usario, un encabezado con el nombre de la obra y el botóon de Mezua bidali que saca el modal, no hace falta nombre ni email en el formulario, cogelos del usuario logueado, ya que para ver todo esto hay que estar logueado.
+- [ ] Si hay una obra en activo, en el front añadir otro bloque junto a bozketak y profila, cada uno de los tres debe ocupar un tercio de la pantalla, si solo hay dos, cada uno la mitad, y si solo se muestra uno, completo.
