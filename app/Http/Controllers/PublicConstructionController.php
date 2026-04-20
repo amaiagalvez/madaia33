@@ -32,7 +32,7 @@ class PublicConstructionController extends Controller
         $notices = Notice::query()
             ->with('documents')
             ->withExists([
-                'reads as is_read_by_current_owner' => fn($query) => $query->where('owner_id', $ownerId ?? 0),
+                'reads as is_read_by_current_owner' => fn ($query) => $query->where('owner_id', $ownerId ?? 0),
             ])
             ->public()
             ->when($construction->tag !== null, function ($query) use ($construction): void {

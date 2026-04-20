@@ -12,6 +12,9 @@
 - [ ] dusk-test
 
 # Code
+- [ ] obra necesita title y slug en eu y es, modificar le formulario, notice_tags necesita slug_eu y slug_es. Cuando se cree la obra tener en cuenta los idiomas al crear el notice_tag. En el front de una obra en concreto da error al cambiar de idioma, se tiene que quedar en la misma página pero en el idioma elegido.
+- [ ] cuando se vota delegado o presencial, si el owner por el que se está votando tiene email, mandarle también un email de confirmación, como el que se manada cuando el owner vota directamente.
+
 - [ ] crear un aviso para las votaciones activas: crear un cron que mire a qué votaciones activas les faltan 3 días para terminarse, que prepare una bidalketa solo para los owner que no hayan votado en alguna de las votaciones que haya encontrado (puede que los owner hayan votado unas si y otras no) y lo envie poniendo en marcha la queue existente. En el texto de la bidalketa que ponga algo así Aviso automático, faltan 3 días para que se terminen las siguientes votaciones y a continuación la lista de votaciones con un enlace a la url de votaciones del front, en el idioma que tenga configurado el owner.
 Añadir un botón en el listado de votaciones que haga lo mismo.
 - [ ] repetir lo anterior, pero buscando solo las votaciones que terminan el día actual (ojo! no repetir código)

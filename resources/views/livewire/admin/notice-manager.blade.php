@@ -453,14 +453,37 @@
                                 @foreach ($noticeReaders as $reader)
                                     <tr>
                                         <td class="px-4 py-2">
-                                            <span @class([
-                                                'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
-                                                'bg-emerald-100 text-emerald-700' => $reader['has_opened'],
-                                                'bg-red-100 text-red-700' => !$reader['has_opened'],
-                                            ])
-                                                data-notice-reader-status>
-                                                {{ $reader['has_opened'] ? __('notices.admin.readers_opened') : __('notices.admin.readers_unopened') }}
-                                            </span>
+                                            @if ($reader['has_opened'])
+                                                <span
+                                                    class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"
+                                                    data-notice-reader-status
+                                                    data-notice-reader-opened-icon
+                                                    aria-label="{{ __('notices.admin.readers_opened') }}"
+                                                    title="{{ __('notices.admin.readers_opened') }}">
+                                                    <svg class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2"
+                                                        stroke="currentColor" aria-hidden="true">
+                                                        <path stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-red-700"
+                                                    data-notice-reader-status
+                                                    data-notice-reader-unopened-icon
+                                                    aria-label="{{ __('notices.admin.readers_unopened') }}"
+                                                    title="{{ __('notices.admin.readers_unopened') }}">
+                                                    <svg class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2"
+                                                        stroke="currentColor" aria-hidden="true">
+                                                        <path stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M6 6l12 12M18 6l-12 12" />
+                                                    </svg>
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-2 text-gray-900">
                                             {{ $reader['owner_name'] }}</td>
@@ -474,12 +497,6 @@
                     </div>
                 @endif
 
-                <div class="flex justify-end">
-                    <button type="button" wire:click="closeReadersModal"
-                        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-600">
-                        {{ __('general.buttons.close') }}
-                    </button>
-                </div>
             </div>
         </dialog>
     @endif

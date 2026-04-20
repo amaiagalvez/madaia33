@@ -37,6 +37,7 @@ flowchart LR
     OWNERSHIP["Ownership\nowners, locations, properties, assignments"]:::ownership
     VOTINGS_G["Votings\nvotings, ballots, selections, totals"]:::votings
     CAMPAIGNS_G["Campaigns\ncampaigns, recipients, documents, templates"]:::campaigns
+    CONSTRUCTIONS_G["Constructions\nconstructions, tags, inquiries, managers"]:::campaigns
     CONTENT["Content & settings\nnotices, images, contact messages, settings"]:::content
     TRACKING["Tracking\nnotice_reads, notice_document_downloads"]:::content
 
@@ -46,6 +47,9 @@ flowchart LR
 
     OWNERSHIP -->|owners and locations| VOTINGS_G
     OWNERSHIP -->|owners and locations| CAMPAIGNS_G
+    OWNERSHIP -->|location context| CONSTRUCTIONS_G
+    AUTH -->|manager assignments| CONSTRUCTIONS_G
+    CONSTRUCTIONS_G -->|tagged notices| CONTENT
     OWNERSHIP -->|location-scoped notices| CONTENT
     OWNERSHIP -->|owner read state| TRACKING
     CONTENT -->|notice audit trail| TRACKING
@@ -382,6 +386,68 @@ erDiagram
     CAMPAIGN_DOCUMENTS ||--o{ CAMPAIGN_TRACKING_EVENTS : has_many
     USERS ||--o{ CAMPAIGN_TEMPLATES : created_by
     LOCATIONS ||--o{ CAMPAIGN_TEMPLATES : has_many
+```
+
+### 2d) Core domain — constructions
+
+```mermaid
+flowchart LR
+    A["Constructions domain"]:::campaigns
+    classDef campaigns fill:#ffe4e6,stroke:#f43f5e,color:#881337
+```
+
+```mermaid
+erDiagram
+    USERS {
+        bigint id
+        string name
+        datetime deleted_at
+    }
+
+    CONSTRUCTIONS {
+        bigint id
+        string title
+        string slug
+        date starts_at
+        date ends_at
+        boolean is_active
+        datetime deleted_at
+    }
+
+    CONSTRUCTION_USER {
+        bigint construction_id
+        bigint user_id
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    NOTICE_TAGS {
+        bigint id
+        string slug
+        string name_eu
+        string name_es
+        datetime deleted_at
+    }
+
+    CONSTRUCTION_INQUIRIES {
+        bigint id
+        bigint construction_id
+        bigint user_id
+        string name
+        string email
+        string subject
+        text message
+        text reply
+        boolean is_read
+        timestamp replied_at
+        datetime deleted_at
+    }
+
+    USERS ||--o{ CONSTRUCTION_USER : assigned_to
+    CONSTRUCTIONS ||--o{ CONSTRUCTION_USER : has_many
+    CONSTRUCTIONS ||--|| NOTICE_TAGS : creates_tag
+    CONSTRUCTIONS ||--o{ CONSTRUCTION_INQUIRIES : has_many
+    USERS ||--o{ CONSTRUCTION_INQUIRIES : authored_by
 ```
 
 ### 3) Content and settings domain

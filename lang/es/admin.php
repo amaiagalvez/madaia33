@@ -412,6 +412,7 @@ return [
             'superadmin' => 'Superadmin',
             'admin_general' => 'Admin general',
             'admin_comunidad' => 'Admin comunidad',
+            'construction_manager' => 'Gestora de obras',
             'propietaria' => 'Propietaria',
             'voto_delegado' => 'Voto delegado',
         ],

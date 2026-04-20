@@ -69,7 +69,7 @@ trait ManagesNoticeLocations
             ->get();
 
         return $locations
-            ->map(fn(Location $location): array => [
+            ->map(fn (Location $location): array => [
                 'id' => (string) $location->id,
                 'type' => $location->type,
                 'label' => trim($this->locationLabel($location) . $location->name),
@@ -93,7 +93,7 @@ trait ManagesNoticeLocations
     private function allowedLocationCodes(): array
     {
         return collect($this->allLocationOptions())
-            ->map(static fn(array $location): string => $location['id'])
+            ->map(static fn (array $location): string => $location['id'])
             ->values()
             ->all();
     }

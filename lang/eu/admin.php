@@ -412,6 +412,7 @@ return [
             'superadmin' => 'Superadmin',
             'admin_general' => 'Admin orokorra',
             'admin_comunidad' => 'Komunitate admin',
+            'construction_manager' => 'Eraikuntzen kudeatzailea',
             'propietaria' => 'Jabea',
             'voto_delegado' => 'Boto delegatua',
         ],

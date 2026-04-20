@@ -573,11 +573,9 @@ Implementación incremental del sistema de etiquetas en avisos, el rol `construc
 - [x] busca en todo el código dónde se utiliza coprop1_name o coprop2_name y preguntame si quiero cambiarlo por fullName1/fullName2 o no.
 - [x] en la pagina de la obra del front, si el usuario no ha leido el aviso, ponerle delante del nombre del aviso un icono cono un sobre cerrado en rojo y lo ha liedo u
 
-- [ ] En el mermaid del SKILL database-schema-mermaid falta añadir la parte de constructions
-- [ ] Falta la traducción del rol de constructor
-- [ ] En el listado de Iragarkiak del panel en el modal "Iragarki honen irekiera-egoera" Cuando este leido mostrar un check verde y si no una x roja en vez del texto en la columna Egoera. Quitar el botón de abjo del modal, ya tiene la X de arriba para cerrar.
-- [ ] obra necesita title y slug en eu y es, modificar le formulario, notice_tags necesita slug_eu y slug_es. Cuando se cree la obra tener en cuenta los idiomas al crear el notice_tag. En el front de una obra en concreto da error al cambiar de idioma, se tiene que quedar en la misma página pero en el idioma elegido.
-- [ ] cuando se vota delegado o presencial, si el owner por el que se está votando tiene email, mandarle también un email de confirmación, como el que se manada cuando el owner vota directamente.
+- [x] En el mermaid del SKILL database-schema-mermaid falta añadir la parte de constructions
+- [x] Falta la traducción del rol de constructor
+- [x] En el listado de Iragarkiak del panel en el modal "Iragarki honen irekiera-egoera" Cuando este leido mostrar un check verde y si no una x roja en vez del texto en la columna Egoera. Quitar el botón de abjo del modal, ya tiene la X de arriba para cerrar.
 
 ## Implementation Plan - Zuzenketak 5
 

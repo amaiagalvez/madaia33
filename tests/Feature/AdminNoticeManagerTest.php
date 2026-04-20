@@ -186,8 +186,8 @@ it('editing notice dispatches focus event to form', function () {
 
 it('location association persists correctly', function () {
     $user = adminUser();
-    Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
-    Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
+    $portal = Location::factory()->create(['type' => 'portal', 'name' => '33-A']);
+    $garage = Location::factory()->create(['type' => 'garage', 'name' => 'P-1']);
 
     Livewire::actingAs($user)
         ->test('admin-notice-manager')
@@ -195,7 +195,7 @@ it('location association persists correctly', function () {
         ->set('titleEs', 'Aviso con ubicación')
         ->set('contentEu', 'Edukia')
         ->set('contentEs', 'Contenido')
-        ->set('selectedLocations', ['33-A', 'P-1'])
+        ->set('selectedLocations', [(string) $portal->id, (string) $garage->id])
         ->call('saveNotice');
 
     $notice = Notice::where('title_eu', 'Iragarki kokapenarekin')->firstOrFail();
@@ -256,8 +256,7 @@ it('shows only locations in form location selector', function () {
 
     $location = Location::factory()->create([
         'type' => 'portal',
-        'code' => '33-A',
-        'name' => 'Portal 33-A',
+        'name' => '33-A',
     ]);
 
     Property::factory()->create([
@@ -267,8 +266,7 @@ it('shows only locations in form location selector', function () {
 
     Location::factory()->create([
         'type' => 'storage',
-        'code' => 'TR-99',
-        'name' => 'Trastero TR-99',
+        'name' => 'TR-99',
     ]);
 
     Livewire::actingAs($user)
@@ -282,8 +280,8 @@ it('shows only locations in form location selector', function () {
 
 it('edits an existing notice and replaces locations on save', function () {
     $user = adminUser();
-    Location::factory()->create(['type' => 'portal', 'code' => '33-A', 'name' => 'Portal 33-A']);
-    Location::factory()->create(['type' => 'garage', 'code' => 'P-1', 'name' => 'Garaje P-1']);
+    $portal = Location::factory()->create(['type' => 'portal', 'name' => '33-A']);
+    $garage = Location::factory()->create(['type' => 'garage', 'name' => 'P-1']);
 
     $notice = Notice::factory()->public()->create([
         'title_eu' => 'Original EU',
@@ -293,7 +291,7 @@ it('edits an existing notice and replaces locations on save', function () {
         'published_at' => now()->subDay(),
     ]);
 
-    attachNoticeToLocationCode($notice, '33-A');
+    $notice->locations()->create(['location_id' => $portal->id]);
 
     $originalPublishedAt = $notice->published_at;
 
@@ -303,13 +301,13 @@ it('edits an existing notice and replaces locations on save', function () {
         ->assertSet('editingId', $notice->id)
         ->assertSet('showForm', true)
         ->assertSet('titleEu', 'Original EU')
-        ->assertSet('selectedLocations', ['33-A'])
+        ->assertSet('selectedLocations', [(string) $portal->id])
         ->set('titleEu', 'Editado EU')
         ->set('titleEs', '')
         ->set('contentEu', 'Edukia eguneratua')
         ->set('contentEs', '')
         ->set('isPublic', true)
-        ->set('selectedLocations', ['P-1'])
+        ->set('selectedLocations', [(string) $garage->id])
         ->call('saveNotice')
         ->assertSet('showForm', false)
         ->assertSet('editingId', null);
@@ -446,8 +444,8 @@ it('shows only managed-location notices to community admin users', function () {
     $communityAdmin = User::factory()->create();
     $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
 
-    $managedLocation = Location::factory()->portal()->create(['code' => 'CA-1']);
-    $otherLocation = Location::factory()->portal()->create(['code' => 'CA-2']);
+    $managedLocation = Location::factory()->portal()->create(['name' => 'CA-1']);
+    $otherLocation = Location::factory()->portal()->create(['name' => 'CA-2']);
     $communityAdmin->managedLocations()->sync([$managedLocation->id]);
 
     $managedNotice = Notice::factory()->create([
@@ -718,6 +716,6 @@ it('shows opened and unopened owners for construction notices', function () {
         ->assertSet('showReadersModal', true)
         ->assertSee('Ane Irekia Jabea')
         ->assertSee('Beñat Itxia Jabea')
-        ->assertSee(__('notices.admin.readers_opened'))
-        ->assertSee(__('notices.admin.readers_unopened'));
+        ->assertSeeHtml('data-notice-reader-opened-icon')
+        ->assertSeeHtml('data-notice-reader-unopened-icon');
 });

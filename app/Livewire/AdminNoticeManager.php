@@ -136,7 +136,7 @@ class AdminNoticeManager extends Component
     {
         abort_unless($this->currentUser()?->canManageNotices(), 403);
 
-        $notice = Notice::with(['locations.location', 'documents' => fn($query) => $query->withCount('downloads')])->findOrFail($id);
+        $notice = Notice::with(['locations.location', 'documents' => fn ($query) => $query->withCount('downloads')])->findOrFail($id);
 
         $this->editingId = $notice->id;
         $this->titleEu = $notice->title_eu ?? '';
@@ -148,7 +148,7 @@ class AdminNoticeManager extends Component
         $this->publishedAt = $notice->published_at?->format('Y-m-d') ?? '';
         $this->originalPublishedAt = $notice->published_at?->toDateTimeString() ?? '';
         $this->selectedLocations = $notice->locations
-            ->map(fn(NoticeLocation $location): string => (string) $location->location_id)
+            ->map(fn (NoticeLocation $location): string => (string) $location->location_id)
             ->filter()
             ->values()
             ->all();
@@ -165,7 +165,7 @@ class AdminNoticeManager extends Component
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->filter(static fn (string $code): bool => in_array($code, $allowedLocationCodes, true))
                 ->values()
                 ->all();
         }
@@ -190,7 +190,7 @@ class AdminNoticeManager extends Component
             $allowedLocationCodes = $this->allowedLocationCodes();
 
             $this->selectedLocations = collect($this->selectedLocations)
-                ->filter(static fn(string $code): bool => in_array($code, $allowedLocationCodes, true))
+                ->filter(static fn (string $code): bool => in_array($code, $allowedLocationCodes, true))
                 ->values()
                 ->all();
         }
@@ -202,7 +202,7 @@ class AdminNoticeManager extends Component
 
         $this->syncLocations($notice);
         $this->storeAttachments($notice);
-        $this->setStoredDocumentsFromNotice($notice->load(['documents' => fn($query) => $query->withCount('downloads')]));
+        $this->setStoredDocumentsFromNotice($notice->load(['documents' => fn ($query) => $query->withCount('downloads')]));
 
         $this->resetForm();
         $this->showForm = false;

@@ -84,6 +84,18 @@ it('shows assigned managed locations in users list', function () {
         ->assertSee('Garaje Principal');
 });
 
+it('renders a translated label for the construction manager role option', function () {
+    $manager = adminUser([
+        'email' => 'manager-role-label@example.com',
+    ]);
+
+    test()->actingAs($manager)
+        ->get(route('admin.users.index'))
+        ->assertOk()
+        ->assertSee(__('admin.users.roles_labels.' . Role::CONSTRUCTION_MANAGER))
+        ->assertDontSee('admin.users.roles_labels.' . Role::CONSTRUCTION_MANAGER);
+});
+
 it('filters users list by selected role', function () {
     $manager = adminUser([
         'email' => 'manager-filter-role@example.com',

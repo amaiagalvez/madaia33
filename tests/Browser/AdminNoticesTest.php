@@ -191,7 +191,8 @@ test('admin can open readers modal for a construction notice', function () {
             ->waitFor('[data-notice-readers-modal]', 5)
             ->assertSee('Irati Ireki')
             ->assertSee('Nora Itxi')
-            ->assertSee('Irekita')
-            ->assertSee('Irakurri gabe');
+            ->assertPresent('[data-notice-reader-opened-icon]')
+            ->assertPresent('[data-notice-reader-unopened-icon]')
+            ->assertMissing('[data-notice-readers-footer-close]');
     });
 });
