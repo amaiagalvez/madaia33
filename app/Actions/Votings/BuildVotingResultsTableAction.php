@@ -182,7 +182,7 @@ class BuildVotingResultsTableAction
                 ));
                 $pct = (float) ($assignment->property->community_pct ?? 0);
 
-                return sprintf('%s (%s%%)', $propertyLabel, number_format($pct, 2, ',', '.'));
+                return sprintf('%s (%s%%)', $propertyLabel, number_format($pct, 4, ',', '.'));
             })
             ->filter()
             ->join(', ');

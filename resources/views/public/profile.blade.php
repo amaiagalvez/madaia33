@@ -935,10 +935,10 @@
                                                 <span class="mt-1 block text-sm text-gray-900"
                                                     data-profile-owner-property-percentages>
                                                     {{ __('profile.owner.community_pct') }}:
-                                                    {{ $assignment->property?->community_pct !== null ? number_format((float) $assignment->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                                                    {{ $assignment->property?->community_pct !== null ? number_format((float) $assignment->property->community_pct, 4, ',', '.') . '%' : '-' }}
                                                     ·
                                                     {{ __('profile.owner.location_pct') }}:
-                                                    {{ $assignment->property?->location_pct !== null ? number_format((float) $assignment->property->location_pct, 2, ',', '.') . '%' : '-' }}
+                                                    {{ $assignment->property?->location_pct !== null ? number_format((float) $assignment->property->location_pct, 4, ',', '.') . '%' : '-' }}
                                                 </span>
                                                 <span
                                                     class="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium {{ $assignment->owner_validated ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800' }}">

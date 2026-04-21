@@ -422,7 +422,7 @@
                                     <td class="px-4 py-2 text-gray-600">
                                         {{ $row['properties'] ?? '—' }}</td>
                                     <td class="px-4 py-2 text-gray-600">
-                                        {{ number_format($row['percentage'], 2, ',', '.') }}%</td>
+                                        {{ number_format($row['percentage'], 4, ',', '.') }}%</td>
                                     @if ($ownersModalContext !== 'census' && !$ownersModalIsAnonymous)
                                         <td class="px-4 py-2 text-gray-600">
                                             {{ $row['vote'] ?: '—' }}

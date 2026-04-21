@@ -231,9 +231,9 @@
                                     </strong>
                                     <br>
                                     <span class="nowrap">
-                                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 2, ',', '.') . '%' : '-' }}
+                                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 4, ',', '.') . '%' : '-' }}
                                         |
-                                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 4, ',', '.') . '%' : '-' }}
                                     </span>
                                 </div>
                             @empty

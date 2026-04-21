@@ -183,9 +183,9 @@
                         <td class="px-6 py-4 text-sm font-medium text-gray-900">
                             {{ $property->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-500">
-                            %{{ number_format($property->community_pct ?? 0, 2, ',', '.') }}</td>
+                            %{{ number_format($property->community_pct ?? 0, 4, ',', '.') }}</td>
                         <td class="px-6 py-4 text-sm text-gray-500">
-                            %{{ number_format($property->location_pct ?? 0, 2, ',', '.') }}</td>
+                            %{{ number_format($property->location_pct ?? 0, 4, ',', '.') }}</td>
                         <td class="px-6 py-4 text-sm">
                             <x-admin.status-indicator :active="$isAssigned"
                                 data-assigned="{{ $isAssigned ? 'yes' : 'no' }}" />

@@ -79,14 +79,14 @@
                             <td class="px-4 py-2 text-gray-600">
                                 {{ $row['properties'] !== '' ? $row['properties'] : '—' }}</td>
                             <td class="px-4 py-2 text-gray-600">
-                                {{ number_format((float) $row['owner_percentage'], 2, ',', '.') }}%
+                                {{ number_format((float) $row['owner_percentage'], 4, ',', '.') }}%
                             </td>
                             @foreach ($options as $option)
                                 <td class="px-4 py-2 text-gray-600"
                                     data-owner-option-cell="{{ $rowIndex }}-{{ $option['id'] }}"
                                     data-option-value="{{ !$isAnonymous && (int) ($row['selected_option_id'] ?? 0) === (int) $option['id'] ? 'selected' : ($isAnonymous ? 'hidden' : 'empty') }}">
                                     @if (!$isAnonymous && (int) ($row['selected_option_id'] ?? 0) === (int) $option['id'])
-                                        {{ number_format((float) $row['owner_percentage'], 2, ',', '.') }}%
+                                        {{ number_format((float) $row['owner_percentage'], 4, ',', '.') }}%
                                     @else
                                         —
                                     @endif
@@ -113,7 +113,7 @@
                         </th>
                         <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700"
                             data-total-owner-percentage>
-                            {{ number_format($totalOwnerPercentage, 2, ',', '.') }}%
+                            {{ number_format($totalOwnerPercentage, 4, ',', '.') }}%
                         </th>
                         @foreach ($options as $option)
                             <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">
@@ -124,7 +124,7 @@
                                     <br>
                                 @endif
                                 <span data-total-option-percentage="{{ $option['id'] }}">
-                                    {{ number_format((float) $option['total_percentage'], 2, ',', '.') }}%
+                                    {{ number_format((float) $option['total_percentage'], 4, ',', '.') }}%
                                 </span>
                             </th>
                         @endforeach
@@ -151,7 +151,7 @@
                                     {{ __('votings.admin.results_pct_total_label') }}:
                                     <span data-pct-total-value="{{ $option['id'] }}"
                                         class="{{ $option['has_pct_total_mismatch'] ? 'font-semibold text-red-600' : 'text-gray-700' }}">
-                                        {{ number_format((float) $option['pct_total'], 2, ',', '.') }}
+                                        {{ number_format((float) $option['pct_total'], 4, ',', '.') }}
                                     </span>
                                 </th>
                             @endforeach
@@ -213,7 +213,7 @@
                                 class="mb-1 flex items-center justify-between text-xs text-gray-700">
                                 <span>{{ __('votings.admin.chart_eligible_pct_total') }}</span>
                                 <span
-                                    data-participation-eligible-pct>{{ number_format($participationEligiblePct, 2, ',', '.') }}%</span>
+                                    data-participation-eligible-pct>{{ number_format($participationEligiblePct, 4, ',', '.') }}%</span>
                             </div>
                             <div class="h-2 rounded-full bg-gray-100">
                                 <div class="h-2 rounded-full" data-participation-eligible-pct-bar
@@ -226,7 +226,7 @@
                                 class="mb-1 flex items-center justify-between text-xs text-gray-700">
                                 <span>{{ __('votings.admin.chart_voted_pct_total') }}</span>
                                 <span
-                                    data-participation-voted-pct>{{ number_format($participationVotedPct, 2, ',', '.') }}%</span>
+                                    data-participation-voted-pct>{{ number_format($participationVotedPct, 4, ',', '.') }}%</span>
                             </div>
                             <div class="h-2 rounded-full bg-gray-100">
                                 <div class="h-2 rounded-full" data-participation-voted-pct-bar
@@ -274,7 +274,7 @@
                                     class="mb-1 flex items-center justify-between text-xs text-gray-700">
                                     <span>{{ $series['label'] }}</span>
                                     <span
-                                        data-option-pct-chart-value="{{ $series['id'] }}">{{ number_format((float) $series['value'], 2, ',', '.') }}%</span>
+                                        data-option-pct-chart-value="{{ $series['id'] }}">{{ number_format((float) $series['value'], 4, ',', '.') }}%</span>
                                 </div>
                                 <div class="h-2 rounded-full bg-gray-100">
                                     <div class="h-2 rounded-full"

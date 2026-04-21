@@ -112,7 +112,7 @@
                     <td class="px-6 py-4 text-sm text-gray-500">{{ $location->properties_count }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
-                        %{{ number_format((float) ($location->properties_sum_community_pct ?? 0), 2, '.', '') }}
+                        %{{ number_format((float) ($location->properties_sum_community_pct ?? 0), 4, '.', '') }}
                     </td>
                     @php
                         $totalLocationPct = (float) ($location->properties_sum_location_pct ?? 0);
@@ -120,7 +120,7 @@
                     @endphp
                     <td
                         class="px-6 py-4 text-sm {{ $isInvalid ? 'text-red-900 font-semibold' : 'text-gray-500' }}">
-                        %{{ number_format($totalLocationPct, 2, '.', '') }}
+                        %{{ number_format($totalLocationPct, 4, '.', '') }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500"
                         data-chief-property-for="{{ $location->id }}">

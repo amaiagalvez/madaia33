@@ -248,7 +248,7 @@ class VotingEligibilityService
             return $label;
         }
 
-        return trim($label . ' (' . number_format((float) $communityPct, 2, ',', '.') . '%)');
+        return trim($label . ' (' . number_format((float) $communityPct, 4, ',', '.') . '%)');
     }
 
     /**

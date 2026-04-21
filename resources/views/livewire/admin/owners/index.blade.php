@@ -432,9 +432,9 @@
                                     </span>
                                     <br>
                                     <span class="text-xs">
-                                        {{ $a->property->location_pct !== null ? number_format((float) $a->property->location_pct, 2, ',', '.') . '%' : '-' }}
+                                        {{ $a->property->location_pct !== null ? number_format((float) $a->property->location_pct, 4, ',', '.') . '%' : '-' }}
                                         |
-                                        {{ $a->property->community_pct !== null ? number_format((float) $a->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                                        {{ $a->property->community_pct !== null ? number_format((float) $a->property->community_pct, 4, ',', '.') . '%' : '-' }}
                                     </span>
                                 </span>
                                 @if (!$loop->last)
@@ -539,10 +539,10 @@
                         </div>
                     </td>
                     <td class="px-3 py-3 text-sm text-gray-600">
-                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 4, ',', '.') . '%' : '-' }}
                     </td>
                     <td class="px-3 py-3 text-sm text-gray-600">
-                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 2, ',', '.') . '%' : '-' }}
+                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 4, ',', '.') . '%' : '-' }}
                     </td>
                     <td class="px-3 py-3">
                         <x-admin.form-date-input :label="__('admin.owners.start_date')" :model="'assignmentEdits.' . $assignment->id . '.start_date'"

@@ -202,7 +202,7 @@
                     <td>
                         <span class="meta-label">{{ __('votings.pdf.total_pct_sum') }}</span>
                         <span
-                            class="meta-value">{{ number_format((float) $voting['total_pct_sum'], 2, ',', '.') }}%</span>
+                            class="meta-value">{{ number_format((float) $voting['total_pct_sum'], 4, ',', '.') }}%</span>
                     </td>
                     <td>
                         <span class="meta-label">{{ __('votings.pdf.period') }}</span>
@@ -238,7 +238,7 @@
                             </td>
                             <td>
                                 <div>
-                                    {{ number_format((float) $option['pct_total'], 2, ',', '.') }}%
+                                    {{ number_format((float) $option['pct_total'], 4, ',', '.') }}%
                                 </div>
                                 <div class="bar-wrap">
                                     <div class="bar-pct"
