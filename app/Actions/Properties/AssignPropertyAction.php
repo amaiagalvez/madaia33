@@ -3,8 +3,8 @@
 namespace App\Actions\Properties;
 
 use App\Models\Owner;
-use App\Models\Property;
 use App\Models\Setting;
+use App\Models\Property;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
 use App\Actions\Owners\CreateOwnerAction;
