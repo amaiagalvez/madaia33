@@ -38,16 +38,16 @@ test('guest home with votings and constructions aligns the first construction bu
             )
             ->assertScript(
                 '(function () {'
-                    . 'const votingButton = document.querySelector("[data-home-votings-cta]");'
+                    . 'const layout = document.querySelector("[data-home-constructions-layout]");'
+                    . 'const actions = document.querySelector("[data-home-constructions-actions]");'
                     . 'const firstButton = document.querySelector("[data-home-construction-link=\"' . $firstConstruction->slug . '\"]");'
-                    . 'if (!votingButton || !firstButton) return false;'
-                    . 'const votingRect = votingButton.getBoundingClientRect();'
-                    . 'const firstRect = firstButton.getBoundingClientRect();'
-                    . 'const votingCenter = votingRect.top + (votingRect.height / 2);'
-                    . 'const firstCenter = firstRect.top + (firstRect.height / 2);'
-                    . 'return Math.abs(firstRect.height - votingRect.height) <= 2'
-                    . ' && Math.abs(firstCenter - votingCenter) <= 18'
-                    . ' && firstButton.classList.contains("btn-brand");'
+                    . 'if (!layout || !actions || !firstButton) return false;'
+                    . 'return layout.classList.contains("sm:flex-row")'
+                    . ' && layout.classList.contains("sm:items-center")'
+                    . ' && actions.classList.contains("sm:self-center")'
+                    . ' && actions.classList.contains("sm:items-stretch")'
+                    . ' && firstButton.classList.contains("btn-brand")'
+                    . ' && firstButton.classList.contains("h-11");'
                     . '})()',
                 true,
             );
@@ -100,16 +100,15 @@ test('authenticated owner sees active constructions callout and keeps three-call
             ->assertPresent('[data-nav-construction-link="' . $secondConstruction->slug . '"]')
             ->assertScript(
                 '(function () {'
-                    . 'const votingButton = document.querySelector("[data-home-votings-cta]");'
-                    . 'const profileButton = document.querySelector("[data-home-profile-cta]");'
+                    . 'const layout = document.querySelector("[data-home-constructions-layout]");'
+                    . 'const actions = document.querySelector("[data-home-constructions-actions]");'
                     . 'const constructionButton = document.querySelector("[data-home-construction-link=\"' . $firstConstruction->slug . '\"]");'
-                    . 'if (!votingButton || !profileButton || !constructionButton) return false;'
-                    . 'const votingRect = votingButton.getBoundingClientRect();'
-                    . 'const profileRect = profileButton.getBoundingClientRect();'
-                    . 'const constructionRect = constructionButton.getBoundingClientRect();'
-                    . 'return Math.abs(votingRect.height - constructionRect.height) <= 2'
-                    . ' && Math.abs(profileRect.height - constructionRect.height) <= 2'
-                    . ' && constructionButton.classList.contains("w-full");'
+                    . 'if (!layout || !actions || !constructionButton) return false;'
+                    . 'return layout.classList.contains("grid")'
+                    . ' && layout.classList.contains("grid-cols-[auto,1fr]")'
+                    . ' && actions.classList.contains("col-start-2")'
+                    . ' && constructionButton.classList.contains("w-full")'
+                    . ' && constructionButton.classList.contains("h-11");'
                     . '})()',
                 true,
             );

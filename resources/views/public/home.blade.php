@@ -170,7 +170,8 @@
                         class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#f1bd4d]/15 p-5 sm:p-6"
                         data-home-constructions-callout>
                         <div
-                            class="{{ $stackCalloutActions ? 'grid h-full grid-cols-[auto,1fr] gap-x-4 gap-y-4' : 'flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between' }}">
+                            class="{{ $stackCalloutActions ? 'grid h-full grid-cols-[auto,1fr] gap-x-4 gap-y-4' : 'flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between' }}"
+                            data-home-constructions-layout>
                             @if ($stackCalloutActions)
                                 <div
                                     class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#793d3d]/20 bg-linear-to-br from-[#edd2c7]/60 via-white to-[#f1bd4d]/20 text-[#793d3d] shadow-sm ring-4 ring-white/40">
@@ -197,7 +198,8 @@
                                     </p>
                                 </div>
 
-                                <div class="col-start-2 flex flex-col items-start gap-2">
+                                <div class="col-start-2 flex flex-col items-start gap-2"
+                                    data-home-constructions-actions>
                                     @foreach ($activeConstructions as $activeConstruction)
                                         <a href="{{ route(\App\SupportedLocales::routeName('constructions.show'), ['slug' => $activeConstruction->slug]) }}"
                                             class="btn-brand inline-flex h-11 w-full items-center justify-center whitespace-nowrap"
@@ -237,7 +239,8 @@
                                 </div>
 
                                 <div
-                                    class="flex flex-col items-start gap-2 sm:min-w-52 sm:items-stretch sm:self-center">
+                                    class="flex flex-col items-start gap-2 sm:min-w-52 sm:items-stretch sm:self-center"
+                                    data-home-constructions-actions>
                                     @foreach ($activeConstructions as $activeConstruction)
                                         <a href="{{ route(\App\SupportedLocales::routeName('constructions.show'), ['slug' => $activeConstruction->slug]) }}"
                                             class="btn-brand inline-flex h-11 items-center justify-center whitespace-nowrap"
