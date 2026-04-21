@@ -95,6 +95,12 @@
             margin-left: 4px;
             font-weight: 700;
         }
+
+        .validation-check {
+            margin-left: 4px;
+            font-weight: 700;
+            color: #16a34a;
+        }
     </style>
 </head>
 
@@ -228,6 +234,9 @@
                                             );
                                         @endphp
                                         {{ $propertyLabel }}
+                                        @if ($assignment->admin_validated && $assignment->owner_validated)
+                                            <span class="validation-check">&#10003;</span>
+                                        @endif
                                     </strong>
                                     <br>
                                     <span class="nowrap">
