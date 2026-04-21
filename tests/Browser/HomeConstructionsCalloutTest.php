@@ -21,15 +21,21 @@ test('guest home with votings and constructions aligns the first construction bu
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($firstConstruction): void {
-        $browser->visit('/eu')
+        $browser->resize(1440, 1200)
+            ->visit('/eu')
             ->assertPresent('[data-home-callouts]')
             ->assertPresent('[data-home-votings-callout]')
             ->assertPresent('[data-home-constructions-callout]')
+            ->assertPresent('[data-home-votings-cta]')
+            ->assertPresent('[data-home-construction-link="' . $firstConstruction->slug . '"]')
+            ->assertScript(
+                'return window.matchMedia("(min-width: 1024px)").matches;',
+                true,
+            )
             ->assertScript(
                 'return document.querySelector("[data-home-callouts]")?.classList.contains("lg:grid-cols-2");',
                 true,
             )
-            ->assertPresent('[data-home-construction-link="' . $firstConstruction->slug . '"]')
             ->assertScript(
                 '(function () {'
                     . 'const votingButton = document.querySelector("[data-home-votings-cta]");'
@@ -71,12 +77,17 @@ test('authenticated owner sees active constructions callout and keeps three-call
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($owner, $firstConstruction, $secondConstruction): void {
-        $browser->loginAs($owner->user)
+        $browser->resize(1440, 1200)
+            ->loginAs($owner->user)
             ->visit('/eu')
             ->assertPresent('[data-home-callouts]')
             ->assertPresent('[data-home-votings-callout]')
             ->assertPresent('[data-home-profile-callout]')
             ->assertPresent('[data-home-constructions-callout]')
+            ->assertScript(
+                'return window.matchMedia("(min-width: 1024px)").matches;',
+                true,
+            )
             ->assertScript(
                 'return document.querySelector("[data-home-callouts]")?.classList.contains("lg:grid-cols-3");',
                 true,
