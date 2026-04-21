@@ -38,6 +38,7 @@ class OwnersPdfController extends Controller
 
         $pdf = Pdf::loadView('pdf.owners.list', [
             'owners' => $owners,
+            'filterStatus' => $filters['status'],
             'appliedFilters' => $this->buildAppliedFilters($filters),
         ])->setPaper('a4', 'landscape');
 

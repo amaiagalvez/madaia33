@@ -43,10 +43,8 @@ class DevSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class,
             LocationSeeder::class,
-            DirectMessagesCampaignSeeder::class,
-            CampaignTemplateSeeder::class,
+            PropertySeeder::class,
         ]);
 
         $this->seedMailhogSettings();
@@ -77,7 +75,7 @@ class DevSeeder extends Seeder
 
         Setting::upsert(
             collect($settings)
-                ->map(fn (mixed $value, string $key): array => [
+                ->map(fn(mixed $value, string $key): array => [
                     'key' => $key,
                     'value' => $value,
                     'section' => Setting::SECTION_EMAIL_CONFIGURATION,
@@ -531,7 +529,7 @@ class DevSeeder extends Seeder
                 }
 
                 $delegatedOwner = $eligibleOwners->first(
-                    fn (Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
+                    fn(Owner $owner): bool => $selfVotingOwner === null || $owner->id !== $selfVotingOwner->id,
                 );
 
                 if (! $delegatedOwner instanceof Owner || ! $delegatedUser instanceof User) {
@@ -559,7 +557,7 @@ class DevSeeder extends Seeder
                 $votedIds = collect([$selfVotingOwner?->id, $delegatedOwner->id])->filter()->values();
 
                 $eligibleOwners
-                    ->reject(fn (Owner $owner): bool => $votedIds->contains($owner->id))
+                    ->reject(fn(Owner $owner): bool => $votedIds->contains($owner->id))
                     ->take(4)
                     ->each(function (Owner $owner) use ($alreadyVotedOwnerIds, $castVotingBallotAction, $voting): void {
                         if ($owner->user === null || $alreadyVotedOwnerIds->contains($owner->id)) {
@@ -646,7 +644,7 @@ class DevSeeder extends Seeder
 
                     $owner->loadMissing('activeAssignments.property');
                     $ownerPct = $owner->activeAssignments
-                        ->sum(fn (PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
+                        ->sum(fn(PropertyAssignment $assignment): float => (float) ($assignment->property->community_pct ?? 0));
 
                     $ballot = VotingBallot::create([
                         'voting_id' => $voting->id,

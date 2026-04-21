@@ -9,7 +9,7 @@ class LocationSeeder extends Seeder
 {
     public function run(): void
     {
-        $portalNames = ['33-A', '33-B', '33-C', '33-D', '33-E', '33-F', '33-G', '33-H', '33-I', '33-J'];
+        $portalNames = ['33-A', '33-B', '33-C', '33-D', '33-E', '33-F', '33-G', '33-H', '33-I', '33-J', '33-K', '33-L'];
         $localNames = ['L-1', 'L-2', 'L-3', 'L-4'];
         $garageNames = ['P-1', 'P-2', 'P-3'];
         $storageNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];

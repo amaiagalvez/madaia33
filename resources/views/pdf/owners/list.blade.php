@@ -129,22 +129,26 @@
         <tbody>
             @forelse ($owners as $owner)
                 @php
-                    $portals = $owner->assignments
+                    $visibleAssignments =
+                        ($filterStatus ?? 'active') === 'active'
+                            ? $owner->assignments->filter(fn($a) => $a->end_date === null)
+                            : $owner->assignments;
+                    $portals = $visibleAssignments
                         ->filter(
                             fn($assignment) => $assignment->property?->location?->type === 'portal',
                         )
                         ->values();
-                    $locals = $owner->assignments
+                    $locals = $visibleAssignments
                         ->filter(
                             fn($assignment) => $assignment->property?->location?->type === 'local',
                         )
                         ->values();
-                    $garages = $owner->assignments
+                    $garages = $visibleAssignments
                         ->filter(
                             fn($assignment) => $assignment->property?->location?->type === 'garage',
                         )
                         ->values();
-                    $storages = $owner->assignments
+                    $storages = $visibleAssignments
                         ->filter(
                             fn($assignment) => $assignment->property?->location?->type ===
                                 'storage',
