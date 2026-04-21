@@ -473,8 +473,8 @@ it('filters delegated vote modal by owner and location search terms', function (
         ->call('openDelegatedVoteModal')
         ->assertSee('Ane Koop1')
         ->assertSee('Bea Koop1')
-        ->assertSee('1,25%')
-        ->assertSee('2,50%')
+        ->assertSee('1,2500%')
+        ->assertSee('2,5000%')
         ->set('delegatedSearch', 'P-301')
         ->assertSee('Ane Koop1')
         ->assertDontSee('Bea Koop1')
@@ -487,8 +487,8 @@ it('filters delegated vote modal by owner and location search terms', function (
         ->call('openInPersonVoteModal')
         ->assertSee('Ane Koop1')
         ->assertSee('Bea Koop1')
-        ->assertSee('1,25%')
-        ->assertSee('2,50%');
+        ->assertSee('1,2500%')
+        ->assertSee('2,5000%');
 });
 
 it('starts delegated vote and redirects to public votings route', function () {
