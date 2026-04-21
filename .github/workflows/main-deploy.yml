@@ -165,6 +165,13 @@ jobs:
             force_full_sync=true
           fi
 
+          if [[ "$EVENT_NAME" == "push" && "$force_full_sync" != "true" && "$has_uploads" != "true" && "$sync_build_assets" != "true" && "$has_deletions" != "true" ]]; then
+            echo "::warning::Incremental deploy resolved to empty payload on push. Forcing full sync as a safety fallback."
+            force_full_sync=true
+          fi
+
+          echo "Deploy payload flags -> force_full_sync=$force_full_sync, has_uploads=$has_uploads, sync_build_assets=$sync_build_assets, has_deletions=$has_deletions"
+
           echo "force_full_sync=$force_full_sync" >> "$GITHUB_OUTPUT"
           echo "sync_build_assets=$sync_build_assets" >> "$GITHUB_OUTPUT"
           echo "has_uploads=$has_uploads" >> "$GITHUB_OUTPUT"
@@ -384,6 +391,8 @@ jobs:
 
           build_lftp_script "$ftps_script" "ftps" "$FTP_PORT" "true" "true" "true"
           build_lftp_script "$ftp_script" "ftp" "$fallback_port" "false" "false" "false"
+
+          echo "Deploy execution flags -> force_full_sync=$FORCE_FULL_SYNC, has_uploads=$HAS_UPLOADS, sync_build_assets=$SYNC_BUILD_ASSETS, has_deletions=$HAS_DELETIONS"
 
           set +e
           lftp -f "$ftps_script"
