@@ -33,7 +33,7 @@ return [
     'profile_cta' => 'Profila ikusi',
     'constructions_badge' => 'Obrak',
     'constructions_title' => 'Obrari buruzko informazio guztia',
-    'constructions_summary' => 'Sartu eta ikusi obren xehetasunak, iragarkiak eta kontakturako formularioa zure zalantzak bidaltzeko.',
+    'constructions_summary' => 'Obren xehetasunak, iragarkiak eta formularioa zure zalantzak bidaltzeko.',
     'promises' => [
         'informed_title' => 'Eguneratuta egoteko',
         'informed_body' => 'Iragarki berriak eta informazio erabilgarria lehen planoan ikusten dira.',
