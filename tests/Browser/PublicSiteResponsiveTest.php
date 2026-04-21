@@ -135,7 +135,20 @@ test('notices page smoke checks responsive grid filter and pagination', function
                 "return getComputedStyle(document.querySelector('[data-notices-grid]')).gridTemplateColumns.split(' ').length;",
                 1
             )
-            ->click('[data-notices-filter-btn="33-A"]')
+            ->assertScript(<<<'JS'
+                (() => {
+                    const button = Array.from(document.querySelectorAll('[data-notices-filter-btn]'))
+                        .find((element) => (element.textContent || '').includes('33-A'));
+
+                    if (!button) {
+                        return false;
+                    }
+
+                    button.click();
+
+                    return true;
+                })();
+            JS, true)
             ->pause(600)
             ->assertScript("return document.body.innerText.includes('Smoke Notice A');", true)
             ->resize(1200, 900)

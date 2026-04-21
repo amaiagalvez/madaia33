@@ -152,7 +152,7 @@ test('admin owners list uses compact bidalketak-style actions with titles', func
     });
 });
 
-test('admin owners list shows id with language and highlights invalid contacts with whatsapp markers', function () {
+test('admin owners list shows language next to ko-jabea1 and highlights invalid contacts with whatsapp markers', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
 
     $owner = Owner::factory()->create([
@@ -200,15 +200,15 @@ test('admin owners list shows id with language and highlights invalid contacts w
                 const coprop2Phone = row.querySelector('[data-owner-coprop2-phone]');
                 const coprop2Whatsapp = row.querySelector('[data-owner-coprop2-whatsapp]');
 
-                if (!idCell || !ownerLanguage || !coprop1 || !coprop1Phone || !coprop1Whatsapp || !coprop2Email || !coprop2Phone || !coprop2Whatsapp) {
+                if (!idCell || ownerLanguage || !coprop1 || !coprop1Phone || !coprop1Whatsapp || !coprop2Email || !coprop2Phone || !coprop2Whatsapp) {
                     return false;
                 }
 
-                const languageMovedToId = ownerLanguage.textContent.trim() === '[es]'
-                    && !coprop1.textContent.includes('[es]');
+                const languageMovedToCoprop1 = coprop1.textContent.includes('[es]')
+                    && !idCell.textContent.includes('[es]');
 
-                return idCell.classList.contains('text-center')
-                    && languageMovedToId
+                return idCell.textContent.trim() === ''
+                    && languageMovedToCoprop1
                     && coprop1Phone.classList.contains('text-red-600')
                     && coprop1Phone.classList.contains('line-through')
                     && coprop2Email.classList.contains('text-red-600')
@@ -232,10 +232,10 @@ test('admin owners list shows assignment percentages with validation colors by p
         'coprop1_name' => 'Dusk Percentages Owner',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'PT-01']);
-    $local = Location::factory()->local()->create(['code' => 'LC-01']);
-    $garage = Location::factory()->garage()->create(['code' => 'GR-01']);
-    $storage = Location::factory()->storage()->create(['code' => 'ST-01']);
+    $portal = Location::factory()->portal()->create(['name' => 'PT-01']);
+    $local = Location::factory()->local()->create(['name' => 'LC-01']);
+    $garage = Location::factory()->garage()->create(['name' => 'GR-01']);
+    $storage = Location::factory()->storage()->create(['name' => 'ST-01']);
 
     $portalProperty = Property::factory()->create([
         'location_id' => $portal->id,
@@ -310,25 +310,25 @@ test('admin owners list shows assignment percentages with validation colors by p
                 const checks = [
                     {
                         selector: '[data-owner-assignment-type="portal"]',
-                        locationAndProperty: 'PT-01 P-1',
+                        locationAndProperty: '[P-1] PT-01 P-1',
                         percentages: '20,75% | 10,50%',
                         colorClass: 'text-green-600',
                     },
                     {
                         selector: '[data-owner-assignment-type="garage"]',
-                        locationAndProperty: 'GR-01 G-1',
+                        locationAndProperty: '[G-1] GR-01 G-1',
                         percentages: '6,50% | 5,25%',
                         colorClass: 'text-green-600',
                     },
                     {
                         selector: '[data-owner-assignment-type="storage"]',
-                        locationAndProperty: 'ST-01 S-1',
+                        locationAndProperty: '[S-1] ST-01 S-1',
                         percentages: '2,00% | 1,00%',
                         colorClass: 'text-red-500',
                     },
                     {
                         selector: '[data-owner-assignment-type="local"]',
-                        locationAndProperty: 'LC-01 L-1',
+                        locationAndProperty: '[L-1] LC-01 L-1',
                         percentages: '40,00% | 30,00%',
                         colorClass: 'text-red-500',
                     },
@@ -444,6 +444,7 @@ test('admin can access location detail sensitive view and sees editable property
 
     $property = Property::factory()->create([
         'location_id' => $location->id,
+        'code' => '2B',
         'name' => '2B',
     ]);
 
@@ -453,6 +454,7 @@ test('admin can access location detail sensitive view and sees editable property
             ->visit('/admin/finkak/' . $location->id)
             ->waitFor('[data-property-id="' . $property->id . '"]', 5)
             ->assertPresent('[data-property-id="' . $property->id . '"]')
+            ->assertSee('2B')
             ->assertPresent('[data-assigned]')
             ->assertMissing('[data-admin-validated]')
             ->assertMissing('[data-owner-validated]');

@@ -401,11 +401,11 @@ class Users extends Component
             'communityLocationOptions' => Location::query()
                 ->whereIn('type', ['portal', 'local', 'garage'])
                 ->orderByRaw("CASE WHEN type = 'portal' THEN 1 WHEN type = 'local' THEN 2 WHEN type = 'garage' THEN 3 ELSE 4 END")
-                ->orderBy('code')
-                ->get(['id', 'code', 'type'])
+                ->orderBy('name')
+                ->get(['id', 'name', 'type'])
                 ->map(static fn (Location $location): array => [
                     'id' => (string) $location->id,
-                    'label' => __('admin.locations.types.' . $location->type) . ' ' . $location->code,
+                    'label' => trim(__('admin.locations.types.' . $location->type) . ' ' . $location->name),
                 ])
                 ->values()
                 ->all(),

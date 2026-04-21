@@ -5,8 +5,13 @@
  */
 
 use App\Models\User;
+use App\Models\Owner;
+use App\Models\Notice;
 use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
+use App\Models\NoticeRead;
+use App\Models\Construction;
+use App\Models\PropertyAssignment;
 
 test('admin can create, publish, verify public, unpublish and delete a notice', function () {
     $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
@@ -141,5 +146,53 @@ test('admin can create, publish, verify public, unpublish and delete a notice', 
 
         $browser->pause(1500)
             ->assertDontSee($title);
+    });
+});
+
+test('admin can open readers modal for a construction notice', function () {
+    $admin = User::where('email', 'info@madaia33.eus')->firstOrFail();
+
+    $construction = Construction::factory()->create([
+        'slug' => 'obrako-irakurleak',
+    ]);
+
+    $notice = Notice::factory()->create([
+        'title_eu' => 'Obrako irakurleen kontrola',
+        'title_es' => 'Control lectoras obra',
+        'notice_tag_id' => $construction->tag->id,
+    ]);
+
+    $openedOwner = Owner::factory()->create([
+        'coprop1_name' => 'Irati',
+        'coprop1_surname' => 'Ireki',
+    ]);
+    $unopenedOwner = Owner::factory()->create([
+        'coprop1_name' => 'Nora',
+        'coprop1_surname' => 'Itxi',
+    ]);
+
+    PropertyAssignment::factory()->create(['owner_id' => $openedOwner->id]);
+    PropertyAssignment::factory()->create(['owner_id' => $unopenedOwner->id]);
+
+    NoticeRead::query()->create([
+        'notice_id' => $notice->id,
+        'owner_id' => $openedOwner->id,
+        'user_id' => $openedOwner->user_id,
+        'ip_address' => '127.0.0.1',
+        'opened_at' => now(),
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($admin, $notice): void {
+        $browser->loginAs($admin)
+            ->visit('/admin/iragarkiak')
+            ->waitFor('[data-notice-readers-btn="' . $notice->id . '"]', 5)
+            ->click('[data-notice-readers-btn="' . $notice->id . '"]')
+            ->waitFor('[data-notice-readers-modal]', 5)
+            ->assertSee('Irati Ireki')
+            ->assertSee('Nora Itxi')
+            ->assertPresent('[data-notice-reader-opened-icon]')
+            ->assertPresent('[data-notice-reader-unopened-icon]')
+            ->assertMissing('[data-notice-readers-footer-close]');
     });
 });

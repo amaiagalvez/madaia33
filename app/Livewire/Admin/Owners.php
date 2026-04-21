@@ -35,8 +35,6 @@ class Owners extends Component
 
     public bool $showCreateForm = false;
 
-    public string $ownerId = '';
-
     public string $coprop1Name = '';
 
     public string $coprop1Surname = '';
@@ -473,7 +471,6 @@ class Owners extends Component
     public function cancelCreateOwner(): void
     {
         $this->reset([
-            'ownerId',
             'coprop1Name',
             'coprop1Surname',
             'coprop1Dni',
@@ -497,7 +494,7 @@ class Owners extends Component
     public function render(): View
     {
         return view('livewire.admin.owners.index', [
-            'owners' => $this->buildOwnersQuery()->orderBy('id')->paginate(20),
+            'owners' => $this->buildOwnersQuery()->paginate(20),
             ...$this->loadViewData(),
             'expandedAssignments' => $this->loadExpandedAssignments(),
         ]);

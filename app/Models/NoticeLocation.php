@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property-read string|null $location_code
  * @property-read string|null $location_type
+ * @property-read string $display_label
  */
 class NoticeLocation extends Model
 {
@@ -43,10 +44,10 @@ class NoticeLocation extends Model
     public function getLocationCodeAttribute(): ?string
     {
         if ($this->relationLoaded('location') && $this->location !== null) {
-            return $this->location->code;
+            return $this->location->name;
         }
 
-        return $this->location?->code;
+        return $this->location?->name;
     }
 
     /**
@@ -59,5 +60,18 @@ class NoticeLocation extends Model
         }
 
         return $this->location?->type;
+    }
+
+    public function getDisplayLabelAttribute(): string
+    {
+        $location = $this->relationLoaded('location')
+            ? $this->location
+            : $this->location()->first();
+
+        if ($location === null) {
+            return '';
+        }
+
+        return trim((string) $location->name);
     }
 }

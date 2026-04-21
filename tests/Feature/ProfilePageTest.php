@@ -5,6 +5,7 @@ use App\Models\Owner;
 use App\Models\Voting;
 use App\Models\Campaign;
 use App\Models\Property;
+use App\SupportedLocales;
 use App\Models\VotingBallot;
 use App\Models\OwnerAuditLog;
 use App\Models\ContactMessage;
@@ -513,3 +514,37 @@ it('shows owner form actions and latest owner audit changes in owner tab', funct
         ->assertSee(__('admin.owners.columns.terms_accepted'))
         ->assertSee('—');
 });
+
+it('renders profile dates using the active locale ordering', function (string $locale) {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+
+    $voting = Voting::factory()->create([
+        'name_eu' => 'Data lokala profilan',
+        'name_es' => 'Fecha local en perfil',
+    ]);
+
+    VotingBallot::factory()->create([
+        'voting_id' => $voting->id,
+        'owner_id' => $owner->id,
+        'cast_by_user_id' => $owner->user_id,
+        'voted_at' => '2026-04-20 09:10:11',
+    ]);
+
+    UserLoginSession::factory()->closed()->create([
+        'user_id' => $owner->user_id,
+        'logged_in_at' => '2026-04-18 08:00:00',
+        'logged_out_at' => '2026-04-18 10:00:00',
+    ]);
+
+    test()->actingAs($owner->user)
+        ->get(route(SupportedLocales::routeName('profile', $locale), ['tab' => 'votings']))
+        ->assertOk()
+        ->assertSee($locale === SupportedLocales::BASQUE ? '2026/04/20 09:10:11' : '20/04/2026 09:10:11');
+
+    test()->actingAs($owner->user)
+        ->get(route(SupportedLocales::routeName('profile', $locale), ['tab' => 'sessions']))
+        ->assertOk()
+        ->assertSee($locale === SupportedLocales::BASQUE ? '2026/04/18 08:00:00' : '18/04/2026 08:00:00');
+})->with(SupportedLocales::all());

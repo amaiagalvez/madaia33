@@ -10,15 +10,18 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 class="sr-only">{{ __('home.title') }}</h1>
 
-        @if ($hasOpenVotings || auth()->check())
-            <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2" data-home-callouts>
+        @if ($hasOpenVotings || auth()->check() || $hasActiveConstructions)
+            @php($homeCalloutCount = ($hasOpenVotings ? 1 : 0) + (auth()->check() ? 1 : 0) + ($hasActiveConstructions ? 1 : 0))
+            @php($stackCalloutActions = $homeCalloutCount === 3)
+            <div class="mb-6 grid grid-cols-1 gap-4 {{ $homeCalloutCount === 3 ? 'lg:grid-cols-3' : ($homeCalloutCount === 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-1') }}"
+                data-home-callouts>
                 @if ($hasOpenVotings)
                     <section
-                        class="section-shell overflow-hidden border border-brand-600/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6 {{ !auth()->check() ? 'lg:col-span-2' : '' }}"
+                        class="section-shell overflow-hidden border border-brand-600/35 bg-linear-to-r from-[#edd2c7]/45 via-white to-[#f1bd4d]/20 p-5 sm:p-6"
                         data-home-votings-callout>
                         <div
-                            class="flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex items-start gap-4">
+                            class="{{ $stackCalloutActions ? 'grid h-full grid-cols-[auto,1fr] gap-x-4 gap-y-4' : 'flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between' }}">
+                            @if ($stackCalloutActions)
                                 <div
                                     class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-brand-600/25 bg-linear-to-br from-[#f1bd4d]/35 via-white to-[#edd2c7]/60 text-[#793d3d] shadow-sm ring-4 ring-white/40">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -29,7 +32,7 @@
                                     <span
                                         class="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 rounded-full bg-brand-600"></span>
                                 </div>
-                                <div>
+                                <div data-home-votings-copy>
                                     <p
                                         class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
                                         {{ __('home.votings_badge') }}
@@ -38,28 +41,63 @@
                                         class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
                                         {{ __('home.votings_title') }}
                                     </h2>
-                                    <p class="mt-1.5 text-sm text-gray-600">
+                                    <p class="mt-1.5 text-sm text-gray-600"
+                                        data-home-votings-summary>
                                         {{ __('home.votings_summary') }}
                                     </p>
                                 </div>
-                            </div>
 
-                            <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
-                                class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap"
-                                data-home-votings-cta>
-                                {{ __('home.votings_cta') }}
-                            </a>
+                                <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
+                                    class="btn-brand col-start-2 inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap"
+                                    data-home-votings-cta>
+                                    {{ __('home.votings_cta') }}
+                                </a>
+                            @else
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-brand-600/25 bg-linear-to-br from-[#f1bd4d]/35 via-white to-[#edd2c7]/60 text-[#793d3d] shadow-sm ring-4 ring-white/40">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.8" stroke="currentColor"
+                                            aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3Zm2.25 4.5h6m-6 3h6m-6 3h3" />
+                                        </svg>
+                                        <span
+                                            class="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 rounded-full bg-brand-600"></span>
+                                    </div>
+                                    <div data-home-votings-copy>
+                                        <p
+                                            class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                                            {{ __('home.votings_badge') }}
+                                        </p>
+                                        <h2
+                                            class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
+                                            {{ __('home.votings_title') }}
+                                        </h2>
+                                        <p class="mt-1.5 text-sm text-gray-600"
+                                            data-home-votings-summary>
+                                            {{ __('home.votings_summary') }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <a href="{{ route(\App\SupportedLocales::routeName('votings')) }}"
+                                    class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap"
+                                    data-home-votings-cta>
+                                    {{ __('home.votings_cta') }}
+                                </a>
+                            @endif
                         </div>
                     </section>
                 @endif
 
                 @auth
                     <section
-                        class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-brand-600/10 p-5 sm:p-6 {{ !$hasOpenVotings ? 'lg:col-span-2' : '' }}"
+                        class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-brand-600/10 p-5 sm:p-6"
                         data-home-profile-callout>
                         <div
-                            class="flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div class="flex items-start gap-4">
+                            class="{{ $stackCalloutActions ? 'grid h-full grid-cols-[auto,1fr] gap-x-4 gap-y-4' : 'flex h-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between' }}">
+                            @if ($stackCalloutActions)
                                 <div
                                     class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#793d3d]/20 bg-linear-to-br from-[#edd2c7]/60 via-white to-brand-600/25 text-[#793d3d] shadow-sm ring-4 ring-white/40">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -70,7 +108,7 @@
                                     <span
                                         class="pointer-events-none absolute -left-1.5 -bottom-1.5 h-3.5 w-3.5 rounded-full bg-[#f1bd4d]"></span>
                                 </div>
-                                <div>
+                                <div data-home-profile-copy>
                                     <p
                                         class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
                                         {{ __('home.profile_badge') }}
@@ -79,20 +117,96 @@
                                         class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
                                         {{ __('home.profile_title') }}
                                     </h2>
-                                    <p class="mt-1.5 text-sm text-gray-600">
+                                    <p class="mt-1.5 text-sm text-gray-600" data-home-profile-summary>
                                         {{ __('home.profile_summary') }}
                                     </p>
                                 </div>
-                            </div>
 
-                            <a href="{{ route(\App\SupportedLocales::routeName('profile')) }}"
-                                class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap"
-                                data-home-profile-cta>
-                                {{ __('home.profile_cta') }}
-                            </a>
+                                <a href="{{ route(\App\SupportedLocales::routeName('profile')) }}"
+                                    class="btn-brand col-start-2 inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap"
+                                    data-home-profile-cta>
+                                    {{ __('home.profile_cta') }}
+                                </a>
+                            @else
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#793d3d]/20 bg-linear-to-br from-[#edd2c7]/60 via-white to-brand-600/25 text-[#793d3d] shadow-sm ring-4 ring-white/40">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm-7.5 8.25a7.5 7.5 0 0 1 15 0" />
+                                        </svg>
+                                        <span
+                                            class="pointer-events-none absolute -left-1.5 -bottom-1.5 h-3.5 w-3.5 rounded-full bg-[#f1bd4d]"></span>
+                                    </div>
+                                    <div data-home-profile-copy>
+                                        <p
+                                            class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                                            {{ __('home.profile_badge') }}
+                                        </p>
+                                        <h2
+                                            class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
+                                            {{ __('home.profile_title') }}
+                                        </h2>
+                                        <p class="mt-1.5 text-sm text-gray-600"
+                                            data-home-profile-summary>
+                                            {{ __('home.profile_summary') }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <a href="{{ route(\App\SupportedLocales::routeName('profile')) }}"
+                                    class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap"
+                                    data-home-profile-cta>
+                                    {{ __('home.profile_cta') }}
+                                </a>
+                            @endif
                         </div>
                     </section>
                 @endauth
+
+                @if ($hasActiveConstructions)
+                    <section
+                        class="section-shell overflow-hidden border border-[#793d3d]/25 bg-linear-to-r from-[#edd2c7]/35 via-white to-[#f1bd4d]/15 p-5 sm:p-6"
+                        data-home-constructions-callout>
+                        <div class="grid h-full grid-cols-[auto,1fr] gap-x-4 gap-y-4">
+                            <div
+                                class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#793d3d]/20 bg-linear-to-br from-[#edd2c7]/60 via-white to-[#f1bd4d]/20 text-[#793d3d] shadow-sm ring-4 ring-white/40">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3.75 21h16.5M5.25 21V9.75m13.5 11.25V6.75m-9 14.25V4.5m-3.75 5.25h7.5" />
+                                </svg>
+                                <span
+                                    class="pointer-events-none absolute -right-1.5 -top-1.5 h-3.5 w-3.5 rounded-full bg-[#f1bd4d]"></span>
+                            </div>
+                            <div data-home-constructions-copy>
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-[#793d3d]">
+                                    {{ __('home.constructions_badge') }}
+                                </p>
+                                <h2
+                                    class="mt-1 text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
+                                    {{ __('home.constructions_title') }}
+                                </h2>
+                                <p class="mt-1.5 text-sm text-gray-600"
+                                    data-home-constructions-summary>
+                                    {{ __('home.constructions_summary') }}
+                                </p>
+                            </div>
+
+                            <div class="col-start-2 flex flex-col items-start gap-2">
+                                @foreach ($activeConstructions as $activeConstruction)
+                                    <a href="{{ route(\App\SupportedLocales::routeName('constructions.show'), ['slug' => $activeConstruction->slug]) }}"
+                                        class="btn-brand inline-flex min-h-11 items-center justify-center whitespace-nowrap {{ $stackCalloutActions ? 'w-full' : '' }}"
+                                        data-home-construction-link="{{ $activeConstruction->slug }}">
+                                        {{ $activeConstruction->title }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </section>
+                @endif
             </div>
         @endif
 
@@ -180,8 +294,9 @@
                         @foreach ($historyImageUrls as $historyImageUrl)
                             <div
                                 class="overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
-                                <img src="{{ $historyImageUrl }}" alt="" aria-hidden="true"
-                                    class="h-36 w-full object-cover sm:h-44" loading="lazy" />
+                                <img src="{{ $historyImageUrl }}" alt=""
+                                    aria-hidden="true" class="h-36 w-full object-cover sm:h-44"
+                                    loading="lazy" />
                             </div>
                         @endforeach
                     </div>

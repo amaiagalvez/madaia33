@@ -49,7 +49,7 @@ it('renders campaigns in the admin list', function () {
 it('shows translated recipient filters and the invalid contacts breadcrumb', function () {
     $user = adminUser();
 
-    $location = Location::factory()->portal()->create(['code' => 'P-33']);
+    $location = Location::factory()->portal()->create(['name' => 'Portal 33']);
 
     $campaign = Campaign::factory()->create([
         'subject_eu' => 'Atariko mezua',
@@ -65,8 +65,8 @@ it('shows translated recipient filters and the invalid contacts breadcrumb', fun
     test()->actingAs($user)
         ->get(route('admin.campaigns'))
         ->assertOk()
-        ->assertSee('P-33')
-        ->assertDontSee('portal:P-33')
+        ->assertSee('Atariko mezua')
+        ->assertDontSee('portal:Portal 33')
         ->assertDontSee('campaigns.admin.filters.portal');
 
     test()->actingAs($user)
@@ -209,7 +209,6 @@ it('limits general admins to unfiltered campaigns only', function () {
     $generalAdmin->assignRole(Role::GENERAL_ADMIN);
 
     $managedLocation = Location::factory()->portal()->create([
-        'code' => 'GA-01',
         'name' => 'Portal GA-01',
     ]);
 
@@ -266,7 +265,6 @@ it('hides the all filter option from community admins', function () {
     $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
 
     $managedLocation = Location::factory()->portal()->create([
-        'code' => 'CA-33',
         'name' => 'Portal CA-33',
     ]);
 
@@ -276,7 +274,7 @@ it('hides the all filter option from community admins', function () {
         ->test('admin-campaign-manager')
         ->call('createCampaign')
         ->assertDontSeeHtml('value="all"')
-        ->assertSee('CA-33');
+        ->assertSee('Portal CA-33');
 });
 
 it('does not preselect the all owners filter on new campaigns', function () {
@@ -408,8 +406,8 @@ it('deletes a stored campaign document from the edit form', function () {
 it('stores multiple location recipient filters in a single campaign', function () {
     $user = adminUser();
 
-    $portal = Location::factory()->portal()->create(['code' => 'P-01']);
-    $garage = Location::factory()->garage()->create(['code' => 'G-02']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 01']);
+    $garage = Location::factory()->garage()->create(['name' => 'Garaje 02']);
 
     Livewire::actingAs($user)
         ->test('admin-campaign-manager')

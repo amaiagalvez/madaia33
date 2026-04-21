@@ -28,7 +28,7 @@ test('census modal hides vote and delegation columns', function () {
         'coprop1_name' => 'Dusk Census Owner',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => 'CENSUS-01']);
+    $portal = Location::factory()->portal()->create(['name' => 'CENSUS-01']);
     $property = Property::factory()->create([
         'location_id' => $portal->id,
         'name' => '1A',

@@ -72,16 +72,28 @@ it('shows assigned managed locations in users list', function () {
     ]);
     $communityAdmin->assignRole(Role::COMMUNITY_ADMIN);
 
-    $portal = Location::factory()->portal()->create(['code' => 'L-PORTAL-01']);
-    $garage = Location::factory()->garage()->create(['code' => 'L-GARAGE-01']);
+    $portal = Location::factory()->portal()->create(['name' => 'Portal Norte']);
+    $garage = Location::factory()->garage()->create(['name' => 'Garaje Principal']);
     $communityAdmin->managedLocations()->sync([$portal->id, $garage->id]);
 
     test()->actingAs($manager)
         ->get(route('admin.users.index'))
         ->assertOk()
         ->assertSee('Community Locations User')
-        ->assertSee('L-PORTAL-01')
-        ->assertSee('L-GARAGE-01');
+        ->assertSee('Portal Norte')
+        ->assertSee('Garaje Principal');
+});
+
+it('renders a translated label for the construction manager role option', function () {
+    $manager = adminUser([
+        'email' => 'manager-role-label@example.com',
+    ]);
+
+    test()->actingAs($manager)
+        ->get(route('admin.users.index'))
+        ->assertOk()
+        ->assertSee(__('admin.users.roles_labels.' . Role::CONSTRUCTION_MANAGER))
+        ->assertDontSee('admin.users.roles_labels.' . Role::CONSTRUCTION_MANAGER);
 });
 
 it('filters users list by selected role', function () {

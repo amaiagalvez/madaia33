@@ -61,7 +61,7 @@
             @if ($currentChief !== null)
                 <p class="mt-3 text-sm text-stone-700"
                     data-chief-owner-current="{{ $currentChief->id }}">
-                    {{ __('admin.locations.chief_owner_current', ['name' => $currentChief->coprop1_name]) }}
+                    {{ __('admin.locations.chief_owner_current', ['name' => $currentChief->fullName1]) }}
                 </p>
             @endif
         </div>
@@ -84,8 +84,11 @@
                 </h2>
 
                 <div class="grid gap-4 md:grid-cols-2">
+                    <x-admin.form-input name="newPropertyCode" model="newPropertyCode"
+                        :label="__('admin.locations.code')" />
+
                     <x-admin.form-input name="newPropertyName" model="newPropertyName"
-                        :label="__('admin.locations.property_name')" class="md:col-span-2" data-field="new-property-name" />
+                        :label="__('admin.locations.property_name')" data-field="new-property-name" />
 
                     <x-admin.form-input name="newCommunityPct" model="newCommunityPct"
                         :label="__('admin.locations.community_pct')" />
@@ -104,6 +107,9 @@
     <x-admin.panel-table>
         <thead class="bg-gray-50">
             <tr>
+                <x-admin.table-header-cell>
+                    {{ __('admin.locations.code') }}
+                </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
                     {{ __('admin.locations.property') }}
                 </x-admin.table-header-cell>
@@ -130,6 +136,13 @@
                 <tr wire:key="property-{{ $property->id }}"
                     data-property-id="{{ $property->id }}">
                     @if ($editingPropertyId === $property->id)
+                        <td class="px-6 py-4 text-sm">
+                            <input type="text" wire:model="editCode"
+                                class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]" />
+                            @error('editCode')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </td>
                         <td class="px-6 py-4 text-sm">
                             <input type="text" wire:model="editName"
                                 class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-[#d9755b] focus:outline-none focus:ring-1 focus:ring-[#d9755b]"
@@ -166,6 +179,8 @@
                         </td>
                     @else
                         <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                            {{ $property->displayCode() }}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
                             {{ $property->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-500">
                             %{{ number_format($property->community_pct ?? 0, 2, ',', '.') }}</td>
@@ -188,7 +203,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('admin.locations.no_properties') }}
                     </td>
                 </tr>

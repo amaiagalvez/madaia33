@@ -221,6 +221,7 @@ it('shows an edit shortcut for recipients with an owner profile', function () {
     test()->actingAs($user)
         ->get(route('admin.campaigns.show', $campaign))
         ->assertOk()
+        ->assertSee('Amaia Arregi')
         ->assertSee(route('admin.owners.index', ['editOwner' => $owner->id]), false)
         ->assertSee('target="_blank"', false)
         ->assertSee('data-campaign-owner-edit-' . $owner->id, false);

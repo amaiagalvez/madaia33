@@ -125,6 +125,19 @@
                     </a>
                 @endif
 
+                @if (auth()->user()?->canManageConstructions())
+                    <a href="{{ route('admin.constructions') }}" data-sidebar-link-constructions
+                        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.constructions') ? 'bg-[#edd2c7] text-[#793d3d]' : 'text-stone-600 hover:bg-[#edd2c7]/45 hover:text-[#793d3d]' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 21h16.5M5.25 21V8.25m13.5 12.75V8.25M5.25 8.25h13.5M7.5 8.25V5.625c0-.621.504-1.125 1.125-1.125h6.75c.621 0 1.125.504 1.125 1.125V8.25M9.75 12h4.5m-4.5 3h4.5" />
+                        </svg>
+
+                        {{ __('admin.constructions.menu') }}
+                    </a>
+                @endif
+
                 <p class="px-3 pt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
                     {{ __('admin.sidebar.community') }}
                 </p>
@@ -257,6 +270,10 @@
                         @if (auth()->user()?->canManageAdminVotings())
                             <a href="{{ route('admin.votings') }}"
                                 class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.votings.menu') }}</a>
+                        @endif
+                        @if (auth()->user()?->canManageConstructions())
+                            <a href="{{ route('admin.constructions') }}"
+                                class="block px-3 py-2 rounded-md text-sm font-medium text-stone-700 hover:bg-[#edd2c7]/45 hover:text-[#793d3d] transition-colors">{{ __('admin.constructions.menu') }}</a>
                         @endif
                         <p
                             class="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-stone-400">

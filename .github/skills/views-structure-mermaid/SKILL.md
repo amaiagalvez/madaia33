@@ -12,7 +12,7 @@ Use this skill to keep a single up-to-date Mermaid map of view architecture for 
 
 ## Source of truth
 
-- Route entry points in `routes/web.php` and `routes/settings.php`.
+- Route entry points in `routes/public.php`, `routes/private.php`, and `routes/settings.php`.
 - Blade templates in `resources/views/**`.
 - Layout usage (`<x-layouts::...>`), includes (`@include(...)`), and Blade components (`<x-...>`).
 - Livewire mounts in Blade (`<livewire:...>` and `Route::livewire(...)`).
@@ -28,27 +28,38 @@ Use this skill to keep a single up-to-date Mermaid map of view architecture for 
 
 ```mermaid
 flowchart LR
-    WEB[web.php locale routes] --> PUB[public views]
-    WEB --> ADM[admin views]
-    SETTINGS[settings.php livewire routes] --> SETTINGSPAGES[settings livewire pages]
-    PUB --> FRONTLAYOUT[layouts.front.main]
-    ADM --> ADMINLAYOUT[layouts.admin.main]
-    AUTHPAGES[auth pages] --> AUTHLAYOUT[layouts.shared.auth -> layouts.shared.auth.simple]
-    DASHBOARDPAGE[pages.dashboard.index] --> APPLAYOUT[layouts.shared.app -> layouts.shared.app.sidebar]
+    PUBLICROUTES[public.php] --> PUBLICVIEWS[public views]
+    PUBLICVIEWS --> FRONTLAYOUT[layouts.front.main]
+
+    PRIVATEROUTES[private.php] --> ADMINVIEWS[admin views]
+    ADMINVIEWS --> ADMINLAYOUT[layouts.admin.main]
+    ADMINVIEWS --> CONSTRUCTIONSVIEW[admin.constructions]
+    CONSTRUCTIONSVIEW --> CONSTRUCTIONSLW[admin-construction-manager]
+    ADMINVIEWS --> CONSTRUCTIONINQUIRIESVIEW[admin.construction-inquiries]
+    CONSTRUCTIONINQUIRIESVIEW --> CONSTRUCTIONINQUIRIESLW[admin-construction-inquiry-inbox]
+
+    AUTHVIEWS[auth pages] --> AUTHSHELL[layouts.shared.auth]
+    AUTHSHELL --> AUTHLAYOUT[layouts.shared.auth.simple]
+
+    DASHBOARDPAGE[pages.dashboard.index] --> APPLAYOUT[layouts.shared.app]
+    APPLAYOUT --> APPSIDEBAR[layouts.shared.app.sidebar]
+
+    SETTINGS[settings.php] --> SETTINGSPAGES[settings livewire pages]
 ```
 
 ### 1) Public routes, views and components
 
 ```mermaid
 flowchart TD
-    R1[web.php eu/es public routes] --> VPH[public.home]
+    R1[public.php eu/es public routes] --> VPH[public.home]
     R1 --> VPN[public.notices]
     R1 --> VPG[public.gallery]
     R1 --> VPC[public.contact]
     R1 --> VPP[public.private]
     R1 --> VPL[public.legal-page]
     R1 --> VPV[public.votings]
-    R1 --> VPDFP[pdf.votings.ballot (front delegated/in-person)]
+    R1 --> VPCS[public.constructions.index/show]
+    R1 --> VPDFP["pdf.votings.ballot - front delegated or in-person"]
     R1 --> VE404[errors.404]
     R1 --> VE500[errors.500]
 
@@ -59,6 +70,7 @@ flowchart TD
     VPP --> LF
     VPL --> LF
     VPV --> LF
+    VPCS --> LF
     VE404 --> LF
     VE500 --> LF
 
@@ -67,6 +79,7 @@ flowchart TD
     VPG --> LWG[livewire image-gallery]
     VPC --> LWC[livewire contact-form]
     VPV --> LWV[livewire public-votings]
+    VPCS --> LWCI[livewire public-construction-inquiry-form]
     LF --> LWL[livewire language-switcher]
 
     VPH --> CFNC[x-front.notice-card]
@@ -83,7 +96,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    R2[web.php admin routes] --> VAD[admin.dashboard.index]
+    R2[private.php admin routes] --> VAD[admin.dashboard.index]
     R2 --> VAN[admin.notices]
     R2 --> VAI[admin.images]
     R2 --> VAM[admin.messages]
@@ -93,7 +106,9 @@ flowchart TD
     R2 --> VAOI[admin.owners.index]
     R2 --> VAOS[admin.owners.show]
     R2 --> VAV[admin.votings]
-    R2 --> VPDFA[pdf.votings.ballot (admin delegated/in-person)]
+    R2 --> VAC[admin.constructions]
+    R2 --> VACI[admin.construction-inquiries]
+    R2 --> VPDFA["pdf.votings.ballot - admin delegated or in-person"]
     R2 --> VAU[admin.users.index]
 
     VAD --> LA[layouts.admin.main]
@@ -106,6 +121,8 @@ flowchart TD
     VAOI --> LA
     VAOS --> LA
     VAV --> LA
+    VAC --> LA
+    VACI --> LA
     VAU --> LA
 
     VAD --> CADM[x-admin.page-header]
@@ -114,7 +131,12 @@ flowchart TD
     VAM --> CADM
     VAS --> CADM
     VALI --> CADM
+    VALS --> CADM
+    VAOI --> CADM
+    VAOS --> CADM
     VAV --> CADM
+    VAC --> CADM
+    VACI --> CADM
     VAU --> CADM
 
     VAN --> LMAN[livewire admin-notice-manager]
@@ -126,6 +148,8 @@ flowchart TD
     VAOI --> LMOI[livewire admin.owners]
     VAOS --> LMOD[livewire admin.owner-detail]
     VAV --> LMOV[livewire admin.votings]
+    VAC --> LMAC[livewire admin-construction-manager]
+    VACI --> LMACI[livewire admin-construction-inquiry-inbox]
     VAU --> LMUS[livewire admin.users]
     LMAS --> CATB[admin settings tab partials]
 ```
@@ -149,10 +173,11 @@ flowchart TD
     PAV --> LSH
     LSH --> LASH[layouts.shared.auth.simple]
 
-    PDB[pages.dashboard.index] --> LSA[layouts.shared.app]
+    DASH[private.php dashboard route] --> PDB[pages.dashboard.index]
+    PDB --> LSA[layouts.shared.app]
     LSA --> LSS[layouts.shared.app.sidebar]
 
-    R3[settings.php Route livewire] --> LSProfile[pages::settings.profile]
+    R3[settings.php livewire routes] --> LSProfile[pages::settings.profile]
     R3 --> LSAppearance[pages::settings.appearance]
     R3 --> LSSecurity[pages::settings.security]
 

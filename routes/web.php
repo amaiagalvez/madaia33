@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NoticeDocumentController;
 use App\Http\Controllers\Messaging\TrackingController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 
@@ -16,6 +17,7 @@ Route::get('/eu/track/click/{token?}', [TrackingController::class, 'click'])->na
 Route::get('/es/track/click/{token?}', [TrackingController::class, 'click'])->name('tracking.click.es');
 Route::get('/eu/track/doc/{token?}/{document?}', [TrackingController::class, 'document'])->name('tracking.document.eu');
 Route::get('/es/track/doc/{token?}/{document?}', [TrackingController::class, 'document'])->name('tracking.document.es');
+Route::get('/notice-documents/{token}', [NoticeDocumentController::class, 'show'])->name('notice-documents.download');
 
 require __DIR__ . '/public.php';
 require __DIR__ . '/private.php';

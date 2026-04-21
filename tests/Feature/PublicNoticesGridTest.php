@@ -66,7 +66,7 @@ test('notices page filter selector is visible and responsive', function () {
 test('notices page filter updates grid when location selected', function (string $locale) {
     $portal1 = 'A';
     $notice1 = Notice::factory()->public()->create();
-    attachNoticeToLocationCode($notice1, $portal1);
+    $portalLocation = attachNoticeToLocationCode($notice1, $portal1);
 
     $notice2 = Notice::factory()->public()->create();
     attachNoticeToLocationCode($notice2, 'B');
@@ -77,7 +77,7 @@ test('notices page filter updates grid when location selected', function (string
 
     // Test filter with Livewire
     Livewire::test('public-notices')
-        ->set('locationFilter', $portal1)
+        ->set('locationFilter', (string) $portalLocation->location_id)
         ->assertSee($notice1->title);
 })->with('supported_locales');
 

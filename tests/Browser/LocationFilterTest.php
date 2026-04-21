@@ -41,18 +41,45 @@ test('location filter on notices page filters results in real time', function ()
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($titleA, $titleB) {
         $browser->visit('/eu/iragarkiak')
+            ->dismissCookieConsentBanner()
             ->waitForText($titleA, 5)
             ->assertSee($titleA)
             ->assertSee($titleB);
 
-        // Filter by portal 33-A — wait for Livewire to update
-        $browser->click('[data-notices-filter-btn="33-A"]')
+        // Filter by portal 33-A — locate button by visible location code
+        $browser->assertScript(<<<'JS'
+            (() => {
+                const button = Array.from(document.querySelectorAll('[data-notices-filter-btn]'))
+                    .find((element) => (element.textContent || '').includes('33-A'));
+
+                if (!button) {
+                    return false;
+                }
+
+                button.click();
+
+                return true;
+            })();
+        JS, true)
             ->pause(1500)
             ->assertSee($titleA)
             ->assertDontSee($titleB);
 
         // Filter by portal 33-B
-        $browser->click('[data-notices-filter-btn="33-B"]')
+        $browser->assertScript(<<<'JS'
+            (() => {
+                const button = Array.from(document.querySelectorAll('[data-notices-filter-btn]'))
+                    .find((element) => (element.textContent || '').includes('33-B'));
+
+                if (!button) {
+                    return false;
+                }
+
+                button.click();
+
+                return true;
+            })();
+        JS, true)
             ->pause(1500)
             ->assertSee($titleB)
             ->assertDontSee($titleA);

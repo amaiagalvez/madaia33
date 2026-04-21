@@ -55,7 +55,7 @@
                     <time datetime="{{ $notice->published_at->toIso8601String() }}"
                         data-notice-published-at
                         class="inline-flex items-center rounded-full bg-brand-600/20 px-2.5 py-1 text-xs font-semibold text-[#793d3d]">
-                        {{ $notice->published_at->translatedFormat('j M Y') }}
+                        {{ \App\Support\LocalizedDateFormatter::date($notice->published_at) }}
                     </time>
                 </div>
             @endif

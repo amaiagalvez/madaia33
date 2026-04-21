@@ -5,6 +5,7 @@
 
 use App\Models\Notice;
 use Livewire\Livewire;
+use App\Models\NoticeTag;
 use App\SupportedLocales;
 use Illuminate\Support\Facades\App;
 
@@ -28,6 +29,31 @@ it('does not show private notices on the public notices route', function (string
     $response->assertOk();
     $response->assertSee($publicTitle);
     $response->assertDontSee($privateTitle);
+})->with('supported_locales');
+
+it('does not show tagged notices on the public notices route', function (string $locale) {
+    $tag = NoticeTag::factory()->create();
+
+    $untaggedTitle = $locale === SupportedLocales::SPANISH ? 'Aviso sin etiqueta ES' : 'Iragarki etiketarik gabe EU';
+    $taggedTitle = $locale === SupportedLocales::SPANISH ? 'Aviso etiquetado ES' : 'Iragarki etiketatua EU';
+
+    Notice::factory()->public()->create([
+        'title_eu' => 'Iragarki etiketarik gabe EU',
+        'title_es' => 'Aviso sin etiqueta ES',
+        'notice_tag_id' => null,
+    ]);
+
+    Notice::factory()->public()->create([
+        'title_eu' => 'Iragarki etiketatua EU',
+        'title_es' => 'Aviso etiquetado ES',
+        'notice_tag_id' => $tag->id,
+    ]);
+
+    $response = test()->get(route(SupportedLocales::routeName('notices', $locale)));
+
+    $response->assertOk();
+    $response->assertSee($untaggedTitle);
+    $response->assertDontSee($taggedTitle);
 })->with('supported_locales');
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -55,7 +81,7 @@ it('paginates notices at 10 per page ordered by published_at desc', function () 
 it('filters notices by portal while also showing general scope notices', function () {
     // Notice for portal 33-A only
     $portalA = Notice::factory()->public()->create();
-    attachNoticeToLocationCode($portalA, '33-A');
+    $portalALocation = attachNoticeToLocationCode($portalA, '33-A');
 
     // Notice for portal 33-B only
     $portalB = Notice::factory()->public()->create();
@@ -65,7 +91,7 @@ it('filters notices by portal while also showing general scope notices', functio
     $general = Notice::factory()->public()->create();
 
     $component = Livewire::test('public-notices')
-        ->set('locationFilter', '33-A');
+        ->set('locationFilter', (string) $portalALocation->location_id);
 
     $ids = $component->notices->pluck('id');
 
@@ -123,17 +149,31 @@ it('does not show missing-translation indicator when notice has translation for 
     $component->assertDontSee(__('notices.no_translation'));
 });
 
-it('shows location tags next to the notice', function () {
+it('shows location names next to the notice', function () {
     $notice = Notice::factory()->public()->create(['title_eu' => 'Aviso con portal']);
     attachNoticeToLocationCode($notice, '33-C');
 
     $component = Livewire::test('public-notices');
 
-    $component->assertSee('C');
+    $component->assertSee('Location 33-C');
 });
+
+it('renders notice dates using locale specific ordering', function (string $locale) {
+    Notice::factory()->public()->create([
+        'title_eu' => 'Data duen iragarkia',
+        'title_es' => 'Aviso con fecha',
+        'published_at' => '2026-04-10 00:00:00',
+    ]);
+
+    test()->get(route(SupportedLocales::routeName('notices', $locale)))
+        ->assertOk()
+        ->assertSee($locale === SupportedLocales::BASQUE ? '2026/04/10' : '10/04/2026');
+})->with('supported_locales');
 
 it('resets pagination when changing location filter', function () {
     Notice::factory()->count(15)->public()->create();
+    $filteredNotice = Notice::factory()->public()->create();
+    $portalLocation = attachNoticeToLocationCode($filteredNotice, '33-A');
 
     $component = Livewire::test('public-notices');
 
@@ -142,6 +182,6 @@ it('resets pagination when changing location filter', function () {
     expect($component->notices->currentPage())->toBe(2);
 
     // Change filter — should reset to page 1
-    $component->set('locationFilter', '33-A');
+    $component->set('locationFilter', (string) $portalLocation->location_id);
     expect($component->notices->currentPage())->toBe(1);
 });

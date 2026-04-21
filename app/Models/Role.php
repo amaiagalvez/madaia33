@@ -19,6 +19,8 @@ class Role extends Model
 
     public const COMMUNITY_ADMIN = 'admin_comunidad';
 
+    public const CONSTRUCTION_MANAGER = 'construction_manager';
+
     public const PROPERTY_OWNER = 'propietaria';
 
     public const DELEGATED_VOTE = 'voto_delegado';
@@ -44,6 +46,7 @@ class Role extends Model
             self::SUPER_ADMIN,
             self::GENERAL_ADMIN,
             self::COMMUNITY_ADMIN,
+            self::CONSTRUCTION_MANAGER,
             self::PROPERTY_OWNER,
             self::DELEGATED_VOTE,
         ];

@@ -166,8 +166,8 @@ class PublicVotings extends Component
             ->map(static function (array $row): array {
                 return [
                     'owner_id' => $row['owner']->id,
-                    'owner_name' => $row['owner']->coprop1_name,
-                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
+                    'owner_name' => $row['owner']->fullName1,
+                    'owner_secondary_name' => $row['owner']->fullName2,
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
                     'local_codes' => $row['local_codes'],
@@ -228,8 +228,8 @@ class PublicVotings extends Component
             ->map(static function (array $row): array {
                 return [
                     'owner_id' => $row['owner']->id,
-                    'owner_name' => $row['owner']->coprop1_name,
-                    'owner_secondary_name' => (string) ($row['owner']->coprop2_name ?? ''),
+                    'owner_name' => $row['owner']->fullName1,
+                    'owner_secondary_name' => $row['owner']->fullName2,
                     'pending_votings' => $row['pending_votings'],
                     'portal_codes' => $row['portal_codes'],
                     'local_codes' => $row['local_codes'],

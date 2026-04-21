@@ -16,7 +16,7 @@ test('open voting callout redirects guest to private login and then to votings p
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '66-A']);
+    $portal = Location::factory()->portal()->create(['name' => '66-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -78,7 +78,7 @@ test('eligible owner can vote from front and ballot is stored as auditable recor
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '77-A']);
+    $portal = Location::factory()->portal()->create(['name' => '77-A']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -124,7 +124,7 @@ test('owner without accepted terms sees blocking modal in front votings until ac
     $owner = Owner::factory()->create([
         'accepted_terms_at' => null,
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '77-T']);
+    $portal = Location::factory()->portal()->create(['name' => '77-T']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -164,7 +164,7 @@ test('authenticated owner sees votings explanation and pdf actions on local http
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '77-U']);
+    $portal = Location::factory()->portal()->create(['name' => '77-U']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -198,11 +198,51 @@ test('authenticated owner sees votings explanation and pdf actions on local http
     });
 });
 
+test('front votings shows localized date range block for each voting', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $portal = Location::factory()->portal()->create([
+        'name' => 'Portal 91-A',
+    ]);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->create([
+        'is_published' => true,
+        'starts_at' => '2026-04-20',
+        'ends_at' => '2026-04-30',
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+        'label_eu' => 'Bai',
+        'label_es' => 'Si',
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($owner, $voting) {
+        $browser->loginAs($owner->user)
+            ->visit('/es/votaciones')
+            ->waitFor('[data-voting-date-range="' . $voting->id . '"]', 5)
+            ->assertSeeIn('[data-voting-date-range="' . $voting->id . '"]', '20/04/2026')
+            ->assertSeeIn('[data-voting-date-range="' . $voting->id . '"]', '30/04/2026');
+    });
+});
+
 test('front votings renders html question content instead of escaped tags', function () {
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
-    $portal = Location::factory()->portal()->create(['code' => '77-H']);
+    $portal = Location::factory()->portal()->create(['name' => '77-H']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -285,9 +325,10 @@ test('delegated-vote user sees delegated button on public votings and can open m
 
     $owner = Owner::factory()->create([
         'coprop1_name' => 'Dusk Delegatua',
+        'coprop1_surname' => 'Abizen Osoa',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => '88-Z']);
+    $portal = Location::factory()->portal()->create(['name' => '88-Z']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -319,6 +360,7 @@ test('delegated-vote user sees delegated button on public votings and can open m
             ->assertPresent('[data-open-front-delegated-modal]')
             ->click('[data-open-front-delegated-modal]')
             ->waitFor('[data-front-delegated-modal]')
+            ->assertSee('Dusk Delegatua Abizen Osoa')
             ->assertPresent('[data-front-vote-as-owner]');
     });
 });
@@ -334,9 +376,10 @@ test('delegated-vote user sees in-person button on public votings and can open m
 
     $owner = Owner::factory()->create([
         'coprop1_name' => 'Dusk Presentziala',
+        'coprop1_surname' => 'Abizen Osoa',
     ]);
 
-    $portal = Location::factory()->portal()->create(['code' => '88-Y']);
+    $portal = Location::factory()->portal()->create(['name' => '88-Y']);
     $property = Property::factory()->create(['location_id' => $portal->id]);
 
     PropertyAssignment::factory()->create([
@@ -368,6 +411,7 @@ test('delegated-vote user sees in-person button on public votings and can open m
             ->assertPresent('[data-open-front-in-person-modal]')
             ->click('[data-open-front-in-person-modal]')
             ->waitFor('[data-front-in-person-modal]')
+            ->assertSee('Dusk Presentziala Abizen Osoa')
             ->assertPresent('[data-front-in-person-vote-as-owner]');
     });
 });

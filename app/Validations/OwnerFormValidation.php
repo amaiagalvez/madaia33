@@ -29,7 +29,6 @@ class OwnerFormValidation
     public static function createRules(): array
     {
         return [
-            'ownerId' => ['nullable', 'integer', 'min:1', 'unique:owners,id'],
             ...self::ownerRules(null, self::createFieldMap()),
             'coprop1Dni' => ['nullable', 'string', 'max:20', 'unique:owners,coprop1_dni'],
             'newAssignments' => ['required', 'array', 'min:1'],

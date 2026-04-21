@@ -44,7 +44,6 @@
             cancel-action="cancelEditForm">
             <form wire:submit="saveEditForm" novalidate>
                 <div class="grid grid-cols-1 gap-4">
-                    <x-admin.form-input name="editCode" model="editCode" :label="__('admin.locations.code')" />
                     <x-admin.form-input name="editName" model="editName" :label="__('admin.locations.name')" />
                 </div>
 
@@ -69,7 +68,6 @@
                         </p>
                     </div>
 
-                    <x-admin.form-input name="newCode" model="newCode" :label="__('admin.locations.code')" />
                     <x-admin.form-input name="newName" model="newName" :label="__('admin.locations.name')" />
                 </div>
 
@@ -82,9 +80,6 @@
     <x-admin.panel-table>
         <thead class="bg-gray-50">
             <tr>
-                <x-admin.table-header-cell>
-                    {{ __('admin.locations.code') }}
-                </x-admin.table-header-cell>
                 <x-admin.table-header-cell>
                     {{ __('admin.locations.name') }}
                 </x-admin.table-header-cell>
@@ -112,9 +107,8 @@
             @forelse($locations as $location)
                 <tr wire:key="location-{{ $location->id }}"
                     data-location-id="{{ $location->id }}">
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $location->code }}
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $location->name }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ $location->name }}</td>
                     <td class="px-6 py-4 text-sm text-gray-500">{{ $location->properties_count }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
@@ -152,7 +146,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
+                    <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
                         {{ __('admin.locations.no_records') }}
                     </td>
                 </tr>

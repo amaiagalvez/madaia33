@@ -21,6 +21,7 @@ class ContactMessageFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->safeEmail(),
             'user_id' => null,
+            'notice_tag_id' => null,
             'subject' => fake()->sentence(4),
             'message' => fake()->paragraph(),
             'is_read' => false,

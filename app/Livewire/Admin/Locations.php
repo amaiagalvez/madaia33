@@ -7,7 +7,6 @@ use App\Models\User;
 use Livewire\Component;
 use App\Models\Location;
 use Livewire\WithPagination;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -24,15 +23,11 @@ class Locations extends Component
 
     public ?int $editingLocationId = null;
 
-    public string $editCode = '';
-
     public string $editName = '';
 
     public bool $showEditForm = false;
 
     public bool $showCreateForm = false;
-
-    public string $newCode = '';
 
     public string $newName = '';
 
@@ -63,7 +58,6 @@ class Locations extends Component
 
         $this->showCreateForm = false;
         $this->editingLocationId = $location->id;
-        $this->editCode = $location->code;
         $this->editName = $location->name;
         $this->showEditForm = true;
     }
@@ -77,7 +71,6 @@ class Locations extends Component
 
         $this->cancelEditForm();
         $this->showCreateForm = true;
-        $this->newCode = '';
         $this->newName = '';
         $this->resetValidation();
     }
@@ -90,13 +83,11 @@ class Locations extends Component
         $this->assertSuperAdmin($user);
 
         $validated = $this->validate([
-            'newCode' => ['required', 'string', 'max:10', Rule::unique('locations', 'code')],
             'newName' => ['required', 'string', 'max:50'],
         ]);
 
         Location::query()->create([
             'type' => $this->type,
-            'code' => $validated['newCode'],
             'name' => $validated['newName'],
         ]);
 
@@ -113,12 +104,10 @@ class Locations extends Component
         abort_unless($this->editingLocationId !== null, 404);
 
         $validated = $this->validate([
-            'editCode' => ['required', 'string', 'max:10', Rule::unique('locations', 'code')->ignore($this->editingLocationId)],
             'editName' => ['required', 'string', 'max:50'],
         ]);
 
         Location::query()->findOrFail($this->editingLocationId)->update([
-            'code' => $validated['editCode'],
             'name' => $validated['editName'],
         ]);
 
@@ -128,7 +117,6 @@ class Locations extends Component
     public function cancelEditForm(): void
     {
         $this->editingLocationId = null;
-        $this->editCode = '';
         $this->editName = '';
         $this->showEditForm = false;
         $this->resetValidation();
@@ -137,7 +125,6 @@ class Locations extends Component
     public function cancelCreateForm(): void
     {
         $this->showCreateForm = false;
-        $this->newCode = '';
         $this->newName = '';
         $this->resetValidation();
     }
@@ -214,7 +201,6 @@ class Locations extends Component
             ->withCount(['properties'])
             ->withSum('properties', 'community_pct')
             ->withSum('properties', 'location_pct')
-            ->orderBy('code')
             ->orderBy('name')
             ->paginate(20);
 

@@ -1,6 +1,6 @@
 <x-layouts::admin.main :title="__('admin.locations.detail_title')">
     <div class="max-w-7xl mx-auto">
-        <x-admin.page-header :title="$location->name . ' (' . $location->code . ')'" />
+        <x-admin.page-header :title="$location->name" />
 
         @php
             $backRoute = match ($location->type) {
@@ -26,7 +26,7 @@
                     {{ $backLabel }}
                 </a>
                 <span class="text-stone-300">/</span>
-                <span class="font-medium text-stone-900">{{ $location->code }}</span>
+                <span class="font-medium text-stone-900">{{ $location->name }}</span>
             </nav>
         </div>
 
