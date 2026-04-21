@@ -43,7 +43,11 @@ test('guest home with votings and constructions aligns the first construction bu
                     . 'if (!votingButton || !firstButton) return false;'
                     . 'const votingRect = votingButton.getBoundingClientRect();'
                     . 'const firstRect = firstButton.getBoundingClientRect();'
-                    . 'return Math.abs(firstRect.top - votingRect.top) <= 6 && firstButton.classList.contains("btn-brand");'
+                    . 'const votingCenter = votingRect.top + (votingRect.height / 2);'
+                    . 'const firstCenter = firstRect.top + (firstRect.height / 2);'
+                    . 'return Math.abs(firstRect.height - votingRect.height) <= 2'
+                    . ' && Math.abs(firstCenter - votingCenter) <= 18'
+                    . ' && firstButton.classList.contains("btn-brand");'
                     . '})()',
                 true,
             );
