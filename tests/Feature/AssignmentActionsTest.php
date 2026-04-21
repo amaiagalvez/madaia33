@@ -10,7 +10,7 @@ use App\Actions\Properties\AssignPropertyAction;
 use App\Actions\Properties\UnassignPropertyAction;
 
 describe('AssignPropertyAction', function () {
-    beforeEach(fn () => Mail::fake());
+    beforeEach(fn() => Mail::fake());
 
     it('creates an active assignment for an unassigned property and activates owner user', function () {
         $property = Property::factory()->create();
@@ -42,7 +42,7 @@ describe('AssignPropertyAction', function () {
 
         $action = app(AssignPropertyAction::class);
 
-        expect(fn () => $action->execute($property, $owner2, '2026-06-01'))
+        expect(fn() => $action->execute($property, $owner2, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -83,6 +83,18 @@ describe('AssignPropertyAction', function () {
                 && $mail->subjectLine === 'Bienvenida'
                 && str_contains($mail->bodyHtml, 'Hola');
         });
+    });
+
+    it('does not send welcome mail when owners_send_welcome_mail setting is disabled', function () {
+        createSetting('owners_send_welcome_mail', '');
+
+        $property = Property::factory()->create();
+        $owner = Owner::factory()->create(['coprop1_email' => 'no.welcome.assign@example.com']);
+
+        $action = app(AssignPropertyAction::class);
+        $action->execute($property, $owner, '2026-06-01');
+
+        Mail::assertNothingSent();
     });
 });
 
@@ -128,7 +140,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn () => $action->execute($assignment, '2026-06-01'))
+        expect(fn() => $action->execute($assignment, '2026-06-01'))
             ->toThrow(ValidationException::class);
     });
 
@@ -137,7 +149,7 @@ describe('UnassignPropertyAction', function () {
 
         $action = new UnassignPropertyAction;
 
-        expect(fn () => $action->execute($assignment, '2026-03-09'))
+        expect(fn() => $action->execute($assignment, '2026-03-09'))
             ->toThrow(ValidationException::class);
     });
 });

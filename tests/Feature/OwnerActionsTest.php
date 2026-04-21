@@ -243,7 +243,7 @@ describe('CreateOwnerAction', function () {
 
         $action = new CreateOwnerAction;
 
-        expect(fn () => $action->execute([
+        expect(fn() => $action->execute([
             'coprop1_name' => 'Miren Etxeberria',
             'coprop1_dni' => '12345678Z',
             'coprop1_email' => 'miren@example.com',
@@ -255,6 +255,20 @@ describe('CreateOwnerAction', function () {
                 ],
             ],
         ]))->toThrow(ValidationException::class);
+    });
+
+    it('does not send welcome mail when owners_send_welcome_mail setting is disabled', function () {
+        Mail::fake();
+        createSetting('owners_send_welcome_mail', '');
+
+        $action = new CreateOwnerAction;
+        $action->execute([
+            'coprop1_name' => 'Ane Etxebarria',
+            'coprop1_dni' => '99887766A',
+            'coprop1_email' => 'ane.no.welcome@example.com',
+        ]);
+
+        Mail::assertNothingSent();
     });
 });
 

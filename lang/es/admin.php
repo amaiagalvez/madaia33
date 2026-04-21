@@ -93,6 +93,7 @@ return [
         'owners_terms_text' => 'Condiciones de uso (propietarias)',
         'owners_terms_text_eu' => 'Condiciones (EU)',
         'owners_terms_text_es' => 'Condiciones (ES)',
+        'owners_send_welcome_mail' => 'Enviar email de bienvenida al crear o asignar una propietaria',
         'vote_delegate_terms_text' => 'Condiciones de uso (voto delegado)',
         'vote_delegate_terms_text_eu' => 'Condiciones (EU)',
         'vote_delegate_terms_text_es' => 'Condiciones (ES)',
