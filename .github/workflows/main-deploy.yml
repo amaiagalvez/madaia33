@@ -160,6 +160,11 @@ jobs:
             has_deletions=true
           fi
 
+          if [[ "$EVENT_NAME" == "push" && "$force_full_sync" != "true" && ! -s "$changes_file" ]]; then
+            echo "::warning::Push diff did not produce a deploy payload. Forcing full sync to avoid missing changes."
+            force_full_sync=true
+          fi
+
           echo "force_full_sync=$force_full_sync" >> "$GITHUB_OUTPUT"
           echo "sync_build_assets=$sync_build_assets" >> "$GITHUB_OUTPUT"
           echo "has_uploads=$has_uploads" >> "$GITHUB_OUTPUT"
