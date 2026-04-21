@@ -299,6 +299,11 @@ jobs:
 
           append_deploy_commands() {
             local command_file="$1"
+            local staged_file
+            local relative_path
+            local relative_dir
+            local remote_target_dir
+            local remote_target_file
 
             if [[ "$FORCE_FULL_SYNC" == "true" ]]; then
               echo "$full_sync_command" >> "$command_file"
@@ -307,19 +312,17 @@ jobs:
 
             if [[ "$HAS_UPLOADS" == "true" ]]; then
               while IFS= read -r staged_file; do
-                local relative_path
-                local relative_dir
-                local remote_target_dir
-
                 relative_path="${staged_file#.deploy-sync/upload/}"
                 relative_dir="$(dirname "$relative_path")"
                 remote_target_dir="$FTP_SERVER_DIR"
+                remote_target_file="${FTP_SERVER_DIR}${relative_path}"
 
                 if [[ "$relative_dir" != "." ]]; then
                   remote_target_dir="${FTP_SERVER_DIR}${relative_dir}"
+                  printf "set cmd:fail-exit false; mkdir -p '%s'; set cmd:fail-exit true;\n" "$remote_target_dir" >> "$command_file"
                 fi
 
-                printf "put -O '%s' '%s';\n" "$remote_target_dir" "$staged_file" >> "$command_file"
+                printf "put -o '%s' '%s';\n" "$remote_target_file" "$staged_file" >> "$command_file"
               done < <(find .deploy-sync/upload -type f | sort)
             fi
 
