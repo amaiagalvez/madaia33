@@ -6,7 +6,55 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 use App\Models\Construction;
 
-test('authenticated owner sees active constructions callout and links on home', function () {
+test('guest home with votings and constructions aligns the first construction button with the voting button', function () {
+    Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    $firstConstruction = Construction::factory()->create([
+        'title' => 'Lehen obra aktiboa gonbidatua',
+        'slug' => 'lehen-obra-aktiboa-gonbidatua-bi',
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDays(3),
+        'is_active' => true,
+    ]);
+
+    /** @var DuskTestCase $this */
+    $this->browse(function (Browser $browser) use ($firstConstruction): void {
+        $browser->resize(1440, 1200)
+            ->visit('/eu')
+            ->assertPresent('[data-home-callouts]')
+            ->assertPresent('[data-home-votings-callout]')
+            ->assertPresent('[data-home-constructions-callout]')
+            ->assertPresent('[data-home-votings-cta]')
+            ->assertPresent('[data-home-construction-link="' . $firstConstruction->slug . '"]')
+            ->assertScript(
+                'return window.matchMedia("(min-width: 1024px)").matches;',
+                true,
+            )
+            ->assertScript(
+                'return document.querySelector("[data-home-callouts]")?.classList.contains("lg:grid-cols-2");',
+                true,
+            )
+            ->assertScript(
+                '(function () {'
+                    . 'const layout = document.querySelector("[data-home-constructions-layout]");'
+                    . 'const actions = document.querySelector("[data-home-constructions-actions]");'
+                    . 'const firstButton = document.querySelector("[data-home-construction-link=\"' . $firstConstruction->slug . '\"]");'
+                    . 'if (!layout || !actions || !firstButton) return false;'
+                    . 'return layout.classList.contains("sm:flex-row")'
+                    . ' && layout.classList.contains("sm:items-center")'
+                    . ' && actions.classList.contains("sm:self-center")'
+                    . ' && actions.classList.contains("sm:items-stretch")'
+                    . ' && firstButton.classList.contains("btn-brand")'
+                    . ' && firstButton.classList.contains("h-11");'
+                    . '})()',
+                true,
+            );
+    });
+});
+
+test('authenticated owner sees active constructions callout and keeps three-callout buttons at matching height', function () {
     $owner = Owner::factory()->create([
         'accepted_terms_at' => now(),
     ]);
@@ -16,16 +64,16 @@ test('authenticated owner sees active constructions callout and links on home', 
     ]);
 
     $firstConstruction = Construction::factory()->create([
-        'title' => 'Lehen obra aktiboa',
-        'slug' => 'lehen-obra-aktiboa',
+        'title' => 'Lehen obra aktiboa erabiltzailea',
+        'slug' => 'lehen-obra-aktiboa-erabiltzailea-hiru',
         'starts_at' => now()->subDay(),
         'ends_at' => now()->addDays(3),
         'is_active' => true,
     ]);
 
     $secondConstruction = Construction::factory()->create([
-        'title' => 'Bigarren obra aktiboa',
-        'slug' => 'bigarren-obra-aktiboa',
+        'title' => 'Bigarren obra aktiboa erabiltzailea',
+        'slug' => 'bigarren-obra-aktiboa-erabiltzailea-hiru',
         'starts_at' => now()->subDays(2),
         'ends_at' => now()->addDays(7),
         'is_active' => true,
@@ -33,64 +81,36 @@ test('authenticated owner sees active constructions callout and links on home', 
 
     /** @var DuskTestCase $this */
     $this->browse(function (Browser $browser) use ($owner, $firstConstruction, $secondConstruction): void {
-        $browser->loginAs($owner->user)
+        $browser->resize(1440, 1200)
+            ->loginAs($owner->user)
             ->visit('/eu')
             ->assertPresent('[data-home-callouts]')
             ->assertPresent('[data-home-votings-callout]')
             ->assertPresent('[data-home-profile-callout]')
             ->assertPresent('[data-home-constructions-callout]')
-            ->assertPresent('[data-nav-construction-link="' . $firstConstruction->slug . '"]')
-            ->assertPresent('[data-nav-construction-link="' . $secondConstruction->slug . '"]')
+            ->assertScript(
+                'return window.matchMedia("(min-width: 1024px)").matches;',
+                true,
+            )
             ->assertScript(
                 'return document.querySelector("[data-home-callouts]")?.classList.contains("lg:grid-cols-3");',
                 true,
             )
+            ->assertPresent('[data-nav-construction-link="' . $firstConstruction->slug . '"]')
+            ->assertPresent('[data-nav-construction-link="' . $secondConstruction->slug . '"]')
             ->assertScript(
                 '(function () {'
-                    . 'const copy = document.querySelector("[data-home-votings-copy]");'
-                    . 'const cta = document.querySelector("[data-home-votings-cta]");'
-                    . 'if (!copy || !cta) return false;'
-                    . 'const copyRect = copy.getBoundingClientRect();'
-                    . 'const ctaRect = cta.getBoundingClientRect();'
-                    . 'return ctaRect.top >= copyRect.bottom && Math.round(ctaRect.left) === Math.round(copyRect.left) && Math.round(ctaRect.right) === Math.round(copyRect.right);'
-                    . '})()',
-                true,
-            )
-            ->assertScript(
-                '(function () {'
-                    . 'const copy = document.querySelector("[data-home-profile-copy]");'
-                    . 'const cta = document.querySelector("[data-home-profile-cta]");'
-                    . 'if (!copy || !cta) return false;'
-                    . 'const copyRect = copy.getBoundingClientRect();'
-                    . 'const ctaRect = cta.getBoundingClientRect();'
-                    . 'return ctaRect.top >= copyRect.bottom && Math.round(ctaRect.left) === Math.round(copyRect.left) && Math.round(ctaRect.right) === Math.round(copyRect.right);'
-                    . '})()',
-                true,
-            )
-            ->assertPresent('[data-home-construction-link="' . $firstConstruction->slug . '"]')
-            ->assertPresent('[data-home-construction-link="' . $secondConstruction->slug . '"]')
-            ->assertScript(
-                '(function () {'
-                    . 'const profileButton = document.querySelector("[data-home-profile-cta]");'
+                    . 'const layout = document.querySelector("[data-home-constructions-layout]");'
+                    . 'const actions = document.querySelector("[data-home-constructions-actions]");'
                     . 'const constructionButton = document.querySelector("[data-home-construction-link=\"' . $firstConstruction->slug . '\"]");'
-                    . 'if (!profileButton || !constructionButton) return false;'
-                    . 'return profileButton.classList.contains("btn-brand") && constructionButton.classList.contains("btn-brand") && constructionButton.classList.contains("w-full");'
+                    . 'if (!layout || !actions || !constructionButton) return false;'
+                    . 'return layout.classList.contains("grid")'
+                    . ' && layout.classList.contains("grid-cols-[auto,1fr]")'
+                    . ' && actions.classList.contains("col-start-2")'
+                    . ' && constructionButton.classList.contains("w-full")'
+                    . ' && constructionButton.classList.contains("h-11");'
                     . '})()',
                 true,
-            )
-            ->assertScript(
-                '(function () {'
-                    . 'const copy = document.querySelector("[data-home-constructions-copy]");'
-                    . 'const button = document.querySelector("[data-home-construction-link=\"' . $firstConstruction->slug . '\"]");'
-                    . 'if (!copy || !button) return false;'
-                    . 'const copyRect = copy.getBoundingClientRect();'
-                    . 'const buttonRect = button.getBoundingClientRect();'
-                    . 'return Math.round(buttonRect.left) === Math.round(copyRect.left) && Math.round(buttonRect.right) === Math.round(copyRect.right);'
-                    . '})()',
-                true,
-            )
-            ->click('[data-home-construction-link="' . $firstConstruction->slug . '"]')
-            ->waitFor('[data-page="construction-show"]')
-            ->assertSee($firstConstruction->title);
+            );
     });
 });

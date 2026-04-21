@@ -29,11 +29,11 @@ return [
     'votings_cta' => 'Ir a votaciones',
     'profile_badge' => 'Tu perfil',
     'profile_title' => 'Consulta tu perfil siempre que lo necesites',
-    'profile_summary' => 'Entra en tu perfil para revisar tus datos, sesiones, mensajes y resumen de votaciones.',
+    'profile_summary' => 'En tu perfil puedes revisar tus datos, mensajes y resumen de votaciones.',
     'profile_cta' => 'Ver perfil',
     'constructions_badge' => 'Obras',
     'constructions_title' => 'Toda la información sobre las obras',
-    'constructions_summary' => 'Entra para revisar los detalles de las obras, avisos y formulario de contacto para enviar tus dudas.',
+    'constructions_summary' => 'Revisar los detalles de las obras, avisos y formulario para enviar tus dudas.',
     'promises' => [
         'informed_title' => 'Mantenerse al día',
         'informed_body' => 'Los avisos recientes y la información útil aparecen en primer plano.',
