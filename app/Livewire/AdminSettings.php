@@ -63,6 +63,7 @@ class AdminSettings extends Component
             'ownersWelcomeTextEs' => 'owners_welcome_text_es',
             'ownersTermsTextEu' => 'owners_terms_text_eu',
             'ownersTermsTextEs' => 'owners_terms_text_es',
+            'ownersSendWelcomeMail' => 'owners_send_welcome_mail',
         ],
         Setting::SECTION_VOTE_DELEGATE => [
             'voteDelegateTermsTextEu' => 'vote_delegate_terms_text_eu',
@@ -155,6 +156,8 @@ class AdminSettings extends Component
 
     public string $ownersTermsTextEs = '';
 
+    public bool $ownersSendWelcomeMail = true;
+
     public string $voteDelegateTermsTextEu = '';
 
     public string $voteDelegateTermsTextEs = '';
@@ -234,6 +237,7 @@ class AdminSettings extends Component
         $this->ownersWelcomeSubjectEs = $settings['owners_welcome_subject_es'] ?? '';
         $this->ownersTermsTextEu = $settings['owners_terms_text_eu'] ?? '';
         $this->ownersTermsTextEs = $settings['owners_terms_text_es'] ?? '';
+        $this->ownersSendWelcomeMail = (bool) ($settings['owners_send_welcome_mail'] ?? '1');
         $this->voteDelegateTermsTextEu = $settings['vote_delegate_terms_text_eu'] ?? '';
         $this->voteDelegateTermsTextEs = $settings['vote_delegate_terms_text_es'] ?? '';
         $this->votingsPdfDelegatedTextEu = $settings['votings_pdf_delegated_text_eu'] ?? '';

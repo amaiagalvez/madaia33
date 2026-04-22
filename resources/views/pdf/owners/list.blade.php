@@ -95,6 +95,12 @@
             margin-left: 4px;
             font-weight: 700;
         }
+
+        .validation-check {
+            margin-left: 4px;
+            font-weight: 700;
+            color: #16a34a;
+        }
     </style>
 </head>
 
@@ -129,22 +135,26 @@
         <tbody>
             @forelse ($owners as $owner)
                 @php
-                    $portals = $owner->assignments
+                    $visibleAssignments =
+                        ($filterStatus ?? 'active') === 'active'
+                            ? $owner->assignments->filter(fn($a) => $a->end_date === null)
+                            : $owner->assignments;
+                    $portals = $visibleAssignments
                         ->filter(
                             fn($assignment) => $assignment->property?->location?->type === 'portal',
                         )
                         ->values();
-                    $locals = $owner->assignments
+                    $locals = $visibleAssignments
                         ->filter(
                             fn($assignment) => $assignment->property?->location?->type === 'local',
                         )
                         ->values();
-                    $garages = $owner->assignments
+                    $garages = $visibleAssignments
                         ->filter(
                             fn($assignment) => $assignment->property?->location?->type === 'garage',
                         )
                         ->values();
-                    $storages = $owner->assignments
+                    $storages = $visibleAssignments
                         ->filter(
                             fn($assignment) => $assignment->property?->location?->type ===
                                 'storage',
@@ -205,31 +215,26 @@
                                 <div class="line">
                                     <strong>
                                         @php
-                                            $propertyCode =
-                                                (string) ($assignment->property->code ??
-                                                    ($assignment->property->name ?? ''));
                                             $propertyName =
                                                 (string) ($assignment->property->name ?? '');
                                             $locationName =
                                                 (string) ($assignment->property->location->name ??
                                                     '');
                                             $propertyLabel = trim(
-                                                sprintf(
-                                                    '[%s] %s %s',
-                                                    $propertyCode,
-                                                    $locationName,
-                                                    $propertyName,
-                                                ),
+                                                sprintf('%s %s', $locationName, $propertyName),
                                                 ' ',
                                             );
                                         @endphp
                                         {{ $propertyLabel }}
+                                        @if ($assignment->admin_validated && $assignment->owner_validated)
+                                            <span class="validation-check">&#10003;</span>
+                                        @endif
                                     </strong>
                                     <br>
                                     <span class="nowrap">
-                                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 2, ',', '.') . '%' : '-' }}
+                                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 4, ',', '.') . '%' : '-' }}
                                         |
-                                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 4, ',', '.') . '%' : '-' }}
                                     </span>
                                 </div>
                             @empty

@@ -329,6 +329,16 @@ class Votings extends Component
         $this->redirectToPdf('admin.votings.pdf.results');
     }
 
+    public function downloadDelegatedPdfSequential(): void
+    {
+        $this->redirectToPdf('admin.votings.pdf.delegated_sequential');
+    }
+
+    public function downloadInPersonPdfSequential(): void
+    {
+        $this->redirectToPdf('admin.votings.pdf.in_person_sequential');
+    }
+
     /**
      * @param  array<int, string>  $pageIds
      */
@@ -572,7 +582,7 @@ class Votings extends Component
         $votings = $this->votingsQueryForCurrentUser()
             ->with(['locations.location'])
             ->withCount('ballots')
-            ->orderByDesc('starts_at')
+            ->orderedByStartAndName()
             ->paginate(10);
 
         $censusCounts = $this->censusCalculator->calculate($votings);

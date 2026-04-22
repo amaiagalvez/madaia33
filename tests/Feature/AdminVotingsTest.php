@@ -47,6 +47,26 @@ it('redirects admin pdf download with selected voting ids', function () {
         ->assertRedirect(route('admin.votings.pdf.delegated', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
 });
 
+it('redirects admin sequential pdf downloads with selected voting ids', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    $firstVoting = Voting::factory()->current()->create();
+    $secondVoting = Voting::factory()->current()->create();
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->set('selectedVotingIds', [(string) $firstVoting->id, (string) $secondVoting->id])
+        ->call('downloadDelegatedPdfSequential')
+        ->assertRedirect(route('admin.votings.pdf.delegated_sequential', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->set('selectedVotingIds', [(string) $firstVoting->id, (string) $secondVoting->id])
+        ->call('downloadInPersonPdfSequential')
+        ->assertRedirect(route('admin.votings.pdf.in_person_sequential', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
+});
+
 it('redirects admin results pdf download with selected voting ids', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::SUPER_ADMIN);
@@ -59,6 +79,37 @@ it('redirects admin results pdf download with selected voting ids', function () 
         ->set('selectedVotingIds', [(string) $firstVoting->id, (string) $secondVoting->id])
         ->call('downloadResultsPdf')
         ->assertRedirect(route('admin.votings.pdf.results', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
+});
+
+it('orders admin votings by start date and name', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    Voting::factory()->create([
+        'name_eu' => 'Zeta bozketa',
+        'starts_at' => '2026-05-01',
+        'ends_at' => '2026-05-10',
+    ]);
+
+    Voting::factory()->create([
+        'name_eu' => 'Alfa bozketa',
+        'starts_at' => '2026-05-01',
+        'ends_at' => '2026-05-10',
+    ]);
+
+    Voting::factory()->create([
+        'name_eu' => 'Beta bozketa',
+        'starts_at' => '2026-06-01',
+        'ends_at' => '2026-06-10',
+    ]);
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->assertSeeInOrder([
+            'Alfa bozketa',
+            'Zeta bozketa',
+            'Beta bozketa',
+        ]);
 });
 
 it('shows an error when downloading admin pdf without selecting votings', function () {
@@ -473,8 +524,8 @@ it('filters delegated vote modal by owner and location search terms', function (
         ->call('openDelegatedVoteModal')
         ->assertSee('Ane Koop1')
         ->assertSee('Bea Koop1')
-        ->assertSee('1,25%')
-        ->assertSee('2,50%')
+        ->assertSee('1,2500%')
+        ->assertSee('2,5000%')
         ->set('delegatedSearch', 'P-301')
         ->assertSee('Ane Koop1')
         ->assertDontSee('Bea Koop1')
@@ -487,8 +538,8 @@ it('filters delegated vote modal by owner and location search terms', function (
         ->call('openInPersonVoteModal')
         ->assertSee('Ane Koop1')
         ->assertSee('Bea Koop1')
-        ->assertSee('1,25%')
-        ->assertSee('2,50%');
+        ->assertSee('1,2500%')
+        ->assertSee('2,5000%');
 });
 
 it('starts delegated vote and redirects to public votings route', function () {

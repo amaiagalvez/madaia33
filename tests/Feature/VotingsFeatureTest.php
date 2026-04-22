@@ -29,6 +29,37 @@ it('requires authentication to access public votings page', function () {
         ->assertRedirect(route('login'));
 });
 
+it('shows front pdf download buttons only for superadmin', function () {
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+    ]);
+
+    VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $superadmin = User::factory()->create();
+    $superadmin->assignRole(Role::SUPER_ADMIN);
+
+    test()->actingAs($superadmin)
+        ->get(route('votings.eu'))
+        ->assertSuccessful()
+        ->assertSeeHtml('data-votings-pdf-actions')
+        ->assertSeeHtml('data-front-download-delegated-pdf')
+        ->assertSeeHtml('data-front-download-in-person-pdf');
+
+    $generalAdmin = User::factory()->create();
+    $generalAdmin->assignRole(Role::GENERAL_ADMIN);
+
+    test()->actingAs($generalAdmin)
+        ->get(route('votings.eu'))
+        ->assertSuccessful()
+        ->assertDontSeeHtml('data-votings-pdf-actions')
+        ->assertDontSeeHtml('data-front-download-delegated-pdf')
+        ->assertDontSeeHtml('data-front-download-in-person-pdf');
+});
+
 it('shows terms blocking modal in front votings when owner has not accepted terms', function () {
     $owner = Owner::factory()->create([
         'accepted_terms_at' => null,

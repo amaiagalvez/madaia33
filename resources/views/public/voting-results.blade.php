@@ -103,7 +103,7 @@
                                 class="mb-1 flex items-center justify-between text-xs text-gray-700">
                                 <span>{{ __('votings.admin.chart_eligible_pct_total') }}</span>
                                 <span
-                                    data-participation-eligible-pct>{{ number_format($participationEligiblePct, 2, ',', '.') }}%</span>
+                                    data-participation-eligible-pct>{{ number_format($participationEligiblePct, 4, ',', '.') }}%</span>
                             </div>
                             <div class="h-2 rounded-full bg-gray-100">
                                 <div class="h-2 rounded-full" data-participation-eligible-pct-bar
@@ -116,7 +116,7 @@
                                 class="mb-1 flex items-center justify-between text-xs text-gray-700">
                                 <span>{{ __('votings.admin.chart_voted_pct_total') }}</span>
                                 <span
-                                    data-participation-voted-pct>{{ number_format($participationVotedPct, 2, ',', '.') }}%</span>
+                                    data-participation-voted-pct>{{ number_format($participationVotedPct, 4, ',', '.') }}%</span>
                             </div>
                             <div class="h-2 rounded-full bg-gray-100">
                                 <div class="h-2 rounded-full" data-participation-voted-pct-bar
@@ -163,7 +163,7 @@
                                     class="mb-1 flex items-center justify-between text-xs text-gray-700">
                                     <span>{{ $series['label'] }}</span>
                                     <span
-                                        data-option-pct-chart-value="{{ $series['id'] }}">{{ number_format((float) $series['value'], 2, ',', '.') }}%</span>
+                                        data-option-pct-chart-value="{{ $series['id'] }}">{{ number_format((float) $series['value'], 4, ',', '.') }}%</span>
                                 </div>
                                 <div class="h-2 rounded-full bg-gray-100">
                                     <div class="h-2 rounded-full"

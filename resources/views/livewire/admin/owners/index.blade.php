@@ -400,17 +400,21 @@
                         </div>
                     </td>
                     @php
+                        $visibleAssignments =
+                            $filterStatus === 'active'
+                                ? $owner->assignments->filter(fn($a) => $a->end_date === null)
+                                : $owner->assignments;
                         $assignmentGroups = [
-                            'portal' => $owner->assignments->filter(
+                            'portal' => $visibleAssignments->filter(
                                 fn($a) => $a->property->location->type === 'portal',
                             ),
-                            'garage' => $owner->assignments->filter(
+                            'garage' => $visibleAssignments->filter(
                                 fn($a) => $a->property->location->type === 'garage',
                             ),
-                            'storage' => $owner->assignments->filter(
+                            'storage' => $visibleAssignments->filter(
                                 fn($a) => $a->property->location->type === 'storage',
                             ),
-                            'local' => $owner->assignments->filter(
+                            'local' => $visibleAssignments->filter(
                                 fn($a) => $a->property->location->type === 'local',
                             ),
                         ];
@@ -420,17 +424,16 @@
                             data-owner-assignment-type="{{ $assignmentType }}">
                             @forelse ($assignments as $a)
                                 <span data-owner-assignment-line
-                                    class="{{ $a->admin_validated && $a->owner_validated ? 'text-green-600' : 'text-red-500' }}">
-                                    [{{ $a->property->displayCode() }}]
+                                    class="{{ $a->end_date !== null ? 'text-gray-400 line-through' : ($a->admin_validated && $a->owner_validated ? 'text-green-600' : 'text-red-500') }}">
                                     <span class="font-semibold">
                                         {{ $a->property->location->name }}
                                         {{ $a->property->name }}
                                     </span>
                                     <br>
                                     <span class="text-xs">
-                                        {{ $a->property->location_pct !== null ? number_format((float) $a->property->location_pct, 2, ',', '.') . '%' : '-' }}
+                                        {{ $a->property->location_pct !== null ? number_format((float) $a->property->location_pct, 4, ',', '.') . '%' : '-' }}
                                         |
-                                        {{ $a->property->community_pct !== null ? number_format((float) $a->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                                        {{ $a->property->community_pct !== null ? number_format((float) $a->property->community_pct, 4, ',', '.') . '%' : '-' }}
                                     </span>
                                 </span>
                                 @if (!$loop->last)
@@ -535,10 +538,10 @@
                         </div>
                     </td>
                     <td class="px-3 py-3 text-sm text-gray-600">
-                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 2, ',', '.') . '%' : '-' }}
+                        {{ $assignment->property->community_pct !== null ? number_format((float) $assignment->property->community_pct, 4, ',', '.') . '%' : '-' }}
                     </td>
                     <td class="px-3 py-3 text-sm text-gray-600">
-                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 2, ',', '.') . '%' : '-' }}
+                        {{ $assignment->property->location_pct !== null ? number_format((float) $assignment->property->location_pct, 4, ',', '.') . '%' : '-' }}
                     </td>
                     <td class="px-3 py-3">
                         <x-admin.form-date-input :label="__('admin.owners.start_date')" :model="'assignmentEdits.' . $assignment->id . '.start_date'"

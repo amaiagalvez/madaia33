@@ -43,6 +43,18 @@
                 {{ __('votings.admin.download_in_person_pdf') }}
             </button>
 
+            <button type="button" wire:click="downloadDelegatedPdfSequential"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                data-action="download-delegated-vote-pdf-sequential">
+                {{ __('votings.admin.download_delegated_pdf_sequential') }}
+            </button>
+
+            <button type="button" wire:click="downloadInPersonPdfSequential"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
+                data-action="download-in-person-vote-pdf-sequential">
+                {{ __('votings.admin.download_in_person_pdf_sequential') }}
+            </button>
+
             <button type="button" wire:click="downloadResultsPdf"
                 class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#d9755b] focus:ring-offset-2"
                 data-action="download-voting-results-pdf">
@@ -422,7 +434,7 @@
                                     <td class="px-4 py-2 text-gray-600">
                                         {{ $row['properties'] ?? '—' }}</td>
                                     <td class="px-4 py-2 text-gray-600">
-                                        {{ number_format($row['percentage'], 2, ',', '.') }}%</td>
+                                        {{ number_format($row['percentage'], 4, ',', '.') }}%</td>
                                     @if ($ownersModalContext !== 'census' && !$ownersModalIsAnonymous)
                                         <td class="px-4 py-2 text-gray-600">
                                             {{ $row['vote'] ?: '—' }}

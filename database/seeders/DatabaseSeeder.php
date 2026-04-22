@@ -18,8 +18,6 @@ class DatabaseSeeder extends Seeder
 
         if (app()->isLocal()) {
             $this->call([
-                LocationSeeder::class,
-                PropertySeeder::class,
                 DevSeeder::class,
             ]);
         }

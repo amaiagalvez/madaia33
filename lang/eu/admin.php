@@ -93,6 +93,7 @@ return [
         'owners_terms_text' => 'Erabilera baldintzak (jabeak)',
         'owners_terms_text_eu' => 'Baldintzak (EU)',
         'owners_terms_text_es' => 'Baldintzak (ES)',
+        'owners_send_welcome_mail' => 'Ongi etorri emaila bidali jabe berria sortzean edo jabetza esleitzean',
         'vote_delegate_terms_text' => 'Erabilera baldintzak (boto delegatua)',
         'vote_delegate_terms_text_eu' => 'Baldintzak (EU)',
         'vote_delegate_terms_text_es' => 'Baldintzak (ES)',

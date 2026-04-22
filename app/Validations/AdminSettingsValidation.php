@@ -136,6 +136,7 @@ class AdminSettingsValidation
             'ownersWelcomeTextEs' => self::richTextRule(5000),
             'ownersTermsTextEu' => self::richTextRule(5000),
             'ownersTermsTextEs' => self::richTextRule(5000),
+            'ownersSendWelcomeMail' => ['boolean'],
         ];
     }
 

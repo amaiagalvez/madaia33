@@ -45,8 +45,7 @@ class DevSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             LocationSeeder::class,
-            DirectMessagesCampaignSeeder::class,
-            CampaignTemplateSeeder::class,
+            PropertySeeder::class,
         ]);
 
         $this->seedMailhogSettings();

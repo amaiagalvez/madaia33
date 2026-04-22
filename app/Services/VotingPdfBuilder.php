@@ -132,7 +132,7 @@ class VotingPdfBuilder
         }
 
         return $votingQuery
-            ->orderBy('starts_at')
+            ->orderedByStartAndName()
             ->get()
             ->map(fn (Voting $voting): array => $this->mapVotingForDocument($voting))
             ->values()

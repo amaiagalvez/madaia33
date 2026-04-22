@@ -485,8 +485,8 @@ it('uses shared styling components in owners inline assignments panel', function
         ->assertSeeHtml('data-admin-date-input')
         ->assertSee('33-Z')
         ->assertSee('5A')
-        ->assertSee('1,25%')
-        ->assertSee('2,50%');
+        ->assertSee('1,2500%')
+        ->assertSee('2,5000%');
 });
 
 it('filters owners by text search across owner record fields', function () {
@@ -744,6 +744,60 @@ it('shows owners without active properties when using without-properties filter'
         ->assertSee('Jabe Itxia')
         ->assertSee('Jabetzarik Gabe')
         ->assertDontSee('Jabe Aktiboa');
+});
+
+it('hides inactive assignments when active owners filter is applied', function () {
+    $user = adminUser();
+
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-F']);
+    $activeProperty = Property::factory()->create(['location_id' => $portal->id, 'name' => 'ACT-1']);
+    $closedProperty = Property::factory()->create(['location_id' => $portal->id, 'name' => 'CLO-1']);
+
+    $owner = Owner::factory()->create(['coprop1_name' => 'Jabe Mistoa']);
+
+    PropertyAssignment::factory()->create([
+        'property_id' => $activeProperty->id,
+        'owner_id' => $owner->id,
+        'end_date' => null,
+    ]);
+    PropertyAssignment::factory()->create([
+        'property_id' => $closedProperty->id,
+        'owner_id' => $owner->id,
+        'end_date' => now()->subMonth(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->assertSee('ACT-1')
+        ->assertDontSee('CLO-1');
+});
+
+it('shows inactive assignments when all owners filter is applied', function () {
+    $user = adminUser();
+
+    $portal = Location::factory()->portal()->create(['name' => 'Portal 33-G']);
+    $activeProperty = Property::factory()->create(['location_id' => $portal->id, 'name' => 'ACT-2']);
+    $closedProperty = Property::factory()->create(['location_id' => $portal->id, 'name' => 'CLO-2']);
+
+    $owner = Owner::factory()->create(['coprop1_name' => 'Jabe Mistoa G']);
+
+    PropertyAssignment::factory()->create([
+        'property_id' => $activeProperty->id,
+        'owner_id' => $owner->id,
+        'end_date' => null,
+    ]);
+    PropertyAssignment::factory()->create([
+        'property_id' => $closedProperty->id,
+        'owner_id' => $owner->id,
+        'end_date' => now()->subMonth(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->set('filterStatus', 'all')
+        ->assertSee('ACT-2')
+        ->assertSee('CLO-2')
+        ->assertSee('line-through', false);
 });
 
 it('shows only properties without active owners in owner property selectors', function () {
@@ -1023,22 +1077,22 @@ it('shows assignment percentages in owner property-type columns with validation 
         ->test(Owners::class)
         ->set('filterStatus', 'all')
         ->set('filterSearch', 'Owner Percentages')
-        ->assertSee('[P-2]')
+        ->assertDontSee('[P-2]')
         ->assertSee('P-2')
-        ->assertSee('21,75%')
-        ->assertSee('11,50%')
-        ->assertSee('[G-2]')
+        ->assertSee('21,7500%')
+        ->assertSee('11,5000%')
+        ->assertDontSee('[G-2]')
         ->assertSee('G-2')
-        ->assertSee('7,50%')
-        ->assertSee('6,25%')
-        ->assertSee('[S-2]')
+        ->assertSee('7,5000%')
+        ->assertSee('6,2500%')
+        ->assertDontSee('[S-2]')
         ->assertSee('S-2')
-        ->assertSee('3,00%')
-        ->assertSee('2,00%')
-        ->assertSee('[L-2]')
+        ->assertSee('3,0000%')
+        ->assertSee('2,0000%')
+        ->assertDontSee('[L-2]')
         ->assertSee('L-2')
-        ->assertSee('41,00%')
-        ->assertSee('31,00%')
+        ->assertSee('41,0000%')
+        ->assertSee('31,0000%')
         ->assertSeeInOrder([
             __('admin.owners.columns.portals'),
             __('admin.owners.columns.garages'),

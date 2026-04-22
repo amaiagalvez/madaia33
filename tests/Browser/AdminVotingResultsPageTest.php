@@ -98,7 +98,7 @@ test('admin voting list shows per-row results button and opens voting results pa
             ->assertPresent('[data-total-voted-owners]')
             ->assertPresent('[data-total-owner-percentage]')
             ->assertSeeIn('[data-total-voted-owners]', '1')
-            ->assertSee('12,50%')
+            ->assertSee('12,5000%')
             ->assertPresent('[data-results-charts]')
             ->assertPresent('[data-chart-participation-owners]')
             ->assertPresent('[data-chart-participation-percentage]')
@@ -114,7 +114,7 @@ test('admin voting list shows per-row results button and opens voting results pa
             ->assertPresent('[data-votes-count-mismatch="0"]')
             ->assertPresent('[data-pct-total-mismatch="0"]')
             ->assertSeeIn('[data-votes-count-value="' . $option->id . '"]', '1')
-            ->assertSeeIn('[data-pct-total-value="' . $option->id . '"]', '12,50');
+            ->assertSeeIn('[data-pct-total-value="' . $option->id . '"]', '12,5000');
     });
 });
 
@@ -198,6 +198,6 @@ test('anonymous voting shows votes_count in GUZTIRA option totals row', function
             ->assertPresent('[data-total-option-votes-count="' . $option->id . '"]')
             ->assertSeeIn('[data-total-option-votes-count="' . $option->id . '"]', '1')
             ->assertPresent('[data-total-option-percentage="' . $option->id . '"]')
-            ->assertSeeIn('[data-total-option-percentage="' . $option->id . '"]', '8,75%');
+            ->assertSeeIn('[data-total-option-percentage="' . $option->id . '"]', '8,7500%');
     });
 });

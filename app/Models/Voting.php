@@ -108,6 +108,17 @@ class Voting extends Model
             ->where('is_published', true);
     }
 
+    /**
+     * @param  Builder<Voting>  $query
+     * @return Builder<Voting>
+     */
+    public function scopeOrderedByStartAndName(Builder $query): Builder
+    {
+        return $query
+            ->orderBy('starts_at')
+            ->orderBy('name_eu');
+    }
+
     public function isOpen(): bool
     {
         if (blank($this->starts_at) || blank($this->ends_at)) {

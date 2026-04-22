@@ -7,9 +7,11 @@ use App\Models\Location;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\PropertyAssignment;
 use Illuminate\Support\Collection;
 use App\Support\AdminOwnersFilters;
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class OwnersPdfController extends Controller
@@ -26,18 +28,11 @@ class OwnersPdfController extends Controller
             'ownershipView' => (string) $request->query('ownership_view', 'default'),
         ];
 
-        $query = Owner::query()->with([
-            'user',
-            'activeAssignments.property.location',
-            'assignments.property.location',
-        ]);
-
-        AdminOwnersFilters::apply($query, $filters);
-
-        $owners = $query->orderBy('id')->get();
+        $owners = $this->buildOwnersQuery($filters)->get();
 
         $pdf = Pdf::loadView('pdf.owners.list', [
             'owners' => $owners,
+            'filterStatus' => $filters['status'],
             'appliedFilters' => $this->buildAppliedFilters($filters),
         ])->setPaper('a4', 'landscape');
 
@@ -57,6 +52,52 @@ class OwnersPdfController extends Controller
             $filename,
             ['Content-Type' => 'application/pdf']
         );
+    }
+
+    /**
+     * @param  array{status: string, portal: string, local: string, garage: string, storage: string, search: string, ownershipView: string}  $filters
+     * @return Builder<Owner>
+     */
+    private function buildOwnersQuery(array $filters): Builder
+    {
+        $query = Owner::query()->with([
+            'user',
+            'activeAssignments.property.location',
+            'assignments.property.location',
+        ]);
+
+        $query->addSelect([
+            'portal_location_sort' => PropertyAssignment::query()
+                ->select('locations.name')
+                ->join('properties', 'properties.id', '=', 'property_assignments.property_id')
+                ->join('locations', 'locations.id', '=', 'properties.location_id')
+                ->whereColumn('property_assignments.owner_id', 'owners.id')
+                ->where('locations.type', 'portal')
+                ->whereNull('property_assignments.end_date')
+                ->orderBy('locations.name')
+                ->orderBy('properties.code')
+                ->orderBy('properties.name')
+                ->limit(1),
+            'portal_property_sort' => PropertyAssignment::query()
+                ->selectRaw('COALESCE(properties.code, properties.name)')
+                ->join('properties', 'properties.id', '=', 'property_assignments.property_id')
+                ->join('locations', 'locations.id', '=', 'properties.location_id')
+                ->whereColumn('property_assignments.owner_id', 'owners.id')
+                ->where('locations.type', 'portal')
+                ->whereNull('property_assignments.end_date')
+                ->orderBy('locations.name')
+                ->orderBy('properties.code')
+                ->orderBy('properties.name')
+                ->limit(1),
+        ]);
+
+        AdminOwnersFilters::apply($query, $filters);
+
+        return $query
+            ->orderByRaw('portal_location_sort IS NULL ASC')
+            ->orderBy('portal_location_sort')
+            ->orderBy('portal_property_sort')
+            ->orderBy('owners.id');
     }
 
     /**

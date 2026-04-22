@@ -37,6 +37,30 @@ class VotingPdfController extends Controller
         );
     }
 
+    public function adminDelegatedSequential(Request $request, VotingPdfBuilder $builder): StreamedResponse
+    {
+        $this->ensureAdminAccess($request->user());
+
+        return $this->downloadPdf(
+            $builder,
+            'delegated_sequential',
+            $request->user(),
+            $this->selectedVotingIdsFromRequest($request)
+        );
+    }
+
+    public function adminInPersonSequential(Request $request, VotingPdfBuilder $builder): StreamedResponse
+    {
+        $this->ensureAdminAccess($request->user());
+
+        return $this->downloadPdf(
+            $builder,
+            'in_person_sequential',
+            $request->user(),
+            $this->selectedVotingIdsFromRequest($request)
+        );
+    }
+
     public function adminResults(Request $request, VotingPdfBuilder $builder): StreamedResponse
     {
         $this->ensureAdminAccess($request->user());
@@ -78,11 +102,12 @@ class VotingPdfController extends Controller
         ?User $user,
         array $selectedVotingIds = []
     ): StreamedResponse {
-        $payload = $builder->build($type, $selectedVotingIds);
+        $isSequential = str_ends_with($type, '_sequential');
+        $baseType = $isSequential ? substr($type, 0, -strlen('_sequential')) : $type;
+        $view = $isSequential ? 'pdf.votings.ballot-sequential' : 'pdf.votings.ballot';
 
-        $pdf = Pdf::loadView('pdf.votings.ballot', $payload)
-            ->setPaper('a4');
-
+        $payload = $builder->build($baseType, $selectedVotingIds);
+        $pdf = Pdf::loadView($view, $payload)->setPaper('a4');
         $filename = $this->localizedFilename($type, $user);
 
         return response()->streamDownload(
@@ -118,6 +143,8 @@ class VotingPdfController extends Controller
         $locale = SupportedLocales::normalize($user->language);
         $translationKey = match ($type) {
             'in_person' => 'votings.pdf.filename_in_person',
+            'in_person_sequential' => 'votings.pdf.filename_in_person_sequential',
+            'delegated_sequential' => 'votings.pdf.filename_delegated_sequential',
             'results' => 'votings.pdf.filename_results',
             default => 'votings.pdf.filename_delegated',
         };
@@ -149,9 +176,9 @@ class VotingPdfController extends Controller
 
         abort_unless(
             $user->canVoteInVotings()
-                || $user->canUseDelegatedVoting()
-                || $user->isSuperadmin()
-                || $user->hasAnyRole([Role::GENERAL_ADMIN, Role::COMMUNITY_ADMIN]),
+            || $user->canUseDelegatedVoting()
+            || $user->isSuperadmin()
+            || $user->hasAnyRole([Role::GENERAL_ADMIN, Role::COMMUNITY_ADMIN]),
             403
         );
     }

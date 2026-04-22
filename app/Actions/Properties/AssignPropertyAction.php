@@ -3,6 +3,7 @@
 namespace App\Actions\Properties;
 
 use App\Models\Owner;
+use App\Models\Setting;
 use App\Models\Property;
 use App\Models\PropertyAssignment;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +59,9 @@ class AssignPropertyAction
 
             $owner->user()->update(['is_active' => true]);
 
-            $this->createOwnerAction->sendWelcomeMailToOwner($owner);
+            if ((bool) Setting::stringValue('owners_send_welcome_mail', '1')) {
+                $this->createOwnerAction->sendWelcomeMailToOwner($owner);
+            }
 
             return $assignment;
         });

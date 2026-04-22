@@ -107,6 +107,12 @@ Route::middleware(['auth', 'admin.panel'])->prefix('admin')->name('admin.')->gro
     Route::get('/bozketak/pdf/emaitzak', [VotingPdfController::class, 'adminResults'])
         ->middleware('role:superadmin,admin_general,admin_comunidad')
         ->name('votings.pdf.results');
+    Route::get('/bozketak/pdf/delegatua-1', [VotingPdfController::class, 'adminDelegatedSequential'])
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('votings.pdf.delegated_sequential');
+    Route::get('/bozketak/pdf/presentziala-1', [VotingPdfController::class, 'adminInPersonSequential'])
+        ->middleware('role:superadmin,admin_general,admin_comunidad')
+        ->name('votings.pdf.in_person_sequential');
     Route::get('/obras', fn () => view('admin.constructions'))
         ->middleware('role:superadmin,admin_general,construction_manager')
         ->name('constructions');
@@ -136,6 +142,7 @@ Route::middleware('auth')->post('/impostazioa/itzuli-nire-erabiltzailea', functi
     $impersonator = User::query()->findOrFail((int) $impersonatorUserId);
 
     Auth::login($impersonator);
+
     $request->session()->forget('impersonator_user_id');
 
     return redirect()->route('admin.users.index');

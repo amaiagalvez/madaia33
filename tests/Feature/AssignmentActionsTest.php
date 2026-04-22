@@ -84,6 +84,18 @@ describe('AssignPropertyAction', function () {
                 && str_contains($mail->bodyHtml, 'Hola');
         });
     });
+
+    it('does not send welcome mail when owners_send_welcome_mail setting is disabled', function () {
+        createSetting('owners_send_welcome_mail', '');
+
+        $property = Property::factory()->create();
+        $owner = Owner::factory()->create(['coprop1_email' => 'no.welcome.assign@example.com']);
+
+        $action = app(AssignPropertyAction::class);
+        $action->execute($property, $owner, '2026-06-01');
+
+        Mail::assertNothingSent();
+    });
 });
 
 describe('UnassignPropertyAction', function () {

@@ -40,7 +40,9 @@ class CreateOwnerAction
 
         $user->assignRole(Role::PROPERTY_OWNER);
 
-        $this->sendWelcomeMailToOwner($owner, $data);
+        if ((bool) Setting::stringValue('owners_send_welcome_mail', '1')) {
+            $this->sendWelcomeMailToOwner($owner, $data);
+        }
 
         return $owner;
     }
