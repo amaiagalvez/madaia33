@@ -47,6 +47,26 @@ it('redirects admin pdf download with selected voting ids', function () {
         ->assertRedirect(route('admin.votings.pdf.delegated', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
 });
 
+it('redirects admin sequential pdf downloads with selected voting ids', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    $firstVoting = Voting::factory()->current()->create();
+    $secondVoting = Voting::factory()->current()->create();
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->set('selectedVotingIds', [(string) $firstVoting->id, (string) $secondVoting->id])
+        ->call('downloadDelegatedPdfSequential')
+        ->assertRedirect(route('admin.votings.pdf.delegated_sequential', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->set('selectedVotingIds', [(string) $firstVoting->id, (string) $secondVoting->id])
+        ->call('downloadInPersonPdfSequential')
+        ->assertRedirect(route('admin.votings.pdf.in_person_sequential', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
+});
+
 it('redirects admin results pdf download with selected voting ids', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::SUPER_ADMIN);

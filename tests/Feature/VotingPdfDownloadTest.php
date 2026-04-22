@@ -24,6 +24,22 @@ it('allows admin users to download delegated and in-person voting pdfs from admi
         ->assertOk()
         ->assertHeader('content-type', 'application/pdf');
 
+    $delegatedSequentialResponse = test()->actingAs($user)
+        ->get(route('admin.votings.pdf.delegated_sequential'))
+        ->assertOk()
+        ->assertHeader('content-type', 'application/pdf');
+
+    expect((string) $delegatedSequentialResponse->headers->get('content-disposition'))
+        ->toMatch('/(delegad|delegatu).*1/i');
+
+    $inPersonSequentialResponse = test()->actingAs($user)
+        ->get(route('admin.votings.pdf.in_person_sequential'))
+        ->assertOk()
+        ->assertHeader('content-type', 'application/pdf');
+
+    expect((string) $inPersonSequentialResponse->headers->get('content-disposition'))
+        ->toMatch('/(presencial|presentziala).*1/i');
+
     test()->actingAs($user)
         ->get(route('admin.votings.pdf.results', ['voting_ids' => []]))
         ->assertOk()

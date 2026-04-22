@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Models\Voting;
 use Livewire\Component;
 use App\Models\Location;
-use Carbon\CarbonInterface;
 use App\Models\VotingOption;
 use Livewire\WithPagination;
 use App\Models\VotingLocation;
@@ -327,6 +326,16 @@ class Votings extends Component
     public function downloadResultsPdf(): void
     {
         $this->redirectToPdf('admin.votings.pdf.results');
+    }
+
+    public function downloadDelegatedPdfSequential(): void
+    {
+        $this->redirectToPdf('admin.votings.pdf.delegated_sequential');
+    }
+
+    public function downloadInPersonPdfSequential(): void
+    {
+        $this->redirectToPdf('admin.votings.pdf.in_person_sequential');
     }
 
     /**
