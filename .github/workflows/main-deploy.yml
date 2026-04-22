@@ -327,7 +327,7 @@ jobs:
                   printf "set cmd:fail-exit false; mkdir -p '%s'; set cmd:fail-exit true;\n" "$remote_target_dir" >> "$command_file"
                 fi
 
-                printf "put -o '%s' '%s';\n" "$remote_target_file" "$staged_file" >> "$command_file"
+                printf "put '%s' -o '%s';\n" "$staged_file" "$remote_target_file" >> "$command_file"
               done < <(find .deploy-sync/upload -type f | sort)
             fi
 
