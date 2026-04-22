@@ -193,7 +193,7 @@ test('authenticated owner sees votings explanation and pdf actions on local http
             ->waitFor('[data-page="votings"]')
             ->assertPresent('[data-votings-content]')
             ->assertPresent('[data-votings-explanation-card]')
-            ->assertPresent('[data-votings-pdf-actions]')
+            ->assertMissing('[data-votings-pdf-actions]')
             ->assertScript('return window.isSecureContext;', false);
     });
 });
