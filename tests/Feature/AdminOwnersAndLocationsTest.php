@@ -856,6 +856,21 @@ it('stores primary dni as null when admin owner edit sends empty dni', function 
     expect($owner->fresh()->coprop1_dni)->toBeNull();
 });
 
+it('loads empty primary email when admin opens owner edit form with empty email', function () {
+    $user = adminUser();
+
+    $owner = Owner::factory()->create([
+        'coprop1_name' => 'Owner Empty Email Admin',
+        'coprop1_email' => '',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Owners::class)
+        ->call('openEditOwnerForm', $owner->id)
+        ->assertSet('editCoprop1Email', '')
+        ->assertHasNoErrors();
+});
+
 it('sanitizes dni and phone fields when creating owner from admin list', function () {
     Mail::fake();
 
