@@ -425,7 +425,6 @@
                             @forelse ($assignments as $a)
                                 <span data-owner-assignment-line
                                     class="{{ $a->end_date !== null ? 'text-gray-400 line-through' : ($a->admin_validated && $a->owner_validated ? 'text-green-600' : 'text-red-500') }}">
-                                    [{{ $a->property->displayCode() }}]
                                     <span class="font-semibold">
                                         {{ $a->property->location->name }}
                                         {{ $a->property->name }}

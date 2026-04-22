@@ -215,21 +215,13 @@
                                 <div class="line">
                                     <strong>
                                         @php
-                                            $propertyCode =
-                                                (string) ($assignment->property->code ??
-                                                    ($assignment->property->name ?? ''));
                                             $propertyName =
                                                 (string) ($assignment->property->name ?? '');
                                             $locationName =
                                                 (string) ($assignment->property->location->name ??
                                                     '');
                                             $propertyLabel = trim(
-                                                sprintf(
-                                                    '[%s] %s %s',
-                                                    $propertyCode,
-                                                    $locationName,
-                                                    $propertyName,
-                                                ),
+                                                sprintf('%s %s', $locationName, $propertyName),
                                                 ' ',
                                             );
                                         @endphp
