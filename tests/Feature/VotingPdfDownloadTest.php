@@ -71,6 +71,47 @@ it('builds results payload with votes_count and pct_total totals', function () {
         ->and((float) $payload['votings'][0]['options'][1]['pct_total'])->toBe(7.25);
 });
 
+it('orders delegated and in-person pdf votings by start date and name', function () {
+    $latestVoting = Voting::factory()->create([
+        'name_eu' => 'Beta bozketa',
+        'starts_at' => '2026-06-01',
+        'ends_at' => '2026-06-10',
+    ]);
+
+    $sameDateSecondByName = Voting::factory()->create([
+        'name_eu' => 'Zeta bozketa',
+        'starts_at' => '2026-05-01',
+        'ends_at' => '2026-05-10',
+    ]);
+
+    $sameDateFirstByName = Voting::factory()->create([
+        'name_eu' => 'Alfa bozketa',
+        'starts_at' => '2026-05-01',
+        'ends_at' => '2026-05-10',
+    ]);
+
+    $selectedIds = [
+        $latestVoting->id,
+        $sameDateSecondByName->id,
+        $sameDateFirstByName->id,
+    ];
+
+    $builder = app(VotingPdfBuilder::class);
+
+    $delegatedPayload = $builder->build('delegated', $selectedIds);
+    $inPersonPayload = $builder->build('in_person', $selectedIds);
+
+    expect(array_column($delegatedPayload['votings'], 'name_eu'))->toBe([
+        'Alfa bozketa',
+        'Zeta bozketa',
+        'Beta bozketa',
+    ])->and(array_column($inPersonPayload['votings'], 'name_eu'))->toBe([
+        'Alfa bozketa',
+        'Zeta bozketa',
+        'Beta bozketa',
+    ]);
+});
+
 it('allows property owners to download delegated and in-person pdfs from localized front routes', function (string $locale) {
     $user = User::factory()->create([
         'language' => $locale,
@@ -80,11 +121,11 @@ it('allows property owners to download delegated and in-person pdfs from localiz
     Owner::factory()->create(['user_id' => $user->id]);
 
     $expectedDelegatedFilename = $locale === SupportedLocales::SPANISH
-    ? 'voto-delegado'
-    : 'boto-delegatua';
+        ? 'voto-delegado'
+        : 'boto-delegatua';
     $expectedInPersonFilename = $locale === SupportedLocales::SPANISH
-    ? 'voto-presencial'
-    : 'boto-presentziala';
+        ? 'voto-presencial'
+        : 'boto-presentziala';
 
     $delegatedResponse = test()->actingAs($user)
         ->get(route(SupportedLocales::routeName('votings.pdf.delegated', $locale)))

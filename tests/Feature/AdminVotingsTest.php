@@ -61,6 +61,37 @@ it('redirects admin results pdf download with selected voting ids', function () 
         ->assertRedirect(route('admin.votings.pdf.results', ['voting_ids' => [$firstVoting->id, $secondVoting->id]]));
 });
 
+it('orders admin votings by start date and name', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::SUPER_ADMIN);
+
+    Voting::factory()->create([
+        'name_eu' => 'Zeta bozketa',
+        'starts_at' => '2026-05-01',
+        'ends_at' => '2026-05-10',
+    ]);
+
+    Voting::factory()->create([
+        'name_eu' => 'Alfa bozketa',
+        'starts_at' => '2026-05-01',
+        'ends_at' => '2026-05-10',
+    ]);
+
+    Voting::factory()->create([
+        'name_eu' => 'Beta bozketa',
+        'starts_at' => '2026-06-01',
+        'ends_at' => '2026-06-10',
+    ]);
+
+    Livewire::actingAs($admin)
+        ->test(Votings::class)
+        ->assertSeeInOrder([
+            'Alfa bozketa',
+            'Zeta bozketa',
+            'Beta bozketa',
+        ]);
+});
+
 it('shows an error when downloading admin pdf without selecting votings', function () {
     $admin = User::factory()->create();
     $admin->assignRole(Role::SUPER_ADMIN);
