@@ -333,7 +333,7 @@ class Owners extends Component
         $this->editCoprop1HasWhatsapp = (bool) $owner->coprop1_has_whatsapp;
         $this->editCoprop1PhoneInvalid = (bool) $owner->coprop1_phone_invalid;
         $this->editCoprop1EmailInvalid = (bool) $owner->coprop1_email_invalid;
-        $this->editCoprop1Email = $owner->coprop1_email;
+        $this->editCoprop1Email = $owner->coprop1_email ?? '';
         $this->editLanguage = $owner->language ?? SupportedLocales::BASQUE;
         $this->editCoprop2Name = $owner->coprop2_name ?? '';
         $this->editCoprop2Surname = $owner->coprop2_surname ?? '';
