@@ -43,6 +43,7 @@ class DevSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            RoleSeeder::class,
             LocationSeeder::class,
             PropertySeeder::class,
         ]);
