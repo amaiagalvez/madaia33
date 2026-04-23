@@ -119,6 +119,7 @@
 
 - In this repo, if static analysis flags `Seeder::call(...)` class resolution inside `database/seeders`, use a fully-qualified seeder class string (e.g., `\\Database\\Seeders\\VotingSeeder::class`) to clear IDE warnings.
 - In this repo, `php artisan make:livewire ... --mfc` can scaffold into `resources/views/components/...` unexpectedly; verify the generated path against `config/livewire.php` before continuing and delete stray scaffold files immediately if they land in the wrong namespace.
+- In this repo, `owners.coprop1_email` is stored as NOT NULL/blank-string, but `users.email` should be normalized to `null` when absent; keep owner storage schema-compatible and normalize only the user-facing auth field, with a focused Feature sync test.
 - If `docker-compose` rejects boolean environment values in this repo, use `docker compose` (v2) for maintenance commands; for root-owned leftovers, run `docker compose run --rm --user root madaia33 chown ...` and then re-verify ownership with `ls -l`.
 - If an admin route allows access but the page still returns 403, verify the mounted Livewire component `mount()`/action guards match route middleware; route-level role checks and component-level checks can drift and block valid superadmin sessions.
 - When adding new variables used inside a DB::transaction closure, include them explicitly in the closure `use (...)`; otherwise runtime `Undefined variable` errors can pass static checks and break critical vote flows.
@@ -334,3 +335,4 @@
 - Si se elimina una columna de dominio (`locations.code`), no usar accessors temporales como parche; migra de forma real todos los usos a `name` (tests, Blade y servicios) y ajusta los assertions de contenido derivado (por ejemplo mails) al nuevo formato.
 - In GitHub Actions FTP deploy workflows, when a push finishes incremental resolution with all payload flags false (`has_uploads`, `has_deletions`, `sync_build_assets`) and `force_full_sync` is still false, force full sync and log flag values to avoid false no-op deploy skips.
 - In Livewire components with typed `string` properties, never assign nullable DB columns directly during form hydration (e.g., edit state); coalesce with `?? ''` and add a regression test for empty-email hydration to prevent PHP 8.4 `TypeError`.
+- In post-vote confirmation flows, guard recipient email with a trimmed non-empty check (not only null) and add a regression test asserting no mail and no campaign-recipient audit row when owner user email is missing.

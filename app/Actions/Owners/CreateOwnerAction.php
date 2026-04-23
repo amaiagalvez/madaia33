@@ -70,10 +70,11 @@ class CreateOwnerAction
     private function createUser(array $data): User
     {
         $code = User::generateUniqueCode();
+        $email = $this->normalizeUserEmail($data['coprop1_email'] ?? null);
 
         return User::create([
             'name' => $data['coprop1_name'],
-            'email' => $data['coprop1_email'],
+            'email' => $email,
             'code' => $code,
             'password' => $code,
             'is_active' => true,
@@ -86,6 +87,8 @@ class CreateOwnerAction
      */
     private function createOwner(User $user, array $data): Owner
     {
+        $email = $this->normalizeOwnerEmail($data['coprop1_email'] ?? null);
+
         $owner = new Owner([
             'user_id' => $user->id,
             'coprop1_name' => $data['coprop1_name'],
@@ -93,7 +96,7 @@ class CreateOwnerAction
             'coprop1_dni' => $data['coprop1_dni'],
             'coprop1_phone' => $data['coprop1_phone'] ?? null,
             'coprop1_has_whatsapp' => (bool) ($data['coprop1_has_whatsapp'] ?? false),
-            'coprop1_email' => $data['coprop1_email'],
+            'coprop1_email' => $email,
             'language' => $data['language'] ?? SupportedLocales::default(),
             'welcome' => false,
             'coprop2_name' => $data['coprop2_name'] ?? null,
@@ -107,6 +110,24 @@ class CreateOwnerAction
         $owner->save();
 
         return $owner;
+    }
+
+    private function normalizeUserEmail(mixed $value): ?string
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private function normalizeOwnerEmail(mixed $value): string
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return '';
+        }
+
+        return $value;
     }
 
     /**

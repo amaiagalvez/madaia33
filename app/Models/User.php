@@ -107,6 +107,7 @@ class User extends Authenticatable
     public function syncOwnerIdentity(): void
     {
         $owner = $this->owner;
+        $normalizedOwnerEmail = $this->email ?? '';
 
         if ($owner === null) {
             return;
@@ -119,8 +120,8 @@ class User extends Authenticatable
             $updated = true;
         }
 
-        if ($owner->coprop1_email !== $this->email) {
-            $owner->coprop1_email = $this->email;
+        if ($owner->coprop1_email !== $normalizedOwnerEmail) {
+            $owner->coprop1_email = $normalizedOwnerEmail;
             $updated = true;
         }
 
