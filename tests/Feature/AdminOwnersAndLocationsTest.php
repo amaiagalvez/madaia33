@@ -619,7 +619,9 @@ it('creates a new owner without email and does not send welcome email', function
     $owner = Owner::query()->where('coprop1_dni', '11223344Z')->first();
 
     expect($owner)->not->toBeNull();
-    expect($owner?->welcome)->toBeFalse();
+    expect($owner?->welcome)->toBeFalse()
+        ->and($owner?->coprop1_email)->toBe('')
+        ->and($owner?->user?->email)->toBeNull();
 
     Mail::assertNothingSent();
 });

@@ -186,7 +186,9 @@ class CastVotingBallotAction
     {
         $owner->loadMissing('user');
 
-        if ($owner->user?->email === null) {
+        $email = trim((string) ($owner->user?->email ?? ''));
+
+        if ($email === '') {
             return;
         }
 
@@ -198,13 +200,13 @@ class CastVotingBallotAction
 
             $recipient = $this->recordDirectMessageRecipientAction->execute(
                 owner: $owner,
-                contact: $owner->user->email,
+                contact: $email,
                 subject: ContactConfirmationSubject::forAudit($subject),
                 body: $body,
                 sentByUserId: Auth::id(),
             );
 
-            Mail::to($owner->user->email)->send(new VotingConfirmationMail(
+            Mail::to($email)->send(new VotingConfirmationMail(
                 $owner,
                 $voting,
                 null,

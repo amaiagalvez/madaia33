@@ -62,6 +62,44 @@ it('sends a confirmation email after a successful vote', function () {
         ->and($recipient?->tracking_token)->not->toBe('');
 });
 
+it('does not send confirmation message when owner email is missing', function () {
+    Mail::fake();
+
+    $owner = Owner::factory()->create();
+    $owner->user->update(['email' => null]);
+
+    $portal = Location::factory()->portal()->create(['name' => '44-B']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $voting = Voting::factory()->current()->create([
+        'is_published' => true,
+        'is_anonymous' => false,
+    ]);
+
+    $option = VotingOption::factory()->create([
+        'voting_id' => $voting->id,
+        'position' => 1,
+    ]);
+
+    $voting->locations()->create(['location_id' => $portal->id]);
+
+    $action = app(CastVotingBallotAction::class);
+    $action->execute($voting, $owner, $option->id, $owner->user->fresh(), CastVotingData::fromInputs());
+
+    Mail::assertNothingSent();
+
+    expect(CampaignRecipient::query()
+        ->where('campaign_id', 1)
+        ->where('owner_id', $owner->id)
+        ->exists())->toBeFalse();
+});
+
 it('rejects vote attempts when owner does not belong to the allowed locations', function () {
     Mail::fake();
 

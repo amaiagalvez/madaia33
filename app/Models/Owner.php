@@ -90,6 +90,7 @@ class Owner extends Model
     {
         static::saved(function (self $owner): void {
             $user = $owner->user;
+            $normalizedEmail = self::normalizeUserEmail($owner->coprop1_email);
 
             if ($user === null) {
                 return;
@@ -102,8 +103,8 @@ class Owner extends Model
                 $updated = true;
             }
 
-            if ($user->email !== $owner->coprop1_email) {
-                $user->email = $owner->coprop1_email;
+            if ($user->email !== $normalizedEmail) {
+                $user->email = $normalizedEmail;
                 $updated = true;
             }
 
@@ -116,6 +117,15 @@ class Owner extends Model
                 $user->saveQuietly();
             }
         });
+    }
+
+    private static function normalizeUserEmail(?string $value): ?string
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        return $value;
     }
 
     /**
