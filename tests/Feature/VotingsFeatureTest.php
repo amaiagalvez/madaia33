@@ -60,6 +60,53 @@ it('shows front pdf download buttons only for superadmin', function () {
         ->assertDontSeeHtml('data-front-download-in-person-pdf');
 });
 
+it('orders owner front votings by name when start date matches', function () {
+    $owner = Owner::factory()->create([
+        'accepted_terms_at' => now(),
+    ]);
+    $portal = Location::factory()->portal()->create(['name' => '33-ORD']);
+    $property = Property::factory()->create(['location_id' => $portal->id]);
+
+    PropertyAssignment::factory()->create([
+        'owner_id' => $owner->id,
+        'property_id' => $property->id,
+        'end_date' => null,
+    ]);
+
+    $startsAt = now()->startOfDay();
+    $endsAt = now()->addDay()->endOfDay();
+
+    $zVoting = Voting::factory()->create([
+        'is_published' => true,
+        'starts_at' => $startsAt,
+        'ends_at' => $endsAt,
+        'name_eu' => 'Zeta bozketa',
+        'name_es' => 'Zeta votacion',
+    ]);
+
+    $aVoting = Voting::factory()->create([
+        'is_published' => true,
+        'starts_at' => $startsAt,
+        'ends_at' => $endsAt,
+        'name_eu' => 'Alfa bozketa',
+        'name_es' => 'Alfa votacion',
+    ]);
+
+    foreach ([$zVoting, $aVoting] as $voting) {
+        VotingOption::factory()->create([
+            'voting_id' => $voting->id,
+            'position' => 1,
+        ]);
+
+        $voting->locations()->create(['location_id' => $portal->id]);
+    }
+
+    test()->actingAs($owner->user)
+        ->get(route('votings.eu'))
+        ->assertSuccessful()
+        ->assertSeeInOrder(['Alfa bozketa', 'Zeta bozketa']);
+});
+
 it('shows terms blocking modal in front votings when owner has not accepted terms', function () {
     $owner = Owner::factory()->create([
         'accepted_terms_at' => null,

@@ -1,5 +1,6 @@
 <?php
 
+use App\SupportedLocales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,15 +22,28 @@ $privatePageHandler = static function () {
     return view('public.private');
 };
 
+$passwordRequestHandler = static function (Request $request) {
+    if (Auth::check()) {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route($request->route()?->getName() ?? SupportedLocales::routeName('password.request'));
+    }
+
+    return view('pages::auth.forgot-password');
+};
+
 Route::get('/', fn () => redirect()->route('home.eu'))->name('root');
 
-Route::prefix('eu')->group(function () use ($privatePageHandler) {
+Route::prefix('eu')->group(function () use ($privatePageHandler, $passwordRequestHandler) {
     Route::get('/', [PublicHomeController::class, 'index'])->name('home.eu');
     Route::get('/iragarkiak', fn () => view('public.notices'))->name('notices.eu');
     Route::get('/argazki-bilduma', fn () => view('public.gallery'))->name('gallery.eu');
     Route::get('/harremana', fn () => view('public.contact'))->name('contact.eu');
     Route::get('/pribatua', $privatePageHandler)->name('private.eu');
-    Route::get('/pasahitza-ahaztu', fn () => view('pages::auth.forgot-password'))->name('password.request.eu');
+    Route::get('/pasahitza-ahaztu', $passwordRequestHandler)->name('password.request.eu');
     Route::get('/pasahitza-berrezarri/{token}', function (Request $request, string $token) {
         return view('pages::auth.reset-password', [
             'token' => $token,
@@ -53,13 +67,13 @@ Route::prefix('eu')->group(function () use ($privatePageHandler) {
     Route::post('/iragarkiak/{notice}/irakurria', [NoticeReadController::class, 'store'])->middleware('auth')->name('notices.read.eu');
 });
 
-Route::prefix('es')->group(function () use ($privatePageHandler) {
+Route::prefix('es')->group(function () use ($privatePageHandler, $passwordRequestHandler) {
     Route::get('/', [PublicHomeController::class, 'index'])->name('home.es');
     Route::get('/avisos', fn () => view('public.notices'))->name('notices.es');
     Route::get('/galeria', fn () => view('public.gallery'))->name('gallery.es');
     Route::get('/contacto', fn () => view('public.contact'))->name('contact.es');
     Route::get('/privado', $privatePageHandler)->name('private.es');
-    Route::get('/olvido-contrasena', fn () => view('pages::auth.forgot-password'))->name('password.request.es');
+    Route::get('/olvido-contrasena', $passwordRequestHandler)->name('password.request.es');
     Route::get('/restablecer-contrasena/{token}', function (Request $request, string $token) {
         return view('pages::auth.reset-password', [
             'token' => $token,

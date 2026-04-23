@@ -456,7 +456,7 @@ class PublicVotings extends Component
             $votings = Voting::query()
                 ->with(['options', 'locations.location', 'optionTotals.option'])
                 ->publishedOpen()
-                ->orderBy('starts_at')
+                ->orderedByStartAndName()
                 ->get();
 
             abort_if($votings->isEmpty(), 404);

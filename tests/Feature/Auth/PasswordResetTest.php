@@ -40,6 +40,21 @@ test('localized password request routes can be rendered', function (string $loca
         ->assertSee(__('admin.password_reset.request_title'));
 })->with('supported_locales');
 
+test('authenticated users are logged out before viewing the localized password request screen', function (string $locale) {
+    $user = User::factory()->create();
+
+    test()->actingAs($user)
+        ->get(route(SupportedLocales::routeName('password.request', $locale)))
+        ->assertRedirect(route(SupportedLocales::routeName('password.request', $locale), absolute: false));
+
+    test()->assertGuest();
+
+    test()->get(route(SupportedLocales::routeName('password.request', $locale)))
+        ->assertOk()
+        ->assertSee('data-auth-shell', false)
+        ->assertSee(__('admin.password_reset.request_title'));
+})->with('supported_locales');
+
 test('password request screen exposes a specific meta description and decorative brand image', function () {
     $response = test()->get(route(SupportedLocales::routeName('password.request', SupportedLocales::SPANISH)));
 

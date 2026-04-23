@@ -110,7 +110,7 @@ class VotingEligibilityService
         return Voting::query()
             ->with(['options', 'locations.location', 'optionTotals.option'])
             ->publishedOpen()
-            ->orderBy('starts_at')
+            ->orderedByStartAndName()
             ->get()
             ->filter(fn (Voting $voting): bool => $this->ownerCanVote($voting, $owner));
     }
